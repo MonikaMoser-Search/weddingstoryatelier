@@ -20,7 +20,7 @@ const description = 'Hochzeitsplanung scheitert nicht an deinem Tempo, sondern a
   <article class="px-6 md:px-16 pt-32 pb-24 article-body">
     <div class="max-w-2xl mx-auto">
       <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
-        Journal · System
+        Journal · System · 13. Mai 2026
       </p>
       <h1 class="serif text-4xl md:text-6xl leading-[1.1] mb-10">
         Hochzeit organisieren ohne Chaos <em class="text-cognac">— das System gegen die zehn offenen Tabs</em>
@@ -146,6 +146,16 @@ const description = 'Hochzeitsplanung scheitert nicht an deinem Tempo, sondern a
       <p class="leading-relaxed mb-6">Hochzeitsplanung muss nicht stressig sein. Sie wird stressig, wenn Werkzeuge isoliert benutzt werden, wenn Informationen verstreut leben und wenn jedes Detail dreimal eingetragen wird. Wenn du das umdrehst — eine Datenquelle, koordinierte Werke, klare Reihenfolge — wird aus den zehn Tabs ein Atelier-Workflow.</p>
       <p class="leading-relaxed mb-6">Das <a href="/" class="cognac-link">Wedding Story Atelier</a> ist genau dafür gebaut. Schau dir die Werke an: jedes davon ist ein System-Baustein, kein isoliertes Produkt. Eingetippt einmal, lebendig in jedem Detail deiner Hochzeit.</p>
       <p class="serif text-xl italic text-ink-muted text-center mt-10">Eine Datenquelle. Viele Werke. Eine Geschichte.</p>
+
+      <aside class="atelier-signature">
+        <p class="atelier-signature-label">Aus dem Atelier</p>
+        <p class="atelier-signature-text">
+          Wedding Story Atelier — kleines Atelier in Leimen. Editorial-Hochzeitspapeterie als interaktive Live-Demos und druckfertige PDF-Vorlagen. Jedes Werk wird während der Entwicklung selbst gedruckt, bis Bildschirm-Vorschau und Papier-Realität deckungsgleich wirken.
+        </p>
+        <p class="atelier-signature-author">
+          <strong>Monika Moser</strong> &nbsp;·&nbsp; <a href="/journal" class="cognac-link">Weitere Notizen im Journal</a>
+        </p>
+      </aside>
     </div>
   </article>
 
@@ -239,4 +249,33 @@ const description = 'Hochzeitsplanung scheitert nicht an deinem Tempo, sondern a
     text-decoration: none;
   }
   .cognac-link:hover { color: var(--color-ink); }
+
+  .atelier-signature {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--color-sand);
+    text-align: center;
+  }
+  .atelier-signature-label {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 1rem;
+  }
+  .atelier-signature-text {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-ink-muted);
+    max-width: 36rem;
+    margin: 0 auto 1.25rem;
+    font-style: italic;
+  }
+  .atelier-signature-author {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    letter-spacing: 0.04em;
+  }
 </style>
