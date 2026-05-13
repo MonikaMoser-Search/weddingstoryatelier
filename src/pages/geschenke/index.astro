@@ -1,0 +1,104 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const geschenke = [
+  {
+    slug: 'allergenkarten',
+    title: 'Allergenkarten',
+    subtitle: '3 Karten für die Candy Bar',
+    description: 'Kleine Allergen-Hinweis-Karten für eure Süßigkeiten — direkt im Browser gestalten, sofort als PDF mitnehmen.',
+    context: 'Teil der Atelier-Welt für Menüs, Candy Bars & Hochzeitsdetails.',
+  },
+  {
+    slug: 'platzkarten',
+    title: 'Platzkarten',
+    subtitle: '6 Karten für eure Gäste',
+    description: 'Kleine Platzkarten für Standesamt, Probedinner oder die Brunch-Runde am Tag danach.',
+    context: 'Teil der Atelier-Welt für Tischdetails und kleine Anlässe.',
+  },
+  {
+    slug: 'gastgeschenk',
+    title: 'Gastgeschenk-Karten',
+    subtitle: '4 Karten mit persönlicher Anrede',
+    description: 'Mit zufälliger gemeinschaftsfördernder Aufgabe — als kleine Geste am Gedeck.',
+    context: 'Teil der Atelier-Welt für Gastgeschenke und stille Atelier-Momente.',
+  },
+];
+---
+
+<Layout
+  title="Geschenke aus dem Atelier — Wedding Story Atelier"
+  description="Kleine Atelier-Geschenke für eure Hochzeit — Allergenkarten, Platzkarten, Gastgeschenk-Karten. Direkt im Browser gestalten, sofort als PDF mitnehmen."
+>
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="px-8 md:px-16 pt-40 pb-16 text-center">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Aus dem Atelier
+    </p>
+    <h1 class="serif text-6xl md:text-8xl leading-none mb-10">
+      <em class="not-italic">Geschenke</em>
+    </h1>
+    <p class="serif text-xl md:text-2xl italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+      Kleine Atelier-Geschenke für eure Hochzeit. Direkt im Browser gestalten, sofort als druckfertiges PDF mitnehmen — ohne Anmeldung, ohne Konto, ohne Gegenleistung.
+    </p>
+  </section>
+
+  <!-- Grid -->
+  <section class="px-8 md:px-16 pb-24">
+    <div class="max-w-5xl mx-auto">
+      <div class="grid md:grid-cols-3 gap-12">
+        {geschenke.map((g) => (
+          <a href={`/geschenke/${g.slug}.html`} class="gift-card group block" target="_blank" rel="noopener">
+            <div class="aspect-[4/5] overflow-hidden bg-cream mb-6 flex items-center justify-center">
+              <span class="serif text-7xl text-cognac italic">{g.title.charAt(0)}</span>
+            </div>
+            <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-2">{g.subtitle}</p>
+            <h2 class="serif text-2xl mb-3 group-hover:text-cognac transition-colors">{g.title}</h2>
+            <p class="text-sm text-ink-muted leading-relaxed mb-4">{g.description}</p>
+            <p class="text-xs italic text-ink-muted leading-relaxed border-t border-sand pt-3">
+              {g.context}
+            </p>
+            <span class="inline-block mt-5 text-xs tracking-[0.2em] uppercase border-b border-ink pb-0.5 group-hover:border-cognac group-hover:text-cognac transition-colors">
+              Geschenk mitnehmen →
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Atelier-Hinweis -->
+  <section class="px-8 md:px-16 py-24 text-center border-t border-sand bg-cream">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Mehr aus dem Atelier
+    </p>
+    <p class="serif text-xl md:text-2xl italic max-w-2xl mx-auto leading-relaxed text-ink-muted mb-8">
+      Neben den Geschenken leben im Atelier die hochwertigen Werke — Wedding Magazine, Sitzplan, Einladungsset und mehr.
+    </p>
+    <a href="/" class="inline-block text-xs tracking-[0.2em] uppercase border-b border-ink pb-1 hover:border-cognac hover:text-cognac transition-colors">
+      Die Werke ansehen →
+    </a>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="google" content="notranslate">
+<title>Allergenkarten — Atelier-Geschenk · 3 Karten · Wedding Story Atelier</title>
+<meta name="description" content="3 Candy-Bar-Allergenkarten als Atelier-Geschenk als PDF — direkt im Browser gestalten, sofort drucken. Keine Anmeldung, keine E-Mail.">
+<link rel="stylesheet" href="/atelier/fonts.css">
+<link rel="stylesheet" href="/atelier/wsa_panel.css">
+<style>
+  :root {
+    --gruen-border: #7AAD62;
+    --gruen-frame:  #9FAF9A;
+    --gruen-outer:  #E2E7DF;
+    --gruen-bg:     #F0F6EB;
+    --gruen-text:   #4E7240;
+    --gelb-border:  #C4A262;
+    --gelb-frame:   #D4A373;
+    --gelb-outer:   #F2E6D0;
+    --gelb-bg:      #FAF4E6;
+    --gelb-text:    #8A6830;
+    --neu-border:   #A5A39C;
+    --neu-frame:    #B8B4AE;
+    --neu-outer:    #E8E5E1;
+    --neu-bg:       #F3F2EF;
+    --neu-text:     #5F5E5A;
+    --blau-border:  #6496C0;
+    --blau-frame:   #8FA6B8;
+    --blau-outer:   #E1E7ED;
+    --blau-bg:      #EBF3FA;
+    --blau-text:    #3C6890;
+    --wsa-dark:     #1C3A2E;
+    --wsa-gold:     #B89A5A;
+    --wsa-cream:    #FAF8F4;
+  }
+
+  body { font-family: 'Jost', sans-serif; background: var(--wsa-cream); color: #2C2C2A; min-height: 100vh; height: auto; overflow: auto; display: block; }
+
+  .site-header { background: var(--wsa-dark); padding: 14px 32px; display: flex; align-items: center; gap: 14px; }
+  .site-header .logo { font-family: 'Cormorant Garamond', serif; font-size: 19px; font-weight: 500; color: var(--wsa-gold); letter-spacing: 0.06em; }
+  .site-header .sep { color: var(--wsa-gold); opacity: 0.4; }
+  .site-header .subtitle { font-weight: 300; font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: #c8b98a; }
+
+  .app { display: grid; grid-template-columns: 400px 1fr; height: calc(100vh - 52px); }
+
+  .panel { background: white; border-right: 1px solid #e8e4dc; padding: 24px 22px; display: flex; flex-direction: column; gap: 16px; overflow-y: auto; }
+
+  .panel-titlerow { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .panel-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 500; color: var(--wsa-dark); }
+  .lang-switch { display: flex; border: 1.5px solid #ddd9d0; border-radius: 5px; overflow: hidden; flex-shrink: 0; }
+  .lang-btn { padding: 4px 13px; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.1em; background: white; color: #888780; border: none; cursor: pointer; transition: all 0.15s; }
+  .lang-btn.active { background: var(--wsa-dark); color: var(--wsa-gold); font-weight: 500; }
+  .lang-btn:not(.active):hover { background: #f4f1eb; }
+
+  .section-label { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #888780; margin-bottom: 6px; }
+
+  input[type="text"], #nameInput { width: 100%; font-family: 'Great Vibes', cursive; font-size: 22px; padding: 8px 11px 4px; border: 1px solid #ddd9d0; border-radius: 6px; background: #faf8f4; color: #2C2C2A; outline: none; transition: border-color 0.2s; line-height: 1.3; }
+  input[type="text"]:focus, #nameInput:focus { border-color: var(--gruen-border); }
+  input[type="text"]::placeholder, #nameInput::placeholder { font-family: 'Jost', sans-serif; font-size: 13px; color: #bbb; font-weight: 300; }
+  #nameInput { resize: none; min-height: 68px; }
+  .name-hint { font-size: 10px; color: #b8b5ae; font-weight: 300; margin-top: 5px; letter-spacing: 0.04em; }
+
+  .vorlagen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .vorlage-btn { padding: 8px 10px; border-radius: 5px; border: 1px solid #ddd9d0; background: #faf8f4; cursor: pointer; text-align: left; transition: all 0.15s; }
+  .vorlage-btn:hover { border-color: var(--wsa-gold); background: #fdf9f2; }
+  .vorlage-name { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 500; color: #2C2C2A; display: block; margin-bottom: 2px; }
+  .vorlage-meta { font-size: 10px; color: #888780; font-weight: 300; font-family: monospace; }
+  .vorlage-ls { font-size: 9px; font-weight: 400; letter-spacing: 0.08em; margin-top: 3px; display: inline-block; padding: 1px 5px; border-radius: 3px; border-width: 1px; border-style: solid; }
+  .vorlage-ls.gruen { background: var(--gruen-bg); color: var(--gruen-text); border-color: var(--gruen-border); }
+  .vorlage-ls.gelb  { background: var(--gelb-bg);  color: var(--gelb-text);  border-color: var(--gelb-border); }
+  .vorlage-hint { font-size: 10px; color: #aaa; font-weight: 300; font-style: italic; line-height: 1.5; }
+
+  .lifestyle-row { display: flex; gap: 8px; }
+  .ls-btn { flex: 1; padding: 8px 4px; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 5px; border: 1.5px solid #ddd9d0; background: white; color: #888780; cursor: pointer; transition: all 0.15s; }
+  .ls-btn.active-neutral { border-color: var(--neu-border);   background: var(--neu-bg);   color: #444441; }
+  .ls-btn.active-gruen   { border-color: var(--gruen-border); background: var(--gruen-bg); color: var(--gruen-text); }
+  .ls-btn.active-gelb    { border-color: var(--gelb-border);  background: var(--gelb-bg);  color: var(--gelb-text); }
+
+  .halal-row { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; border: 1.5px solid #ddd9d0; background: white; cursor: pointer; transition: all 0.15s; user-select: none; }
+  .halal-row:hover { border-color: var(--blau-border); background: var(--blau-bg); }
+  .halal-row.active { border-color: var(--blau-border); background: var(--blau-bg); }
+  .halal-check { width: 18px; height: 18px; border-radius: 4px; border: 1.5px solid #ddd9d0; background: white; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+  .halal-row.active .halal-check { background: var(--blau-border); border-color: var(--blau-border); }
+  .halal-check-mark { color: white; font-size: 11px; font-weight: 500; display: none; }
+  .halal-row.active .halal-check-mark { display: block; }
+  .halal-label-text { font-family: 'Jost', sans-serif; font-size: 12px; font-weight: 400; color: #444441; flex: 1; }
+  .halal-label-text span { font-size: 10px; color: #888780; font-weight: 300; display: block; margin-top: 1px; }
+  .halal-badge { font-size: 9px; font-weight: 400; letter-spacing: 0.1em; padding: 2px 7px; border-radius: 3px; background: var(--blau-bg); color: var(--blau-text); border: 1px solid var(--blau-border); }
+
+  .allergen-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+  .cb-item { display: flex; align-items: center; gap: 7px; cursor: pointer; padding: 3px 0; }
+  .cb-item input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--gruen-border); cursor: pointer; flex-shrink: 0; }
+  .cb-label { font-size: 12px; color: #2C2C2A; font-weight: 300; user-select: none; }
+  .cb-code  { font-size: 11px; font-weight: 400; color: #888780; margin-right: 3px; font-family: monospace; }
+
+  .add-btn { width: 100%; padding: 11px; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.16em; text-transform: uppercase; border-radius: 6px; border: 1.5px solid var(--wsa-dark); background: var(--wsa-dark); color: var(--wsa-gold); cursor: pointer; transition: background 0.15s; }
+  .add-btn:hover { background: #2a5242; }
+  .add-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+  .divider { border: none; border-top: 1px solid #ede9e0; }
+
+  .list-section-label { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #888780; margin-bottom: 8px; }
+  .card-list { display: flex; flex-direction: column; gap: 6px; }
+  .card-list-item { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px; border: 0.5px solid #e8e4dc; background: #faf8f4; }
+  .cli-info { flex: 1; min-width: 0; }
+  .cli-name { font-family: 'Cormorant Garamond', serif; font-size: 14px; color: #2C2C2A; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cli-meta { font-size: 10px; color: #888780; font-weight: 300; margin-top: 1px; }
+  .cli-badges { display: flex; gap: 4px; flex-shrink: 0; }
+  .cli-badge { font-size: 9px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border-width: 1px; border-style: solid; }
+  .badge-neutral { background: var(--neu-bg);   color: var(--neu-text);   border-color: var(--neu-border); }
+  .badge-gruen   { background: var(--gruen-bg); color: var(--gruen-text); border-color: var(--gruen-border); }
+  .badge-gelb    { background: var(--gelb-bg);  color: var(--gelb-text);  border-color: var(--gelb-border); }
+  .badge-halal   { background: var(--blau-bg);  color: var(--blau-text);  border-color: var(--blau-border); }
+  .del-btn { background: none; border: none; color: #bbb; cursor: pointer; font-size: 18px; line-height: 1; padding: 0 2px; flex-shrink: 0; transition: color 0.15s; }
+  .del-btn:hover { color: #A32D2D; }
+  .empty-hint { font-size: 12px; font-weight: 300; color: #bbb; padding: 8px 0; }
+  .hinweis { font-size: 11px; font-weight: 300; color: #aaa9a3; line-height: 1.6; border-top: 1px solid #ede9e0; padding-top: 14px; }
+
+  /* ── CTA-Block ───────────────────────────────────── */
+  .cta-block {
+    margin-top: auto;
+    border-top: 1px solid #ede9e0;
+    padding-top: 16px;
+    display: flex; flex-direction: column; gap: 9px;
+  }
+  .cta-tagline {
+    font-size: 11px; color: #888780; font-weight: 300;
+    line-height: 1.55; letter-spacing: 0.01em;
+  }
+  .cta-tagline strong { color: var(--wsa-dark); font-weight: 500; }
+  .cta-etsy {
+    display: flex; align-items: center; justify-content: center;
+    padding: 11px 12px; background: var(--wsa-gold); color: white;
+    font-family: 'Jost', sans-serif; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.16em; font-weight: 400;
+    text-decoration: none; border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .cta-etsy:hover { background: #a68845; }
+
+  .preview-area { padding: 24px 28px; background: #f0ece4; display: flex; flex-direction: column; gap: 14px; }
+  .preview-topbar { display: flex; align-items: center; justify-content: space-between; }
+  .preview-label { font-size: 10px; font-weight: 400; letter-spacing: 0.14em; text-transform: uppercase; color: #888780; }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .counter-pill { font-size: 12px; color: #888780; font-weight: 300; }
+  .demo-badge {
+    font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--wsa-gold); border: 1px solid var(--wsa-gold);
+    padding: 3px 9px; font-family: 'Jost', sans-serif; font-weight: 400;
+    border-radius: 3px;
+  }
+  .pdf-btn { font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 20px; border: 1.5px solid var(--wsa-dark); border-radius: 4px; background: var(--wsa-dark); color: var(--wsa-gold); cursor: pointer; transition: all 0.2s; }
+  .pdf-btn:hover { background: #2a5242; }
+  .pdf-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  /* Vorschau A4 */
+  .a4-sheet {
+    background: white; border: 1px solid #ddd9d0; border-radius: 6px; padding: 14px;
+    aspect-ratio: 297 / 210; display: grid;
+    grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr);
+    gap: 10px; max-width: calc((100vh - 128px) * 297 / 210); width: 100%;
+    box-shadow: 0 2px 14px rgba(0,0,0,0.07); container-type: size;
+  }
+
+  .card { border-radius: 0; display: flex; flex-direction: column; overflow: hidden; min-height: 0; background: #F7F5F2; container-type: size; margin: 3px; }
+  .card.neutral { background: var(--neu-outer);   padding: 18px; }
+  .card.gruen   { background: var(--gruen-outer); padding: 18px; }
+  .card.gelb    { background: var(--gelb-outer);  padding: 18px; }
+  .card-inner { flex: 1; display: flex; flex-direction: column; min-height: 0; border-radius: 6px; background: #F7F5F2; overflow: hidden; }
+  .card.neutral .card-inner { border: 2px solid var(--neu-frame); }
+  .card.gruen   .card-inner { border: 2px solid var(--gruen-frame); }
+  .card.gelb    .card-inner { border: 2px solid var(--gelb-frame); }
+  .card.halal   .card-inner { border: 2px solid var(--blau-frame); }
+
+  .card-header { display: flex; align-items: center; justify-content: center; padding: 5px 8px; border-bottom: 0.5px solid #C8C5BE; flex-shrink: 0; gap: 5px; background: transparent; }
+
+  .card-header-label { font-family: 'Jost', sans-serif; font-weight: 400; font-size: 7px; letter-spacing: 0.2em; text-transform: uppercase; }
+  .card.neutral .card-header-label { color: var(--neu-frame); }
+  .card.gruen   .card-header-label { color: var(--gruen-frame); }
+  .card.gelb    .card-header-label { color: var(--gelb-frame); }
+
+  .card-halal-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--blau-frame); flex-shrink: 0; display: none; }
+  .card.halal .card-halal-dot { display: block; }
+
+  .card-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; padding: 8px 12px 10px; min-height: 0; }
+
+  .card-name { font-family: 'Great Vibes', cursive; font-size: 15cqw; color: #2C2C2A; line-height: 1.25; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
+  .card-allergene { width: 100%; flex-shrink: 0; border-top: 0.5px solid #ddd9d0; padding-top: 4px; margin-top: 4px; }
+  .card-allergene-label { font-family: 'Jost', sans-serif; font-weight: 400; font-size: 2.8cqw; letter-spacing: 0.16em; text-transform: uppercase; color: #b0ada6; margin-bottom: 2px; }
+  .card-allergene-kuerzel { font-family: 'Jost', sans-serif; font-weight: 500; font-size: 4.5cqw; color: #2C2C2A; letter-spacing: 0.08em; line-height: 1.3; }
+
+  /* Demo: leere Slots zeigen einen sanften "+6 weitere"-Hinweis im mittleren Slot */
+  .card-empty { border: 1.5px dashed #ddd9d0; border-radius: 0; background: transparent; position: relative; }
+  .card-empty.hint-slot::after {
+    content: attr(data-hint);
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 13px; color: #c8c5be; text-align: center; padding: 12px;
+    line-height: 1.4;
+  }
+
+  #pdfCanvas {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    width: 1123px;
+    height: 794px;
+    background: white;
+    padding: 38px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  #pdfCanvas .card { border: none; border-radius: 0; display: flex; flex-direction: column; margin: 6px; }
+  #pdfCanvas .card.neutral { background: var(--neu-outer);   padding: 24px; }
+  #pdfCanvas .card.gruen   { background: var(--gruen-outer); padding: 24px; }
+  #pdfCanvas .card.gelb    { background: var(--gelb-outer);  padding: 24px; }
+  #pdfCanvas .card-inner { border-style: solid; border-width: 4px; border-radius: 6px; background: #F7F5F2; flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  #pdfCanvas .card.neutral .card-inner { border-color: var(--neu-frame); }
+  #pdfCanvas .card.gruen   .card-inner { border-color: var(--gruen-frame); }
+  #pdfCanvas .card.gelb    .card-inner { border-color: var(--gelb-frame); }
+  #pdfCanvas .card.halal   .card-inner { border-color: var(--blau-frame); }
+  #pdfCanvas .card-header { display: flex; align-items: center; justify-content: center; padding: 8px 10px; border-bottom: 0.5px solid #C8C5BE; flex-shrink: 0; gap: 5px; background: transparent; }
+  #pdfCanvas .card-header-label { font-family: 'Jost', sans-serif; font-weight: 400; font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; }
+  #pdfCanvas .card-halal-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blau-frame); flex-shrink: 0; display: none; }
+  #pdfCanvas .card.halal .card-halal-dot { display: block; }
+  #pdfCanvas .card-body { flex: 1; display: flex; flex-direction: column; justify-content: space-between; align-items: stretch; padding: 14px 18px 16px; }
+  #pdfCanvas .card-name { font-family: 'Great Vibes', cursive; font-size: 34px; color: #2C2C2A; line-height: 1.25; flex: 1; display: flex; align-items: center; justify-content: center; text-align: center; width: 100%; overflow: hidden; word-break: break-word; overflow-wrap: break-word; }
+  #pdfCanvas .card-allergene { width: 100%; flex-shrink: 0; border-top: 0.5px solid #ddd9d0; padding-top: 5px; margin-top: 6px; }
+  #pdfCanvas .card-allergene-label { font-family: 'Jost', sans-serif; font-weight: 400; font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: #b0ada6; margin-bottom: 3px; }
+  #pdfCanvas .card-allergene-kuerzel { font-family: 'Jost', sans-serif; font-weight: 500; font-size: 12px; color: #2C2C2A; letter-spacing: 0.08em; line-height: 1.3; }
+
+  /* Format selector */
+  .fmt-row { display: flex; gap: 6px; margin-bottom: 10px; }
+  .fmt-btn { flex: 1; padding: 8px 4px; font-family: 'Jost', sans-serif; font-size: 11px; font-weight: 400; letter-spacing: 0.08em; text-transform: uppercase; border-radius: 5px; border: 1.5px solid #ddd9d0; background: white; color: #888780; cursor: pointer; transition: all 0.15s; text-align: center; }
+  .fmt-btn.active { border-color: var(--wsa-dark); background: var(--wsa-dark); color: var(--wsa-gold); }
+  .fmt-btn:hover:not(.active) { border-color: #b0ada6; }
+
+  @media (max-width: 860px) {
+    .app { grid-template-columns: 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid #e8e4dc; }
+    .a4-sheet { max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="logo">Wedding Story Atelier</span>
+  <span class="sep">·</span>
+  <span class="subtitle" id="headerSubtitle">Allergenkarten — Atelier-Geschenk</span>
+</header>
+
+<div class="app">
+  <div class="panel">
+    <div class="panel-titlerow">
+      <div class="panel-title" id="panelTitle">3 Karten · Geschenk</div>
+      <div class="lang-switch">
+        <button class="lang-btn active" onclick="setLang('de')">DE</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label" id="labelVorlagen">Vorlagen — häufige Süßigkeiten</div>
+      <div class="vorlagen-grid" id="vorlagenGrid"></div>
+      <p class="vorlage-hint" id="vorlageHint" style="margin-top:8px;"></p>
+    </div>
+
+    <hr class="divider">
+
+    <div>
+      <div class="section-label" id="labelName">Name der Süßigkeit</div>
+      <textarea id="nameInput" autocomplete="off" rows="2"></textarea>
+      <p class="name-hint" id="nameHint"></p>
+    </div>
+
+    <div>
+      <div class="section-label" id="labelLifestyle">Lifestyle</div>
+      <div class="lifestyle-row">
+        <button class="ls-btn active-neutral" data-val="neutral" id="btnNeutral" onclick="setLifestyle(this)"></button>
+        <button class="ls-btn" data-val="gruen" id="btnVegetarisch" onclick="setLifestyle(this)"></button>
+        <button class="ls-btn" data-val="gelb" id="btnVegan" onclick="setLifestyle(this)"></button>
+      </div>
+    </div>
+
+    <div class="halal-row" id="halalRow" onclick="toggleHalal()">
+      <div class="halal-check"><span class="halal-check-mark">✓</span></div>
+      <div class="halal-label-text">Halal<span id="halalSubtext"></span></div>
+      <span class="halal-badge">Halal</span>
+    </div>
+
+    <div>
+      <div class="section-label" id="labelAllergene">Allergene (EU-Liste)</div>
+      <div class="allergen-grid" id="allergenGrid"></div>
+    </div>
+
+    <button class="add-btn" id="addBtn" onclick="addCard()"></button>
+
+    <hr class="divider">
+
+    <div>
+      <div class="list-section-label" id="labelListe">Angelegte Karten</div>
+      <div class="card-list" id="cardList"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div>
+      <div class="section-label" id="labelFormat">Papierformat</div>
+      <div class="fmt-row">
+        <button class="fmt-btn active" id="fmtA4"  onclick="setFmt('a4',this)">A4</button>
+        <button class="fmt-btn"        id="fmtLtr" onclick="setFmt('letter',this)">US Letter</button>
+      </div>
+    </div>
+
+    <div class="cta-block">
+      <p class="cta-tagline" id="ctaTagline">
+        Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.
+      </p>
+      <a class="cta-etsy" id="ctaEtsy" href="/" rel="noopener">Aus dem Atelier →</a>
+    </div>
+  </div>
+
+  <div class="preview-area">
+    <div class="preview-topbar">
+      <span class="preview-label" id="previewLabel"></span>
+      <div class="topbar-right">
+        <span class="demo-badge" id="demoBadge">Demo · 3 Karten · Geschenk</span>
+        <span class="counter-pill" id="counterPill"></span>
+        <button class="pdf-btn" id="pdfBtn" onclick="exportPDF()"></button>
+      </div>
+    </div>
+    <div class="a4-sheet" id="grid"></div>
+  </div>
+</div>
+
+<div id="pdfCanvas"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+const MAX_CARDS = 3;
+
+const ALLERGENE = {
+  de: [
+    ['G','Gluten'],['Kr','Krebstiere'],['E','Eier'],['F','Fisch'],
+    ['En','Erdnüsse'],['So','Soja'],['Mi','Milch'],['N','Nüsse'],
+    ['Se','Sellerie'],['Sf','Senf'],['Si','Sesam'],['Sw','Sulfite'],
+    ['Lu','Lupinen'],['We','Weichtiere'],
+  ],
+  en: [
+    ['Gluten','Gluten'],['Crustaceans','Crustaceans'],['Eggs','Eggs'],['Fish','Fish'],
+    ['Peanuts','Peanuts'],['Soya','Soya'],['Milk','Milk'],['Tree Nuts','Tree Nuts'],
+    ['Celery','Celery'],['Mustard','Mustard'],['Sesame','Sesame'],['Sulphites','Sulphites'],
+    ['Lupin','Lupin'],['Molluscs','Molluscs'],
+  ],
+};
+
+const VORLAGEN = {
+  de: [
+    { name: 'Macarons',     allergene: ['E','Mi','N'],  lifestyle: 'gruen'   },
+    { name: 'Brownies',     allergene: ['G','E','Mi'],  lifestyle: 'gruen'   },
+    { name: 'Tartelettes',  allergene: ['G','Mi','E'],  lifestyle: 'gruen'   },
+    { name: 'Cupcakes',     allergene: ['G','E','Mi'],  lifestyle: 'gruen'   },
+    { name: 'Cake Pops',    allergene: ['G','Mi'],      lifestyle: 'gruen'   },
+    { name: 'Marshmallows', allergene: [],              lifestyle: 'neutral' },
+    { name: 'Pralinen',     allergene: ['Mi','So'],     lifestyle: 'gruen'   },
+    { name: 'Fruchtgummis', allergene: [],              lifestyle: 'gelb'    },
+  ],
+  en: [
+    { name: 'Macarons',      allergene: ['Eggs','Milk','Tree Nuts'], lifestyle: 'gruen'   },
+    { name: 'Brownies',      allergene: ['Gluten','Eggs','Milk'],    lifestyle: 'gruen'   },
+    { name: 'Tartelettes',   allergene: ['Gluten','Milk','Eggs'],    lifestyle: 'gruen'   },
+    { name: 'Cupcakes',      allergene: ['Gluten','Eggs','Milk'],    lifestyle: 'gruen'   },
+    { name: 'Cake Pops',     allergene: ['Gluten','Milk'],           lifestyle: 'gruen'   },
+    { name: 'Marshmallows',  allergene: [],                          lifestyle: 'neutral' },
+    { name: 'Pralines',      allergene: ['Milk','Soya'],             lifestyle: 'gruen'   },
+    { name: 'Fruit Gummies', allergene: [],                          lifestyle: 'gelb'    },
+  ],
+};
+
+const UI = {
+  de: {
+    headerSubtitle:  'Allergenkarten — Atelier-Geschenk',
+    panelTitle:      '3 Karten · Geschenk',
+    labelVorlagen:   'Vorlagen — häufige Süßigkeiten',
+    vorlageHint:     'Vorlage wählen, Allergene prüfen, dann hinzufügen.',
+    labelName:       'Name der Süßigkeit',
+    namePlaceholder: 'Name eingeben …',
+    nameHint:        'Enter = Zeilenumbruch  ·  Strg+Enter = Hinzufügen',
+    labelLifestyle:  'Lifestyle',
+    btnNeutral:      'Neutral',
+    btnVegetarisch:  'Vegetarisch',
+    btnVegan:        'Vegan',
+    halalSubtext:    'Nur aktivieren wenn Halal-zertifiziert oder bestätigt',
+    labelAllergene:  'Allergene (EU-Liste)',
+    addBtn:          '+ Karte hinzufügen',
+    labelListe:      'Angelegte Karten',
+    emptyHint:       'Noch keine Karten angelegt.',
+    noAllergene:     'Keine Allergene',
+    vorlageNoAllerg: 'keine Allergene',
+    previewLabel:    'Vorschau — A4 · 3 Karten · Geschenk',
+    counterSuffix:   'Karten',
+    pdfBtn:          'Geschenk-PDF laden',
+    pdfBtnBusy:      'Wird erstellt …',
+    cardAllergenLbl: 'Allergene',
+    cardNone:        '—',
+    lsGruen:         'Vegetarisch',
+    lsGelb:          'Vegan',
+    lsNeutral:       'Neutral',
+    lsHalal:         'Halal',
+    labelFormat:     'Papierformat',
+    demoBadge:       'Demo · 3 Karten · Geschenk',
+    emptyHintSlot:   '',
+    ctaTagline:      'Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.',
+    ctaEtsy:         'Aus dem Atelier →',
+  },
+  en: {
+    headerSubtitle:  'Allergen Cards — Atelier Gift',
+    panelTitle:      '3 cards · Atelier Gift',
+    labelVorlagen:   'Templates — common sweets',
+    vorlageHint:     'Select a template, check allergens, then add.',
+    labelName:       'Name of the sweet',
+    namePlaceholder: 'Enter name …',
+    nameHint:        'Enter = line break  ·  Ctrl+Enter = Add',
+    labelLifestyle:  'Lifestyle',
+    btnNeutral:      'Neutral',
+    btnVegetarisch:  'Vegetarian',
+    btnVegan:        'Vegan',
+    halalSubtext:    'Only activate if Halal-certified or confirmed',
+    labelAllergene:  'Allergens (EU list)',
+    addBtn:          '+ Add card',
+    labelListe:      'Cards added',
+    emptyHint:       'No cards added yet.',
+    noAllergene:     'No allergens',
+    vorlageNoAllerg: 'no allergens',
+    previewLabel:    'Preview — A4 · 3 cards · Atelier Gift',
+    counterSuffix:   'cards',
+    pdfBtn:          'Take the PDF',
+    pdfBtnBusy:      'Creating …',
+    cardAllergenLbl: 'Contains',
+    cardNone:        '—',
+    lsGruen:         'Vegetarian',
+    lsGelb:          'Vegan',
+    lsNeutral:       'Neutral',
+    lsHalal:         'Halal',
+    labelFormat:     'Paper format',
+    demoBadge:       'Demo · 3 cards · Atelier Gift',
+    emptyHintSlot:   '+ 6 more\nin the atelier',
+    ctaTagline: 'More works and small gifts live in the atelier — all from the same world.',
+    ctaEtsy:         'From the atelier →',
+  },
+};
+
+let lang       = 'de';
+let lifestyle  = 'neutral';
+let isHalal    = false;
+let cards      = [];
+let paperFormat = 'a4';
+
+const nameInput   = document.getElementById('nameInput');
+const addBtn      = document.getElementById('addBtn');
+const cardList    = document.getElementById('cardList');
+const counterPill = document.getElementById('counterPill');
+const grid        = document.getElementById('grid');
+const pdfCanvas   = document.getElementById('pdfCanvas');
+const pdfBtn      = document.getElementById('pdfBtn');
+const halalRow    = document.getElementById('halalRow');
+
+function t(key) { return UI[lang][key]; }
+
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l.toUpperCase()));
+  applyUI(); buildAllergenGrid(); buildVorlagen(); renderAll();
+}
+
+function applyUI() {
+  const u = UI[lang];
+  document.getElementById('headerSubtitle').textContent  = u.headerSubtitle;
+  document.getElementById('panelTitle').textContent      = u.panelTitle;
+  document.getElementById('labelVorlagen').textContent   = u.labelVorlagen;
+  document.getElementById('vorlageHint').textContent     = u.vorlageHint;
+  document.getElementById('labelName').textContent       = u.labelName;
+  nameInput.placeholder                                  = u.namePlaceholder;
+  document.getElementById('nameHint').textContent        = u.nameHint;
+  document.getElementById('labelLifestyle').textContent  = u.labelLifestyle;
+  document.getElementById('btnNeutral').textContent      = u.btnNeutral;
+  document.getElementById('btnVegetarisch').textContent  = u.btnVegetarisch;
+  document.getElementById('btnVegan').textContent        = u.btnVegan;
+  document.getElementById('halalSubtext').textContent    = u.halalSubtext;
+  document.getElementById('labelAllergene').textContent  = u.labelAllergene;
+  addBtn.textContent                                     = u.addBtn;
+  document.getElementById('labelListe').textContent      = u.labelListe;
+  document.getElementById('previewLabel').textContent    = u.previewLabel;
+  document.getElementById('labelFormat').textContent     = u.labelFormat;
+  document.getElementById('demoBadge').textContent       = u.demoBadge;
+  document.getElementById('ctaTagline').innerHTML        = u.ctaTagline;
+  document.getElementById('ctaEtsy').textContent         = u.ctaEtsy;
+  pdfBtn.textContent                                     = u.pdfBtn;
+  document.documentElement.lang                          = lang;
+}
+
+nameInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); addCard(); }
+});
+
+function toggleHalal() {
+  isHalal = !isHalal;
+  halalRow.classList.toggle('active', isHalal);
+}
+
+function setFmt(fmt, btn) {
+  paperFormat = fmt;
+  document.querySelectorAll('.fmt-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function buildAllergenGrid() {
+  const ag = document.getElementById('allergenGrid');
+  ag.innerHTML = '';
+  ALLERGENE[lang].forEach(([code, name]) => {
+    const label = document.createElement('label');
+    label.className = 'cb-item';
+    const codeHtml = lang === 'de' ? '<span class="cb-code">' + esc(code) + '</span>' : '';
+    label.innerHTML = '<input type="checkbox" value="' + esc(code) + '"><span class="cb-label">' + codeHtml + esc(name) + '</span>';
+    ag.appendChild(label);
+  });
+}
+
+function buildVorlagen() {
+  const vg = document.getElementById('vorlagenGrid');
+  vg.innerHTML = '';
+  VORLAGEN[lang].forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'vorlage-btn';
+    const lsText = v.lifestyle === 'gruen' ? t('lsGruen') : v.lifestyle === 'gelb' ? t('lsGelb') : '';
+    const lsHtml = lsText ? '<br><span class="vorlage-ls ' + v.lifestyle + '">' + lsText + '</span>' : '';
+    btn.innerHTML =
+      '<span class="vorlage-name">' + esc(v.name) + '</span>' +
+      '<span class="vorlage-meta">' + esc(v.allergene.length ? v.allergene.join(', ') : t('vorlageNoAllerg')) + '</span>' + lsHtml;
+    btn.onclick = () => applyVorlage(v);
+    vg.appendChild(btn);
+  });
+}
+
+function applyVorlage(v) {
+  nameInput.value = v.name;
+  document.querySelectorAll('#allergenGrid input').forEach(cb => { cb.checked = v.allergene.includes(cb.value); });
+  lifestyle = v.lifestyle;
+  document.querySelectorAll('.ls-btn').forEach(b => b.className = 'ls-btn');
+  document.querySelector('.ls-btn[data-val="' + lifestyle + '"]').classList.add('active-' + lifestyle);
+  nameInput.focus(); nameInput.select();
+}
+
+function setLifestyle(btn) {
+  lifestyle = btn.dataset.val;
+  document.querySelectorAll('.ls-btn').forEach(b => b.className = 'ls-btn');
+  btn.classList.add('active-' + lifestyle);
+}
+
+function getChecked() { return [...document.querySelectorAll('#allergenGrid input:checked')].map(cb => cb.value); }
+
+function resetForm() {
+  nameInput.value = '';
+  document.querySelectorAll('#allergenGrid input').forEach(cb => cb.checked = false);
+  lifestyle = 'neutral'; isHalal = false;
+  document.querySelectorAll('.ls-btn').forEach(b => b.className = 'ls-btn');
+  document.querySelector('.ls-btn[data-val="neutral"]').classList.add('active-neutral');
+  halalRow.classList.remove('active');
+  nameInput.focus();
+}
+
+function addCard() {
+  const name = nameInput.value.trim();
+  if (!name) { nameInput.focus(); return; }
+  if (cards.length >= MAX_CARDS) return;
+  cards.push({ name, lifestyle, halal: isHalal, allergene: getChecked(), lang });
+  resetForm(); renderAll();
+}
+
+function removeCard(i) { cards.splice(i, 1); renderAll(); }
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function lsLabel(ls, l) {
+  const u = UI[l || lang];
+  return ls === 'gruen' ? u.lsGruen : ls === 'gelb' ? u.lsGelb : u.lsNeutral;
+}
+
+function headerText(c) {
+  const u  = UI[c.lang || lang];
+  const ls = c.lifestyle !== 'neutral' ? lsLabel(c.lifestyle, c.lang) : '';
+  const hl = c.halal ? u.lsHalal : '';
+  if (ls && hl) return ls + ' · ' + hl;
+  if (ls) return ls;
+  if (hl) return hl;
+  return '—';
+}
+
+function cardClasses(c) {
+  let cls = 'card ' + c.lifestyle;
+  if (c.halal) cls += ' halal';
+  return cls;
+}
+
+function cardNameFontSize(name, isPdf) {
+  const lines    = name.split('\n');
+  const numLines = lines.length;
+  const l        = Math.max(...lines.map(line => line.trim().length));
+
+  if (isPdf) {
+    let sz = l <= 12 ? 34 : l <= 18 ? 28 : l <= 26 ? 22 : l <= 35 ? 17 : 13;
+    if (numLines === 2) sz = Math.max(13, Math.round(sz * 0.75));
+    if (numLines >= 3) sz = Math.max(11, Math.round(sz * 0.58));
+    return sz + 'px';
+  } else {
+    if (l <= 12) return '15cqw';
+    if (l <= 18) return '12cqw';
+    if (l <= 26) return '9cqw';
+    if (l <= 35) return '7cqw';
+    return '5.5cqw';
+  }
+}
+
+function makeCardHTML(c, isPdf) {
+  const cu      = UI[c.lang || lang];
+  const alg     = c.allergene.length ? c.allergene.join(' · ') : cu.cardNone;
+  const hdr     = headerText(c);
+  const nameFs  = cardNameFontSize(c.name, isPdf);
+  const nameHtml = c.name.split('\n').map(line => esc(line.trim())).join('<br>');
+  return '<div class="card-inner">' +
+           '<div class="card-header">' +
+             '<span class="card-header-label">' + esc(hdr) + '</span>' +
+             '<div class="card-halal-dot"></div>' +
+           '</div>' +
+           '<div class="card-body">' +
+             '<div class="card-name" style="font-size:' + nameFs + '"><span>' + nameHtml + '</span></div>' +
+             '<div class="card-allergene">' +
+               '<div class="card-allergene-label">' + cu.cardAllergenLbl + '</div>' +
+               '<div class="card-allergene-kuerzel">' + esc(alg) + '</div>' +
+             '</div>' +
+           '</div>' +
+         '</div>';
+}
+
+function renderAll() {
+  addBtn.disabled  = cards.length >= MAX_CARDS;
+  pdfBtn.disabled  = cards.length === 0;
+  counterPill.textContent = cards.length + ' / ' + MAX_CARDS + ' ' + t('counterSuffix');
+
+  cardList.innerHTML = '';
+  if (cards.length === 0) {
+    cardList.innerHTML = '<div class="empty-hint">' + t('emptyHint') + '</div>';
+  } else {
+    cards.forEach((c, i) => {
+      const div = document.createElement('div');
+      div.className = 'card-list-item';
+      const halalBadge = c.halal ? '<span class="cli-badge badge-halal">Halal</span>' : '';
+      div.innerHTML =
+        '<div class="cli-info">' +
+          '<div class="cli-name">' + esc(c.name) + '</div>' +
+          '<div class="cli-meta">' + esc(c.allergene.length ? c.allergene.join(' · ') : t('noAllergene')) + '</div>' +
+        '</div>' +
+        '<div class="cli-badges">' +
+          '<span class="cli-badge badge-' + c.lifestyle + '">' + lsLabel(c.lifestyle, c.lang) + '</span>' +
+          halalBadge +
+        '</div>' +
+        '<button class="del-btn" onclick="removeCard(' + i + ')">×</button>';
+      cardList.appendChild(div);
+    });
+  }
+
+  // Vorschau-Grid: 3 belegt + 6 leer (Slot 5 = mittlerer Hinweis "+6 weitere")
+  grid.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const div = document.createElement('div');
+    if (i < cards.length) {
+      div.className = cardClasses(cards[i]);
+      div.innerHTML = makeCardHTML(cards[i], false);
+    } else {
+      div.className = 'card-empty';
+      if (i === 4) {
+        div.classList.add('hint-slot');
+        div.setAttribute('data-hint', t('emptyHintSlot'));
+      }
+    }
+    grid.appendChild(div);
+  }
+
+  // PDF-Canvas: nur die echten Karten in die ersten Slots, Rest leer
+  pdfCanvas.innerHTML = '';
+  for (let i = 0; i < 9; i++) {
+    const div = document.createElement('div');
+    if (i < cards.length) {
+      div.className = cardClasses(cards[i]);
+      div.innerHTML = makeCardHTML(cards[i], true);
+    } else {
+      div.className = 'card-empty';
+      div.style.cssText = 'border:1.5px dashed #ddd9d0; border-radius:0;';
+    }
+    pdfCanvas.appendChild(div);
+  }
+}
+
+async function exportPDF() {
+  if (cards.length === 0) return;
+  pdfBtn.disabled = true;
+  pdfBtn.textContent = t('pdfBtnBusy');
+
+  await document.fonts.ready;
+  await new Promise(r => setTimeout(r, 400));
+
+  try {
+    const canvas = await html2canvas(pdfCanvas, {
+      scale: 3,
+      useCORS: true,
+      allowTaint: true,
+      backgroundColor: '#ffffff',
+      logging: false,
+      width:  1123,
+      height: 794,
+      onclone: (doc) => {
+        const el = doc.getElementById('pdfCanvas');
+        el.style.position = 'relative';
+        el.style.left     = '0';
+        el.style.top      = '0';
+      }
+    });
+
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    const { jsPDF } = window.jspdf;
+    const isLetter = paperFormat === 'letter';
+    const pdfW = isLetter ? 279.4 : 297;
+    const pdfH = isLetter ? 215.9 : 210;
+
+    const pdf = new jsPDF({
+      orientation: 'landscape', unit: 'mm',
+      format: [pdfW, pdfH]
+    });
+
+    const imgW = pdfW;
+    const imgH = 794 * pdfW / 1123;
+    const imgY = (pdfH - imgH) / 2;
+
+    pdf.addImage(imgData, 'JPEG', 0, imgY, imgW, imgH);
+
+    // Subtiler Footer: "Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com"
+    pdf.setFont('helvetica', 'normal');
+    pdf.setFontSize(7);
+    pdf.setTextColor(170, 170, 170);
+    pdf.text(
+      'Atelier-Geschenk · Wedding Story Atelier · weddingstoryatelier.etsy.com',
+      pdfW / 2, pdfH - 4, { align: 'center' }
+    );
+
+    pdf.save('Allergenkarten_Atelier-Geschenk.pdf');
+  } catch(e) { console.error(e); }
+
+  pdfBtn.disabled = false;
+  pdfBtn.textContent = t('pdfBtn');
+}
+
+applyUI();
+buildAllergenGrid();
+buildVorlagen();
+renderAll();
+
+</script>
+</body>
+</html>
