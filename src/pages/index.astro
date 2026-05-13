@@ -1,17 +1,105 @@
 ---
-
+import Layout from '../layouts/Layout.astro';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout>
+  <!-- Navigation, sehr zurückhaltend -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero — viel Weißraum, editorial -->
+  <section class="min-h-screen flex items-center justify-center px-8 md:px-16">
+    <div class="max-w-3xl text-center">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-8">
+        Editorial Atelier
+      </p>
+      <h1 class="serif text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-10">
+        Eine Hochzeit<br />
+        ist eine Geschichte.<br />
+        <em class="text-cognac">Wir schreiben sie mit.</em>
+      </h1>
+      <p class="text-lg md:text-xl text-ink-muted max-w-xl mx-auto leading-relaxed">
+        Atelier für editoriale Papeterie und stilbewusste Story-Konzepte.
+        Galerie und Werkbank in einem.
+      </p>
+      <div class="mt-14 flex flex-col sm:flex-row gap-6 items-center justify-center text-sm tracking-wider">
+        <a href="/atelier" class="border-b border-ink pb-1 hover:border-cognac hover:text-cognac transition-colors">
+          Das Atelier betreten →
+        </a>
+        <a href="/journal" class="text-ink-muted hover:text-ink transition-colors">
+          Journal lesen
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galerie-Teaser -->
+  <section class="px-8 md:px-16 py-32 bg-cream">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">Die Werke</p>
+      <h2 class="serif text-4xl md:text-5xl mb-16 max-w-2xl leading-tight">
+        Werkzeuge wie Ausstellungsstücke — präzise, ruhig, ganz Ihre Geschichte.
+      </h2>
+      <div class="grid md:grid-cols-3 gap-12">
+        <article class="group">
+          <div class="aspect-[3/4] bg-sand mb-5"></div>
+          <h3 class="serif text-2xl mb-3">Wedding Magazine</h3>
+          <p class="text-sm text-ink-muted leading-relaxed mb-5">
+            Editorial storytelling für moderne Hochzeiten.
+          </p>
+          <ul class="text-xs tracking-wide text-ink-muted space-y-1.5 border-t border-sand pt-4">
+            <li>· Live im Browser personalisierbar</li>
+            <li>· Sofort als PDF exportierbar</li>
+            <li>· Druckfertig, ohne Installation</li>
+          </ul>
+          <a href="/atelier/wedding-magazine" class="inline-block mt-5 text-xs tracking-[0.2em] uppercase border-b border-ink pb-0.5 hover:border-cognac hover:text-cognac transition-colors">
+            Live Preview öffnen
+          </a>
+        </article>
+        <article class="group">
+          <div class="aspect-[3/4] bg-sand mb-5"></div>
+          <h3 class="serif text-2xl mb-3">Einladungsset</h3>
+          <p class="text-sm text-ink-muted leading-relaxed mb-5">
+            Drei-Karten-Konzept in drei Farbwelten.
+          </p>
+          <ul class="text-xs tracking-wide text-ink-muted space-y-1.5 border-t border-sand pt-4">
+            <li>· Bordeaux · Navy · Salbei</li>
+            <li>· DE und US-Formate</li>
+            <li>· Vektor-PDF, druckfertig</li>
+          </ul>
+          <a href="/atelier/einladungsset" class="inline-block mt-5 text-xs tracking-[0.2em] uppercase border-b border-ink pb-0.5 hover:border-cognac hover:text-cognac transition-colors">
+            Live Preview öffnen
+          </a>
+        </article>
+        <article class="group">
+          <div class="aspect-[3/4] bg-sand mb-5"></div>
+          <h3 class="serif text-2xl mb-3">Sitzplan</h3>
+          <p class="text-sm text-ink-muted leading-relaxed mb-5">
+            Floral oder Earth — die Bühne für Ihre Gäste.
+          </p>
+          <ul class="text-xs tracking-wide text-ink-muted space-y-1.5 border-t border-sand pt-4">
+            <li>· Gästeliste live im Browser</li>
+            <li>· Foto pro Tisch optional</li>
+            <li>· Sofort als PDF exportierbar</li>
+          </ul>
+          <a href="/atelier/sitzplan" class="inline-block mt-5 text-xs tracking-[0.2em] uppercase border-b border-ink pb-0.5 hover:border-cognac hover:text-cognac transition-colors">
+            Live Preview öffnen
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer, minimal -->
+  <footer class="px-8 md:px-16 py-16 text-center">
+    <p class="serif text-2xl">Wedding Story Atelier</p>
+  </footer>
+</Layout>

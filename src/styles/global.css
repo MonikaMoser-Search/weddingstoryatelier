@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  /* Atelier-Farbpalette — 70% clean, 30% warm editorial */
+  --color-paper: #FAF8F4;        /* warmes Weiß */
+  --color-cream: #F3EDE3;        /* leichtes Creme */
+  --color-sand:  #E4D9C7;        /* Sand */
+  --color-ink:   #1C1A17;        /* Soft Black */
+  --color-ink-muted: #6B6760;
+
+  /* Akzente — sparsam einsetzen */
+  --color-bordeaux: #5B1A26;
+  --color-forest:   #2E3A2C;
+  --color-cognac:   #A06B3B;
+  --color-gold:     #B89968;     /* muted gold */
+
+  /* Typografie */
+  --font-serif: "Cormorant Garamond", "Cormorant", Georgia, serif;
+  --font-sans:  "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    color: var(--color-ink);
+    background: var(--color-paper);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, .serif {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background: var(--color-sand);
+    color: var(--color-ink);
+  }
+}
