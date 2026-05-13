@@ -1,0 +1,82 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Impressum — Wedding Story Atelier"
+  description="Anbieterkennzeichnung gemäß § 5 TMG für weddingstoryatelier.de"
+  noindex={false}
+>
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="px-8 md:px-16 pt-40 pb-24">
+    <div class="max-w-2xl mx-auto legal">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+        Rechtliches
+      </p>
+
+      <h1 class="serif text-5xl md:text-6xl leading-tight mb-12">Impressum</h1>
+
+      <p>Monika Moser<br />
+      Karl-Theodor-Straße 28<br />
+      69181 Leimen</p>
+
+      <h2>Kontakt</h2>
+      <p>Telefon: +49 6224 9877090<br />
+      E-Mail: info@mmsearch.de</p>
+
+      <h2>Umsatzsteuer-ID</h2>
+      <p>Umsatzsteuer-Identifikationsnummer gemäß § 27 a Umsatzsteuergesetz:<br />
+      DE275608530</p>
+
+      <h2>Redaktionell verantwortlich</h2>
+      <p>Monika Moser</p>
+
+      <h2>Verbraucher­streit­beilegung / Universal­schlichtungs­stelle</h2>
+      <p>Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+    </div>
+  </main>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
+
+<style>
+  .legal :global(h2) {
+    font-family: var(--font-serif);
+    font-size: 1.75rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+  .legal :global(p) {
+    font-size: 1rem;
+    line-height: 1.75;
+    color: var(--color-ink);
+    margin-bottom: 1rem;
+  }
+  .legal :global(a) {
+    color: var(--color-cognac);
+    border-bottom: 1px solid currentColor;
+  }
+  .legal :global(a:hover) {
+    color: var(--color-ink);
+  }
+</style>
