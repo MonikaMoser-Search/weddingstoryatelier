@@ -1,0 +1,242 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const title = 'Hochzeit organisieren ohne Chaos — das Atelier-System';
+const description = 'Hochzeitsplanung scheitert nicht an deinem Tempo, sondern an Fragmentierung. Wie ein System aus 10 offenen Tabs einen Workflow macht — 5 Prinzipien.';
+---
+
+<Layout title={title} description={description} image="/images/card-sitzplan.png">
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <article class="px-6 md:px-16 pt-32 pb-24 article-body">
+    <div class="max-w-2xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+        Journal · System
+      </p>
+      <h1 class="serif text-4xl md:text-6xl leading-[1.1] mb-10">
+        Hochzeit organisieren ohne Chaos <em class="text-cognac">— das System gegen die zehn offenen Tabs</em>
+      </h1>
+
+      <p class="text-lg leading-relaxed mb-8 lead">
+        Es ist Mittwochabend, halb elf. Du hast einen Excel-Sheet mit Gästen offen, daneben einen Pinterest-Tab mit Sitzplan-Inspiration, das WhatsApp deiner Mutter wegen der Tanten dritten Grades, zwei Tabs mit Einladungs-Templates und einen Notizblock auf deinem Schoß für die Adresse vom Hotel in Heidelberg, die du immer wieder vergisst.
+      </p>
+      <p class="leading-relaxed mb-12">
+        Das ist nicht zu wenig Zeit. Das ist zu wenig System. Dieser Artikel argumentiert, warum Hochzeitsplanung nicht an deinem Tempo scheitert, sondern an der Fragmentierung deiner Daten — und wie sich aus den fünfzig Einzelaufgaben ein zusammenhängendes System bauen lässt, in dem du jede Information genau einmal anlegst.
+      </p>
+    </div>
+
+    <figure class="my-16 max-w-4xl mx-auto">
+      <img src="/images/card-sitzplan.png" alt="Sitzplan im Editorial-Stil auf Staffelei — ein Baustein des Atelier-Systems" class="w-full" loading="lazy" />
+      <figcaption class="text-xs text-center text-ink-muted mt-4 italic">Ein Sitzplan ist nie ein einzelnes Produkt — er ist die sichtbarste Spitze einer Datenquelle.</figcaption>
+    </figure>
+
+    <div class="max-w-2xl mx-auto">
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Was bedeutet ein System für die Hochzeitsplanung?</h2>
+      <div class="snippet-box">
+        <strong>Eine System-Hochzeit ist eine Hochzeit, deren Planungsinformationen zentral verwaltet werden und in alle einzelnen Werke (Einladung, Sitzplan, Tagesprogramm, Platzkarten, Welcome Letter) automatisch einfließen — statt parallel in zehn Tools nebeneinander zu existieren.</strong> System bedeutet: eine Datenquelle, viele Outputs.
+      </div>
+      <p class="leading-relaxed mt-6 mb-4">
+        Das klingt nach Software-Sprache. Genau das ist es auch. Und genau das fehlt der Hochzeitsplanung, wie sie heute organisiert wird.
+      </p>
+      <p class="leading-relaxed mb-4">
+        Wenn du eine Hochzeit planst, hast du keinen Zeitmangel im engeren Sinn. Du hast einen Koordinationsmangel. Die Information „Maria Schmidt sitzt am Tisch der Eltern" ist ein einziges Detail — aber sie muss in mindestens vier Werken auftauchen:
+      </p>
+      <ul class="leading-relaxed mb-4 pl-5 list-disc">
+        <li class="mb-2">Auf der Gästeliste, damit sie zählt</li>
+        <li class="mb-2">Auf dem Sitzplan, damit sie weiß, wo sie hingehört</li>
+        <li class="mb-2">Auf der Platzkarte am Gedeck</li>
+        <li class="mb-2">Auf der Versandliste der Einladungen</li>
+      </ul>
+      <p class="leading-relaxed">
+        Trägst du sie viermal ein, machst du nicht 1× die Arbeit, sondern 4× — und vergisst beim vierten Mal, dass Maria Schmidt eigentlich Maria Müller-Schmidt heißt, weil sie sich gerade scheiden lässt. Vier Tools, vier Fehlerquellen, viermal Stress.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Warum klassische Checklisten nur die Tab-Liste verlängern</h2>
+      <p class="leading-relaxed mb-4">
+        Wenn du jetzt googelst „hochzeit organisieren checkliste", findest du PDFs mit 200 Punkten. Das Problem: jeder Punkt verlängert deine Tab-Liste, statt sie zu verkürzen.
+      </p>
+      <p class="leading-relaxed mb-4">
+        Eine Checkliste sagt dir, <em>was</em> zu tun ist. Sie sagt dir nicht, <em>wie das Ergebnis zusammenhängt.</em> Sie zwingt dich, jeden Punkt einzeln zu erledigen, jeden Punkt in einem eigenen Tool zu verwalten, jeden Punkt nach Bauchgefühl mit den anderen zu verbinden.
+      </p>
+      <p class="leading-relaxed mb-4">Das funktioniert in der Theorie. In der Praxis hast du nach drei Monaten Hochzeitsplanung:</p>
+      <ul class="leading-relaxed mb-4 pl-5 list-disc">
+        <li class="mb-2">Eine Spalte „Einladungen verschickt" in deinem Excel</li>
+        <li class="mb-2">Eine Tabelle „RSVP eingegangen" in einem Google Sheet, das deine Trauzeugin angelegt hat</li>
+        <li class="mb-2">Eine WhatsApp-Gruppe für „Sitzplan-Brainstorming" mit deiner Schwester</li>
+        <li class="mb-2">Eine Pinterest-Sammlung mit Sitzplan-Beispielen</li>
+        <li class="mb-2">Eine E-Mail-Vorlage „Adresse korrigieren" in deinem Mailprogramm</li>
+        <li class="mb-2">Einen Tab mit drei verschiedenen Sitzplan-PDFs, die du nebeneinander vergleichst</li>
+      </ul>
+      <p class="leading-relaxed">Sechs Orte für eine einzige Aufgabe. Das ist nicht dein Versagen. Das ist die Logik der Checkliste, die dich dahingebracht hat.</p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Die fünf Prinzipien einer System-Hochzeit</h2>
+      <p class="leading-relaxed mb-8">Eine Hochzeit wird kein System, weil du fleißig bist. Sie wird ein System, wenn fünf Prinzipien zusammenkommen.</p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">1. Eine Datenquelle statt zehn</h3>
+      <p class="leading-relaxed mb-4">Alles, was du eintippen musst — Namen, Adressen, Telefonnummern, Tischzuordnungen, RSVP-Status — wohnt an <em>einem</em> Ort. Nicht in der Bauchgefühl-Liste deiner Mutter, nicht in der Notiz-App deines Partners, nicht in der WhatsApp-Gruppe der Trauzeuginnen. Eine einzige Tabelle oder ein einziges Tool, das alle anderen Tools speist.</p>
+      <p class="leading-relaxed">Klingt simpel. Macht aber fast niemand. Weil jedes Werk traditionell als isoliertes Produkt verkauft wird — und du jedes Mal von vorne eingibst.</p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">2. Drei Werk-Familien statt 30 Einzelprodukte</h3>
+      <p class="leading-relaxed mb-4">Eine Hochzeit hat nicht 30 Aufgaben. Sie hat drei thematische Werk-Familien:</p>
+      <ul class="leading-relaxed mb-4 pl-5 list-disc">
+        <li class="mb-2"><strong>Vor der Hochzeit:</strong> Save the Date, Einladung, RSVP, Welcome Letter</li>
+        <li class="mb-2"><strong>Am Tag:</strong> Tagesprogramm, Sitzplan, Platzkarten, Tischschilder, Allergenkarten</li>
+        <li class="mb-2"><strong>Nach dem Tag:</strong> Dankeskarten, Hochzeitszeitung als Andenken</li>
+      </ul>
+      <p class="leading-relaxed">Wenn du in diesen Familien denkst statt in 30 Einzel-Items, wird die Liste nicht nur kürzer — sie wird auch organisierbar. Die Vor-Werke hängen vom Datum ab, die Tag-Werke hängen vom Sitzplan ab, die Nach-Werke hängen von den Fotos ab. Drei Cluster, drei Deadlines.</p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">3. Konsistentes Design statt Patchwork</h3>
+      <p class="leading-relaxed mb-4">Die größte stille Quelle von Aufwand: dass Einladung, Sitzplan, Programm und Platzkarten visuell nicht zusammenpassen, weil sie von drei verschiedenen Anbietern stammen. Du verbringst Stunden damit, dass „alles zusammen wirkt" — und es wirkt am Ende doch leicht aus dem Stilbruch.</p>
+      <p class="leading-relaxed">In einem System gehören alle Werke zur selben Design-Familie. Eine Farbpalette, eine Schriftpaarung, eine Komposition. Du triffst die Stil-Entscheidung einmal, sie wirkt automatisch in jedem Output. Mehr zur Stil-Frage findest du in unserem Pillar-Artikel <a href="/journal/editorial-hochzeit-papeterie-magazin-stil" class="cognac-link">Editorial Hochzeit</a> — der Look ist nur eine Seite der Atelier-Idee. Die andere Seite ist das System.</p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">4. Workflow-Reihenfolge statt Pinterest-Random</h3>
+      <p class="leading-relaxed mb-4">Pinterest gibt dir Inspiration in zufälliger Reihenfolge. Ein System gibt dir Inspiration in der Reihenfolge, in der du sie brauchst.</p>
+      <p class="leading-relaxed">Save the Date zuerst (12 Monate vorher), Einladung danach (4 Monate vorher), RSVP-Tracking (2 Monate vorher), Sitzplan (4 Wochen vorher), Platzkarten (2 Wochen vorher), Tagesprogramm und Welcome Letter (3 Tage vorher), Dankeskarten (4 Wochen nach der Hochzeit). Wenn du diese Reihenfolge im Kopf hast, weißt du jederzeit, wo du gerade stehst — und was <em>jetzt</em> dran ist. Nicht alles auf einmal. Eine Aufgabe pro Phase.</p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">5. Letzte Meile dokumentiert</h3>
+      <p class="leading-relaxed mb-4">Das wichtigste Prinzip — und das, was klassische Wedding-Planung am häufigsten ignoriert: ist alles so dokumentiert, dass jemand anderes übernehmen könnte?</p>
+      <p class="leading-relaxed">Konkret: Falls du am Hochzeitsmorgen krank wirst, könnte deine Trauzeugin den Sitzplan ausdrucken, die Tischschilder verteilen, die Allergenkarten an den richtigen Stellen positionieren? Falls die Antwort „nein" lautet, weil zu viel im Kopf ist und zu wenig auf Papier — dann bist du das System. Das ist riskant. Eine System-Hochzeit lebt nicht in deinem Kopf. Sie lebt in Dateien, die druckfertig sind, in Listen, die übergeben werden können, in Werken, die selbsterklärend sind.</p>
+
+      <!-- Mid-Article CTA -->
+      <aside class="mid-cta">
+        <p class="cta-eyebrow">Live im Browser</p>
+        <p class="cta-text">Ein konkretes Beispiel macht das System greifbar. Aus einer Gästeliste wird auf Knopfdruck ein alphabetischer Sitzplan UND ein visueller Sitzplan nach Tischen — eine Datenquelle, zwei Outputs. Im <strong>Sitzplan-Atelier</strong> kannst du genau das ausprobieren.</p>
+        <a href="/atelier/sitzplan.html" class="cta-btn" target="_blank" rel="noopener">Sitzplan-Demo öffnen →</a>
+      </aside>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Wie ein System in der Praxis aussieht</h2>
+      <p class="leading-relaxed mb-4">System ist kein Software-Begriff für Hochzeitsplanung. Es ist eine Haltung.</p>
+      <p class="leading-relaxed mb-4">Konkret: Du fragst bei jeder Entscheidung „Wo lebt diese Information?" — und wenn die Antwort „in einer WhatsApp" oder „in meinem Kopf" lautet, dann verlagerst du sie an einen besseren Ort. Du kaufst keine isolierten PDFs mehr, sondern fragst „Welche Werke gehören zusammen?" und wählst sie als Set. Du achtest darauf, dass dein Sitzplan und deine Platzkarten denselben Farbcode haben — nicht weil ein Trauzeuge das merkt, sondern weil dein Auge sich beim Aufbau am Hochzeitsmorgen erholen muss.</p>
+      <p class="leading-relaxed">Eine System-Hochzeit ist nicht <em>kürzer</em> zu planen. Sie ist <em>aufmerksamer</em> zu planen — und am Tag selbst zehnmal entspannter.</p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Wenn du weiter denken willst</h2>
+      <p class="leading-relaxed mb-4">Wir entwickeln gerade eine App im Atelier, in der genau dieses System lebt: alle Daten einmal eintragen, alle Werke fließen automatisch. Gästeliste — und der Sitzplan, die Platzkarten, das Tagesprogramm ergeben sich von selbst. Wenn du beim Launch dabei sein willst, schreib uns kurz an <a href="mailto:info@mmsearch.de" class="cognac-link">info@mmsearch.de</a>. Kein Newsletter, kein Pop-up — einfach kurz Bescheid.</p>
+      <p class="leading-relaxed">Bis dahin ist jedes Atelier-Werk so gebaut, dass es System-tauglich ist: gleiche Designsprache, gleiche Datenlogik, kein Eintippen doppelt. Das ist der Vorbote.</p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Häufige Fragen</h2>
+
+      <div class="faq">
+        <h3>Was bedeutet ein System für die Hochzeitsplanung?</h3>
+        <p>Eine System-Hochzeit verwaltet alle Planungsinformationen zentral statt verstreut. Du legst Namen, Adressen, Tischzuordnungen und Daten einmal an — und alle Werke (Einladung, Sitzplan, Platzkarten, Tagesprogramm) speisen sich daraus. Resultat: weniger Tabs offen, weniger Fehlerquellen, mehr Überblick.</p>
+
+        <h3>Brauche ich eine Wedding-Planner-Agentur, um ein System zu haben?</h3>
+        <p>Nein. Eine Agentur kann ein System bauen, aber sie ist nicht das System selbst. Du kannst eine System-Hochzeit selbst planen, wenn du die richtigen Tools wählst — Werke, die dieselbe Datenlogik teilen, statt isolierter PDFs aus verschiedenen Quellen.</p>
+
+        <h3>Reicht eine Excel-Tabelle nicht als System?</h3>
+        <p>Excel ist eine Datenquelle, aber kein System. Ein System ist Datenquelle plus Output-Vorlagen, die sich daraus speisen. Excel gibt dir keine druckfertigen Sitzpläne, Platzkarten oder Tagesprogramme — du tippst diese Outputs in andere Tools von Hand wieder ein. Excel plus isolierte Vorlagen ergibt das Chaos, nicht das System.</p>
+
+        <h3>Wie viele Werke brauche ich für eine vollständige System-Hochzeit?</h3>
+        <p>Minimaler Umfang: Einladung, RSVP-Tracking, Sitzplan, Platzkarten. Empfehlenswert dazu: Tagesprogramm und Welcome Letter. Plus optional: Allergenkarten, Tischschilder, Dankeskarten. Wichtig ist nicht die Anzahl, sondern die Zusammengehörigkeit.</p>
+
+        <h3>Wann sollte ich mit dem System starten?</h3>
+        <p>Idealerweise bei der Festlegung des Datums. Spätestens, sobald die Gästeliste die ersten 20 Namen hat. Je früher das System aufgesetzt ist, desto weniger musst du später nachträglich zusammenführen.</p>
+      </div>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Vom Chaos zum System</h2>
+      <p class="leading-relaxed mb-6">Hochzeitsplanung muss nicht stressig sein. Sie wird stressig, wenn Werkzeuge isoliert benutzt werden, wenn Informationen verstreut leben und wenn jedes Detail dreimal eingetragen wird. Wenn du das umdrehst — eine Datenquelle, koordinierte Werke, klare Reihenfolge — wird aus den zehn Tabs ein Atelier-Workflow.</p>
+      <p class="leading-relaxed mb-6">Das <a href="/" class="cognac-link">Wedding Story Atelier</a> ist genau dafür gebaut. Schau dir die Werke an: jedes davon ist ein System-Baustein, kein isoliertes Produkt. Eingetippt einmal, lebendig in jedem Detail deiner Hochzeit.</p>
+      <p class="serif text-xl italic text-ink-muted text-center mt-10">Eine Datenquelle. Viele Werke. Eine Geschichte.</p>
+    </div>
+  </article>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Hochzeit organisieren ohne Chaos — das System gegen die zehn offenen Tabs",
+  "description": description,
+  "image": "https://weddingstoryatelier.de/images/card-sitzplan.png",
+  "author": { "@type": "Organization", "name": "Wedding Story Atelier" },
+  "publisher": { "@type": "Organization", "name": "Wedding Story Atelier", "url": "https://weddingstoryatelier.de" },
+  "datePublished": "2026-05-13",
+  "dateModified": "2026-05-13",
+  "mainEntityOfPage": "https://weddingstoryatelier.de/journal/hochzeit-organisieren-ohne-chaos-system",
+  "inLanguage": "de-DE"
+})} />
+
+<style>
+  .article-body .lead { font-size: 1.25rem; color: var(--color-ink); }
+  .article-body p { color: var(--color-ink); }
+  .article-body strong { font-weight: 500; color: var(--color-ink); }
+
+  .snippet-box {
+    background: var(--color-cream);
+    border-left: 3px solid var(--color-cognac);
+    padding: 1.5rem 1.75rem;
+    margin: 1rem 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .mid-cta {
+    background: linear-gradient(180deg, #FAF7F2 0%, #F3EDE3 100%);
+    border: 1px solid #E5DCC9;
+    padding: 2rem 2rem 1.75rem;
+    margin: 3.5rem 0;
+    text-align: center;
+  }
+  .cta-eyebrow {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 0.75rem;
+  }
+  .cta-text {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    margin-bottom: 1.5rem;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+
+  .faq h3 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq p { margin-bottom: 0.5rem; }
+
+  .cognac-link {
+    color: var(--color-cognac);
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+  }
+  .cognac-link:hover { color: var(--color-ink); }
+</style>
