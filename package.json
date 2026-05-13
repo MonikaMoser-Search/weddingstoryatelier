@@ -14,6 +14,7 @@
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
     "@fontsource/cormorant-garamond": "^5.2.11",
+    "@fontsource/great-vibes": "^5.2.8",
     "@fontsource/inter": "^5.2.8",
     "@tailwindcss/vite": "^4.3.0",
     "astro": "^6.3.1",

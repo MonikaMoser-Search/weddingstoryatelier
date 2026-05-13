@@ -118,6 +118,15 @@
   src: url("/fonts/inter-latin-600-normal.woff2") format("woff2");
 }
 
+/* ---------- Great Vibes (Kalligrafie) ---------- */
+@font-face {
+  font-family: "Great Vibes";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/great-vibes-latin-400-normal.woff2") format("woff2");
+}
+
 /* ---------- DM Sans (Substitut: Inter) ----------
    Beide geometric sans-serif, sehr nah verwandt. */
 @font-face {
