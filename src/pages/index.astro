@@ -8,7 +8,7 @@ import Layout from '../layouts/Layout.astro';
     <nav class="flex items-center justify-between text-sm tracking-wide">
       <a href="/" class="serif text-xl">Wedding Story Atelier</a>
       <ul class="hidden md:flex gap-10 text-ink-muted">
-        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
         <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
         <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
       </ul>
@@ -31,7 +31,7 @@ import Layout from '../layouts/Layout.astro';
         Galerie und Werkbank in einem.
       </p>
       <div class="mt-14 flex flex-col sm:flex-row gap-6 items-center justify-center text-sm tracking-wider">
-        <a href="/atelier" class="border-b border-ink pb-1 hover:border-cognac hover:text-cognac transition-colors">
+        <a href="#werke" class="border-b border-ink pb-1 hover:border-cognac hover:text-cognac transition-colors">
           Das Atelier betreten →
         </a>
         <a href="/journal" class="text-ink-muted hover:text-ink transition-colors">
@@ -42,7 +42,7 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <!-- Galerie-Teaser -->
-  <section class="px-8 md:px-16 py-32 bg-cream">
+  <section id="werke" class="px-8 md:px-16 py-32 bg-cream">
     <div class="max-w-5xl mx-auto">
       <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">Die Werke</p>
       <h2 class="serif text-4xl md:text-5xl mb-16 max-w-2xl leading-tight">
