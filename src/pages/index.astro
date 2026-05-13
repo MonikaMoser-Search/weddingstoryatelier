@@ -24,7 +24,7 @@ import Layout from '../layouts/Layout.astro';
       <h1 class="serif text-5xl md:text-7xl lg:text-8xl leading-[1.05] mb-10">
         Eine Hochzeit<br />
         ist eine Geschichte.<br />
-        <em class="text-cognac">Wir schreiben sie mit.</em>
+        <em class="text-forest">Wir schreiben sie mit.</em>
       </h1>
       <p class="text-lg md:text-xl text-ink-muted max-w-xl mx-auto leading-relaxed">
         Atelier für editoriale Papeterie und stilbewusste Story-Konzepte.
@@ -98,8 +98,29 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
+  <!-- Atelier-Siegel — das Logo bekommt seine Bühne -->
+  <section class="px-8 md:px-16 py-32 text-center">
+    <img
+      src="/logo.jpg"
+      alt="Wedding Story Atelier — Monogramm"
+      width="220"
+      height="220"
+      class="mx-auto rounded-full shadow-sm"
+    />
+    <p class="serif text-2xl mt-10 text-ink-muted italic">
+      Aus dem Atelier
+    </p>
+  </section>
+
   <!-- Footer, minimal -->
-  <footer class="px-8 md:px-16 py-16 text-center">
-    <p class="serif text-2xl">Wedding Story Atelier</p>
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
   </footer>
 </Layout>
