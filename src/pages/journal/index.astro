@@ -1,0 +1,144 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const articles = [
+  {
+    slug: 'editorial-hochzeit-papeterie-magazin-stil',
+    eyebrow: 'Editorial · Pillar',
+    title: 'Editorial Hochzeit: Papeterie wie aus einem Magazin — ohne Designer',
+    excerpt: 'Dein Pinterest-Board sieht aus wie ein Vogue-Editorial. Deine Canva-Vorlagen sehen aus wie eine Vereinsmitteilung. Zwischen diesen zwei Welten klafft eine Lücke, die fast jede Braut kennt — und genau dort entsteht ein eigener Stil.',
+    image: '/images/card-wedding-magazine.png',
+    date: '13. Mai 2026',
+    readingTime: '8 Minuten',
+    featured: true,
+  },
+];
+
+const featured = articles.find(a => a.featured);
+const rest = articles.filter(a => !a.featured);
+---
+
+<Layout
+  title="Journal — Wedding Story Atelier"
+  description="Atelier-Notizen zu Editorial Wedding, Hochzeitspapeterie und Stilfragen. Ein Magazin für Brautpaare, die das Besondere im Detail suchen."
+>
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero: Journal-Titel -->
+  <section class="px-8 md:px-16 pt-40 pb-16 text-center">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Magazin · Atelier-Notizen
+    </p>
+    <h1 class="serif text-6xl md:text-8xl leading-none mb-10">
+      <em class="not-italic">Journal</em>
+    </h1>
+    <p class="serif text-xl md:text-2xl italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+      Notizen aus dem Atelier — über Editorial Wedding, das Handwerk hinter der Hochzeitspapeterie, und das Besondere, das aus dem Detail entsteht.
+    </p>
+  </section>
+
+  <!-- Featured Article -->
+  {featured && (
+    <section class="px-8 md:px-16 pb-24">
+      <div class="max-w-6xl mx-auto">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-8 text-center">
+          ─── Aktuell ───
+        </p>
+
+        <a href={`/journal/${featured.slug}`} class="featured-card group block">
+          <div class="grid md:grid-cols-5 gap-10 md:gap-16 items-center">
+            <div class="md:col-span-2 order-2 md:order-1">
+              <p class="text-xs tracking-[0.3em] uppercase text-cognac mb-4">
+                {featured.eyebrow}
+              </p>
+              <h2 class="serif text-3xl md:text-4xl lg:text-5xl leading-tight mb-6 group-hover:text-cognac transition-colors">
+                {featured.title}
+              </h2>
+              <p class="text-base md:text-lg text-ink-muted leading-relaxed mb-6">
+                {featured.excerpt}
+              </p>
+              <div class="flex items-center gap-4 text-xs tracking-wider uppercase text-ink-muted mb-6">
+                <span>{featured.date}</span>
+                <span>·</span>
+                <span>{featured.readingTime} Lesezeit</span>
+              </div>
+              <span class="inline-block text-xs tracking-[0.2em] uppercase border-b border-ink pb-0.5 group-hover:border-cognac group-hover:text-cognac transition-colors">
+                Weiterlesen →
+              </span>
+            </div>
+            <div class="md:col-span-3 order-1 md:order-2">
+              <div class="aspect-[4/5] overflow-hidden bg-sand">
+                <img
+                  src={featured.image}
+                  alt={featured.title}
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                />
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+  )}
+
+  <!-- Weitere Artikel (falls vorhanden) -->
+  {rest.length > 0 && (
+    <section class="px-8 md:px-16 pb-24 bg-cream">
+      <div class="max-w-6xl mx-auto py-16">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-12 text-center">
+          ─── Weitere Stücke ───
+        </p>
+        <div class="grid md:grid-cols-3 gap-12">
+          {rest.map((article) => (
+            <a href={`/journal/${article.slug}`} class="group block">
+              <div class="aspect-[3/4] overflow-hidden bg-sand mb-5">
+                <img
+                  src={article.image}
+                  alt={article.title}
+                  loading="lazy"
+                  class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+              <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-2">{article.eyebrow}</p>
+              <h3 class="serif text-2xl leading-tight mb-2 group-hover:text-cognac transition-colors">
+                {article.title}
+              </h3>
+              <p class="text-sm text-ink-muted leading-relaxed">{article.excerpt.substring(0, 120)}…</p>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Editorial Ausblick (atelier-style, nicht "coming soon") -->
+  <section class="px-8 md:px-16 py-24 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      In Arbeit
+    </p>
+    <p class="serif text-xl md:text-2xl italic max-w-2xl mx-auto leading-relaxed text-ink-muted">
+      Weitere Notizen entstehen gerade im Atelier — über Sitzpläne mit Charakter, Save-the-Date-Trends und das Handwerk hinter dem Editorial-Stil.
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
