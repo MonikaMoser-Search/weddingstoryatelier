@@ -1,0 +1,69 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Kontakt — Wedding Story Atelier"
+  description="Schreib uns. Persönlich, direkt, ohne Formular."
+>
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/atelier" class="hover:text-ink transition-colors">Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="min-h-screen flex items-center justify-center px-8 md:px-16 py-32">
+    <div class="max-w-2xl text-center">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-8">
+        Kontakt
+      </p>
+
+      <h1 class="serif text-5xl md:text-6xl leading-tight mb-8">
+        Erzähl uns von<br />
+        <em class="text-cognac">deiner Geschichte.</em>
+      </h1>
+
+      <p class="text-lg text-ink-muted leading-relaxed max-w-lg mx-auto mb-16">
+        Kein Formular, kein Klick-Labyrinth. Schreib uns einfach —
+        wir antworten persönlich, meist innerhalb eines Werktages.
+      </p>
+
+      <div class="space-y-6 text-base">
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-ink-muted mb-2">Per E-Mail</p>
+          <a href="mailto:info@mmsearch.de" class="serif text-2xl border-b border-ink pb-1 hover:border-cognac hover:text-cognac transition-colors">
+            info@mmsearch.de
+          </a>
+        </div>
+
+        <div class="pt-4">
+          <p class="text-xs tracking-[0.2em] uppercase text-ink-muted mb-2">Per Telefon</p>
+          <a href="tel:+4962249877090" class="serif text-2xl hover:text-cognac transition-colors">
+            +49 6224 9877090
+          </a>
+        </div>
+      </div>
+
+      <p class="mt-20 text-sm text-ink-muted italic max-w-md mx-auto leading-relaxed">
+        Hinter dem Atelier steht Monika Moser. Jede Nachricht landet
+        direkt bei ihr — keine Hotline, kein Bot dazwischen.
+      </p>
+    </div>
+  </main>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
