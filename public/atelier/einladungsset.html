@@ -514,7 +514,7 @@ function applyLang() {
   ge('sl-ornament').textContent  = s.slOrnament;
   ge('sl-format').textContent    = s.slFormat;
   ge('sl-lang').textContent      = s.slLang;
-  ge('sl-bleed').textContent     = s.slBleed;
+  if (ge('sl-bleed')) ge('sl-bleed').textContent = s.slBleed;
   // Color button labels
   ge('cbtn-navy').textContent    = s.cbNavy;
   ge('cbtn-sage').textContent    = s.cbSage;
@@ -557,10 +557,10 @@ function applyLang() {
   ge('rsvpDate').placeholder     = s.phRsvpDate;
   ge('rsvpText').placeholder     = s.phRsvpText;
   // Download buttons & privacy
-  ge('dl-invite').textContent    = s.dlInvite;
-  ge('dl-details').textContent   = s.dlDetails;
-  ge('dl-rsvp').textContent      = s.dlRsvp;
-  ge('privacy-txt').textContent  = s.privacy;
+  if (ge('dl-invite'))   ge('dl-invite').textContent   = s.dlInvite;
+  if (ge('dl-details'))  ge('dl-details').textContent  = s.dlDetails;
+  if (ge('dl-rsvp'))     ge('dl-rsvp').textContent     = s.dlRsvp;
+  if (ge('privacy-txt')) ge('privacy-txt').textContent = s.privacy;
   ge('qr-label').textContent     = s.qrLabel;
   ge('svgHint').textContent      = s.svgHint;
 }
