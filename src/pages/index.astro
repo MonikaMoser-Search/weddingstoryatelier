@@ -119,6 +119,46 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
+  <!-- Process — Atelier-Workflow als Editorial-Step-Line -->
+  <section class="px-8 md:px-16 py-32 border-t border-sand">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4 text-center">
+        Der Atelier-Weg
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-20 max-w-2xl mx-auto leading-tight">
+        Von der ersten Vorschau zum druckfertigen Werk.
+      </h2>
+
+      <ol class="process-steps">
+        <li class="process-step">
+          <span class="step-numeral">I</span>
+          <h3 class="step-title">Ansehen</h3>
+          <p class="step-text">Stöbere durch die Werke wie durch eine Galerie. Kein Konto, kein Klick-Zwang.</p>
+        </li>
+        <li class="process-step">
+          <span class="step-numeral">II</span>
+          <h3 class="step-title">Ausprobieren</h3>
+          <p class="step-text">Öffne eine Live-Demo direkt im Browser. Tippe deine Namen, dein Datum, deine Geschichte.</p>
+        </li>
+        <li class="process-step">
+          <span class="step-numeral">III</span>
+          <h3 class="step-title">Personalisieren</h3>
+          <p class="step-text">Wähle Farben, Layouts, Fotos. Alles ändert sich live vor deinen Augen — nichts wird hochgeladen.</p>
+        </li>
+        <li class="process-step">
+          <span class="step-numeral">IV</span>
+          <h3 class="step-title">Bezahlen</h3>
+          <p class="step-text">Wenn dir gefällt, was du siehst, kaufst du die Vorlage einmalig im Shop. Druckfertig, ohne Abo.</p>
+        </li>
+        <li class="process-step">
+          <span class="step-numeral">V</span>
+          <h3 class="step-title">Drucken</h3>
+          <p class="step-text">Lade dein PDF herunter. Probedruck zuerst, dann Auflage zuhause, bei DM oder einer Online-Druckerei.</p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
   <!-- Atelier-Siegel — das Logo bekommt seine Bühne -->
   <section class="px-8 md:px-16 py-32 text-center">
     <img
@@ -145,3 +185,90 @@ import Layout from '../layouts/Layout.astro';
     </p>
   </footer>
 </Layout>
+
+<style>
+  .process-steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 2.5rem;
+    position: relative;
+  }
+  /* Verbindungslinie zwischen den Ziffern */
+  .process-steps::before {
+    content: '';
+    position: absolute;
+    top: 1.75rem;
+    left: 12%;
+    right: 12%;
+    height: 1px;
+    background: var(--color-sand);
+    z-index: 0;
+  }
+  .process-step {
+    position: relative;
+    text-align: center;
+    z-index: 1;
+  }
+  .step-numeral {
+    display: inline-block;
+    width: 3.5rem;
+    height: 3.5rem;
+    line-height: 3.5rem;
+    background: var(--color-paper);
+    border: 1px solid var(--color-sand);
+    border-radius: 50%;
+    font-family: var(--font-serif);
+    font-size: 1.5rem;
+    color: var(--color-cognac);
+    margin-bottom: 1.25rem;
+    transition: all 0.4s ease;
+  }
+  .process-step:hover .step-numeral {
+    background: var(--color-ink);
+    color: var(--color-paper);
+    border-color: var(--color-ink);
+  }
+  .step-title {
+    font-family: var(--font-serif);
+    font-size: 1.35rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-ink);
+  }
+  .step-text {
+    font-size: 0.85rem;
+    line-height: 1.6;
+    color: var(--color-ink-muted);
+    max-width: 14rem;
+    margin: 0 auto;
+  }
+
+  @media (max-width: 768px) {
+    .process-steps {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+    .process-steps::before {
+      display: none;
+    }
+    .process-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 1.25rem;
+      text-align: left;
+      align-items: start;
+    }
+    .step-numeral {
+      margin-bottom: 0;
+      width: 2.75rem;
+      height: 2.75rem;
+      line-height: 2.75rem;
+      font-size: 1.15rem;
+    }
+    .step-text {
+      max-width: none;
+    }
+  }
+</style>
