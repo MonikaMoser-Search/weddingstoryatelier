@@ -1,0 +1,204 @@
+/* =============================================================================
+   wsa_panel.css — Wedding Story Atelier · Gemeinsames Panel-Styling
+   Einbindung: <link rel="stylesheet" href="wsa_panel.css">
+   Gilt für: alle Generatoren · linkes Steuerungs-Panel
+   ============================================================================= */
+
+/* ── Variablen ────────────────────────────────────────────────────────────── */
+:root {
+  --wsa-dark:         #1A1A1A;
+  --wsa-panel-width:  360px;
+  --wsa-border:       #e8e5e0;
+  --wsa-divider:      #f2f0ec;
+}
+
+/* ── Reset & Body ─────────────────────────────────────────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: #EAE6DF;
+  display: flex; height: 100vh; overflow: hidden;
+  color: #1A1A1A;
+}
+
+/* ── Panel Container ──────────────────────────────────────────────────────── */
+.panel-form {
+  width: var(--wsa-panel-width);
+  min-width: var(--wsa-panel-width);
+  background: #fff;
+  padding: 24px 22px 20px;
+  border-right: 1px solid var(--wsa-border);
+  display: block;
+  overflow-y: auto; height: 100vh;
+  flex-shrink: 0;
+}
+
+/* ── Logo & Tagline ───────────────────────────────────────────────────────── */
+.panel-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 17px; letter-spacing: 1.5px; color: #1a1a1a;
+}
+.panel-tagline {
+  font-size: 8px; color: #ccc;
+  text-transform: uppercase; letter-spacing: 2px;
+  margin-top: 2px; margin-bottom: 22px;
+}
+
+/* ── Abschnitts-Labels ────────────────────────────────────────────────────── */
+.section-label {
+  font-size: 8.5px; text-transform: uppercase;
+  letter-spacing: 1.5px; color: #aaa;
+  display: block; margin: 14px 0 6px;
+}
+
+/* ── Trennlinie ───────────────────────────────────────────────────────────── */
+.divider { border: none; border-top: 1px solid var(--wsa-divider); margin: 13px 0; }
+
+/* ── Hinweis-Text ─────────────────────────────────────────────────────────── */
+.hint { font-size: 9.5px; color: #bbb; font-style: italic; line-height: 1.6; margin-bottom: 7px; }
+
+/* ── Button-Gruppen ───────────────────────────────────────────────────────── */
+.btn-group { display: flex; gap: 4px; }
+.ui-btn {
+  flex: 1; padding: 7px 4px; font-size: 9px;
+  border: 1px solid #ebebeb; background: #fff; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s; color: #777;
+}
+.ui-btn:hover  { border-color: var(--wsa-dark); color: var(--wsa-dark); }
+.ui-btn.active { background: var(--wsa-dark); color: #fff; border-color: var(--wsa-dark); }
+
+/* ── Sprachumschalter ─────────────────────────────────────────────────────── */
+.lang-buttons { display: flex; gap: 4px; margin-bottom: 10px; }
+.lang-btn {
+  flex: 1; padding: 7px 8px; font-size: 9px;
+  border: 1px solid #ebebeb; background: #fff; cursor: pointer;
+  text-transform: uppercase; letter-spacing: 1.5px;
+  font-family: 'DM Sans', sans-serif; transition: all 0.15s; color: #777;
+}
+.lang-btn:hover  { border-color: var(--wsa-dark); color: var(--wsa-dark); }
+.lang-btn.active { background: var(--wsa-dark); color: #fff; border-color: var(--wsa-dark); }
+
+/* ── Eingabefelder ────────────────────────────────────────────────────────── */
+.panel-form input[type="text"],
+.panel-form input[type="email"],
+.panel-form input[type="number"] {
+  width: 100%; padding: 9px 11px; margin-bottom: 5px;
+  border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; outline: none; transition: border-color 0.2s;
+  background: #FAFAFA; color: #1A1A1A;
+}
+.panel-form input[type="text"]:focus,
+.panel-form input[type="email"]:focus,
+.panel-form input[type="number"]:focus { border-color: var(--wsa-dark); background: #fff; }
+
+/* ── Textarea ─────────────────────────────────────────────────────────────── */
+.panel-form textarea {
+  width: 100%; padding: 9px 11px;
+  border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+  font-size: 12px; resize: vertical; outline: none;
+  line-height: 1.7; transition: border-color 0.2s;
+  background: #fff; color: #1A1A1A;
+}
+.panel-form textarea:focus { border-color: var(--wsa-dark); }
+
+/* ── Dropdown / Select ────────────────────────────────────────────────────── */
+.panel-form select {
+  width: 100%; padding: 7px 10px; margin-bottom: 5px;
+  border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+  font-size: 11px; outline: none; background: #FAFAFA; color: #1A1A1A;
+  cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+  padding-right: 28px;
+}
+.panel-form select:focus { border-color: var(--wsa-dark); background-color: #fff; }
+
+/* ── Range-Slider ─────────────────────────────────────────────────────────── */
+.panel-form input[type="range"] {
+  flex: 1; -webkit-appearance: none; height: 3px;
+  background: #eee; border-radius: 2px; outline: none;
+  border: none; padding: 0; cursor: pointer; accent-color: var(--wsa-dark);
+}
+.panel-form input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 13px; height: 13px;
+  border-radius: 50%; background: var(--wsa-dark); cursor: pointer;
+}
+
+/* ── Aktions-Zeile ────────────────────────────────────────────────────────── */
+.action-row {
+  display: flex; gap: 7px; padding: 12px 0 16px;
+  flex-shrink: 0; border-top: 1px solid #f0eee9; margin-top: 12px;
+}
+.btn-demo {
+  flex: 1; padding: 10px 4px; border: 1px solid #ddd; background: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase;
+  letter-spacing: 1.5px; cursor: pointer; transition: all 0.15s; color: #666;
+}
+.btn-demo:hover { border-color: var(--wsa-dark); color: var(--wsa-dark); }
+.btn-export {
+  flex: 2; padding: 10px; background: var(--wsa-dark); color: #fff; border: none;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase;
+  letter-spacing: 1.5px; cursor: pointer; transition: background 0.15s;
+}
+.btn-export:hover { background: #2e2e2e; }
+.btn-export-secondary {
+  flex: 1; padding: 10px 4px; border: 1px solid var(--wsa-dark); background: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase;
+  letter-spacing: 1.5px; cursor: pointer; transition: all 0.15s; color: var(--wsa-dark);
+}
+.btn-export-secondary:hover { background: var(--wsa-dark); color: #fff; }
+
+/* ── Beschnittzugabe-Checkbox ─────────────────────────────────────────────── */
+.bleed-label {
+  display: flex; align-items: center; gap: 5px;
+  font-family: 'DM Sans', sans-serif; font-size: 8px;
+  text-transform: uppercase; letter-spacing: 1px;
+  color: #666; cursor: pointer; padding: 4px 0 2px;
+  user-select: none;
+}
+.bleed-label input[type="checkbox"] {
+  cursor: pointer; accent-color: var(--wsa-dark);
+  width: 12px; height: 12px; flex-shrink: 0;
+}
+
+/* ── Druckempfehlung ──────────────────────────────────────────────────────── */
+.print-hint {
+  border-top: 1px solid #e8e4df;
+  padding: 8px 0 20px;
+  margin-top: 4px;
+}
+.print-hint-de {
+  display: block; font-family: 'DM Sans', sans-serif;
+  font-size: 7.5px; color: #555; line-height: 1.55; margin-bottom: 4px;
+}
+.print-hint-en {
+  display: block; font-family: 'DM Sans', sans-serif;
+  font-size: 7px; color: #999; font-style: italic; line-height: 1.55;
+}
+
+/* ── PDF-Lade-Spinner ─────────────────────────────────────────────────────── */
+#pdf-spinner {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6); z-index: 999;
+  justify-content: center; align-items: center;
+  flex-direction: column; gap: 14px; color: #fff;
+  font-family: 'DM Sans', sans-serif; font-size: 10px;
+  letter-spacing: 2px; text-transform: uppercase;
+}
+#pdf-spinner span { opacity: 0.85; }
+.spin-ring {
+  width: 36px; height: 36px;
+  border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #fff; border-radius: 50%;
+  animation: wsa-spin 0.8s linear infinite;
+}
+@keyframes wsa-spin { to { transform: rotate(360deg); } }
+
+/* ── Vorschau-Panel (rechts) ──────────────────────────────────────────────── */
+.panel-preview {
+  flex: 1; background: #DDD8D0;
+  display: flex; align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 36px 36px 80px;
+}
+#preview-scaler { transform-origin: top center; transition: transform 0.3s; }
