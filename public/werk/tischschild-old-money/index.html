@@ -1,0 +1,779 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Tischschild — Old Money Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Theme Dots ── */
+    .theme-dots { display: flex; gap: 8px; margin: 6px 0 2px; }
+    .theme-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2.5px solid transparent; cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; }
+    .theme-dot:hover  { transform: scale(1.12); }
+
+    /* ── Tisch-Zeilen ── */
+    .table-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+    .table-row  { display: flex; align-items: center; gap: 6px; }
+    .row-num {
+      width: 16px; flex-shrink: 0; text-align: right;
+      font-size: 9px; color: #bbb; font-family: 'DM Sans', sans-serif;
+    }
+    .row-fixed {
+      flex: 1; font-size: 11px; color: #999;
+      font-family: 'DM Sans', sans-serif;
+      padding: 5px 7px; border: 1px solid #eee; background: #fafafa;
+    }
+    .row-input {
+      flex: 1; border: 1px solid #eee; padding: 5px 7px;
+      font-size: 11px; font-family: 'DM Sans', sans-serif;
+      background: #fafafa; color: #333; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .row-input:focus,
+    .row-input.is-active { border-color: #8B1A35; background: #fff; }
+
+    .btn-photo {
+      flex-shrink: 0; height: 28px; padding: 0 8px;
+      border: 1px solid #eee; background: #fafafa;
+      cursor: pointer; font-size: 9px;
+      display: flex; align-items: center; gap: 4px;
+      position: relative; transition: border-color 0.15s, background 0.15s;
+      color: #aaa; white-space: nowrap; letter-spacing: 0.5px;
+      font-family: 'DM Sans', sans-serif; text-transform: uppercase;
+    }
+    .btn-photo:hover     { border-color: #aaa; color: #555; background: #f5f5f5; }
+    .btn-photo.has-photo { border-color: #8B1A35; background: #fef8f7; color: #8B1A35; }
+    .btn-photo input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .btn-rm {
+      flex-shrink: 0; width: 16px; height: 16px;
+      border: none; background: none; cursor: pointer;
+      font-size: 14px; color: #d0ccc8; padding: 0; line-height: 1;
+      transition: color 0.12s;
+    }
+    .btn-rm:hover { color: #999; }
+
+    /* Foto Y-Regler */
+    .photo-y-wrap {
+      flex-shrink: 0; display: flex; align-items: center;
+    }
+    .photo-y-slider {
+      width: 58px; height: 4px; cursor: pointer;
+      accent-color: #8B1A35;
+    }
+
+    /* ── Preview ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; width: 100%; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── Karte ── */
+    .tisch-card {
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.20);
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      width: 148mm; height: 210mm;
+    }
+    .tisch-card.burgund {
+      background: #FEF8F7; border: 5.5mm solid #8B1A35; color: #8B1A35;
+      --tc-r: 142; --tc-g: 27; --tc-b: 48;
+    }
+    .tisch-card.cognac {
+      background: #FEF9F5; border: 5.5mm solid #7B4718; color: #7B4718;
+      --tc-r: 123; --tc-g: 71; --tc-b: 24;
+    }
+    .tisch-card.forest {
+      background: #F7FAF7; border: 5.5mm solid #1F4A32; color: #1F4A32;
+      --tc-r: 31; --tc-g: 74; --tc-b: 50;
+    }
+
+    .card-inner-frame {
+      position: absolute; inset: 3.5mm; pointer-events: none; z-index: 1;
+      border: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.32);
+    }
+    .card-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; position: relative; z-index: 2;
+      padding: 9mm 0; /* symmetrisch → korrektes vertikales Zentrum */
+    }
+    .card-text {
+      flex: 1; width: 100%; padding: 0 9mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .card-prefix {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10pt;
+      letter-spacing: 1.5px; opacity: 0.72;
+      text-align: center; line-height: 1.3;
+    }
+    .card-orn {
+      width: 36mm; height: 6mm;
+      display: flex; align-items: center;
+      margin: 7mm 0 5mm; opacity: 0.75;
+    }
+    .card-orn svg { width: 100%; height: 100%; }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.2em;
+      text-align: center; line-height: 1.2;
+    }
+    /* Schriftgröße nach Textlänge */
+    .card-name.len-xs  { font-size: 52pt; } /* 1–2 Zeichen: Zahlen */
+    .card-name.len-s   { font-size: 36pt; } /* 3–5 Zeichen */
+    .card-name.len-m   { font-size: 28pt; } /* 6–9 Zeichen */
+    .card-name.len-l   { font-size: 22pt; } /* 10+ Zeichen */
+
+    /* Foto — 3:4 Fenster, zentriert, unten */
+    .card-photo {
+      width: 95mm; height: 127mm;   /* festes 3:4-Fenster */
+      margin: 0 auto 3.5mm;
+      flex-shrink: 0; overflow: hidden;
+    }
+    .card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-photo-empty {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7px; letter-spacing: 2.5px; text-transform: uppercase;
+      opacity: 0.18;
+      border-top: 1px dashed rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<!-- LINKES PANEL -->
+<form class="panel-form" onsubmit="return false">
+  <div class="panel-logo">WSA</div>
+  <div class="panel-tagline" id="lbl-tagline">Tischschild · Old Money Line</div>
+
+  <div class="btn-group" id="lang-btns" style="margin:6px 0 10px">
+    <button type="button" class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button type="button" class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <label class="section-label">1 · Design</label>
+  <div class="theme-dots">
+    <button type="button" class="theme-dot active" data-theme="burgund"
+      style="background:#8B1A35" title="Burgund" onclick="setTheme('burgund')"></button>
+    <button type="button" class="theme-dot" data-theme="cognac"
+      style="background:#7B4718" title="Cognac"  onclick="setTheme('cognac')"></button>
+    <button type="button" class="theme-dot" data-theme="forest"
+      style="background:#1F4A32" title="Forest"  onclick="setTheme('forest')"></button>
+  </div>
+
+  <label class="section-label">2 · Format</label>
+  <select id="sel-format" onchange="onFormatChange()">
+    <option value="a5">A5 — 148 × 210 mm</option>
+    <option value="us57">5×7" — 127 × 178 mm</option>
+  </select>
+
+  <label class="section-label">3 · Prefix
+    <span id="lbl-sec3-note" style="opacity:.38;font-style:italic;font-size:9px;text-transform:none;letter-spacing:0;margin-left:4px">optional — z. B. Tisch, Table, Movie …</span>
+  </label>
+  <input type="text" id="inp-prefix" value="Tisch"
+    placeholder="Tisch / Table / Movie / Zone …" oninput="renderPreview()">
+
+  <hr class="divider">
+
+  <label class="section-label" id="lbl-sec5">5 · Tische — Durchgang 1–10</label>
+  <div class="table-rows" id="table-rows"></div>
+
+  <hr class="divider" style="margin-top:14px">
+
+  <div class="action-row">
+    <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <button type="button" class="btn-export" id="btn-export" onclick="exportPDF()">PDF exportieren</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
+  <div class="print-hint">
+    <span id="lbl-print-hint">
+      Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien.
+      Für randlose Drucke Beschnitt aktivieren.
+    </span>
+  </div>
+</form>
+
+<!-- RECHTES PANEL: VORSCHAU -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navCard(-1)" disabled>‹</button>
+    <span id="nav-label">1 / 10</span>
+    <button class="nav-btn" id="btn-next" onclick="navCard(1)">›</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div class="tisch-card burgund" id="card-preview">
+        <div class="card-inner-frame"></div>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="card-prefix" id="prev-prefix">Tisch</div>
+            <div class="card-orn" id="prev-orn">
+              <svg viewBox="0 0 90 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="6" y1="6" x2="37" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.85"/>
+                <line x1="53" y1="6" x2="84" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.85"/>
+                <polygon points="45,2.5 48.5,6 45,9.5 41.5,6" fill="currentColor" opacity="0.9"/>
+                <circle cx="6"  cy="6" r="1.4" fill="currentColor" opacity="0.62"/>
+                <circle cx="84" cy="6" r="1.4" fill="currentColor" opacity="0.62"/>
+              </svg>
+            </div>
+            <div class="card-name" id="prev-name">ITALIEN</div>
+          </div>
+          <div class="card-photo" id="prev-photo" style="display:none">
+            <div class="card-photo-empty">Foto optional</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ÜBERSETZUNGEN
+// ════════════════════════════════════════════════════════
+const T = {
+  de: {
+    tagline:      'Tischschild · Old Money Line',
+    sec3note:     'optional — z. B. Tisch, Table, Movie …',
+    sec5:         '5 · Tische — Durchgang 1–10',
+    prefixDefault: 'Tisch',
+    prefixPH:     'Tisch / Table / Movie / Zone …',
+    rowPH:        'z. B. Italien, 18, Der Pate …',
+    fotoBtnAdd:   '+ Foto',   fotoBtnHas:   '✓ Foto',
+    fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
+    sliderTitle:  'Bildausschnitt vertikal',
+    btnRm:        'Foto entfernen',
+    btnExport:    'PDF exportieren',
+    bleed:        'Beschnittzugabe 3 mm',
+    printHint:    'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.',
+    demo:         ['Italien','Frankreich','Portugal','Griechenland','Spanien','Kroatien','Österreich','Schweiz','Irland','Island'],
+  },
+  en: {
+    tagline:      'Table Sign · Old Money Line',
+    sec3note:     'optional — e. g. Table, Movie, Zone …',
+    sec5:         '5 · Tables — Batch 1–10',
+    prefixDefault: 'Table',
+    prefixPH:     'Table / Movie / Zone …',
+    rowPH:        'e. g. Italy, 18, The Godfather …',
+    fotoBtnAdd:   '+ Photo', fotoBtnHas:   '✓ Photo',
+    fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
+    sliderTitle:  'Vertical crop',
+    btnRm:        'Remove photo',
+    btnExport:    'Export PDF',
+    bleed:        'Bleed 3 mm',
+    printHint:    'File in sRGB color space, print-ready for all major online printers. Enable bleed for borderless prints.',
+    demo:         ['Italy','France','Portugal','Greece','Spain','Croatia','Austria','Switzerland','Ireland','Iceland'],
+  },
+};
+function tt() { return T[currentLang]; }
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let currentTheme = 'burgund';
+let currentCard  = 0;
+let currentLang  = 'de';
+
+const tables = Array.from({length: 10}, () => ({
+  name:   '',
+  photo:  null,   // base64-String oder null
+  photoY: 50,     // 0–100: vertikaler Fokus (0 = oben, 100 = unten)
+}));
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  buildTableRows();
+  renderPreview();
+  scalePreview();
+  window.addEventListener('resize', scalePreview);
+});
+
+// ════════════════════════════════════════════════════════
+// FOTO-KOMPRIMIERUNG — eigenständiges Modul, übertragbar
+// ════════════════════════════════════════════════════════
+function compressImage(file, maxPx, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// TISCH-ZEILEN AUFBAUEN
+// ════════════════════════════════════════════════════════
+function buildTableRows() {
+  const container = document.getElementById('table-rows');
+  container.innerHTML = '';
+
+  tables.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'table-row';
+
+    // Index-Zahl
+    const num = document.createElement('div');
+    num.className = 'row-num';
+    num.textContent = i + 1;
+    row.appendChild(num);
+
+    // Name-Eingabe
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'row-input' + (i === currentCard ? ' is-active' : '');
+    inp.placeholder = tt().rowPH;
+    inp.value = t.name;
+    inp.oninput = (e) => { tables[i].name = e.target.value; if (i === currentCard) renderPreview(); };
+    inp.onfocus = () => {
+      currentCard = i;
+      document.querySelectorAll('.row-input').forEach(el => el.classList.remove('is-active'));
+      inp.classList.add('is-active');
+      renderPreview(); updateNav();
+    };
+    row.appendChild(inp);
+
+    // Foto-Button
+    const btnP = document.createElement('div');
+    btnP.className = 'btn-photo' + (t.photo ? ' has-photo' : '');
+    btnP.title = t.photo ? tt().fotoTitleHas : tt().fotoTitleAdd;
+    btnP.innerHTML = t.photo ? tt().fotoBtnHas : tt().fotoBtnAdd;
+    const fi = document.createElement('input');
+    fi.type = 'file'; fi.accept = 'image/*';
+    fi.onchange = async (e) => {
+      if (!e.target.files[0]) return;
+      tables[i].photo = await compressImage(e.target.files[0], 1600, 0.85);
+      currentCard = i;
+      buildTableRows(); renderPreview(); updateNav();
+    };
+    btnP.appendChild(fi);
+    row.appendChild(btnP);
+
+    // Entfernen-Button + Y-Regler (nur wenn Foto vorhanden)
+    if (t.photo) {
+      const yWrap = document.createElement('div');
+      yWrap.className = 'photo-y-wrap';
+      const slider = document.createElement('input');
+      slider.type = 'range'; slider.min = '0'; slider.max = '100';
+      slider.value = t.photoY ?? 50;
+      slider.className = 'photo-y-slider';
+      slider.title = tt().sliderTitle;
+      slider.oninput = (e) => {
+        tables[i].photoY = parseInt(e.target.value);
+        if (i === currentCard) renderPreview();
+      };
+      yWrap.appendChild(slider);
+      row.appendChild(yWrap);
+
+      const btnR = document.createElement('button');
+      btnR.type = 'button'; btnR.className = 'btn-rm'; btnR.title = tt().btnRm;
+      btnR.textContent = '×';
+      btnR.onclick = () => {
+        tables[i].photo = null;
+        buildTableRows();
+        if (i === currentCard) renderPreview();
+      };
+      row.appendChild(btnR);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// SPRACHE
+// ════════════════════════════════════════════════════════
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = tt();
+  document.getElementById('lbl-tagline').textContent    = t.tagline;
+  document.getElementById('lbl-sec3-note').textContent  = t.sec3note;
+  document.getElementById('lbl-sec5').textContent       = t.sec5;
+  document.getElementById('inp-prefix').placeholder     = t.prefixPH;
+  document.getElementById('btn-export').textContent     = t.btnExport;
+  document.getElementById('lbl-bleed').textContent      = t.bleed;
+  document.getElementById('lbl-print-hint').textContent = t.printHint;
+  buildTableRows();
+}
+
+// ════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════
+function setTheme(theme) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-dot').forEach(d =>
+    d.classList.toggle('active', d.dataset.theme === theme));
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════
+// FORMAT
+// ════════════════════════════════════════════════════════
+function onFormatChange() { renderPreview(); scalePreview(); }
+
+// ════════════════════════════════════════════════════════
+// VORSCHAU RENDERN
+// ════════════════════════════════════════════════════════
+function renderPreview() {
+  const card   = document.getElementById('card-preview');
+  const prefix = document.getElementById('inp-prefix').value.trim();
+  const fmt    = document.getElementById('sel-format').value;
+  const t      = tables[currentCard];
+
+  // Format
+  const FMT = { a5:[148,210], us57:[127,178] };
+  const [w, h] = FMT[fmt] || FMT.a5;
+  card.style.width  = w + 'mm';
+  card.style.height = h + 'mm';
+
+  // Theme
+  card.className = 'tisch-card ' + currentTheme;
+
+  // Prefix + Ornament
+  const prefixEl = document.getElementById('prev-prefix');
+  const ornEl    = document.getElementById('prev-orn');
+  prefixEl.textContent = prefix;
+  prefixEl.style.display = prefix ? '' : 'none';
+  ornEl.style.display    = prefix ? '' : 'none';
+
+  // Name
+  const nameEl = document.getElementById('prev-name');
+  const txt = t.name || '—';
+  nameEl.textContent = txt;
+  const l = txt.replace(/\s/g,'').length;
+  nameEl.className = 'card-name ' + (l <= 2 ? 'len-xs' : l <= 5 ? 'len-s' : l <= 9 ? 'len-m' : 'len-l');
+
+  // Foto — nur anzeigen wenn vorhanden (sonst zentriert sich Text im ganzen Bereich)
+  const photoEl = document.getElementById('prev-photo');
+  if (t.photo) {
+    const yPos = t.photoY ?? 50;
+    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:center ${yPos}%">`;
+    photoEl.style.display = '';
+  } else {
+    photoEl.style.display = 'none';
+  }
+
+  updateNav();
+  scalePreview();
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function navCard(dir) {
+  currentCard = Math.max(0, Math.min(9, currentCard + dir));
+  renderPreview();
+}
+
+function updateNav() {
+  document.getElementById('btn-prev').disabled = currentCard === 0;
+  document.getElementById('btn-next').disabled = currentCard === 9;
+  const t   = tables[currentCard];
+  const lbl = t.name || ('Slot ' + (currentCard + 1));
+  document.getElementById('nav-label').textContent =
+    lbl + '\u2002\u00B7\u2002' + (currentCard + 1) + ' / 10';
+}
+
+// ════════════════════════════════════════════════════════
+// SKALIERUNG
+// ════════════════════════════════════════════════════════
+function scalePreview() {
+  const area = document.getElementById('preview-area');
+  if (!area || area.clientWidth <= 0) {
+    requestAnimationFrame(scalePreview);
+    return;
+  }
+
+  const fmt = document.getElementById('sel-format').value;
+  const FMT = { a5:[148,210], us57:[127,178] };
+  const [wMM, hMM] = FMT[fmt] || FMT.a5;
+  const PX = 96 / 25.4;
+  const cardW = wMM * PX, cardH = hMM * PX;
+
+  const wrap = document.getElementById('preview-wrap');
+  const avW  = area.clientWidth  - 48;
+  const avH  = area.clientHeight - 48;
+  const scale = Math.min(avW / cardW, avH / cardH, 1);
+
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.left = Math.round((area.clientWidth  - cardW * scale) / 2) + 'px';
+  wrap.style.top  = Math.round((area.clientHeight - cardH * scale) / 2) + 'px';
+}
+
+// ════════════════════════════════════════════════════════
+// DEMO
+// ════════════════════════════════════════════════════════
+function loadDemo() {
+  tt().demo.forEach((n, i) => { tables[i].name = n; });
+  document.getElementById('inp-prefix').value = tt().prefixDefault;
+  currentCard = 0;
+  buildTableRows(); renderPreview();
+}
+
+// ════════════════════════════════════════════════════════
+// PDF EXPORT
+// ════════════════════════════════════════════════════════
+function exportPDF() {
+  exportPDF_vector().catch(e => { console.error(e); alert('Export fehlgeschlagen: ' + e.message); });
+}
+
+// Foto auf Ziel-Seitenverhältnis zuschneiden (canvas-basiert)
+function cropPhoto(base64, targetW, targetH, yPercent) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const srcR = img.width / img.height;
+      const tgtR = targetW / targetH;
+      let sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        // Bild breiter als Fenster → links/rechts abschneiden, horizontal zentriert
+        sh = img.height; sw = sh * tgtR;
+        sx = (img.width - sw) / 2; sy = 0;
+      } else {
+        // Bild höher als Fenster → vertikal nach yPercent schneiden
+        sw = img.width; sh = sw / tgtR;
+        sx = 0;
+        const maxY = img.height - sh;
+        sy = maxY * ((yPercent ?? 50) / 100);
+      }
+      const c = document.createElement('canvas');
+      c.width = Math.round(sw); c.height = Math.round(sh);
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.9));
+    };
+    img.src = base64;
+  });
+}
+
+async function exportPDF_vector() {
+  const { jsPDF } = window.jspdf;
+
+  const formatKey = document.getElementById('sel-format').value;
+  const bleedMM   = document.getElementById('chk-bleed').checked ? 3 : 0;
+  const prefix    = document.getElementById('inp-prefix').value.trim();
+
+  const FMT = { a5:[148,210], us57:[127,178] };
+  const [baseW, baseH] = FMT[formatKey] || FMT.a5;
+  const fS   = baseW / 148;          // Skalierungsfaktor relativ zu A5
+  const docW = baseW + bleedMM * 2;
+  const docH = baseH + bleedMM * 2;
+  const bx = bleedMM, by = bleedMM;  // Bleed-Offset
+
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [docW, docH] });
+  if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+  const THEMES = {
+    burgund: { tc:[142, 27, 48],  bg:[254,248,247] },
+    cognac:  { tc:[123, 71, 24],  bg:[254,249,245] },
+    forest:  { tc:[ 31, 74, 50],  bg:[247,250,247] },
+  };
+  const th = THEMES[currentTheme] || THEMES.burgund;
+  const tc = th.tc, bg = th.bg;
+
+  // Farbmischung (Farbe auf Hintergrund bei gegebener Deckkraft)
+  function bl(rgb, op) {
+    return [
+      Math.round(rgb[0]*op + bg[0]*(1-op)),
+      Math.round(rgb[1]*op + bg[1]*(1-op)),
+      Math.round(rgb[2]*op + bg[2]*(1-op)),
+    ];
+  }
+  const sf = (rgb) => pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+  const sd = (rgb) => pdf.setDrawColor(rgb[0], rgb[1], rgb[2]);
+  const st = (rgb) => pdf.setTextColor(rgb[0], rgb[1], rgb[2]);
+
+  function setFont(name, style) {
+    const keyMap = {
+      'CormorantGaramond-light':  'CormorantGaramond-Light',
+      'CormorantGaramond-normal': 'CormorantGaramond-Regular',
+      'CormorantGaramond-italic': 'CormorantGaramond-Italic',
+      'DMSans-normal':            'DMSans-Regular',
+    };
+    const fontKey = keyMap[name + '-' + style];
+    if (window.WSA_FONTS && fontKey && WSA_FONTS.has(fontKey)) {
+      pdf.setFont(name, style);
+    } else {
+      const fb = {
+        CormorantGaramond: { normal:['Times','normal'], italic:['Times','italic'], light:['Times','normal'] },
+        DMSans:            { normal:['Helvetica','normal'] },
+      };
+      const r = ((fb[name]||{})[style]) || ['Helvetica','normal'];
+      pdf.setFont(r[0], r[1]);
+    }
+  }
+
+  const PTmm = 0.3528; // 1pt in mm
+  const BW   = 5.5 * fS; // Randbreite
+
+  const toExport = tables.filter(t => t.name.trim() !== '');
+  if (toExport.length === 0) {
+    alert('Bitte mindestens einen Tischnamen eingeben.');
+    return;
+  }
+
+  for (let i = 0; i < toExport.length; i++) {
+    const t = toExport[i];
+    if (i > 0) pdf.addPage();
+
+    // ── Hintergrund ──
+    sf(bg); pdf.rect(0, 0, docW, docH, 'F');
+
+    // ── Außenrahmen (4 Streifen, schließen Bleed ein) ──
+    sf(tc);
+    pdf.rect(0,              0,              docW,    BW+by,  'F'); // oben
+    pdf.rect(0,              docH-BW-by,     docW,    BW+by,  'F'); // unten
+    pdf.rect(0,              0,              BW+bx,   docH,   'F'); // links
+    pdf.rect(docW-BW-bx,     0,              BW+bx,   docH,   'F'); // rechts
+
+    // ── Innenrahmen ──
+    const fi = BW + 3.5*fS;
+    sd(bl(tc, 0.32)); pdf.setLineWidth(0.25*fS);
+    pdf.rect(bx+fi, by+fi, baseW-fi*2, baseH-fi*2, 'S');
+
+    // ── Foto (3:4-Fenster, zentriert, unten) ──
+    const photoW   = t.photo ? 95*fS : 0;
+    const photoH   = t.photo ? 127*fS : 0;
+    const photoX   = bx + (baseW - photoW) / 2;   // horizontal zentriert
+    const photoY   = by + baseH - fi - photoH - 3.5*fS; // Unterkante = Innenrahmen
+
+    // ── Textbereich: vertikal zentriert ──
+    const PAD_TOP  = BW + 9*fS;
+    const PAD_BOT  = BW + 9*fS;
+    const textTop  = by + PAD_TOP;
+    const textBot  = t.photo ? photoY - 5*fS : by + baseH - PAD_BOT;
+    const textCY   = (textTop + textBot) / 2;
+
+    const cx = bx + baseW / 2; // Horizontale Mitte
+
+    // Name-Text vorab berechnen (für dynamische Schriftgröße)
+    const nameText = t.name.toUpperCase();
+
+    // Schriftgrößen — dynamisch nach Textlänge
+    const pfFS   = 9.5 * fS;
+    const nLen   = nameText.replace(/\s/g,'').length;
+    const nameFS = (nLen <= 2 ? 52 : nLen <= 5 ? 36 : nLen <= 9 ? 28 : 22) * fS;
+
+    // Ornament
+    const ornW   = 32 * fS;
+    const ornH   = 6  * fS;
+    const spc1   = 7  * fS; // Abstand Prefix → Ornament
+    const spc2   = 5.5* fS; // Abstand Ornament → Name
+
+    // Gesamthöhe Textblock
+    let blockH = nameFS * PTmm;
+    if (prefix) blockH += pfFS*PTmm + spc1 + ornH + spc2;
+
+    let y = textCY - blockH / 2;
+
+    // ── Prefix (kursiv) ──
+    if (prefix) {
+      st(bl(tc, 0.72));
+      setFont('CormorantGaramond', 'italic');
+      pdf.setFontSize(pfFS);
+      // CSS letter-spacing: 1.5px → 1.5 × (25.4/96) mm, skaliert mit fS
+      const pfCharSp = 1.5 * (25.4 / 96) * fS;
+      pdf.setCharSpace(0);                           // Reset vor getTextWidth
+      const pfGlyphW = pdf.getTextWidth(prefix);
+      const pfTotalW = pfGlyphW + pfCharSp * Math.max(0, prefix.length - 1);
+      pdf.setCharSpace(pfCharSp);
+      y += pfFS * PTmm * 0.5;
+      pdf.text(prefix, cx - pfTotalW / 2, y, { baseline:'middle' });
+      pdf.setCharSpace(0);
+      y += pfFS * PTmm * 0.5 + spc1;
+
+      // ── Ornament (ORN_SMALL-Stil: 2 Linien + Diamant + 2 Kreise) ──
+      const s  = ornW / 90;
+      const my = y + 6*s;
+      sd(bl(tc, 0.82)); pdf.setLineWidth(Math.max(0.72*s, 0.08));
+      pdf.line(cx - ornW/2 + 6*s,  my, cx - ornW/2 + 37*s, my);
+      pdf.line(cx - ornW/2 + 53*s, my, cx - ornW/2 + 84*s, my);
+      sf(bl(tc, 0.85));
+      pdf.lines([[3*s,3*s],[-3*s,3*s],[-3*s,-3*s]], cx - ornW/2 + 45*s, y + 3*s, [1,1], 'F', true);
+      sf(bl(tc, 0.62));
+      pdf.circle(cx - ornW/2 + 6*s,  my, Math.max(1.4*s, 0.1), 'F');
+      pdf.circle(cx - ornW/2 + 84*s, my, Math.max(1.4*s, 0.1), 'F');
+
+      y += ornH + spc2;
+    }
+
+    // ── Name / Nummer (Kapitälchen-Stil: Versalien + weiter Zeichenabstand) ──
+
+    st(tc);
+    setFont('CormorantGaramond', 'normal');
+    pdf.setFontSize(nameFS);
+    // Manuelle Zentrierung — setCharSpace() nimmt mm (User Units), NICHT pt
+    // CSS letter-spacing: 0.2em → 0.2 × nameFS_pt × PTmm = charSp in mm
+    // CSS trimmt trailing spacing beim Zentrieren → (N-1) Lücken
+    const charSp  = 0.2 * nameFS * PTmm; // mm — exakt wie CSS 0.2em
+    pdf.setCharSpace(0);                  // Reset VOR getTextWidth (verhindert Beeinflussung)
+    const glyphW  = pdf.getTextWidth(nameText); // mm, reine Glyphenbreite
+    const totalW  = glyphW + charSp * Math.max(0, nameText.length - 1); // mm, N-1 Lücken
+    pdf.setCharSpace(charSp);
+    y += nameFS * PTmm * 0.5;
+    pdf.text(nameText, cx - totalW / 2, y, { baseline:'middle' });
+    pdf.setCharSpace(0);
+
+    // ── Foto (zugeschnitten nach Position) ──
+    if (t.photo) {
+      const cropped = await cropPhoto(t.photo, photoW, photoH, t.photoY ?? 50);
+      pdf.addImage(cropped, 'JPEG', photoX, photoY, photoW, photoH);
+    }
+  }
+
+  const THEME_NAMES = { burgund:'Burgund', cognac:'Cognac', forest:'Forest' };
+  const FMT_NAMES   = { a5:'A5', us57:'5x7' };
+  pdf.save(`WSA_Tischschild_${THEME_NAMES[currentTheme]}_${FMT_NAMES[formatKey]}.pdf`);
+}
+</script>
+</body>
+</html>

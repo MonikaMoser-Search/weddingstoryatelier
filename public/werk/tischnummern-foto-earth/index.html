@@ -1,0 +1,920 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Tischschild — Modern Earth Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Theme Dots ── */
+    .theme-dots { display: flex; gap: 8px; margin: 6px 0 2px; }
+    .theme-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2.5px solid transparent; cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; }
+    .theme-dot:hover  { transform: scale(1.12); }
+
+    /* ── Table Rows ── */
+    .table-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+    .table-row  { display: flex; align-items: center; gap: 6px; }
+    .row-num {
+      width: 16px; flex-shrink: 0; text-align: right;
+      font-size: 9px; color: #bbb; font-family: 'DM Sans', sans-serif;
+    }
+    .row-input {
+      flex: 1; border: 1px solid #eee; padding: 5px 7px;
+      font-size: 11px; font-family: 'DM Sans', sans-serif;
+      background: #fafafa; color: #333; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .row-input:focus,
+    .row-input.is-active { border-color: #A0522D; background: #fff; }
+
+    .btn-photo {
+      flex-shrink: 0; height: 28px; padding: 0 8px;
+      border: 1px solid #eee; background: #fafafa;
+      cursor: pointer; font-size: 9px;
+      display: flex; align-items: center; gap: 4px;
+      position: relative; transition: border-color 0.15s, background 0.15s;
+      color: #aaa; white-space: nowrap; letter-spacing: 0.5px;
+      font-family: 'DM Sans', sans-serif; text-transform: uppercase;
+    }
+    .btn-photo:hover     { border-color: #aaa; color: #555; background: #f5f5f5; }
+    .btn-photo.has-photo { border-color: #A0522D; background: #fdf8f5; color: #A0522D; }
+    .btn-photo input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .btn-rm {
+      flex-shrink: 0; width: 16px; height: 16px;
+      border: none; background: none; cursor: pointer;
+      font-size: 14px; color: #d0ccc8; padding: 0; line-height: 1;
+      transition: color 0.12s;
+    }
+    .btn-rm:hover { color: #999; }
+
+    .photo-y-wrap { flex-shrink: 0; display: flex; align-items: center; }
+    .photo-y-slider {
+      width: 58px; height: 4px; cursor: pointer;
+      accent-color: #A0522D;
+    }
+
+    /* ── Preview Panel ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #ECEAE4;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; width: 100%; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ══════════════════════════════════════════════════════
+       TISCH-KARTE — MODERN EARTH COLLECTION
+    ══════════════════════════════════════════════════════ */
+    .tisch-card {
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      width: 148mm; height: 210mm;
+    }
+
+    /* ── Terracotta Dusk #A0522D ── */
+    .tisch-card.terracotta {
+      color: #A0522D;
+      border: 5mm solid #A0522D;
+      --accent: #C4784A;
+      --frame:  rgba(160,82,45,0.26);
+      --rule:   rgba(160,82,45,0.20);
+      --label:  #A0522D;
+    }
+
+    /* ── Eucalyptus Mist #8F9779 ── */
+    .tisch-card.sage {
+      color: #8F9779;
+      border: 5mm solid #8F9779;
+      --accent: #C9A96E;
+      --frame:  rgba(143,151,121,0.30);
+      --rule:   rgba(143,151,121,0.22);
+      --label:  #8F9779;
+    }
+
+    /* ── Stone Taupe #96897F ── */
+    .tisch-card.clay {
+      color: #96897F;
+      border: 5mm solid #96897F;
+      --accent: #C4A09E;
+      --frame:  rgba(150,137,127,0.26);
+      --rule:   rgba(150,137,127,0.20);
+      --label:  #96897F;
+    }
+
+    .card-inner-frame {
+      position: absolute; inset: 3mm; pointer-events: none; z-index: 1;
+      border: 0.4px solid var(--frame);
+    }
+
+    .card-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; position: relative; z-index: 2;
+      padding: 9mm 0;
+    }
+
+    .card-text {
+      flex: 1; width: 100%; padding: 0 9mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+
+    /* Prefix — Montserrat, uppercase, wie pcard-motto in Earth-Platzkarten */
+    .card-prefix {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 500;
+      font-size: 9.5pt;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--label);
+      text-align: center;
+      line-height: 1.3;
+      margin-bottom: 5mm;
+    }
+
+    /* Ornament — gleicher Stil wie Earth-Platzkarten (orn-sep) */
+    .card-orn-sep {
+      display: flex; align-items: center; gap: 5px;
+      width: 52%; margin-bottom: 5mm;
+    }
+    .card-orn-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .card-orn-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* Name — Cormorant italic, wie pcard-name in Earth-Platzkarten */
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      text-align: center;
+      line-height: 1.15;
+      color: inherit;
+    }
+    .card-name.len-xs  { font-size: 52pt; }
+    .card-name.len-s   { font-size: 40pt; }
+    .card-name.len-m   { font-size: 32pt; }
+    .card-name.len-l   { font-size: 26pt; }
+
+    /* Foto — 3:4, zentriert, unten (Größe via JS gesetzt) */
+    .photo-frame-wrapper {
+      flex-shrink: 0; position: relative;
+      margin-left: auto; margin-right: auto;
+      margin-bottom: 3.5mm;
+    }
+    .card-photo-top {
+      width: 100%; height: 100%;
+      overflow: hidden; position: relative; z-index: 1;
+    }
+
+    /* Doppel-Rechteck-Eckenmarken: oben-rechts + unten-links */
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off, 4mm) + var(--cm-line, 16mm));
+      height: calc(var(--cm-off, 4mm) + var(--cm-line, 16mm));
+      pointer-events: none; z-index: 3;
+    }
+    .corner-mark::before,
+    .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line, 16mm); height: var(--cm-line, 16mm);
+    }
+    .corner-mark.tr {
+      top:   calc(-1 * var(--cm-off, 4mm));
+      right: calc(-1 * var(--cm-off, 4mm));
+    }
+    .corner-mark.tr::before {
+      top: 0; right: 0;
+      border-top:   0.4px solid var(--frame);
+      border-right: 0.4px solid var(--frame);
+    }
+    .corner-mark.tr::after {
+      top: var(--cm-off, 4mm); right: var(--cm-off, 4mm);
+      border-top:   0.4px solid var(--frame);
+      border-right: 0.4px solid var(--frame);
+    }
+    .corner-mark.bl {
+      bottom: calc(-1 * var(--cm-off, 4mm));
+      left:   calc(-1 * var(--cm-off, 4mm));
+    }
+    .corner-mark.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.4px solid var(--frame);
+      border-left:   0.4px solid var(--frame);
+    }
+    .corner-mark.bl::after {
+      bottom: var(--cm-off, 4mm); left: var(--cm-off, 4mm);
+      border-bottom: 0.4px solid var(--frame);
+      border-left:   0.4px solid var(--frame);
+    }
+    .card-photo-top img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-photo-empty {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7px; letter-spacing: 2.5px; text-transform: uppercase;
+      opacity: 0.18;
+    }
+  </style>
+<script>
+(function(){var _rc={_id:"TS-Earth",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════════ -->
+<form class="panel-form" onsubmit="return false">
+
+  <div class="panel-logo">WSA</div>
+  <div class="panel-tagline" id="lbl-tagline">Tischschild · Modern Earth Collection</div>
+
+  <div class="btn-group" id="lang-btns" style="margin:6px 0 10px">
+    <button type="button" class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button type="button" class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- 1 · Design -->
+  <label class="section-label">1 · Design</label>
+  <div class="theme-dots">
+    <button type="button" class="theme-dot active" data-theme="terracotta"
+      style="background:#A0522D" title="Terracotta" onclick="setTheme('terracotta')"></button>
+    <button type="button" class="theme-dot" data-theme="sage"
+      style="background:#8F9779" title="Eucalyptus" onclick="setTheme('sage')"></button>
+    <button type="button" class="theme-dot" data-theme="clay"
+      style="background:#96897F" title="Warm Taupe" onclick="setTheme('clay')"></button>
+  </div>
+
+  <!-- 2 · Hintergrund -->
+  <label class="section-label" style="margin-top:8px;">2 · Hintergrund</label>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-bg-1" onclick="setBg('#FAF9F6',this)">Off-White</button>
+    <button type="button" class="ui-btn"        id="btn-bg-2" onclick="setBg('#F5F5DC',this)">Sandstone</button>
+  </div>
+
+  <!-- 3 · Format -->
+  <label class="section-label" style="margin-top:8px;">3 · Format</label>
+  <select id="sel-format" onchange="onFormatChange()">
+    <option value="a5">A5 — 148 × 210 mm</option>
+    <option value="us57">5×7" — 127 × 178 mm</option>
+  </select>
+
+  <!-- 4 · Prefix -->
+  <label class="section-label" style="margin-top:8px;">4 · Prefix
+    <span id="lbl-sec4-note" style="opacity:.38;font-style:italic;font-size:9px;text-transform:none;letter-spacing:0;margin-left:4px">optional — z. B. Tisch, Table, Movie …</span>
+  </label>
+  <input type="text" id="inp-prefix" value="Tisch"
+    placeholder="Tisch / Table / Movie / Zone …" oninput="renderPreview()">
+
+  <hr class="divider">
+
+  <!-- 5 · Tische -->
+  <label class="section-label" id="lbl-sec5">5 · Tische — Durchgang 1–10</label>
+  <div class="table-rows" id="table-rows"></div>
+
+  <hr class="divider" style="margin-top:14px">
+
+  <div class="action-row">
+    <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <button type="button" class="btn-export" id="btn-export" onclick="exportPDF()">PDF exportieren</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
+  <div class="print-hint">
+    <span id="lbl-print-hint">Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.</span>
+  </div>
+
+</form>
+
+<!-- ════ PREVIEW PANEL ══════════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navCard(-1)" disabled>‹</button>
+    <span id="nav-label">1 / 10</span>
+    <button class="nav-btn" id="btn-next" onclick="navCard(1)">›</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div class="tisch-card terracotta" id="card-preview" style="background:#FAF9F6">
+        <div class="card-inner-frame"></div>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="card-prefix" id="prev-prefix">Tisch</div>
+            <div class="card-orn-sep" id="prev-orn-sep">
+              <span class="card-orn-line"></span>
+              <span class="card-orn-dot"></span>
+              <span class="card-orn-line"></span>
+            </div>
+            <div class="card-name len-s" id="prev-name">Italien</div>
+          </div>
+          <div class="photo-frame-wrapper" id="prev-photo-wrapper" style="display:none">
+            <div class="card-photo-top" id="prev-photo"></div>
+            <div class="corner-mark tr"></div>
+            <div class="corner-mark bl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════ SPINNER ════════════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// ÜBERSETZUNGEN
+// ════════════════════════════════════════════════════════════
+var T = {
+  de: {
+    tagline:       'Tischschild · Modern Earth Collection',
+    sec4note:      'optional — z. B. Tisch, Table, Movie …',
+    sec5:          '5 · Tische — Durchgang 1–10',
+    prefixDefault: 'Tisch',
+    prefixPH:      'Tisch / Table / Movie / Zone …',
+    rowPH:         'z. B. Italien, 18, Der Pate …',
+    fotoBtnAdd:    '+ Foto',  fotoBtnHas:    '✓ Foto',
+    fotoTitleAdd:  'Foto hochladen', fotoTitleHas: 'Foto ändern',
+    sliderTitle:   'Bildausschnitt vertikal',
+    btnRm:         'Foto entfernen',
+    btnExport:     'PDF exportieren',
+    bleed:         'Beschnittzugabe 3 mm',
+    printHint:     'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.',
+    alertEmpty:    'Bitte mindestens einen Tischnamen eingeben.',
+    alertFail:     'Export fehlgeschlagen: ',
+    spinPage:      function(c,t){ return 'Karte ' + c + ' von ' + t + ' …'; },
+    demo: ['Italien','Frankreich','Portugal','Griechenland','Spanien','Kroatien','Österreich','Schweiz','Irland','Island'],
+  },
+  en: {
+    tagline:       'Table Sign · Modern Earth Collection',
+    sec4note:      'optional — e. g. Table, Movie, Zone …',
+    sec5:          '5 · Tables — Batch 1–10',
+    prefixDefault: 'Table',
+    prefixPH:      'Table / Movie / Zone …',
+    rowPH:         'e. g. Italy, 18, The Godfather …',
+    fotoBtnAdd:    '+ Photo', fotoBtnHas:    '✓ Photo',
+    fotoTitleAdd:  'Upload photo', fotoTitleHas: 'Change photo',
+    sliderTitle:   'Vertical crop',
+    btnRm:         'Remove photo',
+    btnExport:     'Export PDF',
+    bleed:         'Bleed 3 mm',
+    printHint:     'File in sRGB color space, print-ready for all major online printers. Enable bleed for borderless prints.',
+    alertEmpty:    'Please add at least one table name.',
+    alertFail:     'Export failed: ',
+    spinPage:      function(c,t){ return 'Card ' + c + ' of ' + t + ' …'; },
+    demo: ['Italy','France','Portugal','Greece','Spain','Croatia','Austria','Switzerland','Ireland','Iceland'],
+  },
+};
+
+function tt() { return T[currentLang]; }
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+var currentTheme = 'terracotta';
+var currentBg    = '#FAF9F6';
+var currentCard  = 0;
+var currentLang  = 'de';
+
+var tables = [];
+for (var _i = 0; _i < 10; _i++) {
+  tables.push({ name: '', photo: null, photoY: 50 });
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  buildTableRows();
+  renderPreview();
+  scalePreview();
+  window.addEventListener('resize', scalePreview);
+});
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+function ge(id) { return document.getElementById(id); }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function sizeClass(txt) {
+  var n = txt.replace(/\s/g,'').length;
+  return n <= 2 ? 'len-xs' : n <= 5 ? 'len-s' : n <= 9 ? 'len-m' : 'len-l';
+}
+
+// ════════════════════════════════════════════════════════════
+// FOTO-KOMPRIMIERUNG
+// ════════════════════════════════════════════════════════════
+function compressImage(file, maxPx, quality) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// TISCH-ZEILEN
+// ════════════════════════════════════════════════════════════
+function buildTableRows() {
+  var container = ge('table-rows');
+  container.innerHTML = '';
+
+  tables.forEach(function(t, i) {
+    var row = document.createElement('div');
+    row.className = 'table-row';
+
+    var num = document.createElement('div');
+    num.className = 'row-num';
+    num.textContent = i + 1;
+    row.appendChild(num);
+
+    var inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'row-input' + (i === currentCard ? ' is-active' : '');
+    inp.placeholder = tt().rowPH;
+    inp.value = t.name;
+    inp.oninput = (function(idx){ return function(e){
+      tables[idx].name = e.target.value;
+      if (idx === currentCard) renderPreview();
+    }; })(i);
+    inp.onfocus = (function(idx, el){ return function(){
+      currentCard = idx;
+      document.querySelectorAll('.row-input').forEach(function(x){ x.classList.remove('is-active'); });
+      el.classList.add('is-active');
+      renderPreview(); updateNav();
+    }; })(i, inp);
+    row.appendChild(inp);
+
+    var btnP = document.createElement('div');
+    btnP.className = 'btn-photo' + (t.photo ? ' has-photo' : '');
+    btnP.title = t.photo ? tt().fotoTitleHas : tt().fotoTitleAdd;
+    btnP.innerHTML = t.photo ? tt().fotoBtnHas : tt().fotoBtnAdd;
+    var fi = document.createElement('input');
+    fi.type = 'file'; fi.accept = 'image/*';
+    fi.onchange = (function(idx){ return function(e){
+      if (!e.target.files[0]) return;
+      compressImage(e.target.files[0], 1600, 0.85).then(function(data){
+        tables[idx].photo = data;
+        currentCard = idx;
+        buildTableRows(); renderPreview(); updateNav();
+      });
+    }; })(i);
+    btnP.appendChild(fi);
+    row.appendChild(btnP);
+
+    if (t.photo) {
+      var yWrap = document.createElement('div');
+      yWrap.className = 'photo-y-wrap';
+      var slider = document.createElement('input');
+      slider.type = 'range'; slider.min = '0'; slider.max = '100';
+      slider.value = t.photoY != null ? t.photoY : 50;
+      slider.className = 'photo-y-slider';
+      slider.title = tt().sliderTitle;
+      slider.oninput = (function(idx){ return function(e){
+        tables[idx].photoY = parseInt(e.target.value);
+        if (idx === currentCard) renderPreview();
+      }; })(i);
+      yWrap.appendChild(slider);
+      row.appendChild(yWrap);
+
+      var btnR = document.createElement('button');
+      btnR.type = 'button'; btnR.className = 'btn-rm'; btnR.title = tt().btnRm;
+      btnR.textContent = '×';
+      btnR.onclick = (function(idx){ return function(){
+        tables[idx].photo = null;
+        buildTableRows();
+        if (idx === currentCard) renderPreview();
+      }; })(i);
+      row.appendChild(btnR);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// SPRACHE
+// ════════════════════════════════════════════════════════════
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var l = tt();
+  ge('lbl-tagline').textContent    = l.tagline;
+  ge('lbl-sec4-note').textContent  = l.sec4note;
+  ge('lbl-sec5').textContent       = l.sec5;
+  ge('inp-prefix').placeholder     = l.prefixPH;
+  ge('btn-export').textContent     = l.btnExport;
+  ge('lbl-bleed').textContent      = l.bleed;
+  ge('lbl-print-hint').textContent = l.printHint;
+  document.documentElement.lang   = lang;
+  buildTableRows();
+}
+
+// ════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════
+function setTheme(theme) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-dot').forEach(function(d){
+    d.classList.toggle('active', d.dataset.theme === theme);
+  });
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// HINTERGRUND
+// ════════════════════════════════════════════════════════════
+function setBg(bg, btn) {
+  currentBg = bg;
+  document.querySelectorAll('#btn-bg-1, #btn-bg-2').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// FORMAT
+// ════════════════════════════════════════════════════════════
+function onFormatChange() { renderPreview(); scalePreview(); }
+
+// ════════════════════════════════════════════════════════════
+// VORSCHAU RENDERN
+// ════════════════════════════════════════════════════════════
+function renderPreview() {
+  var card   = ge('card-preview');
+  var prefix = ge('inp-prefix').value.trim();
+  var fmt    = ge('sel-format').value;
+  var t      = tables[currentCard];
+
+  var FMT = { a5:[148,210], us57:[127,178] };
+  var dims = FMT[fmt] || FMT.a5;
+  var fS   = dims[0] / 148;
+
+  card.style.width      = dims[0] + 'mm';
+  card.style.height     = dims[1] + 'mm';
+  card.className        = 'tisch-card ' + currentTheme;
+  card.style.background = currentBg;
+
+  var prefixEl = ge('prev-prefix');
+  var ornEl    = ge('prev-orn-sep');
+  prefixEl.textContent   = prefix;
+  prefixEl.style.display = prefix ? '' : 'none';
+  ornEl.style.display    = prefix ? '' : 'none';
+
+  var nameEl = ge('prev-name');
+  var txt = t.name || '—';
+  nameEl.textContent = txt;
+  nameEl.className   = 'card-name ' + sizeClass(txt);
+
+  var wrapperEl = ge('prev-photo-wrapper');
+  var photoEl   = ge('prev-photo');
+  var photoW_mm = 95 * fS;
+  var photoH_mm = 127 * fS;
+  wrapperEl.style.width  = photoW_mm + 'mm';
+  wrapperEl.style.height = photoH_mm + 'mm';
+  wrapperEl.style.setProperty('--cm-off',  (4  * fS) + 'mm');
+  wrapperEl.style.setProperty('--cm-line', (16 * fS) + 'mm');
+
+  if (t.photo) {
+    var yPos = t.photoY != null ? t.photoY : 50;
+    photoEl.innerHTML = '<img src="' + t.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;object-position:center ' + yPos + '%">';
+    wrapperEl.style.display = '';
+  } else {
+    wrapperEl.style.display = 'none';
+  }
+
+  updateNav();
+  scalePreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function navCard(dir) {
+  currentCard = Math.max(0, Math.min(9, currentCard + dir));
+  document.querySelectorAll('.row-input').forEach(function(el, i){
+    el.classList.toggle('is-active', i === currentCard);
+  });
+  renderPreview();
+}
+
+function updateNav() {
+  ge('btn-prev').disabled = currentCard === 0;
+  ge('btn-next').disabled = currentCard === 9;
+  var t   = tables[currentCard];
+  var lbl = t.name || ('Slot ' + (currentCard + 1));
+  ge('nav-label').textContent = lbl + '\u2002\u00B7\u2002' + (currentCard + 1) + ' / 10';
+}
+
+// ════════════════════════════════════════════════════════════
+// SKALIERUNG
+// ════════════════════════════════════════════════════════════
+function scalePreview() {
+  var area = ge('preview-area');
+  if (!area || area.clientWidth <= 0) { requestAnimationFrame(scalePreview); return; }
+  var fmt  = ge('sel-format').value;
+  var FMT  = { a5:[148,210], us57:[127,178] };
+  var dims = FMT[fmt] || FMT.a5;
+  var PX   = 96 / 25.4;
+  var cardW = dims[0] * PX, cardH = dims[1] * PX;
+  var wrap  = ge('preview-wrap');
+  var avW   = area.clientWidth  - 48;
+  var avH   = area.clientHeight - 48;
+  var scale = Math.min(avW / cardW, avH / cardH, 1);
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.left = Math.round((area.clientWidth  - cardW * scale) / 2) + 'px';
+  wrap.style.top  = Math.round((area.clientHeight - cardH * scale) / 2) + 'px';
+}
+
+// ════════════════════════════════════════════════════════════
+// DEMO
+// ════════════════════════════════════════════════════════════
+function loadDemo() {
+  var demo = tt().demo;
+  demo.forEach(function(n, i){ tables[i].name = n; });
+  ge('inp-prefix').value = tt().prefixDefault;
+  currentCard = 0;
+  buildTableRows(); renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// FOTO ZUSCHNEIDEN (canvas-basiert, kein html2canvas)
+// ════════════════════════════════════════════════════════════
+function cropPhoto(base64, targetW, targetH, yPercent) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var srcR = img.width / img.height;
+      var tgtR = targetW / targetH;
+      var sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        sh = img.height; sw = sh * tgtR;
+        sx = (img.width - sw) / 2; sy = 0;
+      } else {
+        sw = img.width; sh = sw / tgtR;
+        sx = 0;
+        var maxY = img.height - sh;
+        sy = maxY * ((yPercent != null ? yPercent : 50) / 100);
+      }
+      var c = document.createElement('canvas');
+      c.width = Math.round(sw); c.height = Math.round(sh);
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.90));
+    };
+    img.src = base64;
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// PDF EXPORT — nativer jsPDF-Vektor (kein html2canvas)
+// ════════════════════════════════════════════════════════════
+function exportPDF() {
+  exportPDF_vector().catch(function(e) { alert(tt().alertFail + e.message); });
+}
+
+async function exportPDF_vector() {
+  var l       = tt();
+  var toExport = tables.filter(function(t){ return t.name.trim() !== ''; });
+  if (toExport.length === 0) { alert(l.alertEmpty); return; }
+
+  var fmt     = ge('sel-format').value;
+  var bleedMM = ge('chk-bleed').checked ? 3 : 0;
+  var FMT     = { a5:[148,210], us57:[127,178] };
+  var dims    = FMT[fmt] || FMT.a5;
+  var baseW   = dims[0], baseH = dims[1];
+  var fS      = baseW / 148;
+  var docW    = baseW + bleedMM * 2, docH = baseH + bleedMM * 2;
+  var bx      = bleedMM, by = bleedMM;
+  var prefix  = ge('inp-prefix').value.trim();
+
+  var spinner = ge('pdf-spinner');
+  var msg     = ge('spin-msg');
+  spinner.style.display = 'flex';
+  msg.textContent = 'PDF wird erstellt …';
+
+  try {
+    var { jsPDF } = window.jspdf;
+    var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[docW, docH] });
+    if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+    // ── Farbpalette ──────────────────────────────────────
+    var THEMES = {
+      terracotta: { tc:[160,82,45],   ac:[196,120,74]  },
+      sage:       { tc:[143,151,121], ac:[201,169,110] },
+      clay:       { tc:[150,137,127], ac:[196,160,158] },
+    };
+    var th = THEMES[currentTheme] || THEMES.terracotta;
+    var tc = th.tc, ac = th.ac;
+    var bg = (currentBg === '#F5F5DC') ? [245,245,220] : [250,249,246];
+
+    // Farbmischung (rgb auf Hintergrund bei Deckkraft op)
+    function bl(rgb, op) {
+      return [
+        Math.round(rgb[0]*op + bg[0]*(1-op)),
+        Math.round(rgb[1]*op + bg[1]*(1-op)),
+        Math.round(rgb[2]*op + bg[2]*(1-op)),
+      ];
+    }
+    var sf = function(rgb){ pdf.setFillColor(rgb[0], rgb[1], rgb[2]); };
+    var sd = function(rgb){ pdf.setDrawColor(rgb[0], rgb[1], rgb[2]); };
+    var st = function(rgb){ pdf.setTextColor(rgb[0], rgb[1], rgb[2]); };
+
+    function setFont(name, style) {
+      var keyMap = {
+        'CormorantGaramond-italic': 'CormorantGaramond-Italic',
+        'CormorantGaramond-normal': 'CormorantGaramond-Regular',
+        'DMSans-normal':            'DMSans-Regular',
+      };
+      var fontKey = keyMap[name + '-' + style];
+      if (window.WSA_FONTS && fontKey && WSA_FONTS.has(fontKey)) {
+        pdf.setFont(name, style);
+      } else {
+        var fb = {
+          CormorantGaramond: { italic:['Times','italic'], normal:['Times','normal'] },
+          Montserrat:        { normal:['Helvetica','normal'] },
+          DMSans:            { normal:['Helvetica','normal'] },
+        };
+        var r = ((fb[name]||{})[style]) || ['Helvetica','normal'];
+        pdf.setFont(r[0], r[1]);
+      }
+    }
+
+    var PTmm = 0.3528;   // 1pt in mm
+    var BW   = 5 * fS;   // Randbreite
+    var fi   = BW + 3 * fS; // Innenrahmen-Abstand von Kartenkante
+    var cx   = bx + baseW / 2;
+
+    for (var i = 0; i < toExport.length; i++) {
+      var t = toExport[i];
+      msg.textContent = l.spinPage(i + 1, toExport.length);
+      if (i > 0) pdf.addPage();
+
+      // ── Hintergrund ──
+      sf(bg); pdf.rect(0, 0, docW, docH, 'F');
+
+      // ── Außenrahmen (4 Streifen, schließen Bleed ein) ──
+      sf(tc);
+      pdf.rect(0,              0,              docW,    BW+by,  'F');
+      pdf.rect(0,              docH-BW-by,     docW,    BW+by,  'F');
+      pdf.rect(0,              0,              BW+bx,   docH,   'F');
+      pdf.rect(docW-BW-bx,     0,              BW+bx,   docH,   'F');
+
+      // ── Innenrahmen ──
+      sd(bl(tc, 0.26)); pdf.setLineWidth(0.25 * fS);
+      pdf.rect(bx+fi, by+fi, baseW-fi*2, baseH-fi*2, 'S');
+
+      // ── Foto (3:4-Fenster, zentriert, unten) ──
+      var photoW = t.photo ? 95 * fS : 0;
+      var photoH = t.photo ? 127 * fS : 0;
+      var photoX = bx + (baseW - photoW) / 2;
+      // Spiegelt die CSS-Flex-Berechnung: BW + 9*fS (padding) + text + photo + 3.5mm margin-bottom + padding + BW = baseH
+      // → photoTop = baseH − (BW + 9*fS) − photoH − 3.5mm − (9*fS + BW) = baseH − 141*fS − 3.5
+      var photoY_mm = by + baseH - 141 * fS - 3.5;
+
+      // ── Textbereich: vertikal zentriert zwischen Rand und Foto ──
+      var PAD    = BW + 9 * fS;
+      var textTop = by + PAD;
+      var textBot = t.photo ? photoY_mm : by + baseH - PAD;
+      var textCY  = (textTop + textBot) / 2;
+
+      var nameText = t.name;
+      var nLen     = nameText.replace(/\s/g,'').length;
+      var nameFS   = (nLen <= 2 ? 52 : nLen <= 5 ? 40 : nLen <= 9 ? 32 : 26) * fS;
+      var pfFS     = 8 * fS;
+      // Ornament: Linie · Punkt · Linie (Earth-Stil)
+      var ornW     = (baseW - 2*BW - 18*fS) * 0.52; // 52% der Textbereichsbreite
+      var ornH     = 3 * fS;
+      var spc1     = 5 * fS; // Abstand Prefix → Ornament
+      var spc2     = 5 * fS; // Abstand Ornament → Name
+
+      // Gesamthöhe Textblock
+      var blockH = nameFS * PTmm;
+      if (prefix) blockH += pfFS * PTmm + spc1 + ornH + spc2;
+
+      var y = textCY - blockH / 2;
+
+      // ── Prefix (Montserrat/Helvetica, uppercase, letter-spaced) ──
+      if (prefix) {
+        var prefixUpper = prefix.toUpperCase();
+        st(tc);
+        setFont('Montserrat', 'normal');
+        pdf.setFontSize(pfFS);
+        var pfCharSp = 0.18 * pfFS * PTmm;
+        pdf.setCharSpace(0);
+        var pfGlyphW = pdf.getTextWidth(prefixUpper);
+        var pfTotalW = pfGlyphW + pfCharSp * Math.max(0, prefixUpper.length - 1);
+        pdf.setCharSpace(pfCharSp);
+        y += pfFS * PTmm * 0.5;
+        pdf.text(prefixUpper, cx - pfTotalW / 2, y, { baseline:'middle' });
+        pdf.setCharSpace(0);
+        y += pfFS * PTmm * 0.5 + spc1;
+
+        // Ornament: Linie · Punkt · Linie
+        var oy   = y + ornH / 2;
+        var dotR = 1.4 * fS;
+        var gap  = 3.5 * fS;
+        sd(bl(tc, 0.20)); pdf.setLineWidth(0.2);
+        pdf.line(cx - ornW/2,        oy, cx - dotR - gap, oy);
+        pdf.line(cx + dotR + gap,    oy, cx + ornW/2,     oy);
+        pdf.setFillColor(ac[0], ac[1], ac[2]);
+        pdf.circle(cx, oy, dotR, 'F');
+
+        y += ornH + spc2;
+      }
+
+      // ── Name (Cormorant Garamond italic) ──
+      st(tc);
+      setFont('CormorantGaramond', 'italic');
+      pdf.setFontSize(nameFS);
+      pdf.setCharSpace(0);
+      var nameW = pdf.getTextWidth(nameText);
+      y += nameFS * PTmm * 0.5;
+      pdf.text(nameText, cx - nameW / 2, y, { baseline:'middle' });
+
+      // ── Foto ──
+      if (t.photo) {
+        var cropped = await cropPhoto(t.photo, photoW, photoH, t.photoY != null ? t.photoY : 50);
+        pdf.addImage(cropped, 'JPEG', photoX, photoY_mm, photoW, photoH);
+
+        // ── Eckenmarken: doppeltes versetztes L, TR + BL ──
+        var CL  = 16 * fS;
+        var OFF = 4  * fS;
+        var pR  = photoX + photoW;
+        var pB  = photoY_mm + photoH;
+        sd(bl(tc, 0.22)); pdf.setLineWidth(0.3);
+        // oben-rechts — innere L
+        pdf.line(pR - CL,        photoY_mm,        pR,           photoY_mm);
+        pdf.line(pR,              photoY_mm,        pR,           photoY_mm + CL);
+        // oben-rechts — äußere L
+        pdf.line(pR - CL + OFF,  photoY_mm - OFF,  pR + OFF,     photoY_mm - OFF);
+        pdf.line(pR + OFF,        photoY_mm - OFF,  pR + OFF,     photoY_mm + CL - OFF);
+        // unten-links — innere L
+        pdf.line(photoX,          pB,               photoX + CL,  pB);
+        pdf.line(photoX,          pB - CL,          photoX,       pB);
+        // unten-links — äußere L
+        pdf.line(photoX - OFF,    pB + OFF,         photoX + CL - OFF, pB + OFF);
+        pdf.line(photoX - OFF,    pB - CL + OFF,    photoX - OFF, pB + OFF);
+      }
+    }
+
+    var FMT_NAMES = { a5:'A5', us57:'5x7' };
+    var dateStr   = new Date().toISOString().slice(0,10);
+    pdf.save('WSA_Tischschild_Earth_' + FMT_NAMES[fmt] + '_' + dateStr + '.pdf');
+
+  } catch(e) {
+    throw e;
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>

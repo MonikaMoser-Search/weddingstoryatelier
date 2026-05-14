@@ -1,0 +1,858 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Tischplan — Cards Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root { --gold: #C89A5A; }
+
+    /* ── Gold accent overrides for Classic Line ── */
+    .ui-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .panel-form input[type="text"]:focus { border-color: var(--gold); }
+
+    .count-row { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .count-btn {
+      width: 26px; height: 26px; border: 1px solid #eee; background: #fff;
+      cursor: pointer; font-size: 15px; display: flex; align-items: center;
+      justify-content: center; transition: all 0.15s; color: #666; flex-shrink: 0;
+    }
+    .count-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .count-num { font-size: 18px; font-family: 'Playfair Display', serif; width: 30px; text-align: center; color: var(--wsa-dark); }
+    .count-sub { font-size: 9px; color: #bbb; }
+
+    .tables-wrap { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 7px; padding-right: 2px; min-height: 0; }
+    .t-card { border: 1px solid #f0f0f0; padding: 9px 11px; background: #fafafa; transition: border-color 0.15s; }
+    .t-card:hover { border-color: #e0d8cc; }
+    .t-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .t-num { font-size: 8px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; white-space: nowrap; }
+    .t-name-in {
+      flex: 1; padding: 4px 7px; border: 1px solid #eee;
+      font-family: 'Cormorant Garamond', serif; font-size: 13px;
+      outline: none; transition: border-color 0.2s; background: #fff;
+    }
+    .t-name-in:focus { border-color: var(--gold); }
+    .t-guests {
+      width: 100%; min-height: 54px; padding: 5px 7px;
+      border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; resize: vertical; outline: none;
+      line-height: 1.7; transition: border-color 0.2s; background: #fff;
+    }
+    .t-guests:focus { border-color: var(--gold); }
+    .t-gc { font-size: 8.5px; color: #ccc; text-align: right; margin-top: 3px; }
+
+    .duplex-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .panel-form input[type="range"] { accent-color: var(--gold); }
+    .range-val { font-size: 9px; color: #aaa; width: 30px; text-align: right; flex-shrink: 0; }
+
+    .btn-demo:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* ── Language toggle ── */
+  .lang-de .print-hint-en { display: none; }
+  .lang-en .print-hint-de { display: none; }
+
+    /* ── POSTER ── */
+    #poster {
+      width: 210mm; min-height: 297mm;
+      position: relative; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      display: flex; flex-direction: column;
+    }
+
+    /* Themes */
+    #poster.neodeco { background-color: #1a1610; color: #FAF6EC; }
+    #poster.opera   { background-color: #380e0e; color: #eedec4; }
+    #poster.cloud   { background-color: #F5F0E8; color: #1a1610; }
+
+    /* Outer frame */
+    .poster-frame { position: absolute; inset: 8mm; pointer-events: none; z-index: 1; }
+    .neodeco .poster-frame { border: 1px solid rgba(200,154,90,0.28); }
+    .opera   .poster-frame { border: 1px solid rgba(180,70,70,0.42); }
+    .cloud   .poster-frame { border: 1px solid rgba(80,55,12,0.28); }
+
+    /* Body — 45/55 split via flex pseudo-spacers */
+    .poster-body {
+      flex: 1; display: flex; flex-direction: column;
+      padding: 0 14mm; position: relative; z-index: 2;
+    }
+    .poster-body::before { content: ''; flex: 45; min-height: 12mm; }
+    .poster-body::after  { content: ''; flex: 55; min-height: 14mm; }
+
+    /* Header */
+    .poster-header { text-align: center; margin-bottom: 7mm; }
+    .poster-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: var(--fs-eyebrow, 7pt);
+      letter-spacing: 5px; text-transform: uppercase; opacity: 0.42; margin-bottom: 3mm;
+    }
+    .poster-title {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-title, 26pt);
+      font-weight: 700; letter-spacing: 7px; text-transform: uppercase; line-height: 1.1;
+    }
+    .neodeco .poster-title { color: var(--gold); }
+    .opera   .poster-title { color: #E0CCA8; font-style: italic; }
+    .cloud   .poster-title { color: #5C3A0A; }
+
+    .poster-subtitle {
+      margin-top: 2.5mm; font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: var(--fs-sub, 10.5pt);
+      letter-spacing: 1.5px; opacity: 0.62;
+    }
+    .poster-rule { width: 34mm; height: 1px; margin: 5mm auto 0; }
+    .neodeco .poster-rule { background: rgba(200,154,90,0.38); }
+    .opera   .poster-rule { background: rgba(200,130,100,0.55); }
+    .cloud   .poster-rule { background: rgba(80,55,12,0.35); }
+
+    /* ── CARD GRID ── */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols, 3), 1fr);
+      gap: 9mm 8mm;
+    }
+    .card-grid.cols-1 { max-width: 90mm;  margin-left: auto; margin-right: auto; }
+    .card-grid.cols-2 { max-width: 156mm; margin-left: auto; margin-right: auto; }
+
+    /* ── TABLE CARD — frei schwebend, kein Rahmen ── */
+    .table-card {
+      text-align: center;
+      display: flex; flex-direction: column;
+    }
+    .card-grid.density-spacious .table-card { padding: 0 4px; }
+    .card-grid.density-normal   .table-card { padding: 0 3px; }
+    .card-grid.density-compact  .table-card { padding: 0 2px; }
+
+    /* ── ORNAMENT WRAPPER ── */
+    .card-orn-wrap { display: block; line-height: 0; flex-shrink: 0; }
+    .card-orn-wrap svg { display: inline-block; width: 100%; height: auto; }
+    .card-orn-wrap.orn-lg svg { max-width: 138px; }
+    .card-orn-wrap.orn-sm svg { max-width:  76px; }
+    .card-orn-wrap.orn-top { margin-bottom: 2.5mm; }
+    .card-orn-wrap.orn-bot { margin-top: auto; padding-top: 2.5mm; }
+    .neodeco .card-orn-wrap { color: rgba(200,154,90,0.72); }
+    .opera   .card-orn-wrap { color: rgba(210,150,110,0.72); }
+    .cloud   .card-orn-wrap { color: rgba(75,50,10,0.88); }
+
+    /* Card internals */
+    .card-num {
+      font-family: 'DM Sans', sans-serif;
+      font-size: var(--fs-num, 6.5pt);
+      text-transform: uppercase; letter-spacing: 2.5px; margin-bottom: 1.2mm;
+    }
+    .neodeco .card-num { color: rgba(200,154,90,0.55); }
+    .opera   .card-num { color: rgba(196,149,106,0.55); }
+    .cloud   .card-num { color: rgba(75,50,10,0.58); }
+
+    .card-name {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-name, 11pt);
+      font-weight: 700; margin-bottom: 2.5mm; line-height: 1.2;
+    }
+    .density-compact .card-name { margin-bottom: 1.5mm; }
+    .neodeco .card-name { color: var(--gold); }
+    .opera   .card-name { color: #c4956a; }
+    .cloud   .card-name { color: #5C3A0A; }
+
+    /* Trennlinie mit Ornament-Unterbrechung */
+    .card-rule {
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 2.5mm;
+    }
+    .density-compact .card-rule { margin-bottom: 1.5mm; }
+    .card-rule::before, .card-rule::after { content: ''; flex: 1; height: 1px; }
+    .neodeco .card-rule::before, .neodeco .card-rule::after { background: rgba(200,154,90,0.20); }
+    .opera   .card-rule::before, .opera   .card-rule::after { background: rgba(210,150,110,0.28); }
+    .cloud   .card-rule::before, .cloud   .card-rule::after { background: rgba(75,50,10,0.30); }
+
+    .card-orn {
+      font-size: 5.5pt; line-height: 1; flex-shrink: 0;
+      letter-spacing: 0; font-style: normal;
+    }
+    .neodeco .card-orn { color: rgba(200,154,90,0.52); }
+    .opera   .card-orn { color: rgba(210,150,110,0.52); }
+    .cloud   .card-orn { color: rgba(75,50,10,0.70); }
+
+    .guest-entry {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: var(--fs-guest, 8.5pt);
+      letter-spacing: 0.2px; padding: 1.2mm 0; line-height: 1.25;
+    }
+    .density-compact .guest-entry { padding: 0.7mm 0; }
+    .neodeco .guest-entry { border-bottom: 1px dotted rgba(200,154,90,0.07); }
+    .opera   .guest-entry { border-bottom: 1px dotted rgba(224,204,168,0.07); }
+    .cloud   .guest-entry { border-bottom: 1px dotted rgba(75,50,10,0.12); }
+    .guest-entry:last-child { border-bottom: none; }
+
+    /* Footer */
+    .poster-footer { text-align: center; margin-top: 6mm; }
+    .footer-ornament { display: inline-flex; align-items: center; gap: 3.5mm; }
+    .f-line { display: inline-block; width: 22mm; height: 1px; }
+    .neodeco .f-line { background: rgba(200,154,90,0.25); }
+    .opera   .f-line { background: rgba(100,20,20,0.32); }
+    .cloud   .f-line { background: rgba(75,50,10,0.28); }
+    .f-dot { width: 3px; height: 3px; border-radius: 50%; display: inline-block; }
+    .neodeco .f-dot { background: rgba(200,154,90,0.42); }
+    .opera   .f-dot { background: rgba(196,149,106,0.48); }
+    .cloud   .f-dot { background: rgba(75,50,10,0.55); }
+
+    /* Spinner */
+    #pdf-spinner {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 999; justify-content: center; align-items: center;
+      flex-direction: column; gap: 14px; color: var(--gold);
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    .spin-ring {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(200,154,90,0.2);
+      border-top-color: var(--gold);
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+<script>
+(function(){var _rc={_id:"SP-Karten-ClassicLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="panel-form">
+  <div class="panel-logo">Tischplan</div>
+  <div class="panel-tagline">Cards Edition · Luxury 2026</div>
+
+  <label class="section-label">Sprache / Language</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <hr class="divider">
+
+  <label class="section-label">1 · Stil</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('neodeco',this)">Neo Deco</button>
+    <button class="ui-btn" onclick="setTheme('opera',this)">Opera</button>
+    <button class="ui-btn" onclick="setTheme('cloud',this)">Ivory</button>
+  </div>
+
+  <hr class="divider">
+
+  <label class="section-label">2 · Titel</label>
+  <input type="text" id="inp-title" placeholder="TISCHPLAN" oninput="renderPoster()">
+
+  <label class="section-label">Untertitel</label>
+  <input type="text" id="inp-subtitle" placeholder="Anna &amp; Maximilian · 12. Juli 2026" oninput="renderPoster()">
+
+  <hr class="divider">
+
+  <label class="section-label">3 · Anzahl Tische</label>
+  <div class="count-row">
+    <button class="count-btn" onclick="changeCount(-1)">−</button>
+    <span class="count-num" id="count-num">8</span>
+    <button class="count-btn" onclick="changeCount(1)">+</button>
+    <span class="count-sub">max. 12</span>
+  </div>
+
+  <label class="section-label" style="margin-bottom:8px;">4 · Namen eintragen · eine Person pro Zeile</label>
+  <div class="tables-wrap" id="tables-wrap"></div>
+
+  <hr class="divider" style="flex-shrink:0;">
+
+  <label class="section-label">Schriftgröße</label>
+  <div class="duplex-row">
+    <input type="range" id="font-slider" min="70" max="130" value="100" step="5" oninput="updateFontScale(this.value)">
+    <span class="range-val" id="font-val">100%</span>
+  </div>
+  <label class="section-label">5 · Druckformat</label>
+  <select id="sel-format">
+    <option value="a4" selected>A4 — 210 × 297 mm</option>
+    <option value="letter">Letter — 216 × 279 mm (US)</option>
+    <option value="a3">A3 — 297 × 420 mm</option>
+    <option value="tabloid">Tabloid — 279 × 432 mm (US)</option>
+    <option value="a2">A2 — 420 × 594 mm</option>
+    <option value="a1">A1 — 594 × 841 mm</option>
+    <option value="a0">A0 — 841 × 1189 mm</option>
+  </select>
+
+  <div class="action-row">
+    <button class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    Beschnittzugabe 3 mm
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="poster" class="neodeco">
+      <div class="poster-frame"></div>
+      <div class="poster-body">
+
+        <div class="poster-header">
+          <div class="poster-eyebrow">Seating Chart</div>
+          <div class="poster-title" id="poster-title">TISCHPLAN</div>
+          <div class="poster-subtitle" id="poster-subtitle" style="display:none;"></div>
+          <div class="poster-rule"></div>
+        </div>
+
+        <div class="card-grid" id="card-grid"></div>
+
+        <div class="poster-footer">
+          <div class="footer-ornament">
+            <span class="f-line"></span>
+            <span class="f-dot"></span>
+            <span class="f-line"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span>PDF wird erstellt …</span>
+</div>
+
+<script>
+let currentTheme = 'neodeco';
+let currentLang  = 'de';
+let fontScale = 1.0;
+let tableCount = 8;
+let tableData = [];
+
+const T = {
+  de: { tisch: 'Tisch', seating: 'SEATING CHART', titlePlaceholder: 'TISCHPLAN', subtitlePlaceholder: 'Anna & Maximilian · 12. Juli 2026', demo: 'Vorschau laden' },
+  en: { tisch: 'Table', seating: 'SEATING CHART', titlePlaceholder: 'SEATING PLAN',  subtitlePlaceholder: 'Anna & Maximilian · July 12, 2026',   demo: 'Load preview' },
+};
+
+// ── DATA ──────────────────────────────────────────────
+function initTableData(count) {
+  const old = tableData.slice();
+  tableData = Array.from({ length: count }, (_, i) => ({
+    name:       old[i] ? old[i].name       : '',
+    guests_raw: old[i] ? old[i].guests_raw : '',
+  }));
+}
+
+function renderTableInputs() {
+  const wrap = document.getElementById('tables-wrap');
+  wrap.innerHTML = '';
+  tableData.forEach((t, i) => {
+    const n = parseGuests(t.guests_raw).length;
+    const el = document.createElement('div');
+    el.className = 't-card';
+    el.innerHTML = `
+      <div class="t-head">
+        <span class="t-num">${T[currentLang].tisch} ${i + 1}</span>
+        <input class="t-name-in" type="text" placeholder="Tischname (optional)"
+          value="${esc(t.name)}" oninput="tableData[${i}].name=this.value;renderPoster()">
+      </div>
+      <textarea class="t-guests" placeholder="Max Müller&#10;Anna Schmidt&#10;..."
+        oninput="tableData[${i}].guests_raw=this.value;updateGC(${i},this);renderPoster()">${esc(t.guests_raw)}</textarea>
+      <div class="t-gc" id="gc-${i}">${n > 0 ? n + ' Gäste' : ''}</div>
+    `;
+    wrap.appendChild(el);
+  });
+}
+
+function updateGC(i, el) {
+  const n = parseGuests(el.value).length;
+  document.getElementById('gc-' + i).textContent = n > 0 ? n + ' Gäste' : '';
+}
+
+// ── HELPERS ───────────────────────────────────────────
+function parseGuests(raw) {
+  return raw ? raw.split('\n').map(l => l.trim()).filter(Boolean) : [];
+}
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── CONTROLS ──────────────────────────────────────────
+function changeCount(d) {
+  const n = Math.max(1, Math.min(12, tableCount + d));
+  if (n === tableCount) return;
+  tableCount = n;
+  document.getElementById('count-num').textContent = n;
+  initTableData(n);
+  renderTableInputs();
+  renderPoster();
+}
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  btn.parentElement.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.body.className = 'lang-' + lang;
+  renderTableInputs();
+  renderPoster();
+}
+
+function setTheme(t, btn) {
+  currentTheme = t;
+  btn.parentElement.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPoster();
+}
+
+function updateFontScale(val) {
+  fontScale = val / 100;
+  document.getElementById('font-val').textContent = val + '%';
+  applyFontScale();
+}
+function setFontPreset(val, btn) {
+  fontScale = val / 100;
+  document.getElementById('font-slider').value = val;
+  document.getElementById('font-val').textContent = val + '%';
+  btn.parentElement.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  applyFontScale();
+}
+function applyFontScale() {
+  const p = document.getElementById('poster');
+  const s = fontScale;
+  p.style.setProperty('--fs-title',   (26   * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-sub',     (10.5 * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-name',    (11   * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-guest',   (8.5  * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-num',     (6.5  * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-eyebrow', (7    * s).toFixed(1) + 'pt');
+}
+
+// ── SVG ORNAMENTS ─────────────────────────────────────
+// Großes Ornament: Linsen-Shape (zwei Bögen) mit Scrolls an den Enden + Diamant
+const ORN_LARGE = `<svg viewBox="0 0 180 26" xmlns="http://www.w3.org/2000/svg"
+  fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M 22,13 Q 90,4 158,13"  stroke-width="0.85"/>
+  <path d="M 22,13 Q 90,22 158,13" stroke-width="0.85"/>
+  <path d="M 22,13 C 15,13 10,9 12,5 C 14,2 18,5 16,9 C 15,11 12,10 13,8"
+        stroke-width="0.82"/>
+  <path d="M 158,13 C 165,13 170,9 168,5 C 166,2 162,5 164,9 C 165,11 168,10 167,8"
+        stroke-width="0.82"/>
+  <path d="M 90,8 L 94,13 L 90,18 L 86,13 Z" fill="currentColor" stroke="none" opacity="0.88"/>
+  <circle cx="22"  cy="13" r="1.8" fill="currentColor" stroke="none" opacity="0.62"/>
+  <circle cx="158" cy="13" r="1.8" fill="currentColor" stroke="none" opacity="0.62"/>
+</svg>`;
+
+// Kleines Ornament: einfache Linie mit Diamant und Endpunkten
+const ORN_SMALL = `<svg viewBox="0 0 90 12" xmlns="http://www.w3.org/2000/svg"
+  fill="none" stroke="currentColor" stroke-linecap="round">
+  <line x1="6" y1="6" x2="37" y2="6" stroke-width="0.72" opacity="0.80"/>
+  <line x1="53" y1="6" x2="84" y2="6" stroke-width="0.72" opacity="0.80"/>
+  <path d="M 45,3 L 48,6 L 45,9 L 42,6 Z" fill="currentColor" stroke="none" opacity="0.82"/>
+  <circle cx="6"  cy="6" r="1.4" fill="currentColor" stroke="none" opacity="0.58"/>
+  <circle cx="84" cy="6" r="1.4" fill="currentColor" stroke="none" opacity="0.58"/>
+</svg>`;
+
+// ── POSTER RENDER ─────────────────────────────────────
+function renderPoster() {
+  const poster = document.getElementById('poster');
+  poster.className = currentTheme;
+
+  document.getElementById('poster-title').textContent =
+    document.getElementById('inp-title').value.trim() || 'TISCHPLAN';
+
+  const sub   = document.getElementById('inp-subtitle').value.trim();
+  const subEl = document.getElementById('poster-subtitle');
+  subEl.textContent  = sub;
+  subEl.style.display = sub ? '' : 'none';
+
+  // Grid columns + density
+  const cols    = tableCount <= 2 ? 1 : tableCount <= 6 ? 2 : 3;
+  const density = tableCount <= 4 ? 'density-spacious' : tableCount <= 8 ? 'density-normal' : 'density-compact';
+  const colsCls = tableCount <= 2 ? 'cols-1' : tableCount <= 6 ? 'cols-2' : 'cols-3';
+
+  const grid = document.getElementById('card-grid');
+  grid.className = `card-grid ${density} ${colsCls}`;
+  grid.style.setProperty('--cols', cols);
+
+  // Build cards
+  const isSpacious = tableCount <= 4;
+  const isCompact  = tableCount >= 9;
+  const topOrn  = isSpacious ? `<div class="card-orn-wrap orn-top orn-lg">${ORN_LARGE}</div>`
+                             : `<div class="card-orn-wrap orn-top orn-sm">${ORN_SMALL}</div>`;
+  const botOrn  = isCompact  ? ''
+                             : `<div class="card-orn-wrap orn-bot orn-sm">${ORN_SMALL}</div>`;
+
+  grid.innerHTML = tableData.map((t, i) => {
+    const guests  = parseGuests(t.guests_raw);
+    const hasName = t.name && t.name.trim();
+    return `
+      <div class="table-card">
+        ${topOrn}
+        <div class="card-num">${T[currentLang].tisch} ${i + 1}</div>
+        ${hasName ? `<div class="card-name">${esc(t.name)}</div>` : ''}
+        <div class="card-rule"><span class="card-orn">◆</span></div>
+        <div class="card-guests">
+          ${guests.length
+            ? guests.map(g => `<div class="guest-entry">${esc(g)}</div>`).join('')
+            : `<div class="guest-entry" style="opacity:0.2;font-style:italic;">—</div>`}
+        </div>
+        ${botOrn}
+      </div>`;
+  }).join('');
+
+  setTimeout(scalePreview, 20);
+}
+
+// ── SCALE PREVIEW ─────────────────────────────────────
+function scalePreview() {
+  const scaler   = document.getElementById('preview-scaler');
+  const panel    = document.querySelector('.panel-preview');
+  const avail    = panel.clientWidth - 72;
+  const posterEl = document.getElementById('poster');
+  const scale    = Math.min(avail / posterEl.offsetWidth, 1);
+  scaler.style.transform = `scale(${scale})`;
+  scaler.style.height    = (posterEl.offsetHeight * scale) + 'px';
+}
+
+// ── PDF EXPORT ────────────────────────────────────────
+function exportPDF() {
+  const spinner = document.getElementById('pdf-spinner');
+  spinner.style.display = 'flex';
+  try { exportPDF_vector(); }
+  catch(e) { alert('Export fehlgeschlagen: ' + e.message); console.error(e); }
+  finally { spinner.style.display = 'none'; }
+}
+
+function exportPDF_vector() {
+  const { jsPDF } = window.jspdf;
+
+  const formatKey = (document.getElementById('sel-format') || {}).value || 'a4';
+  const bleedMM   = document.getElementById('chk-bleed').checked ? 3 : 0;
+  const FMT = { a4:[210,297], letter:[216,279], a3:[297,420], tabloid:[279,432], a2:[420,594], a1:[594,841], a0:[841,1189] };
+  const [baseW, baseH] = FMT[formatKey] || FMT.a4;
+  const fS   = baseW / 210;
+  const docW = baseW + bleedMM * 2;
+  const docH = baseH + bleedMM * 2;
+  const bx   = bleedMM, by = bleedMM;
+
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [docW, docH] });
+  if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+  const THEMES = {
+    neodeco: { tc: [250, 246, 236], ac: [200, 154,  90], bg: [ 26,  22,  16], hasBorder: false },
+    opera:   { tc: [238, 222, 196], ac: [210, 150, 110], bg: [ 56,  14,  14], hasBorder: false },
+    cloud:   { tc: [ 26,  22,  16], ac: [ 92,  58,  10], bg: [245, 240, 232], hasBorder: false },
+  };
+  const th = THEMES[currentTheme] || THEMES.neodeco;
+  const tc = th.tc, ac = th.ac, bg = th.bg;
+
+  function bl(rgb, op) {
+    return [
+      Math.round(rgb[0] * op + bg[0] * (1 - op)),
+      Math.round(rgb[1] * op + bg[1] * (1 - op)),
+      Math.round(rgb[2] * op + bg[2] * (1 - op)),
+    ];
+  }
+  const sf = (rgb) => pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+  const sd = (rgb) => pdf.setDrawColor(rgb[0], rgb[1], rgb[2]);
+  const st = (rgb) => pdf.setTextColor(rgb[0], rgb[1], rgb[2]);
+
+  function setFont(name, style) {
+    const keyMap = {
+      'CormorantGaramond-light':    'CormorantGaramond-Light',
+      'CormorantGaramond-normal':   'CormorantGaramond-Regular',
+      'CormorantGaramond-italic':   'CormorantGaramond-Italic',
+      'CormorantGaramond-semibold': 'CormorantGaramond-SemiBold',
+      'PlayfairDisplay-bold':       'PlayfairDisplay-Bold',
+      'PlayfairDisplay-bolditalic': 'PlayfairDisplay-BoldItalic',
+      'DMSans-normal':  'DMSans-Regular',
+      'DMSans-light':   'DMSans-Light',
+      'DMSans-medium':  'DMSans-Medium',
+    };
+    const fontKey = keyMap[name + '-' + style];
+    if (window.WSA_FONTS && fontKey && WSA_FONTS.has(fontKey)) {
+      pdf.setFont(name, style);
+    } else {
+      const fb = {
+        CormorantGaramond: { normal: ['Times','normal'], italic: ['Times','italic'], light: ['Times','normal'], semibold: ['Times','bold'] },
+        PlayfairDisplay:   { bold: ['Times','bold'], bolditalic: ['Times','bolditalic'] },
+        DMSans:            { normal: ['Helvetica','normal'], light: ['Helvetica','normal'], medium: ['Helvetica','bold'] },
+      };
+      const r = ((fb[name] || {})[style]) || ['Helvetica','normal'];
+      pdf.setFont(r[0], r[1]);
+    }
+  }
+
+  const PTmm = 0.3528;
+  const fs   = fontScale;
+
+  // Hintergrund
+  sf(bg); pdf.rect(bx, by, baseW, baseH, 'F');
+
+  // Kein Außenrahmen (hasBorder: false für alle Classic-Line-Themes)
+  const BW = 0;
+
+  // Innenrahmen
+  const fi = 8 * fS;
+  sd(bl(ac, 0.28)); pdf.setLineWidth(0.25 * fS);
+  pdf.rect(bx + fi, by + fi, baseW - fi * 2, baseH - fi * 2, 'S');
+
+  // Layout
+  const PL = BW + 14 * fS, PT = BW + 13 * fS, PB = BW + 10 * fS;
+  const cxPage = bx + baseW / 2;
+  const contX  = bx + PL, contY = by + PT;
+  const contW  = baseW - PL * 2, contH = baseH - PT - PB;
+
+  // Header
+  let y = contY;
+  const eyeFS = 7 * fS;
+  st(bl(tc, 0.42)); setFont('DMSans', 'normal'); pdf.setFontSize(eyeFS);
+  y += eyeFS * PTmm * 0.5;
+  pdf.text(T[currentLang].seating, cxPage, y, { align: 'center', baseline: 'middle' });
+  y += eyeFS * PTmm * 0.5 + 2.5 * fS;
+
+  // Titel — PlayfairDisplay bold
+  const titleFS  = 26 * fS;
+  const titleTxt = document.getElementById('inp-title').value.trim() || 'TISCHPLAN';
+  st(ac); setFont('PlayfairDisplay', 'bold'); pdf.setFontSize(titleFS * fs);
+  y += titleFS * fs * PTmm * 0.5;
+  pdf.text(titleTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+  y += titleFS * fs * PTmm * 0.5 + 2 * fS;
+
+  // Untertitel
+  const subTxt = document.getElementById('inp-subtitle').value.trim();
+  if (subTxt) {
+    const subFS = 10.5 * fS * fs;
+    st(bl(tc, 0.62)); setFont('CormorantGaramond', 'italic'); pdf.setFontSize(subFS);
+    y += 2 * fS + subFS * PTmm * 0.5;
+    pdf.text(subTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+    y += subFS * PTmm * 0.5 + 2 * fS;
+  }
+
+  // Trennlinie
+  y += 4 * fS;
+  sd(bl(ac, 0.38)); pdf.setLineWidth(0.25 * fS);
+  pdf.line(cxPage - 17 * fS, y, cxPage + 17 * fS, y);
+  y += 7 * fS;
+
+  const contentTopY = y;
+  const footerH     = 8 * fS;
+  const gridAvailH  = contY + contH - footerH - contentTopY;
+
+  // Grid-Konfiguration
+  const cols   = tableCount <= 2 ? 1 : tableCount <= 6 ? 2 : 3;
+  const isSpac = tableCount <= 4;
+  const isComp = tableCount >= 9;
+  const colGap = 8 * fS, rowGap = 9 * fS;
+  const cardW  = (contW - colGap * (cols - 1)) / cols;
+
+  // Font-Größen
+  const FS_NUM   = 6.5  * fS * fs;
+  const FS_NAME  = 11   * fS * fs;
+  const FS_GUEST = 8.5  * fS * fs;
+
+  // Ornament-Zeichner ORN_SMALL
+  function drawOrnSmall(cx_o, topY, w) {
+    const s  = w / 90;
+    const my = topY + 6 * s;
+    sd(bl(ac, 0.80)); pdf.setLineWidth(Math.max(0.72 * s, 0.08));
+    pdf.line(cx_o - w / 2 + 6  * s, my, cx_o - w / 2 + 37 * s, my);
+    pdf.line(cx_o - w / 2 + 53 * s, my, cx_o - w / 2 + 84 * s, my);
+    sf(bl(ac, 0.82));
+    pdf.lines([[3 * s, 3 * s], [-3 * s, 3 * s], [-3 * s, -3 * s]], cx_o - w / 2 + 45 * s, topY + 3 * s, [1, 1], 'F', true);
+    sf(bl(ac, 0.58));
+    pdf.circle(cx_o - w / 2 + 6  * s, my, Math.max(1.4 * s, 0.1), 'F');
+    pdf.circle(cx_o - w / 2 + 84 * s, my, Math.max(1.4 * s, 0.1), 'F');
+  }
+
+  // Ornament-Zeichner ORN_LARGE
+  function drawOrnLarge(cx_o, topY, w) {
+    const s  = w / 180;
+    const my = topY + 13 * s;
+
+    sd(bl(ac, 0.70)); pdf.setLineWidth(Math.max(0.85 * s, 0.08));
+    pdf.lines([[45.33 * s, -6 * s, 90.67 * s, -6 * s, 136 * s, 0]], cx_o - w / 2 + 22 * s, my, [1, 1], 'S');
+    pdf.lines([[45.33 * s,  6 * s, 90.67 * s,  6 * s, 136 * s, 0]], cx_o - w / 2 + 22 * s, my, [1, 1], 'S');
+
+    pdf.setLineWidth(Math.max(0.82 * s, 0.08));
+    pdf.lines([
+      [-7 * s,  0 * s, -12 * s, -4 * s, -10 * s, -8 * s],
+      [ 2 * s, -3 * s,   6 * s,  0 * s,   4 * s,  4 * s],
+      [-1 * s,  2 * s,  -4 * s,  1 * s,  -3 * s, -1 * s],
+    ], cx_o - w / 2 + 22 * s, my, [1, 1], 'S');
+
+    pdf.lines([
+      [ 7 * s,  0 * s,  12 * s, -4 * s,  10 * s, -8 * s],
+      [-2 * s, -3 * s,  -6 * s,  0 * s,  -4 * s,  4 * s],
+      [ 1 * s,  2 * s,   4 * s,  1 * s,   3 * s, -1 * s],
+    ], cx_o - w / 2 + 158 * s, my, [1, 1], 'S');
+
+    sf(bl(ac, 0.88));
+    const gs = 4 * s;
+    pdf.lines([[gs, gs], [-gs, gs], [-gs, -gs]], cx_o - gs, topY + 8 * s, [1, 1], 'F', true);
+
+    sf(bl(ac, 0.62));
+    pdf.circle(cx_o - w / 2 + 22  * s, my, Math.max(1.8 * s, 0.12), 'F');
+    pdf.circle(cx_o - w / 2 + 158 * s, my, Math.max(1.8 * s, 0.12), 'F');
+  }
+
+  // Kartenhöhe berechnen
+  function cardHeight(t) {
+    const guests  = parseGuests(t.guests_raw);
+    const hasName = t.name && t.name.trim();
+    const topOrnW = isSpac ? cardW * 0.9 : cardW * 0.8;
+    const topOrnH = isSpac ? 26 * (topOrnW / 180) : 12 * (topOrnW / 90);
+    const botOrnW = cardW * 0.8;
+    const botOrnH = isComp ? 0 : 12 * (botOrnW / 90);
+    const numH    = FS_NUM  * PTmm + 1.5 * fS;
+    const nameH   = hasName ? FS_NAME * PTmm + 2.5 * fS : 0;
+    const ruleH   = 3 * fS;
+    const guestH  = guests.length * (FS_GUEST * PTmm + 2.4 * fS);
+    return topOrnH + numH + nameH + ruleH + guestH + botOrnH + 2 * fS;
+  }
+
+  // Auto-Scale
+  const rows        = Math.ceil(tableCount / cols);
+  const maxRowCards = Array.from({ length: rows }, (_, r) =>
+    Array.from({ length: cols }, (_, c) => tableData[r * cols + c]).filter(Boolean)
+  );
+  const rowHeights  = maxRowCards.map(row => Math.max(...row.map(cardHeight)));
+  const totalGridH  = rowHeights.reduce((s, h) => s + h, 0) + rowGap * (rows - 1);
+  const cS          = totalGridH > gridAvailH ? gridAvailH / totalGridH : 1.0;
+  const scaledGridH = totalGridH * cS;
+  const gridOffsetY = Math.max(0, (gridAvailH - scaledGridH) / 2);
+
+  // Karten zeichnen
+  for (let i = 0; i < tableCount; i++) {
+    const t      = tableData[i];
+    const col    = i % cols;
+    const row    = Math.floor(i / cols);
+    const cardX  = contX + col * (cardW + colGap);
+    const cardCx = cardX + cardW / 2;
+
+    const prevRowsH = rowHeights.slice(0, row).reduce((s, h) => s + h, 0) + row * rowGap;
+    let cy = contentTopY + gridOffsetY + prevRowsH * cS;
+
+    const guests  = parseGuests(t.guests_raw);
+    const hasName = t.name && t.name.trim();
+
+    // Ornament oben
+    const topOrnW = (isSpac ? cardW * 0.9 : cardW * 0.8) * cS;
+    if (isSpac) {
+      drawOrnLarge(cardCx, cy, topOrnW);
+      cy += 26 * (topOrnW / 180);
+    } else {
+      drawOrnSmall(cardCx, cy, topOrnW);
+      cy += 12 * (topOrnW / 90);
+    }
+
+    // Tischnummer
+    st(bl(ac, 0.55)); setFont('DMSans', 'normal'); pdf.setFontSize(FS_NUM * cS);
+    cy += FS_NUM * cS * PTmm * 0.5;
+    pdf.text(T[currentLang].tisch + ' ' + (i + 1), cardCx, cy, { align: 'center', baseline: 'middle' });
+    cy += FS_NUM * cS * PTmm * 0.5 + 1.5 * fS * cS;
+
+    // Tischname — PlayfairDisplay bold
+    if (hasName) {
+      st(ac); setFont('PlayfairDisplay', 'bold'); pdf.setFontSize(FS_NAME * cS);
+      cy += FS_NAME * cS * PTmm * 0.5;
+      pdf.text(t.name.trim(), cardCx, cy, { align: 'center', baseline: 'middle' });
+      cy += FS_NAME * cS * PTmm * 0.5 + 2.5 * fS * cS;
+    }
+
+    // Trennlinie mit Diamant
+    const drW   = cardW * 0.55;
+    const drGap = 2.5 * fS * cS;
+    const dY    = cy + 1.5 * fS * cS;
+    sd(bl(ac, 0.22)); pdf.setLineWidth(0.25 * fS);
+    pdf.line(cardCx - drW / 2, dY, cardCx - drGap, dY);
+    pdf.line(cardCx + drGap,   dY, cardCx + drW / 2, dY);
+    const gs = 1.5 * fS * cS;
+    sf(bl(ac, 0.52));
+    pdf.lines([[gs, -gs], [gs, gs], [-gs, gs]], cardCx - gs, dY, [1, 1], 'F', true);
+    cy += 3 * fS * cS;
+
+    // Gäste
+    st(tc); setFont('CormorantGaramond', 'normal'); pdf.setFontSize(FS_GUEST * cS);
+    guests.forEach(g => {
+      cy += FS_GUEST * cS * PTmm * 0.5 + 0.5 * fS * cS;
+      pdf.text(g, cardCx, cy, { align: 'center', baseline: 'middle' });
+      cy += FS_GUEST * cS * PTmm * 0.5 + 0.5 * fS * cS + 1.4 * fS * cS;
+    });
+
+    // Ornament unten
+    if (!isComp) {
+      const botOrnW = cardW * 0.8 * cS;
+      drawOrnSmall(cardCx, cy, botOrnW);
+    }
+  }
+
+  // Footer
+  const fY     = by + baseH - fi - 3 * fS;
+  const fLineW = 22 * fS;
+  const fGap   = 3.5 * fS;
+  sd(bl(ac, 0.28)); pdf.setLineWidth(0.25 * fS);
+  pdf.line(cxPage - fGap - fLineW, fY, cxPage - fGap, fY);
+  pdf.line(cxPage + fGap,          fY, cxPage + fGap + fLineW, fY);
+  sf(bl(ac, 0.45)); pdf.circle(cxPage, fY, 0.75 * fS, 'F');
+
+  // Speichern
+  const saveName = (document.getElementById('inp-title').value.trim() || 'Tischplan').replace(/\s+/g, '_');
+  pdf.save('Tischplan_ClassicLine_' + saveName + '_' + formatKey.toUpperCase() + '.pdf');
+}
+
+// ── DEMO ──────────────────────────────────────────────
+function loadDemo() {
+  const isEN = currentLang === 'en';
+  document.getElementById('inp-title').value    = isEN ? 'SEATING PLAN' : 'TISCHPLAN';
+  document.getElementById('inp-subtitle').value = isEN ? 'Anna & Maximilian · July 12, 2026' : 'Anna & Maximilian · 12. Juli 2026';
+  tableCount = 9;
+  document.getElementById('count-num').textContent = 9;
+  const demo = isEN ? [
+    { name: 'Couple',         guests: 'Anna Müller\nMaximilian Becker' },
+    { name: 'Müller Family',  guests: 'Brigitte Müller\nHeinz Müller\nSophia Müller\nJonas Müller' },
+    { name: 'Becker Family',  guests: 'Ursula Becker\nGerhard Becker\nLena Becker' },
+    { name: 'Friends',        guests: 'Claudia Hoffmann\nStefan Klein\nJulia Richter' },
+    { name: 'Colleagues',     guests: 'Petra Schäfer\nRalf Vogt\nMarina Bauer\nDaniel Krause' },
+    { name: 'Table 6',        guests: 'Ingrid Lange\nWerner Lange\nBrigitte Otto' },
+    { name: 'Table 7',        guests: 'Sabine Fischer\nKarl Fischer\nHelga Weber' },
+    { name: 'Table 8',        guests: 'Manfred Roth\nElise Roth\nPeter Braun' },
+    { name: 'Children',       guests: 'Mia Müller\nLeon Becker\nEmma Hoffmann\nBen Klein' },
+  ] : [
+    { name: 'Brautpaar',      guests: 'Anna Müller\nMaximilian Becker' },
+    { name: 'Familie Müller', guests: 'Brigitte Müller\nHeinz Müller\nSophia Müller\nJonas Müller' },
+    { name: 'Familie Becker', guests: 'Ursula Becker\nGerhard Becker\nLena Becker' },
+    { name: 'Freunde',        guests: 'Claudia Hoffmann\nStefan Klein\nJulia Richter' },
+    { name: 'Kollegen',       guests: 'Petra Schäfer\nRalf Vogt\nMarina Bauer\nDaniel Krause' },
+    { name: 'Tisch 6',        guests: 'Ingrid Lange\nWerner Lange\nBrigitte Otto' },
+    { name: 'Tisch 7',        guests: 'Sabine Fischer\nKarl Fischer\nHelga Weber' },
+    { name: 'Tisch 8',        guests: 'Manfred Roth\nElise Roth\nPeter Braun' },
+    { name: 'Kinder',         guests: 'Mia Müller\nLeon Becker\nEmma Hoffmann\nBen Klein' },
+  ];
+  initTableData(tableCount);
+  demo.forEach((d, i) => {
+    if (tableData[i]) { tableData[i].name = d.name; tableData[i].guests_raw = d.guests; }
+  });
+  renderTableInputs();
+  renderPoster();
+}
+
+// ── STARTUP ───────────────────────────────────────────
+document.body.className = 'lang-' + currentLang;
+initTableData(tableCount);
+renderTableInputs();
+renderPoster();
+applyFontScale();
+window.addEventListener('resize', scalePreview);
+</script>
+</body>
+</html>

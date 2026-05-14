@@ -1,0 +1,1245 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Brautjungfer fragen — Romantic Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Pinyon+Script&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Preview Panel ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #ECEAE4; align-items: stretch; padding: 0;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── Card Face ── */
+    .card-face {
+      width: 127mm; height: 178mm;
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .card-face.sq4 { width: 102mm; height: 102mm; }
+
+    .card-bg {
+      position: absolute; inset: 0;
+      background: var(--bg, #FBF5F2);
+    }
+    .card-border-line {
+      position: absolute; inset: 3.5mm;
+      border: 0.4px solid var(--acc, #C4907A);
+      pointer-events: none; z-index: 2;
+    }
+    .card-photo-wrap {
+      position: absolute; left: 7mm; top: 10mm;
+      width: 113mm; height: 88mm;
+      overflow: hidden; z-index: 1;
+    }
+    .card-face.sq4 .card-photo-wrap {
+      left: 5.6mm; top: 8mm;
+      width: 90.8mm; height: 44mm;
+    }
+    .card-photo-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 50%; display: block;
+    }
+    .card-photo-placeholder {
+      width: 100%; height: 100%; background: #e8e3dd;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* ── Corner Marks: TR + BL only, doppeltes versetztes L ──
+       --off entspricht dem Abstand Foto→Rahmen (= padX − Rahmen-Inset).
+       Wird in positionCornerMarks() pro Format gesetzt; Defaults für 5×7". */
+    .corner-mark {
+      position: absolute; pointer-events: none; z-index: 4;
+      --cl: 12mm; --off: 3.5mm;
+      width: calc(var(--cl) + var(--off));
+      height: calc(var(--cl) + var(--off));
+    }
+    .card-face.sq4 .corner-mark { --off: 2.1mm; }
+    .corner-mark::before, .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cl); height: var(--cl);
+      border-color: var(--acc, #C4907A); border-style: solid;
+    }
+    /* TR – äußeres L (weiter vom Foto) */
+    .corner-mark.tr::before { top: 0; right: var(--off); border-width: 0.4px 0.4px 0 0; }
+    /* TR – inneres L (am Fotorand) */
+    .corner-mark.tr::after  { top: var(--off); right: 0; border-width: 0.5px 0.5px 0 0; }
+    /* BL – äußeres L */
+    .corner-mark.bl::before { bottom: 0; left: var(--off); border-width: 0 0 0.4px 0.4px; }
+    /* BL – inneres L */
+    .corner-mark.bl::after  { bottom: var(--off); left: 0; border-width: 0 0 0.5px 0.5px; }
+
+    /* ── Card Text ── */
+    .card-text {
+      position: absolute; left: 7mm; right: 7mm;
+      bottom: 10mm; top: 104mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; gap: 6mm; z-index: 3;
+    }
+    .card-face.sq4 .card-text { top: 58mm; }
+
+    .card-greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 13pt;
+      color: var(--txt2, #8B6A5C); letter-spacing: 0.05em; line-height: 1;
+    }
+    .card-name {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 50pt; line-height: 1.05;
+      color: var(--txt-strong, #1A0D06);
+    }
+    .card-face.sq4 .card-name { font-size: 36pt; }
+
+    .card-ornament {
+      display: flex; align-items: center; gap: 3mm; width: 80%;
+    }
+    .card-ornament::before, .card-ornament::after {
+      content: ''; flex: 1; height: 0.4px;
+      background: var(--acc, #C4907A); opacity: 0.65;
+    }
+    .orn-dot {
+      width: 2.5mm; height: 2.5mm;
+      background: var(--acc, #C4907A); opacity: 0.8;
+      border-radius: 50%;
+    }
+    .card-role {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt; font-weight: 300;
+      text-transform: uppercase; letter-spacing: 0.16em;
+      color: var(--txt, #3D2B1F); line-height: 1.5;
+    }
+    .card-face.sq4 .card-role { font-size: 7pt; }
+
+    /* ── Back Side ── */
+    .card-back {
+      width: 127mm; height: 178mm;
+      position: relative; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      box-sizing: border-box;
+    }
+    .card-back.sq4 { width: 102mm; height: 102mm; }
+
+    /* Bogen-Stil: Monogramm-Cluster oben, Textzeile unten — klassische Stationery-Aufteilung */
+    .card-back.seal-arc {
+      justify-content: flex-start;
+      padding: 50mm 0 38mm;
+    }
+    .card-back.sq4.seal-arc {
+      padding: 28mm 0 22mm;
+    }
+    .card-back.seal-arc .back-textline { margin-top: auto; }
+    .card-back.style-clean { background: var(--bg, #FBF5F2); }
+    .card-back.style-color { background: var(--acc, #C4907A); }
+    .card-back-border {
+      position: absolute; inset: 7mm; pointer-events: none;
+    }
+    .card-back.style-clean .card-back-border { border: 0.4px solid var(--acc, #C4907A); }
+    .card-back.style-color .card-back-border { border: 0.4px solid rgba(255,255,255,0.4); }
+
+    /* ── Monogram Seal: Clean / Bogen ── */
+    .back-seal { display: block; margin: 0 auto; overflow: visible; z-index: 1; }
+    .back-seal.arc-top    { margin-bottom: 5mm; }
+    .back-seal.arc-bottom { margin-top: 5mm; }
+    .card-back.sq4 .back-seal.arc-top    { margin-bottom: 3.5mm; }
+    .card-back.sq4 .back-seal.arc-bottom { margin-top: 3.5mm; }
+    .card-back.style-clean .back-seal { color: var(--acc, #C4907A); }
+    .card-back.style-color .back-seal { color: rgba(255,255,255,0.88); }
+    .back-mono {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 52pt; line-height: 1; z-index: 1;
+    }
+    .card-back.sq4 .back-mono { font-size: 40pt; }
+    .card-back.style-clean .back-mono { color: var(--txt, #3D2B1F); }
+    .card-back.style-color .back-mono { color: #fff; }
+    .back-textline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10pt;
+      letter-spacing: 0.12em; margin-top: 6mm; z-index: 1;
+    }
+    .card-back.style-clean .back-textline { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .back-textline { color: rgba(255,255,255,0.92); }
+
+    /* ── Theme Colors ── */
+    /* --txt2-deep = txt2 + 30% Richtung txt; print-sicherer Kontrast für die kleine Rückseiten-Textzeile */
+    :root,[data-theme="rose"]  { --bg:#FBF5F2; --acc:#C4907A; --txt:#3D2B1F; --txt-strong:#1A0A04; --txt2:#8B6A5C; --txt2-deep:#73574A; }
+    [data-theme="sage"]  { --bg:#F2F5F0; --acc:#7A9C7E; --txt:#283527; --txt-strong:#0E1D0D; --txt2:#5A7A5E; --txt2-deep:#4B664E; }
+    [data-theme="terra"] { --bg:#F5EDE6; --acc:#B5694A; --txt:#3A1E12; --txt-strong:#1A0804; --txt2:#7A4A35; --txt2-deep:#684029; }
+
+    /* ── Guest Rows ── */
+    .guest-row { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; }
+    .row-num { width: 14px; flex-shrink: 0; text-align: right; font-size: 9px; color: #ccc; }
+    .row-name {
+      flex: 1; padding: 5px 8px;
+      border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; outline: none; background: #FAFAFA;
+      transition: border-color 0.15s; color: #1A1A1A;
+    }
+    .row-name:focus, .row-name.is-active { border-color: #1A1A1A; background: #fff; }
+    .btn-photo {
+      width: 30px; height: 27px; border: 1px solid #ddd;
+      background: #fff; cursor: pointer; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #bbb; transition: all 0.15s; flex-shrink: 0;
+    }
+    .btn-photo:hover { border-color: #888; color: #555; }
+    .btn-photo.has-photo { border-color: #7A9C7E; color: #7A9C7E; font-weight: bold; }
+    .btn-photo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .row-yslider { display: flex; align-items: center; gap: 5px; margin-bottom: 3px; padding-left: 19px; }
+    .row-yslider input[type=range] { flex: 1; }
+    .row-yslider span { font-size: 8px; color: #bbb; width: 22px; text-align: right; }
+
+    /* ── Monogram Row ── */
+    .mono-row { display: flex; gap: 5px; margin-bottom: 5px; }
+    .mono-row input { flex: 1; text-align: center; font-size: 15px; padding: 7px 4px; }
+    .mono-sep { max-width: 36px !important; }
+
+    /* ── Theme Dots ── */
+    .theme-row { display: flex; gap: 8px; margin-bottom: 2px; }
+    .theme-dot {
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+      border: 2.5px solid transparent; transition: all 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; transform: scale(1.12); }
+    .theme-dot.rose  { background: #C4907A; }
+    .theme-dot.sage  { background: #7A9C7E; }
+    .theme-dot.terra { background: #B5694A; }
+
+    /* ── Export Buttons ── */
+    .btn-export {
+      width: 100%; padding: 10px; background: #1A1A1A; color: #fff;
+      border: none; font-family: 'DM Sans', sans-serif; font-size: 9.5px;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+      margin-bottom: 4px; transition: background 0.15s;
+    }
+    .btn-export:hover:not(:disabled) { background: #333; }
+    .btn-export:disabled { opacity: 0.5; cursor: default; }
+    .btn-export.secondary {
+      background: #fff; color: #1A1A1A; border: 1px solid #1A1A1A;
+    }
+    .btn-export.secondary:hover:not(:disabled) { background: #f5f5f5; }
+  </style>
+</head>
+<body data-theme="rose">
+
+<form class="panel-form" onsubmit="return false">
+  <div class="panel-logo">Wedding Story Atelier</div>
+  <div class="panel-tagline">Romantic Line · Proposal Cards</div>
+
+  <!-- ── 1. Grundeinstellungen ── -->
+  <span class="section-label">Sprache / Language</span>
+  <div class="lang-buttons">
+    <button type="button" class="lang-btn active" onclick="setLang('de')">DE</button>
+    <button type="button" class="lang-btn" onclick="setLang('en')">EN</button>
+  </div>
+
+  <span class="section-label" id="lbl-format">Format</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-fmt-57" onclick="setFormat('us57')">Hochkant</button>
+    <button type="button" class="ui-btn" id="btn-fmt-sq" onclick="setFormat('sq4')">Quadrat</button>
+  </div>
+
+  <span class="section-label">Farbvariante</span>
+  <div class="theme-row">
+    <div class="theme-dot rose active" onclick="setTheme('rose')" title="Dusty Rose"></div>
+    <div class="theme-dot sage" onclick="setTheme('sage')" title="Sage Green"></div>
+    <div class="theme-dot terra" onclick="setTheme('terra')" title="Terracotta"></div>
+  </div>
+
+  <!-- ── 2. Vorschau-Seite ── -->
+  <span class="section-label" id="lbl-preview-toggle">Vorschau</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-side-front" onclick="setSide('front')">Vorderseite</button>
+    <button type="button" class="ui-btn" id="btn-side-back" onclick="setSide('back')">Rückseite</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── 3. Vorderseite ── -->
+  <span class="section-label" id="lbl-section-front">Vorderseite</span>
+
+  <span class="section-label" id="lbl-role">Rolle</span>
+  <select id="sel-role" onchange="setRole(this.value)"></select>
+
+  <span class="section-label" id="lbl-greeting">Ansprache</span>
+  <input type="text" id="inp-greeting" value="Liebe" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-names">Namen &amp; Fotos (10 pro Durchgang)</span>
+  <div id="guest-rows"></div>
+
+  <hr class="divider">
+
+  <!-- ── 4. Rückseite ── -->
+  <span class="section-label" id="lbl-section-back">Rückseite</span>
+
+  <span class="section-label" id="lbl-mono">Monogramm</span>
+  <div class="mono-row">
+    <input type="text" id="mono-a" placeholder="B" maxlength="3" oninput="renderPreview()">
+    <input type="text" id="mono-sep" class="mono-sep" value="&amp;" maxlength="3" oninput="renderPreview()">
+    <input type="text" id="mono-b" placeholder="J" maxlength="3" oninput="renderPreview()">
+  </div>
+
+  <span class="section-label" id="lbl-backtext">Textzeile</span>
+  <input type="text" id="inp-backtext" value="With Love" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-backstyle">Hintergrund</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-back-clean" onclick="setBackStyle('clean')">Clean</button>
+    <button type="button" class="ui-btn" id="btn-back-color" onclick="setBackStyle('color')">Color</button>
+  </div>
+
+  <span class="section-label" id="lbl-seal">Siegel</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-seal-clean" onclick="setSealStyle('clean')">Clean</button>
+    <button type="button" class="ui-btn" id="btn-seal-arc" onclick="setSealStyle('arc')">Bogen</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── 5. Export ── -->
+  <span class="section-label" id="lbl-paper">Druckpapier</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-paper-a4" onclick="setPaper('a4')">A4</button>
+    <button type="button" class="ui-btn" id="btn-paper-lt" onclick="setPaper('letter')">Letter</button>
+  </div>
+
+  <span class="section-label" id="lbl-output">Ausgabe</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-out-home" onclick="setOutput('home')">Heimdruck</button>
+    <button type="button" class="ui-btn" id="btn-out-print" onclick="setOutput('print')">Druckerei</button>
+  </div>
+  <p class="hint" id="hint-output"></p>
+
+  <button type="button" class="btn-export" id="btn-exp-front" onclick="exportFronts()">Vorderseiten exportieren</button>
+  <button type="button" class="btn-export secondary" id="btn-exp-back" onclick="exportBacks()">Rückseiten exportieren</button>
+</form>
+
+<div class="panel-preview">
+  <div class="page-nav">
+    <button type="button" class="nav-btn" id="nav-prev" onclick="navCard(-1)" disabled>&#8249;</button>
+    <span id="nav-label">Karte 1 / 10</span>
+    <button type="button" class="nav-btn" id="nav-next" onclick="navCard(1)">&#8250;</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div id="preview-card"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let cards = Array.from({length:10}, () => ({name:'', photo:null, photoY:50}));
+let currentCard = 0;
+let lang = 'de', theme = 'rose', format = 'us57';
+let paper = 'a4', output = 'home';
+let role = 'bridesmaid', showSide = 'front', backStyle = 'clean', sealStyle = 'clean';
+
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+const ROLES = {
+  de: [
+    {v:'bridesmaid',   l:'Brautjungfer',            s:'Willst du meine Brautjungfer werden?',      g:'Liebe'},
+    {v:'maid_honor',   l:'Trauzeugin',              s:'Willst du meine Trauzeugin werden?',         g:'Liebe'},
+    {v:'matron_honor', l:'Trauzeugin (verheiratet)',s:'Willst du meine Trauzeugin sein?',           g:'Liebe'},
+    {v:'junior_bm',    l:'Junge Brautjungfer',      s:'Willst du meine Brautjungfer werden?',      g:'Liebe'},
+    {v:'flower_girl',  l:'Blumenmädchen',           s:'Willst du unser Blumenmädchen sein?',       g:'Liebe'},
+    {v:'ring_bearer',  l:'Ringträger',              s:'Willst du unser Ringträger sein?',           g:'Lieber'},
+    {v:'best_man',     l:'Trauzeuge',               s:'Willst du mein Trauzeuge sein?',            g:'Lieber'},
+    {v:'groomsman',    l:'Groomsman',               s:'Willst du mein Groomsman sein?',            g:'Lieber'},
+    {v:'officiant',    l:'Standesbeamter / Freund', s:'Willst du uns trauen?',                     g:'Lieber'},
+  ],
+  en: [
+    {v:'bridesmaid',   l:'Bridesmaid',              s:'Will you be my Bridesmaid?',                g:'Dear'},
+    {v:'maid_honor',   l:'Maid of Honor',           s:'Will you be my Maid of Honor?',            g:'Dear'},
+    {v:'matron_honor', l:'Matron of Honor',         s:'Will you be my Matron of Honor?',          g:'Dear'},
+    {v:'junior_bm',    l:'Junior Bridesmaid',       s:'Will you be my Junior Bridesmaid?',        g:'Dear'},
+    {v:'flower_girl',  l:'Flower Girl',             s:'Will you be my Flower Girl?',              g:'Dear'},
+    {v:'ring_bearer',  l:'Ring Bearer',             s:'Will you be my Ring Bearer?',              g:'Dear'},
+    {v:'best_man',     l:'Best Man',                s:'Will you be my Best Man?',                 g:'Dear'},
+    {v:'groomsman',    l:'Groomsman',               s:'Will you be my Groomsman?',                g:'Dear'},
+    {v:'officiant',    l:'Officiant',               s:'Will you marry us?',                       g:'Dear'},
+  ],
+};
+
+const THEMES = {
+  rose:  {bg:[251,245,242], acc:[196,144,122], txt:[61,43,31],  txtStrong:[26,10,4],  txt2:[139,106,92], txt2Deep:[115,87,74]},
+  sage:  {bg:[242,245,240], acc:[122,156,126], txt:[40,53,39],  txtStrong:[14,29,13], txt2:[90,122,94],  txt2Deep:[75,102,78]},
+  terra: {bg:[245,237,230], acc:[181,105,74],  txt:[58,30,18],  txtStrong:[26,8,4],   txt2:[122,74,53],  txt2Deep:[104,64,41]},
+};
+
+const CARD_DIM = {
+  us57: {w:127, h:178, photoH:88, padX:7,   padY:10},
+  sq4:  {w:102, h:102, photoH:44, padX:5.6, padY:8},
+};
+
+// ════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════
+const ge = id => document.getElementById(id);
+const getRoleData = () => ROLES[lang].find(r => r.v === role) || ROLES[lang][0];
+
+function tt(key) {
+  const labels = {
+    de: { role:'Rolle', greeting:'Ansprache', names:'Namen & Fotos (10 pro Durchgang)',
+          mono:'Monogramm (Rückseite)', backtext:'Textzeile Rückseite',
+          bgstyle:'Hintergrund', seal:'Siegel',
+          format:'Format', fmtPortrait:'Hochkant', fmtSquare:'Quadrat',
+          paper:'Druckpapier',
+          navLabel: (i,n) => `Karte ${i+1} / ${n}`,
+          hintHome57: p => `${p.toUpperCase()} quer · 2 Karten/Seite · Schnittmarken`,
+          hintPrint57: '5×7″ Einzelseiten · 3 mm Beschnitt',
+          hintHomeSq: p => `${p.toUpperCase()} hoch · 4 Karten/Seite · Schnittmarken`,
+          hintPrintSq: '4×4″ Einzelseiten · 3 mm Beschnitt',
+          expFront:'Vorderseiten exportieren', expBack:'Rückseiten exportieren',
+          alertName:'Bitte mindestens einen Namen eingeben.'},
+    en: { role:'Role', greeting:'Greeting', names:'Names & Photos (10 per batch)',
+          mono:'Monogram (Back)', backtext:'Back Text Line',
+          bgstyle:'Background', seal:'Seal',
+          format:'Format', fmtPortrait:'Portrait', fmtSquare:'Square',
+          paper:'Print Paper',
+          navLabel: (i,n) => `Card ${i+1} / ${n}`,
+          hintHome57: p => `${p.charAt(0).toUpperCase()+p.slice(1)} landscape · 2 cards/page · trim marks`,
+          hintPrint57: '5×7″ single pages · 3mm bleed',
+          hintHomeSq: p => `${p.charAt(0).toUpperCase()+p.slice(1)} portrait · 4 cards/page · trim marks`,
+          hintPrintSq: '4×4″ single pages · 3mm bleed',
+          expFront:'Export Fronts', expBack:'Export Backs',
+          alertName:'Please enter at least one name.'},
+  };
+  return labels[lang][key];
+}
+
+// ════════════════════════════════════════════════════
+// UI SETTERS
+// ════════════════════════════════════════════════════
+function setLang(l) {
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.trim().toLowerCase() === l));
+  rebuildRoles();
+  updateLabels();
+  updateHint();
+  renderPreview();
+}
+
+function setFormat(f) {
+  format = f;
+  ge('btn-fmt-57').classList.toggle('active', f==='us57');
+  ge('btn-fmt-sq').classList.toggle('active', f==='sq4');
+  updateHint();
+  renderPreview();
+}
+
+function setTheme(t) {
+  theme = t;
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-dot').forEach(d =>
+    d.classList.toggle('active', d.classList.contains(t)));
+  renderPreview();
+}
+
+function setRole(v) {
+  role = v;
+  const rd = getRoleData();
+  ge('inp-greeting').value = rd.g;
+  renderPreview();
+}
+
+function setSide(s) {
+  showSide = s;
+  ge('btn-side-front').classList.toggle('active', s==='front');
+  ge('btn-side-back').classList.toggle('active', s==='back');
+  renderPreview();
+}
+
+function setPaper(p) {
+  paper = p;
+  ge('btn-paper-a4').classList.toggle('active', p==='a4');
+  ge('btn-paper-lt').classList.toggle('active', p==='letter');
+  updateHint();
+}
+
+function setOutput(o) {
+  output = o;
+  ge('btn-out-home').classList.toggle('active', o==='home');
+  ge('btn-out-print').classList.toggle('active', o==='print');
+  updateHint();
+}
+
+function setBackStyle(s) {
+  backStyle = s;
+  ge('btn-back-clean').classList.toggle('active', s==='clean');
+  ge('btn-back-color').classList.toggle('active', s==='color');
+  renderPreview();
+}
+
+function setSealStyle(s) {
+  sealStyle = s;
+  ['clean','arc'].forEach(k =>
+    ge('btn-seal-'+k).classList.toggle('active', s===k));
+  renderPreview();
+}
+
+function navCard(dir) {
+  currentCard = Math.max(0, Math.min(9, currentCard + dir));
+  ge('nav-prev').disabled = currentCard === 0;
+  ge('nav-next').disabled = currentCard === 9;
+  ge('nav-label').textContent = tt('navLabel')(currentCard, 10);
+  document.querySelectorAll('.row-name').forEach((inp, i) =>
+    inp.classList.toggle('is-active', i === currentCard));
+  renderPreview();
+}
+
+function updateHint() {
+  const p = paper;
+  let h = format==='us57'
+    ? (output==='home' ? tt('hintHome57')(p) : tt('hintPrint57'))
+    : (output==='home' ? tt('hintHomeSq')(p) : tt('hintPrintSq'));
+  ge('hint-output').textContent = h;
+}
+
+function updateLabels() {
+  ge('lbl-format').textContent    = tt('format');
+  ge('btn-fmt-57').textContent    = tt('fmtPortrait');
+  ge('btn-fmt-sq').textContent    = tt('fmtSquare');
+  ge('lbl-role').textContent      = tt('role');
+  ge('lbl-greeting').textContent  = tt('greeting');
+  ge('lbl-names').textContent     = tt('names');
+  ge('lbl-mono').textContent      = tt('mono');
+  ge('lbl-backtext').textContent  = tt('backtext');
+  ge('lbl-backstyle').textContent = tt('bgstyle');
+  ge('lbl-seal').textContent      = tt('seal');
+  ge('lbl-paper').textContent     = tt('paper');
+  ge('btn-exp-front').textContent = tt('expFront');
+  ge('btn-exp-back').textContent  = tt('expBack');
+  ge('nav-label').textContent     = tt('navLabel')(currentCard, 10);
+}
+
+// ════════════════════════════════════════════════════
+// GUEST ROWS
+// ════════════════════════════════════════════════════
+function buildGuestRows() {
+  const container = ge('guest-rows');
+  container.innerHTML = '';
+  cards.forEach((c, i) => {
+    const row = document.createElement('div');
+    row.className = 'guest-row';
+
+    const num = document.createElement('div');
+    num.className = 'row-num';
+    num.textContent = i + 1;
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'row-name' + (i===currentCard ? ' is-active' : '');
+    inp.placeholder = 'Name';
+    inp.value = c.name;
+    inp.oninput = e => { cards[i].name = e.target.value; if (i===currentCard) renderPreview(); };
+    inp.onfocus = () => {
+      currentCard = i;
+      document.querySelectorAll('.row-name').forEach(el => el.classList.remove('is-active'));
+      inp.classList.add('is-active');
+      ge('nav-prev').disabled = i===0;
+      ge('nav-next').disabled = i===9;
+      ge('nav-label').textContent = tt('navLabel')(i, 10);
+      renderPreview();
+    };
+
+    const photoBtn = document.createElement('div');
+    photoBtn.className = 'btn-photo' + (c.photo ? ' has-photo' : '');
+    photoBtn.innerHTML = c.photo ? '&#10003;' : '+';
+    const fi = document.createElement('input');
+    fi.type = 'file'; fi.accept = 'image/*';
+    fi.onchange = async e => {
+      if (!e.target.files[0]) return;
+      cards[i].photo = await compressImage(e.target.files[0], 1600, 0.85);
+      currentCard = i;
+      buildGuestRows(); renderPreview();
+    };
+    photoBtn.appendChild(fi);
+
+    row.appendChild(num); row.appendChild(inp); row.appendChild(photoBtn);
+    container.appendChild(row);
+
+    if (c.photo) {
+      const sr = document.createElement('div');
+      sr.className = 'row-yslider';
+      const sl = document.createElement('input');
+      sl.type = 'range'; sl.min = 0; sl.max = 100; sl.value = c.photoY;
+      const sv = document.createElement('span');
+      sv.textContent = c.photoY + '%';
+      sl.oninput = e => {
+        cards[i].photoY = parseInt(e.target.value);
+        sv.textContent = e.target.value + '%';
+        if (i===currentCard) renderPreview();
+      };
+      sr.appendChild(sl); sr.appendChild(sv);
+      container.appendChild(sr);
+    }
+  });
+}
+
+function rebuildRoles() {
+  const sel = ge('sel-role');
+  const cur = role;
+  sel.innerHTML = '';
+  ROLES[lang].forEach(r => {
+    const opt = document.createElement('option');
+    opt.value = r.v; opt.textContent = r.l;
+    if (r.v === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  role = sel.value;
+}
+
+// ════════════════════════════════════════════════════
+// IMAGE
+// ════════════════════════════════════════════════════
+function compressImage(file, maxPx, quality) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h*maxPx/w); w = maxPx; }
+          else        { w = Math.round(w*maxPx/h); h = maxPx; }
+        }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function cropPhoto(base64, targetW, targetH, yPercent) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const srcR = img.width/img.height, tgtR = targetW/targetH;
+      let sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        sh = img.height; sw = sh*tgtR;
+        sx = (img.width-sw)/2; sy = 0;
+      } else {
+        sw = img.width; sh = sw/tgtR;
+        sx = 0; sy = (img.height-sh)*((yPercent??50)/100);
+      }
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(sw); cv.height = Math.round(sh);
+      cv.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL('image/jpeg', 0.9));
+    };
+    img.src = base64;
+  });
+}
+
+// ════════════════════════════════════════════════════
+// SEAL "Bogen" — flache Quadratic-Bezier-Bögen oben + unten,
+// mit offenen Endpunkt-Kreisen. Geometrie geteilt mit drawArc() im PDF.
+// ════════════════════════════════════════════════════
+const ARC_DIM = {
+  us57: { w: 66, h: 5, depth: 3   },
+  sq4:  { w: 52, h: 4, depth: 2.4 },
+};
+const ARC_DOT_R = 0.7;
+
+function buildArcSvg(direction, isSquare) {
+  const d = ARC_DIM[isSquare ? 'sq4' : 'us57'];
+  const w = d.w, h = d.h, depth = d.depth;
+  const totalW = w + 2 * ARC_DOT_R;        // SVG-Breite inkl. der beiden Endpunkt-Kreise
+  const padding = (h - depth) / 2;
+  // 'top'    : Bogen senkt sich in der Mitte ab    (Endpunkte oben, Apex unten)
+  // 'bottom' : Bogen wölbt sich in der Mitte hoch (Endpunkte unten, Apex oben)
+  const yEdge = direction === 'top' ? padding         : h - padding;
+  const yApex = direction === 'top' ? h - padding     : padding;
+  const yQ    = 2 * yApex - yEdge;          // Quadratic-Kontrollpunkt (siehe Bezier-Mittelpunkt-Formel)
+  const arcStart = 2 * ARC_DOT_R;            // Bogen beginnt an der Innenkante des linken Punkts
+  const arcEnd   = totalW - 2 * ARC_DOT_R;
+  const xQ       = totalW / 2;
+  const path = `M ${arcStart} ${yEdge.toFixed(2)} Q ${xQ.toFixed(2)} ${yQ.toFixed(2)} ${arcEnd.toFixed(2)} ${yEdge.toFixed(2)}`;
+  return `<svg class="back-seal arc-${direction}" viewBox="0 0 ${totalW} ${h}" width="${totalW}mm" height="${h}mm">
+    <path d="${path}" stroke="currentColor" stroke-width="0.25" fill="none" stroke-linecap="round"/>
+    <circle cx="${ARC_DOT_R}" cy="${yEdge.toFixed(2)}" r="${ARC_DOT_R}" stroke="currentColor" stroke-width="0.2" fill="none"/>
+    <circle cx="${(totalW - ARC_DOT_R).toFixed(2)}" cy="${yEdge.toFixed(2)}" r="${ARC_DOT_R}" stroke="currentColor" stroke-width="0.2" fill="none"/>
+  </svg>`;
+}
+
+// ════════════════════════════════════════════════════
+// PREVIEW
+// ════════════════════════════════════════════════════
+function positionCornerMarks(cardEl, dim) {
+  const tr = cardEl.querySelector('.corner-mark.tr');
+  const bl = cardEl.querySelector('.corner-mark.bl');
+  if (!tr || !bl) return;
+  const {padX, padY, photoH, h} = dim;
+  // off = Abstand Foto→Rahmen, sodass das versetzte L immer innerhalb der Border bleibt
+  const off = Math.max(0, padX - 3.5);
+
+  tr.style.setProperty('--off', off + 'mm');
+  bl.style.setProperty('--off', off + 'mm');
+
+  tr.style.top    = `${padY - off}mm`;
+  tr.style.right  = `${padX - off}mm`;
+  tr.style.left   = '';
+  tr.style.bottom = '';
+
+  const photoBottom = padY + photoH;
+  bl.style.bottom = `${h - photoBottom - off}mm`;
+  bl.style.left   = `${padX - off}mm`;
+  bl.style.top    = '';
+  bl.style.right  = '';
+}
+
+function renderPreview() {
+  const c = cards[currentCard];
+  const dim = CARD_DIM[format];
+  const isSquare = format === 'sq4';
+  const greeting = ge('inp-greeting').value || '';
+  const name = c.name || (lang==='de' ? 'Name' : 'Name');
+  const sentence = getRoleData().s;
+  const monoA = ge('mono-a').value || '';
+  const monoSep = ge('mono-sep').value || '&';
+  const monoB = ge('mono-b').value || '';
+  const monoStr = (monoA||monoB) ? [monoA, monoSep, monoB].filter(Boolean).join(' ') : (lang==='de' ? 'B & J' : 'B & J');
+  const backText = ge('inp-backtext').value || '';
+
+  let html = '';
+  if (showSide === 'front') {
+    const photoStyle = c.photo ? `background-image:url('${c.photo}');background-size:cover;background-position:center ${c.photoY}%` : '';
+    html = `
+    <div class="card-face${isSquare?' sq4':''}">
+      <div class="card-bg"></div>
+      <div class="card-border-line"></div>
+      <div class="card-photo-wrap">
+        ${c.photo
+          ? `<img class="card-photo-img" src="${c.photo}" style="object-position:center ${c.photoY}%">`
+          : `<div class="card-photo-placeholder">Foto</div>`}
+      </div>
+      <div class="corner-mark tr"></div>
+      <div class="corner-mark bl"></div>
+      <div class="card-text">
+        ${greeting ? `<div class="card-greeting">${greeting}</div>` : ''}
+        <div class="card-name">${name}</div>
+        <div class="card-ornament"><div class="orn-dot"></div></div>
+        <div class="card-role">${sentence}</div>
+      </div>
+    </div>`;
+  } else {
+    const useArc = sealStyle === 'arc';
+    const arcTop = useArc ? buildArcSvg('top', isSquare) : '';
+    const arcBot = useArc ? buildArcSvg('bottom', isSquare) : '';
+    html = `
+    <div class="card-back${isSquare?' sq4':''} style-${backStyle} seal-${sealStyle}">
+      <div class="card-back-border"></div>
+      ${arcTop}
+      <div class="back-mono">${monoStr}</div>
+      ${arcBot}
+      ${backText ? `<div class="back-textline">${backText}</div>` : ''}
+    </div>`;
+  }
+
+  ge('preview-card').innerHTML = html;
+
+  if (showSide === 'front') {
+    const cardEl = ge('preview-card').firstElementChild;
+    positionCornerMarks(cardEl, dim);
+  }
+  scalePreview();
+}
+
+function scalePreview() {
+  const area = ge('preview-area');
+  const wrap = ge('preview-wrap');
+  const card = wrap.firstElementChild;
+  if (!card) return;
+  wrap.style.transform = 'none';
+  const cW = card.offsetWidth, cH = card.offsetHeight;
+  const aW = area.clientWidth, aH = area.clientHeight;
+  const scale = Math.min((aW-40)/cW, (aH-40)/cH, 1);
+  wrap.style.transform = `translate(${(aW-cW*scale)/2}px,${(aH-cH*scale)/2}px) scale(${scale})`;
+}
+
+// ════════════════════════════════════════════════════
+// PDF HELPERS
+// ════════════════════════════════════════════════════
+const PTmm = 0.3528;
+
+function pdfFont(pdf, name, style) {
+  if (window.WSA_FONTS) {
+    WSA_FONTS.set(pdf, name, style);
+  } else {
+    const fb = {
+      CormorantGaramond:{normal:['Times','normal'],italic:['Times','italic'],light:['Times','normal']},
+      PinyonScript:{normal:['Times','italic']},
+      DMSans:{light:['Helvetica','normal'],normal:['Helvetica','normal']},
+    };
+    const r = ((fb[name]||{})[style])||['Helvetica','normal'];
+    pdf.setFont(r[0],r[1]);
+  }
+}
+
+function drawTrimMark(pdf, x, y) {
+  pdf.setDrawColor(160,160,160); pdf.setLineWidth(0.12);
+  const s = 3;
+  pdf.line(x-s-1, y, x-1, y); pdf.line(x+1, y, x+s+1, y);
+  pdf.line(x, y-s-1, x, y-1); pdf.line(x, y+1, x, y+s+1);
+}
+
+// ════════════════════════════════════════════════════
+// DRAW CARD (jsPDF)
+// ════════════════════════════════════════════════════
+async function drawCard(pdf, ox, oy, cardData, greeting, sentence) {
+  const th = THEMES[theme];
+  const {bg,acc,txt,txtStrong,txt2} = th;
+  const dim = CARD_DIM[format];
+  const {w:cardW, h:cardH, photoH, padX, padY} = dim;
+  const fS = cardW / 127;
+
+  const sf = r => pdf.setFillColor(r[0],r[1],r[2]);
+  const sd = r => pdf.setDrawColor(r[0],r[1],r[2]);
+  const st = r => pdf.setTextColor(r[0],r[1],r[2]);
+
+  // Background
+  sf(bg); pdf.rect(ox, oy, cardW, cardH, 'F');
+
+  // Border
+  sd(acc); pdf.setLineWidth(0.3);
+  pdf.rect(ox+3.5, oy+3.5, cardW-7, cardH-7, 'S');
+
+  // Photo
+  const pLeft = ox + padX, pTop = oy + padY;
+  const pW = cardW - padX*2, pH = photoH;
+
+  if (cardData.photo) {
+    const cropped = await cropPhoto(cardData.photo, pW*12, pH*12, cardData.photoY??50);
+    pdf.addImage(cropped, 'JPEG', pLeft, pTop, pW, pH);
+  } else {
+    sf([232,227,221]); pdf.rect(pLeft, pTop, pW, pH, 'F');
+  }
+
+  // Corner marks: TR + BL, doppeltes versetztes L
+  // OFF = Abstand Foto→Rahmen, damit das versetzte L immer innerhalb der Border bleibt
+  const CL  = 12 * fS;
+  const OFF = Math.max(0, padX - 3.5);
+  sd(acc);
+  // TR – äußeres L
+  pdf.setLineWidth(0.3);
+  pdf.line(pLeft+pW+OFF-CL, pTop-OFF, pLeft+pW+OFF, pTop-OFF);
+  pdf.line(pLeft+pW+OFF,    pTop-OFF, pLeft+pW+OFF, pTop-OFF+CL);
+  // TR – inneres L
+  pdf.setLineWidth(0.45);
+  pdf.line(pLeft+pW-CL, pTop, pLeft+pW, pTop);
+  pdf.line(pLeft+pW,    pTop, pLeft+pW, pTop+CL);
+  // BL – äußeres L
+  pdf.setLineWidth(0.3);
+  pdf.line(pLeft-OFF, pTop+pH+OFF-CL, pLeft-OFF, pTop+pH+OFF);
+  pdf.line(pLeft-OFF, pTop+pH+OFF,    pLeft-OFF+CL, pTop+pH+OFF);
+  // BL – inneres L
+  pdf.setLineWidth(0.45);
+  pdf.line(pLeft, pTop+pH-CL, pLeft, pTop+pH);
+  pdf.line(pLeft, pTop+pH,    pLeft+CL, pTop+pH);
+
+  // Text area
+  const textTop = oy + padY + photoH + 6*fS;
+  const textBot = oy + cardH - padY;
+  const textMid = (textTop + textBot) / 2;
+  const cx = ox + cardW / 2;
+  const textH = textBot - textTop;
+
+  // Measure block height first
+  const greetFS = 13*fS;
+  const nameStr = cardData.name || '';
+  const nLen = nameStr.length;
+  const nameFS = (nLen<=4?50:nLen<=8?42:nLen<=12?34:26) * fS;
+  const roleFS = 9*fS;
+  const ornH   = 5*fS;
+  const gap1   = 6*fS, gap2 = 6*fS, gap3 = 6*fS;
+
+  let blockH = nameFS*PTmm + gap2 + ornH + gap3 + roleFS*PTmm;
+  if (greeting) blockH += greetFS*PTmm + gap1;
+  let y = textMid - blockH/2;
+
+  // Greeting
+  if (greeting) {
+    st(txt2); pdfFont(pdf,'CormorantGaramond','italic');
+    pdf.setFontSize(greetFS);
+    pdf.setCharSpace(0.4*(25.4/96)*fS);
+    pdf.text(greeting, cx, y+greetFS*PTmm*0.5, {baseline:'middle', align:'center'});
+    pdf.setCharSpace(0);
+    y += greetFS*PTmm + gap1;
+  }
+
+  // Name — optisch zentriert (Tinten-Mitte statt Advance-Mitte)
+  st(txtStrong||txt); pdfFont(pdf,'PinyonScript','normal');
+  pdf.setFontSize(nameFS);
+  pdf.setCharSpace(0);
+  if (nameStr) {
+    const nameShift = measurePinyonOpticalCenter(nameStr, nameFS);
+    pdf.text(nameStr, cx - nameShift, y+nameFS*PTmm*0.5, {baseline:'middle'});
+  }
+  y += nameFS*PTmm + gap2;
+
+  // Ornament (line · dot · line)
+  const oW = 28*fS;
+  sd(acc); pdf.setLineWidth(0.22);
+  const oy2 = y + 2.5*fS;
+  pdf.line(cx-oW/2, oy2, cx-3*fS, oy2);
+  pdf.line(cx+3*fS, oy2, cx+oW/2, oy2);
+  sf(acc); pdf.circle(cx, oy2, 1.2*fS, 'F');
+  y += ornH + gap3;
+
+  // Role text — DM Sans Light, uppercase, wide tracking
+  st(txt); pdfFont(pdf,'DMSans','light');
+  pdf.setFontSize(roleFS);
+  pdf.setCharSpace(1.8*(25.4/96)*fS);
+  const roleStr = sentence ? sentence.toUpperCase() : '';
+  if (roleStr) pdf.text(roleStr, cx, y+roleFS*PTmm*0.5, {baseline:'middle', align:'center'});
+  pdf.setCharSpace(0);
+}
+
+// ════════════════════════════════════════════════════
+// MONO MEASUREMENT — Tinten-Bounding-Box statt Advance-Breite
+// Pinyon Script ist asymmetrisch: das W zieht eine weite Schleife nach rechts,
+// das B/A/M ist links viel kompakter. pdf.getTextWidth liefert nur die Advance-Breite,
+// nicht die echte Tinten-Ausdehnung — über Advance-Mitte zentriert wirkt B&W deshalb
+// nach rechts verschoben. Hier messen wir den echten Ink-Bounding-Box per HTML-Canvas
+// (selbe @font-face wie im PDF, da WSA_FONTS.registerWithCSS dieselbe TTF einbindet)
+// und liefern den Versatz zur Advance-Start-Position.
+// ════════════════════════════════════════════════════
+let _monoMeasureCtx = null;
+function measurePinyonOpticalCenter(text, fontSizePt) {
+  if (!text) return 0;
+  if (!_monoMeasureCtx) {
+    _monoMeasureCtx = document.createElement('canvas').getContext('2d');
+  }
+  _monoMeasureCtx.font = `${(fontSizePt * 96/72).toFixed(2)}px "Pinyon Script"`;
+  const m = _monoMeasureCtx.measureText(text);
+  // Versatz vom Advance-Start zum visuellen Tinten-Mittelpunkt (mm)
+  // positiv = Tinten-Mittelpunkt liegt rechts vom Advance-Start (Standard-Fall)
+  const PXmm = 25.4 / 96;
+  return ((m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2) * PXmm;
+}
+
+// ════════════════════════════════════════════════════
+// DRAW BACK (jsPDF)
+// ════════════════════════════════════════════════════
+function drawBack(pdf, ox, oy) {
+  const th = THEMES[theme];
+  const {bg,acc,txt,txt2,txt2Deep} = th;
+  const dim = CARD_DIM[format];
+  const {w:cardW, h:cardH} = dim;
+  const fS = cardW/127;
+  const PTmm = 0.3528;
+  const isSquare = format === 'sq4';
+
+  const sf = r => pdf.setFillColor(r[0],r[1],r[2]);
+  const sd = r => pdf.setDrawColor(r[0],r[1],r[2]);
+  const st = r => pdf.setTextColor(r[0],r[1],r[2]);
+
+  const monoA = ge('mono-a').value || '';
+  const monoSep = ge('mono-sep').value || '&';
+  const monoB = ge('mono-b').value || '';
+  const monoStr = (monoA||monoB) ? [monoA,monoSep,monoB].filter(Boolean).join(' ') : '';
+  const backText = ge('inp-backtext').value || '';
+
+  if (backStyle==='color') { sf(acc); } else { sf(bg); }
+  pdf.rect(ox, oy, cardW, cardH, 'F');
+
+  // Innenrahmen mit 7mm Inset (sicherer Schnittpuffer für Heimschneider)
+  if (backStyle==='color') { pdf.setDrawColor(255,255,255); }
+  else { sd(acc); }
+  pdf.setLineWidth(0.3);
+  pdf.rect(ox+7, oy+7, cardW-14, cardH-14, 'S');
+
+  const cx = ox+cardW/2, cy = oy+cardH/2;
+  const hasText = !!backText;
+  const monoFS = (monoStr.length<=5?46:36)*fS;
+  const btFS = 10;  // absolute 10pt — print-sicher, gespiegelt zur CSS-Größe der Textzeile
+  const useArc = sealStyle === 'arc';
+
+  // Bogen-Geometrie (gespiegelt zu ARC_DIM in der Preview)
+  const arcH       = useArc ? ARC_DIM[isSquare ? 'sq4' : 'us57'].h : 0;
+  const gapMonoArc = useArc ? (isSquare ? 3.5 : 5) : 0;
+
+  const sealColor = backStyle==='color' ? [255,255,255] : acc;
+
+  // Vertikale Anker (gespiegelt zur CSS-Spread-Aufteilung der Preview)
+  // Bogen: Mono-Cluster oben, Textzeile unten verankert
+  // Clean: alles zentriert wie bisher
+  let y;
+  if (useArc) {
+    const padTop = isSquare ? 28 : 50;
+    y = oy + padTop;
+  } else {
+    const totalH = monoFS*PTmm + (hasText ? 6 + btFS*PTmm : 0);
+    y = cy - totalH/2;
+  }
+
+  // Top-Bogen
+  if (useArc) {
+    drawArc(pdf, cx, y, 'top', isSquare, sealColor);
+    y += arcH + gapMonoArc;
+  }
+
+  // Monogram — optisch zentriert (Tinten-Mitte statt Advance-Mitte)
+  if (backStyle==='color') { st([255,255,255]); } else { st(txt); }
+  pdfFont(pdf,'PinyonScript','normal');
+  pdf.setFontSize(monoFS);
+  pdf.setCharSpace(0);
+  if (monoStr) {
+    const monoShift = measurePinyonOpticalCenter(monoStr, monoFS);
+    pdf.text(monoStr, cx - monoShift, y+monoFS*PTmm*0.5, {baseline:'middle'});
+  }
+  y += monoFS*PTmm;
+
+  // Bottom-Bogen
+  if (useArc) {
+    y += gapMonoArc;
+    drawArc(pdf, cx, y, 'bottom', isSquare, sealColor);
+    y += arcH;
+  }
+
+  // Text line
+  if (hasText) {
+    if (useArc) {
+      // unten verankert: Baseline bei (Karten-Unterkante − padBot)
+      const padBot = isSquare ? 22 : 38;
+      y = oy + cardH - padBot - btFS*PTmm;
+    } else {
+      y += 6;
+    }
+    if (backStyle==='color') { st([255,255,255]); } else { st(txt2Deep); }
+    pdfFont(pdf,'CormorantGaramond','italic');
+    pdf.setFontSize(btFS);
+    pdf.setCharSpace(1.2*(25.4/96));
+    const btW = pdf.getTextWidth(backText);
+    pdf.text(backText, cx-btW/2, y+btFS*PTmm*0.5, {baseline:'middle'});
+    pdf.setCharSpace(0);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SEAL DRAWING (jsPDF) — gespiegelte Geometrie zur SVG-Preview
+// ════════════════════════════════════════════════════
+function drawArc(pdf, cx, yTop, direction, isSquare, color) {
+  const d = ARC_DIM[isSquare ? 'sq4' : 'us57'];
+  const halfW = d.w / 2;
+  const padding = (d.h - d.depth) / 2;
+
+  // yEdge = Endpunkt-Höhe (mit Punkten), yApex = tiefste/höchste Stelle der Kurve
+  const yEdge = direction === 'top' ? yTop + padding         : yTop + padding + d.depth;
+  const yApex = direction === 'top' ? yTop + padding + d.depth : yTop + padding;
+
+  pdf.setDrawColor(color[0], color[1], color[2]);
+  pdf.setLineWidth(0.25);
+
+  // Quadratic-Bezier-Kontrollpunkt: yQ = 2·yApex − yEdge (für Apex an x-Mitte bei symmetrischem Bogen)
+  const yQ = 2 * yApex - yEdge;
+  const arcStartX = cx - halfW + 2 * ARC_DOT_R;
+  const arcEndX   = cx + halfW - 2 * ARC_DOT_R;
+  const xQ        = cx;
+
+  // Quadratic→Cubic: C1 = P0 + 2/3·(Q−P0), C2 = P2 + 2/3·(Q−P2)
+  const c1x = arcStartX + (2/3) * (xQ - arcStartX);
+  const c1y = yEdge     + (2/3) * (yQ - yEdge);
+  const c2x = arcEndX   + (2/3) * (xQ - arcEndX);
+  const c2y = c1y;  // gleiche y-Komponente, weil yEdge symmetrisch
+
+  pdf.lines([
+    [c1x - arcStartX, c1y - yEdge, c2x - arcStartX, c2y - yEdge, arcEndX - arcStartX, 0]
+  ], arcStartX, yEdge, [1, 1], 'S', false);
+
+  // Endpunkt-Kreise (offen, gestrichelt)
+  pdf.circle(cx - halfW, yEdge, ARC_DOT_R, 'S');
+  pdf.circle(cx + halfW, yEdge, ARC_DOT_R, 'S');
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT FRONTS
+// ════════════════════════════════════════════════════
+async function exportFronts() {
+  const btn = ge('btn-exp-front');
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const {jsPDF} = window.jspdf;
+    const bleed = output==='print' ? 3 : 0;
+    const greeting = ge('inp-greeting').value||'';
+    const sentence = getRoleData().s;
+    const toExp = cards.filter(c=>c.name.trim());
+    if (!toExp.length) { alert(tt('alertName')); return; }
+    if (window.WSA_FONTS) console.log('WSA_FONTS status:', JSON.stringify(WSA_FONTS.status()));
+
+    const dim = CARD_DIM[format];
+    const {w:cW, h:cH} = dim;
+    let pdf;
+
+    if (output==='print') {
+      const pgW=cW+bleed*2, pgH=cH+bleed*2;
+      const bgC = THEMES[theme].bg;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<toExp.length; i++) {
+        if (i>0) pdf.addPage([pgW,pgH],'portrait');
+        // Bleed-Zone mit Hintergrundfarbe fluten — sonst Weiß-Blitzer am Kartenrand bei Schnittversatz
+        pdf.setFillColor(bgC[0], bgC[1], bgC[2]);
+        pdf.rect(0, 0, pgW, pgH, 'F');
+        await drawCard(pdf, bleed, bleed, toExp[i], greeting, sentence);
+      }
+    } else if (format==='us57') {
+      // 2-up landscape
+      const pgW = paper==='a4'?297:279.4, pgH = paper==='a4'?210:215.9;
+      const mX = (pgW-cW*2)/2, mY = (pgH-cH)/2;
+      pdf = new jsPDF({orientation:'landscape',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<toExp.length; i+=2) {
+        if (i>0) pdf.addPage();
+        await drawCard(pdf, mX,         mY, toExp[i],   greeting, sentence);
+        [[mX,mY],[mX+cW,mY],[mX,mY+cH],[mX+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        if (toExp[i+1]) {
+          await drawCard(pdf, mX+cW, mY, toExp[i+1], greeting, sentence);
+          [[mX+cW,mY],[mX+cW*2,mY],[mX+cW,mY+cH],[mX+cW*2,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    } else {
+      // 4×4": 2×2 portrait
+      const pgW=paper==='a4'?210:215.9, pgH=paper==='a4'?297:279.4;
+      const gap=4, totW=cW*2+gap, totH=cH*2+gap;
+      const mX=(pgW-totW)/2, mY=(pgH-totH)/2;
+      const pos=[[mX,mY],[mX+cW+gap,mY],[mX,mY+cH+gap],[mX+cW+gap,mY+cH+gap]];
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<toExp.length; i+=4) {
+        if (i>0) pdf.addPage();
+        for (let j=0; j<4; j++) {
+          if (!toExp[i+j]) continue;
+          const [ox,oy2]=pos[j];
+          await drawCard(pdf, ox, oy2, toExp[i+j], greeting, sentence);
+          [[ox,oy2],[ox+cW,oy2],[ox,oy2+cH],[ox+cW,oy2+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    }
+
+    const fmt=format==='sq4'?'4x4':'5x7';
+    const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
+    pdf.save(`WSA_BJ_Vorderseite_${tn}_${fmt}.pdf`);
+  } finally {
+    btn.disabled=false; btn.textContent=tt('expFront');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT BACKS
+// ════════════════════════════════════════════════════
+async function exportBacks() {
+  const btn = ge('btn-exp-back');
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const {jsPDF} = window.jspdf;
+    const bleed = output==='print' ? 3 : 0;
+    const toExp = cards.filter(c=>c.name.trim());
+    if (!toExp.length) { alert(tt('alertName')); return; }
+    const dim = CARD_DIM[format];
+    const {w:cW, h:cH} = dim;
+    let pdf;
+
+    if (output==='print') {
+      const pgW=cW+bleed*2, pgH=cH+bleed*2;
+      // Beim Stil "Color" liegt die Akzentfarbe als Hintergrund — Bleed muss entsprechend gefärbt werden
+      const bleedC = backStyle === 'color' ? THEMES[theme].acc : THEMES[theme].bg;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<toExp.length; i++) {
+        if (i>0) pdf.addPage([pgW,pgH],'portrait');
+        pdf.setFillColor(bleedC[0], bleedC[1], bleedC[2]);
+        pdf.rect(0, 0, pgW, pgH, 'F');
+        drawBack(pdf, bleed, bleed);
+      }
+    } else if (format==='us57') {
+      const pgW=paper==='a4'?297:279.4, pgH=paper==='a4'?210:215.9;
+      const mX=(pgW-cW*2)/2, mY=(pgH-cH)/2;
+      pdf = new jsPDF({orientation:'landscape',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(toExp.length/2);
+      for (let i=0; i<pages; i++) {
+        if (i>0) pdf.addPage();
+        drawBack(pdf, mX, mY);
+        [[mX,mY],[mX+cW,mY],[mX,mY+cH],[mX+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        drawBack(pdf, mX+cW, mY);
+        [[mX+cW,mY],[mX+cW*2,mY],[mX+cW,mY+cH],[mX+cW*2,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+      }
+    } else {
+      const pgW=paper==='a4'?210:215.9, pgH=paper==='a4'?297:279.4;
+      const gap=4, totW=cW*2+gap, totH=cH*2+gap;
+      const mX=(pgW-totW)/2, mY=(pgH-totH)/2;
+      const pos=[[mX,mY],[mX+cW+gap,mY],[mX,mY+cH+gap],[mX+cW+gap,mY+cH+gap]];
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(toExp.length/4);
+      for (let i=0; i<pages; i++) {
+        if (i>0) pdf.addPage();
+        pos.forEach(([ox,oy2]) => {
+          drawBack(pdf, ox, oy2);
+          [[ox,oy2],[ox+cW,oy2],[ox,oy2+cH],[ox+cW,oy2+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        });
+      }
+    }
+
+    const fmt=format==='sq4'?'4x4':'5x7';
+    const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
+    pdf.save(`WSA_BJ_Rueckseite_${tn}_${fmt}.pdf`);
+  } finally {
+    btn.disabled=false; btn.textContent=tt('expBack');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  try { if (window.WSA_FONTS) WSA_FONTS.registerWithCSS(); } catch(e) {}
+  rebuildRoles();
+  const rd = getRoleData();
+  ge('inp-greeting').value = rd.g;
+  buildGuestRows();
+  updateHint();
+  updateLabels();
+  renderPreview();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => renderPreview());
+  }
+  window.addEventListener('resize', scalePreview);
+});
+</script>
+</body>
+</html>

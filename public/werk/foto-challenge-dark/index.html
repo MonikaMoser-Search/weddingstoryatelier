@@ -1,0 +1,793 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Foto-Challenge — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --gold: #8B6F47;
+    }
+    body { background: #F2EFE9; }
+
+
+    /* ── FORM ── */
+    .form-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 4px; }
+
+    .btn-lang {
+      padding: 5px 12px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 10px; font-weight: 500;
+      color: var(--mid); border-radius: 2px; letter-spacing: 0.12em;
+      text-transform: uppercase; transition: all 0.2s; flex-shrink: 0; margin-top: 6px;
+    }
+    .btn-lang:hover { border-color: var(--charcoal); color: var(--charcoal); }
+
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 12px; color: var(--mid); transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .form-section { margin-bottom: 20px; }
+
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+
+    .task-list { display: flex; flex-direction: column; gap: 5px; }
+    .task-row { display: flex; align-items: center; gap: 6px; }
+    .task-num-label { font-size: 9px; color: var(--light); min-width: 16px; text-align: right; }
+    .task-row input { flex: 1; }
+    .btn-remove {
+      width: 22px; height: 22px; flex-shrink: 0;
+      border: 1px solid var(--rule); background: white; cursor: pointer;
+      color: var(--light); font-size: 14px; line-height: 1;
+      border-radius: 2px; transition: all 0.2s; display: flex; align-items: center; justify-content: center;
+    }
+    .btn-remove:hover { border-color: #CC4444; color: #CC4444; }
+    .btn-remove:disabled { opacity: 0.25; cursor: default; pointer-events: none; }
+
+    .task-actions { display: flex; gap: 8px; margin-top: 10px; }
+    .btn-add {
+      flex: 1; padding: 8px 10px; border: 1.5px dashed var(--rule);
+      background: transparent; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; color: var(--mid);
+      border-radius: 2px; transition: all 0.2s; letter-spacing: 0.05em;
+    }
+    .btn-add:hover { border-color: var(--charcoal); color: var(--charcoal); background: #FAFAFA; }
+    .btn-add:disabled { opacity: 0.3; cursor: default; pointer-events: none; }
+    .task-counter { font-size: 10px; color: var(--light); text-align: right; margin-top: 4px; font-style: italic; }
+
+    .btn-export {
+      width: 100%; padding: 13px; background: var(--charcoal); color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 8px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-export:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+
+    /* ── PREVIEW ── */
+    #foto-output {
+      width: 560px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    /* ════ OUTPUT: SHARED STRUCTURE ════ */
+    .fo-page { padding: 40px 40px 36px; font-family: 'Cormorant Garamond', serif; box-shadow: 0 12px 48px rgba(0,0,0,0.18); min-height: 792px; display: flex; flex-direction: column; }
+    .fo-page-2 { padding-top: 32px; }
+    .fo-grid-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 4px 0 8px; }
+    .fo-rule-thick { border: none; border-top-width: 3px; border-top-style: solid; margin-bottom: 4px; }
+    .fo-rule-thin  { border: none; border-top-width: 1px; border-top-style: solid; }
+    .fo-masthead   { text-align: center; padding: 14px 0 12px; }
+    .fo-eyebrow    { font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase; opacity: 0.42; margin-bottom: 6px; }
+    .fo-title      { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; letter-spacing: 0.04em; line-height: 1.15; }
+    .fo-names      { font-size: 12px; letter-spacing: 0.22em; text-transform: uppercase; margin-top: 10px; }
+    .fo-hint       { font-size: 11px; font-style: italic; text-align: center; opacity: 0.42; margin: 10px 0 16px; }
+    .fo-grid       { display: grid; gap: 12px 10px; margin-bottom: 14px; }
+    .fo-footer     { text-align: center; font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; opacity: 0.25; margin-top: 8px; display: none; }
+    .fo-footer {
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.25;
+  margin-top: 8px;
+  display: none;
+}
+
+/* === THEME LINES === */
+
+/* Noir */
+.classic .fo-rule-thick {
+  border-top-color: #E0E0E0;
+  border-top-width: 2px;
+}
+
+.classic .fo-rule-thin {
+  border-top-color: 555;
+}
+
+/* Opera Red */
+.dark .fo-rule-thick {
+  border-top-color:#C6A46C;
+  border-top-width: 3px;
+}
+
+.dark .fo-rule-thin {
+  border-top-color: #8E5A5A;
+}
+
+/* Mystic Forest */
+.garden .fo-rule-thick {
+  border-top-color: #A06A4A;
+  border-top-width: 2px;
+}
+
+.garden .fo-rule-thin {
+  border-top-color: #4E5B4F;
+}
+
+    /* ─────────────────────────────
+       POLAROID CARD
+       ───────────────────────────── */
+    .fo-card {
+      display: flex;
+      flex-direction: column;
+      padding: 0 5px 5px;           /* side + bottom white "border" of polaroid */
+    }
+
+    /* Washi tape strip */
+    .fo-tape-area {
+      display: flex;
+      justify-content: center;
+      padding-top: 6px;
+      padding-bottom: 2px;
+    }
+    .fo-tape {
+      height: 13px;
+      border-radius: 1px;
+    }
+
+    /* Photo area with side decorations — text lives inside here */
+    .fo-photo-area {
+      flex-shrink: 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .fo-deco-l, .fo-deco-r {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 11px;
+      overflow: hidden;
+      writing-mode: vertical-rl;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 7px;
+      letter-spacing: 3px;
+      display: flex;
+      align-items: center;
+    }
+    .fo-deco-l { left: 0; }
+    .fo-deco-r { right: 0; transform: rotate(180deg); }
+
+    /* Text container centred inside the photo area */
+    .fo-photo-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 14px;
+      text-align: center;
+      width: 100%;
+    }
+    .fo-card-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      line-height: 1.3;
+      text-align: center;
+      width: 100%;
+    }
+    .fo-card-symbol {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 8px;
+      letter-spacing: 0.3em;
+      opacity: 0.55;
+    }
+
+    /* Bottom white polaroid strip — only number */
+    .fo-caption {
+      display: flex;
+      justify-content: flex-end;
+      padding: 4px 6px 3px;
+      position: relative;
+    }
+    .fo-caption::before {
+      position: absolute;
+      left: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal;
+      line-height: 1;
+    }
+    .classic .fo-caption::before { content: '\2726'; font-size: 8px; color: rgba(58,56,96,0.45); }
+    .dark    .fo-caption::before { content: '\273F'; font-size: 9px; color: rgba(122,26,26,0.52); }
+    .garden  .fo-caption::before { content: '\2767'; font-size: 9px; color: rgba(46,72,48,0.52); }
+    .fo-card-num {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      font-size: 7.5px;
+      letter-spacing: 0.12em;
+      opacity: 0.55;
+    }
+
+    /* Responsive sizing by column count */
+    .fo-grid[data-cols="3"] .fo-photo-area { height: 82px; }
+    .fo-grid[data-cols="4"] .fo-photo-area { height: 70px; }
+    .fo-grid[data-cols="3"] .fo-tape       { width: 38px; }
+    .fo-grid[data-cols="4"] .fo-tape       { width: 30px; }
+    .fo-grid[data-cols="3"] .fo-card-text  { font-size: 12px; }
+    .fo-grid[data-cols="4"] .fo-card-text  { font-size: 10.5px; }
+    .fo-grid[data-cols="4"] .fo-tape-area  { padding-top: 5px; }
+
+    /* ════ THE NOIR EDIT ════ */
+    .classic .fo-page       { background: #140F14; color: #F2F2F2; }
+    .classic .fo-rule-thick { border-top-color: #A8A8A8; border-top-width: 2px; }
+    .classic .fo-rule-thin  { border-top-color: #2C2C2C; }
+    .classic .fo-names      { color: #B8B8B8; letter-spacing: 0.32em; }
+    .classic .fo-hint       { color: #B8B8B8; }
+    .classic .fo-eyebrow    { color: #B8B8B8; opacity: 0.55; }
+    .classic .fo-title      { color: #F2F2F2; text-shadow: 0 0 40px rgba(168,168,168,0.12); }
+    .classic .fo-card {
+      background: #F0EEF5;
+      border: 1px solid #2C2420;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.55), 0 2px 6px rgba(0,0,0,0.35);
+    }
+    .classic .fo-tape       { background: rgba(50,42,38,0.52); }
+    .classic .fo-photo-area { background: linear-gradient(160deg, #E0DCE9 0%, #E7E4F0 100%); border-bottom: 1px solid rgba(44,36,32,0.18); }
+    .classic .fo-deco-l, .classic .fo-deco-r { color: #3C3430; opacity: 0.42; }
+    .classic .fo-caption    { background: #F0EEF5; }
+    .classic .fo-photo-content .fo-card-text   { color: #1A1614; }
+    .classic .fo-photo-content .fo-card-symbol { color: #3A3860; opacity: 0.65; }
+    .classic .fo-card-num   { color: rgba(70,68,90,0.62); }
+    .classic .fo-footer     { color: #555; opacity: 1; }
+
+    /* ════ THE OPERA RED ════ */
+    .dark .fo-page       { background: #300808; color: #F5E9DC; }
+    .dark .fo-rule-thick { border-top-color: #C6A46C; border-top-width: 2px; }
+    .dark .fo-rule-thin  { border-top-color: #5A1414; }
+    .dark .fo-names      { color: #C6A46C; letter-spacing: 0.28em; }
+    .dark .fo-hint       { color: #A09070; }
+    .dark .fo-eyebrow    { color: #C6A46C; opacity: 0.85; }
+    .dark .fo-title      { color: #F5E9DC; text-shadow: 0 2px 32px rgba(198,164,108,0.22); }
+    .dark .fo-card {
+      background: #FAF0EC;
+      border: 1px solid #7A1A1A;
+      box-shadow: 0 8px 36px rgba(0,0,0,0.60), 0 2px 10px rgba(0,0,0,0.42);
+    }
+    .dark .fo-tape       { background: rgba(160,25,25,0.84); }
+    .dark .fo-photo-area { background: linear-gradient(150deg, #EDD9C8 0%, #F3E6D8 100%); border-bottom: 1px solid rgba(122,26,26,0.22); }
+    .dark .fo-deco-l, .dark .fo-deco-r { color: #8B3030; opacity: 0.48; }
+    .dark .fo-caption    { background: #FAF0EC; }
+    .dark .fo-photo-content .fo-card-text   { color: #3A0808; }
+    .dark .fo-photo-content .fo-card-symbol { color: #8B3030; opacity: 0.72; }
+    .dark .fo-card-num   { color: rgba(120,50,30,0.68); }
+    .dark .fo-footer     { color: #C6A46C; opacity: 0.48; }
+
+    /* ════ THE MYSTIC FOREST ════ */
+    .garden .fo-page       { background: #1B261E; color: #EAE6DF; }
+    .garden .fo-rule-thick { border-top-color: #704238; border-top-width: 2px; }
+    .garden .fo-rule-thin  { border-top-color: #2E3E30; }
+    .garden .fo-names      { color: #B7B0A3; letter-spacing: 0.28em; }
+    .garden .fo-hint       { color: #B7B0A3; }
+    .garden .fo-eyebrow    { color: #B7B0A3; opacity: 0.60; }
+    .garden .fo-title      { color: #EAE6DF; text-shadow: 0 2px 24px rgba(112,66,56,0.22); }
+    .garden .fo-card {
+      background: #ECF2E9;
+      border: 1px solid #2E4830;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.38);
+    }
+    .garden .fo-tape       { background: rgba(112,66,56,0.88); }
+    .garden .fo-photo-area { background: linear-gradient(150deg, #D5E5D0 0%, #DCE9D8 100%); border-bottom: 1px solid rgba(46,72,48,0.20); }
+    .garden .fo-deco-l, .garden .fo-deco-r { color: #2E4830; opacity: 0.44; }
+    .garden .fo-caption    { background: #ECF2E9; }
+    .garden .fo-photo-content .fo-card-text   { color: #1B2E1E; }
+    .garden .fo-photo-content .fo-card-symbol { color: #2E5535; opacity: 0.78; }
+    .garden .fo-card-num   { color: rgba(46,72,48,0.62); }
+    .garden .fo-footer     { color: #704238; opacity: 0.62; }
+
+    /* Loading */
+    .loading { display: none; position: fixed; inset: 0; background: rgba(26,26,26,0.75); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: white; font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.15em; }
+    .loading.active { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bleed-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    #chk-bleed { opacity: 0; position: absolute; pointer-events: none; width: 0; height: 0; }
+    .bleed-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-bottom: 7px; }
+    .bleed-check { width: 14px; height: 14px; border: 1.5px solid #ccc; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 9px; color: transparent; line-height: 1; }
+    #chk-bleed:checked ~ .bleed-row .bleed-check { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+    .bleed-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; }
+    .bleed-off-desc, .bleed-on-desc { font-family: 'DM Sans', sans-serif; font-size: 8px; color: #666; line-height: 1.6; margin: 0; }
+    .bleed-off-desc strong, .bleed-on-desc strong { color: #333; }
+    .bleed-on-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-off-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-on-desc { display: block; }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+  </style>
+<script>
+(function(){var _rc={_id:"FC-DarkSignatureLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+
+  <!-- FORM -->
+  <div class="panel-form">
+    <div class="form-header" style="display:flex;align-items:flex-start;justify-content:space-between;">
+      <div>
+        <div class="panel-logo">Foto-Challenge</div>
+        <div class="panel-tagline">Wedding Story Atelier</div>
+      </div>
+      <button class="btn-lang" id="btn-lang" onclick="toggleLang()">EN</button>
+    </div>
+
+    <span class="section-label" id="ui-style-label">Stil wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)"><span class="dot" style="background:#1A1A1A"></span>Noir Edit</button>
+      <button class="style-btn" onclick="setTheme('dark', this)"><span class="dot" style="background:#8B6F47"></span>Opera Red</button>
+      <button class="style-btn" onclick="setTheme('garden', this)"><span class="dot" style="background:#B07A4A"></span>Mystic Forest</button>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label" id="ui-section-couple">Das Paar</div>
+      <div class="field">
+        <label id="ui-label-name1">Name (optional)</label>
+        <input type="text" id="name1" placeholder="z. B. Anna" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="ui-label-name2">Name (optional)</label>
+        <input type="text" id="name2" placeholder="z. B. Peter" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="ui-label-date">Datum (optional)</label>
+        <input type="text" id="wdate" placeholder="z. B. 14. Juni 2026" oninput="update()">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label" id="ui-section-tasks">Foto-Aufgaben</div>
+      <div class="task-list" id="task-list"></div>
+      <div class="task-counter" id="task-counter"></div>
+      <div class="task-actions">
+        <button class="btn-add" id="btn-add" onclick="addTask()">+ Aufgabe hinzufügen</button>
+      </div>
+    </div>
+
+    <button class="btn-export" id="btn-export" onclick="startExport()">&#11015; Design exportieren</button>
+    <p class="privacy-note" id="ui-privacy">Keine Datenspeicherung · Alles lokal · Chrome / Firefox empfohlen</p>
+    <div class="format-box">
+      <div class="format-title">Papierformat / Paper Format</div>
+      <div class="format-opts">
+        <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>210×297 mm</em></label>
+        <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>8½×11"</em></label>
+      </div>
+    </div>
+    <div class="bleed-box">
+      <input type="checkbox" id="chk-bleed">
+      <label class="bleed-row" for="chk-bleed">
+        <span class="bleed-check">&#10003;</span>
+        <span class="bleed-title">Beschnittzugabe 3 mm</span>
+      </label>
+      <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+      <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+    </div>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel-preview">
+    <div id="foto-output" class="classic"></div>
+  </div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="ui-loading-text">Design wird erstellt…</span>
+</div>
+
+<script>
+var currentTheme = 'classic';
+var currentLang  = 'de';
+var MIN_TASKS    = 12;
+var MAX_TASKS    = 24;
+
+/* Per-theme deco and symbol config */
+var THEME_CONFIG = {
+  classic: {
+    deco:   '\u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 \u2726 \u00B7 ',
+    symbol: '\u2726 \u00b7 \u2726'
+  },
+  dark: {
+    deco:   '\u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 \u273F \u00B7 ',
+    symbol: '\u273F \u00b7 \u273F'
+  },
+  garden: {
+    deco:   '\u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 \u2767 \u00B7 ',
+    symbol: '\u2767 \u00b7 \u2767'
+  }
+};
+
+var i18n = {
+  de: {
+    topbar:        'Foto-Challenge Design-Atelier',
+    formTitle:     'Foto-Challenge',
+    formSubtitle:  'Passe die Aufgaben individuell an \u2014 die Vorschau aktualisiert sich live.',
+    styleLabel:    'Stil w\u00e4hlen',
+    sectionCouple: 'Das Paar',
+    labelName:     'Name (optional)',
+    labelDate:     'Datum (optional)',
+    ph1:           'z.\u00a0B. Anna',
+    ph2:           'z.\u00a0B. Peter',
+    phDate:        'z.\u00a0B. 14. Juni 2026',
+    sectionTasks:  'Foto-Aufgaben',
+    taskPh:        'Aufgabe beschreiben \u2026',
+    btnRemoveT:    'Aufgabe entfernen',
+    counterSfx:    'von max. 24 Aufgaben',
+    btnAdd:        '+ Aufgabe hinzuf\u00fcgen',
+    btnExport:     '\u2B07 Design exportieren',
+    privacy:       'Keine Datenspeicherung \u00b7 Alles lokal \u00b7 Chrome / Firefox empfohlen',
+    loadingText:   'Design wird erstellt\u2026',
+    langBtn:       'EN',
+    outEyebrow:    'Foto-Challenge',
+    outTitle:      'Halte die sch\u00f6nsten Momente\neurer Hochzeit fest',
+    outHint:       'Fotografiere jeden Moment \u2014 halte ihn f\u00fcr immer fest',
+    outSymbol:     '\u2727 \u00b7 \u2727',
+    outFooter:     'Wedding Story Atelier',
+    defTasks: [
+      'Eine Silhouette im Gegenlicht',
+      'Der erste Blick \u2013 ungestellt',
+      'Schatten und Licht auf einem Gesicht',
+      'Zwei H\u00e4nde, im Dunkel verschlungen',
+      'Ein stilles Aufatmen zwischen zwei Momenten',
+      'Das Rauschen der Kleider beim Tanz',
+      'Ein Moment, als niemand zuschaut',
+      'Kerzenlicht auf einem Gesicht',
+      'Ein Weinglas, halb geleert',
+      'Das Brautpaar \u2013 verborgen in der Menge',
+      'Licht, das durch einen Vorhang f\u00e4llt',
+      'Der letzte Moment dieser Nacht'
+    ]
+  },
+  en: {
+    topbar:        'Photo Challenge Design Studio',
+    formTitle:     'Photo Challenge',
+    formSubtitle:  'Customise each task \u2014 the preview updates live.',
+    styleLabel:    'Choose style',
+    sectionCouple: 'The couple',
+    labelName:     'Name (optional)',
+    labelDate:     'Date (optional)',
+    ph1:           'e.\u00a0g. Anna',
+    ph2:           'e.\u00a0g. Peter',
+    phDate:        'e.\u00a0g. June 14, 2026',
+    sectionTasks:  'Photo Tasks',
+    taskPh:        'Describe the task \u2026',
+    btnRemoveT:    'Remove task',
+    counterSfx:    'of max. 24 tasks',
+    btnAdd:        '+ Add task',
+    btnExport:     '\u2B07 Export design',
+    privacy:       'No data stored \u00b7 All local \u00b7 Chrome / Firefox recommended',
+    loadingText:   'Creating your design\u2026',
+    langBtn:       'DE',
+    outEyebrow:    'Photo Challenge',
+    outTitle:      'Capture the most beautiful\nmoments of your wedding',
+    outHint:       'Photograph every moment \u2014 keep it forever',
+    outSymbol:     '\u2727 \u00b7 \u2727',
+    outFooter:     'Wedding Story Atelier',
+    defTasks: [
+      'A silhouette against the light',
+      'The first glance \u2013 unposed',
+      'Shadow and light across a face',
+      'Two hands, entwined in darkness',
+      'A quiet breath between two moments',
+      'The rustle of fabric on the dance floor',
+      'A moment when no one is watching',
+      'Candlelight across a face',
+      'A wine glass, half emptied',
+      'The couple \u2013 hidden in the crowd',
+      'Light falling through a curtain',
+      'The last moment of this night'
+    ]
+  }
+};
+
+var tasks = i18n.de.defTasks.slice();
+
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function getColumns(n) { return n <= 12 ? 3 : 4; }
+
+function tasksMatchDefaults(lang) {
+  var d = i18n[lang].defTasks;
+  if (tasks.length !== d.length) return false;
+  for (var i = 0; i < tasks.length; i++) { if (tasks[i] !== d[i]) return false; }
+  return true;
+}
+
+function setText(id, txt) { var el = ge(id); if (el) el.textContent = txt; }
+function setPh(id, txt)   { var el = ge(id); if (el) el.placeholder = txt; }
+
+function applyI18n() {
+  var L = i18n[currentLang];
+  setText('ui-style-label',    L.styleLabel);
+  setText('ui-section-couple', L.sectionCouple);
+  setText('ui-label-name1',    L.labelName);
+  setText('ui-label-name2',    L.labelName);
+  setText('ui-label-date',     L.labelDate);
+  setPh('name1', L.ph1);
+  setPh('name2', L.ph2);
+  setPh('wdate', L.phDate);
+  setText('ui-section-tasks', L.sectionTasks);
+  setText('btn-add',          L.btnAdd);
+  setText('btn-export',       L.btnExport);
+  setText('ui-privacy',       L.privacy);
+  setText('ui-loading-text',  L.loadingText);
+  setText('btn-lang',         L.langBtn);
+}
+
+function toggleLang() {
+  var next = currentLang === 'de' ? 'en' : 'de';
+  var wasDefault = tasksMatchDefaults(currentLang);
+  currentLang = next;
+  applyI18n();
+  if (wasDefault) { tasks = i18n[currentLang].defTasks.slice(); renderTaskList(); }
+  update();
+}
+
+function renderTaskList() {
+  var L    = i18n[currentLang];
+  var list = ge('task-list');
+  list.innerHTML = '';
+  for (var i = 0; i < tasks.length; i++) {
+    (function(idx) {
+      var row = document.createElement('div');
+      row.className = 'task-row';
+
+      var num = document.createElement('span');
+      num.className = 'task-num-label';
+      num.textContent = idx + 1;
+
+      var inp = document.createElement('input');
+      inp.type = 'text';
+      inp.value = tasks[idx];
+      inp.placeholder = L.taskPh;
+      inp.oninput = function() { tasks[idx] = this.value; update(); };
+
+      var rm = document.createElement('button');
+      rm.className = 'btn-remove';
+      rm.title = L.btnRemoveT;
+      rm.innerHTML = '&times;';
+      rm.disabled = tasks.length <= MIN_TASKS;
+      rm.onclick = function() { removeTask(idx); };
+
+      row.appendChild(num);
+      row.appendChild(inp);
+      row.appendChild(rm);
+      list.appendChild(row);
+    })(i);
+  }
+  ge('task-counter').textContent = tasks.length + ' ' + i18n[currentLang].counterSfx;
+  ge('btn-add').disabled = tasks.length >= MAX_TASKS;
+}
+
+function addTask() {
+  if (tasks.length >= MAX_TASKS) return;
+  tasks.push('');
+  renderTaskList();
+  var rows = ge('task-list').querySelectorAll('.task-row');
+  rows[rows.length - 1].querySelector('input').focus();
+  update();
+}
+
+function removeTask(idx) {
+  if (tasks.length <= MIN_TASKS) return;
+  tasks.splice(idx, 1);
+  renderTaskList();
+  update();
+}
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  document.querySelectorAll('.style-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  update();
+}
+
+function buildCard(taskText, globalNum, L) {
+  var tc   = THEME_CONFIG[currentTheme];
+  var deco = tc.deco;
+  var sym  = tc.symbol;
+  return '<div class="fo-card">' +
+    '<div class="fo-tape-area"><div class="fo-tape"></div></div>' +
+    '<div class="fo-photo-area">' +
+      '<span class="fo-deco-l">' + deco + '</span>' +
+      '<span class="fo-deco-r">' + deco + '</span>' +
+      '<div class="fo-photo-content">' +
+        '<div class="fo-card-text">' + esc(taskText || '') + '</div>' +
+        '<div class="fo-card-symbol">' + sym + '</div>' +
+      '</div>' +
+    '</div>' +
+    '<div class="fo-caption">' +
+      '<div class="fo-card-num">' + String(globalNum).padStart(2, '0') + '</div>' +
+    '</div>' +
+  '</div>';
+}
+
+function update() {
+  var L    = i18n[currentLang];
+  var n1   = gv('name1');
+  var n2   = gv('name2');
+  var date = gv('wdate');
+
+  /* Names + date line */
+  var namesStr = '';
+  if (n1 && n2)               namesStr = esc(n1) + ' &amp; ' + esc(n2);
+  else if (n1)                namesStr = esc(n1);
+  else if (n2)                namesStr = esc(n2);
+  if (namesStr && date)       namesStr += ' &nbsp;&middot;&nbsp; ' + esc(date);
+  else if (!namesStr && date) namesStr = esc(date);
+  var namesLine = namesStr ? '<div class="fo-names">' + namesStr + '</div>' : '';
+  var titleHtml = esc(L.outTitle).replace('\n', '<br>');
+
+  /* Split tasks into pages of max 12 */
+  var pageGroups = [];
+  for (var p = 0; p < tasks.length; p += 12) {
+    pageGroups.push(tasks.slice(p, p + 12));
+  }
+  var totalPages = pageGroups.length;
+
+  var pagesHtml = '';
+
+  pageGroups.forEach(function(pageTasks, pageIdx) {
+    var cardsHtml = '';
+    for (var i = 0; i < pageTasks.length; i++) {
+      cardsHtml += buildCard(pageTasks[i], pageIdx * 12 + i + 1, L);
+    }
+    var grid = '<div class="fo-grid-wrapper"><div class="fo-grid" data-cols="3" style="grid-template-columns:repeat(3,1fr);">' +
+      cardsHtml + '</div></div>';
+
+    if (pageIdx === 0) {
+      pagesHtml +=
+        '<div class="fo-page">' +
+          '<hr class="fo-rule-thick">' +
+          '<hr class="fo-rule-thin">' +
+          '<div class="fo-masthead">' +
+            '<div class="fo-eyebrow">' + esc(L.outEyebrow) + '</div>' +
+            '<div class="fo-title">' + titleHtml + '</div>' +
+            namesLine +
+          '</div>' +
+          '<hr class="fo-rule-thin">' +
+          '<hr class="fo-rule-thick">' +
+          '<div class="fo-hint">' + esc(L.outHint) + '</div>' +
+          grid +
+          (totalPages === 1 ? '<hr class="fo-rule-thin"><div class="fo-footer">' + esc(L.outFooter) + '</div>' : '') +
+        '</div>';
+    } else {
+      pagesHtml +=
+        '<div class="fo-page fo-page-2">' +
+          '<hr class="fo-rule-thick">' +
+          '<hr class="fo-rule-thin">' +
+          '<div class="fo-masthead">' +
+            '<div class="fo-eyebrow">' + esc(L.outEyebrow) + ' &nbsp;&middot;&nbsp; ' + (pageIdx + 1) + ' / ' + totalPages + '</div>' +
+            namesLine +
+          '</div>' +
+          '<hr class="fo-rule-thin">' +
+          grid +
+          '<hr class="fo-rule-thin">' +
+          '<div class="fo-footer">' + esc(L.outFooter) + '</div>' +
+        '</div>';
+    }
+  });
+
+  var out = ge('foto-output');
+  out.className = currentTheme;
+  out.innerHTML = pagesHtml;
+}
+
+function startExport() {
+  ge('loading').classList.add('active');
+  setTimeout(doExport, 150);
+}
+
+function doExport() {
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var fmt = (document.querySelector('input[name="paper-format"]:checked') || {}).value || 'a4';
+  var isLetter = fmt === 'letter';
+  var pdfW = isLetter ? 215.9 : 210;
+  var pdfH = isLetter ? 279.4 : 297;
+  var pageEls = document.querySelectorAll('#foto-output .fo-page');
+  var jsPDF   = window.jspdf.jsPDF;
+  var pdf     = new jsPDF({ orientation: 'portrait', unit: 'mm', format: bleed ? [pdfW + bleed*2, pdfH + bleed*2] : [pdfW, pdfH] });
+
+  var promises = [];
+  pageEls.forEach(function(el) {
+    promises.push(html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null }));
+  });
+
+  var bleedRgb = null;
+  if (bleed && pageEls[0]) {
+    var bg = getComputedStyle(pageEls[0]).backgroundColor.match(/\d+/g);
+    if (bg && bg.length >= 3) bleedRgb = [+bg[0], +bg[1], +bg[2]];
+  }
+
+  Promise.all(promises)
+    .then(function(canvases) {
+      canvases.forEach(function(canvas, idx) {
+        if (idx > 0) pdf.addPage();
+        if (bleedRgb) {
+          pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+          pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+        }
+        var imgData = canvas.toDataURL('image/png');
+        var imgW = pdfW; var imgH = canvas.height * pdfW / canvas.width;
+        if (imgH > pdfH) { var s = pdfH / imgH; imgH = pdfH; imgW = pdfW * s; }
+        var xOff = bleed + (pdfW - imgW) / 2;
+        var yOff = bleed + (pdfH - imgH) / 2;
+        pdf.addImage(imgData, 'PNG', xOff, yOff, imgW, imgH);
+      });
+      var n1 = gv('name1') || 'Foto';
+      var n2 = gv('name2') || 'Challenge';
+      pdf.save(n1 + '_' + n2 + '_FotoChallenge_WeddingStoryAtelier.pdf');
+      ge('loading').classList.remove('active');
+    })
+    .catch(function() {
+      alert(currentLang === 'de'
+        ? 'Das Design konnte nicht erstellt werden. Bitte nochmal versuchen.'
+        : 'The design could not be created. Please try again.');
+      ge('loading').classList.remove('active');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  tasks = i18n.de.defTasks.slice();
+  renderTaskList();
+  ge('name1').value = 'Anna';
+  ge('name2').value = 'Peter';
+  ge('wdate').value = '14. Juni 2026';
+  update();
+});
+</script>
+</body>
+</html>

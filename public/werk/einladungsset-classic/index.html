@@ -1,0 +1,502 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Einladungs-Set Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --gold: #8B6F47;
+      --gold-l: #C4A882;
+      --wsa-panel-width: 380px;
+    }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 4px; margin-bottom: 20px; }
+    .tab-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 12px; color: var(--mid); transition: all 0.2s; border-radius: 2px;
+      text-align: center;
+    }
+    .tab-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .style-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--light); margin-bottom: 8px; display: block; }
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 20px; }
+    .style-btn {
+      flex: 1; padding: 7px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; color: var(--mid); transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .form-section { margin-bottom: 18px; }
+    .section-title { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: var(--light); margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid var(--rule); }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    .opt { font-size: 9px; color: var(--light); margin-left: 4px; font-style: italic; }
+    .panel-form textarea { resize: none; line-height: 1.5; }
+
+    /* Photo upload */
+    .photo-upload {
+      border: 2px dashed var(--rule); border-radius: 2px;
+      padding: 12px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: #FAFAFA;
+    }
+    .photo-upload:hover { border-color: var(--charcoal); background: white; }
+    .photo-upload input { display: none; }
+    .photo-upload .icon { font-size: 20px; margin-bottom: 4px; }
+    .photo-upload .label { font-size: 11px; color: var(--mid); }
+    .photo-upload .sublabel { font-size: 9px; color: var(--light); margin-top: 2px; }
+    .photo-preview { width: 100%; height: 80px; object-fit: cover; border-radius: 2px; display: none; }
+
+    /* Download buttons */
+    .download-section { margin-top: 16px; }
+    .btn-download {
+      width: 100%; padding: 11px; background: var(--charcoal); color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase;
+      cursor: pointer; margin-bottom: 6px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .btn-download.secondary {
+      background: transparent; color: var(--charcoal);
+      border: 1.5px solid var(--charcoal);
+    }
+    .btn-download.secondary:hover { background: var(--charcoal); color: white; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+
+    /* ── PREVIEW ── */
+    .panel-preview {
+      flex-direction: column; align-items: center;
+      justify-content: flex-start; gap: 24px;
+    }
+
+    .preview-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #999; margin-bottom: -16px; align-self: flex-start; margin-left: 8px;
+    }
+
+    /* Cards */
+    #invite-output {
+      width: 480px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); transition: all 0.3s;
+    }
+    #details-output {
+      width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); transition: all 0.3s;
+    }
+    #rsvp-output {
+      width: 340px; box-shadow: 0 8px 32px rgba(0,0,0,0.15); transition: all 0.3s;
+    }
+
+    /* ════ CLASSIC CARD STYLES ════ */
+    .classic-card {
+      background: #FAF7F2; font-family: 'Cormorant Garamond', serif;
+      padding: 48px 44px; text-align: center;
+    }
+    .classic-card .top-rule { border-top: 2px solid #1A1A1A; margin-bottom: 4px; }
+    .classic-card .thin-rule { border-top: 1px solid #1A1A1A; }
+    .classic-card .gold-rule { border-top: 1px solid #C4A882; margin: 16px auto; width: 60%; }
+    .classic-card .together { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #444; margin: 16px 0 10px; }
+    .classic-card .names { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; color: #1A1A1A; line-height: 1; }
+    .classic-card .amp { font-family: 'Playfair Display', serif; font-size: 28px; font-style: italic; color: #8B6F47; margin: 6px 0; }
+    .classic-card .invite-text { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #333; margin: 10px 0; }
+    .classic-card .date-box { margin: 16px 0; }
+    .classic-card .day { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; color: #1A1A1A; line-height: 1; }
+    .classic-card .month-year { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: #222; margin-top: 4px; }
+    .classic-card .detail { font-size: 13px; letter-spacing: 0.15em; color: #111; margin: 6px 0; }
+    .classic-card .detail-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #666; }
+    .classic-card .dresscode { font-size: 12px; letter-spacing: 0.15em; color: #444; margin-top: 8px; font-style: italic; }
+    .classic-card .photo-area { width: 100%; margin: 16px 0; overflow: hidden; }
+    .classic-card .photo-area img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .classic-card .photo-placeholder-box { width: 100%; height: 100px; background: #E8E4DF; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #AAA; }
+
+    /* DARK CARD */
+    .dark-card {
+      background: #1C1410; font-family: 'Cormorant Garamond', serif;
+      padding: 48px 44px; text-align: center;
+    }
+    .dark-card .top-rule { border-top: 1.5px solid #C89A5A; margin-bottom: 4px; }
+    .dark-card .thin-rule { border-top: 1px solid #3A2E22; }
+    .dark-card .gold-rule { border-top: 1px solid #3A2E22; margin: 16px auto; width: 60%; }
+    .dark-card .together { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #D4AA6A; margin: 16px 0 10px; }
+    .dark-card .names { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; color: #F0E8D8; line-height: 1; }
+    .dark-card .amp { font-family: 'Playfair Display', serif; font-size: 28px; font-style: italic; color: #C89A5A; margin: 6px 0; }
+    .dark-card .invite-text { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #C89A5A; margin: 10px 0; }
+    .dark-card .date-box { margin: 16px 0; }
+    .dark-card .day { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; color: #F0E8D8; line-height: 1; }
+    .dark-card .month-year { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: #F0E8D8; margin-top: 4px; }
+    .dark-card .detail { font-size: 13px; letter-spacing: 0.15em; color: #F0E8D8; margin: 6px 0; }
+    .dark-card .detail-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #C89A5A; }
+    .dark-card .dresscode { font-size: 12px; letter-spacing: 0.15em; color: #D4C4A0; margin-top: 8px; font-style: italic; }
+    .dark-card .photo-area { width: 100%; margin: 16px 0; overflow: hidden; }
+    .dark-card .photo-area img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .dark-card .photo-placeholder-box { width: 100%; height: 100px; background: #2E2218; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #5A4A38; }
+
+    /* GARDEN CARD */
+    .garden-card {
+      background: #F5EFE6; font-family: 'Cormorant Garamond', serif;
+      padding: 48px 44px; text-align: center;
+    }
+    .garden-card .top-rule { border-top: 2px solid #B07A4A; margin-bottom: 4px; }
+    .garden-card .thin-rule { border-top: 1px solid #D4B896; }
+    .garden-card .gold-rule { border-top: 1px solid #D4B896; margin: 16px auto; width: 60%; }
+    .garden-card .together { font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: #8A5A2A; margin: 16px 0 10px; }
+    .garden-card .names { font-family: 'Playfair Display', serif; font-size: 48px; font-weight: 900; color: #3D2B1F; line-height: 1; }
+    .garden-card .amp { font-family: 'Playfair Display', serif; font-size: 28px; font-style: italic; color: #B07A4A; margin: 6px 0; }
+    .garden-card .invite-text { font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: #5A3E2B; margin: 10px 0; }
+    .garden-card .date-box { margin: 16px 0; }
+    .garden-card .day { font-family: 'Playfair Display', serif; font-size: 56px; font-weight: 900; color: #3D2B1F; line-height: 1; }
+    .garden-card .month-year { font-size: 13px; letter-spacing: 0.3em; text-transform: uppercase; color: #3D2B1F; margin-top: 4px; }
+    .garden-card .detail { font-size: 13px; letter-spacing: 0.15em; color: #2A1A0F; margin: 6px 0; }
+    .garden-card .detail-label { font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A5A2A; }
+    .garden-card .dresscode { font-size: 12px; letter-spacing: 0.15em; color: #5A3E2B; margin-top: 8px; font-style: italic; }
+    .garden-card .photo-area { width: 100%; margin: 16px 0; overflow: hidden; }
+    .garden-card .photo-area img { width: 100%; height: 180px; object-fit: cover; display: block; }
+    .garden-card .photo-placeholder-box { width: 100%; height: 100px; background: #E8DDD0; display: flex; align-items: center; justify-content: center; font-size: 11px; color: #C4A882; }
+
+    /* Loading */
+    .loading { display: none; position: fixed; inset: 0; background: rgba(26,26,26,0.75); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: white; font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.15em; }
+    .loading.active { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<!-- FORM -->
+<div class="panel-form">
+  <div class="panel-logo">Einladungs-Set</div>
+  <div class="panel-tagline">Wedding Story Atelier · 3 Karten</div>
+
+    <span class="style-label">Stil wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)"><span class="dot" style="background:#1A1A1A"></span>Classic</button>
+      <button class="style-btn" onclick="setTheme('dark', this)"><span class="dot" style="background:#8B6F47"></span>Dark</button>
+      <button class="style-btn" onclick="setTheme('garden', this)"><span class="dot" style="background:#B07A4A"></span>Garden</button>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('invite', this)">Einladung</button>
+      <button class="tab-btn" onclick="switchTab('details', this)">Details</button>
+      <button class="tab-btn" onclick="switchTab('rsvp', this)">RSVP</button>
+    </div>
+
+    <!-- TAB 1: EINLADUNG -->
+    <div class="tab-content active" id="tab-invite">
+      <div class="form-section">
+        <div class="section-title">Das Paar</div>
+        <div class="field"><label>Name 1</label><input type="text" id="name1" oninput="update()" placeholder="Anna"></div>
+        <div class="field"><label>Name 2</label><input type="text" id="name2" oninput="update()" placeholder="Peter"></div>
+        <div class="field"><label>Einleitungstext <span class="opt">optional</span></label><input type="text" id="togetherText" oninput="update()" placeholder="Gemeinsam mit ihren Familien"></div>
+        <div class="field"><label>Einladungstext <span class="opt">optional</span></label><input type="text" id="inviteText" oninput="update()" placeholder="laden euch herzlich ein zu ihrer Hochzeit"></div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">Datum & Ort</div>
+        <div class="field"><label>Wochentag</label><input type="text" id="weekday" oninput="update()" placeholder="Samstag"></div>
+        <div class="field"><label>Tag (Zahl)</label><input type="text" id="day" oninput="update()" placeholder="14"></div>
+        <div class="field"><label>Monat & Jahr</label><input type="text" id="monthyear" oninput="update()" placeholder="Juni 2026"></div>
+        <div class="field"><label>Uhrzeit</label><input type="text" id="time" oninput="update()" placeholder="15:00 Uhr"></div>
+        <div class="field"><label>Location</label><input type="text" id="location" oninput="update()" placeholder="Schloss Heidelberg"></div>
+        <div class="field"><label>Adresse <span class="opt">optional</span></label><input type="text" id="address" oninput="update()" placeholder="Schlosshof 1, 69117 Heidelberg"></div>
+        <div class="field"><label>Dresscode <span class="opt">optional</span></label><input type="text" id="dresscode" oninput="update()" placeholder="Black Tie Optional"></div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">Foto <span class="opt">optional</span></div>
+        <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+          <input type="file" id="photoInput" accept="image/*" onchange="loadPhoto(this)">
+          <img id="photoPreview" class="photo-preview">
+          <div id="photoPlaceholderUI">
+            <div class="icon">📷</div>
+            <div class="label">Foto hochladen</div>
+            <div class="sublabel">Bleibt lokal auf eurem Gerät</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 2: DETAILS -->
+    <div class="tab-content" id="tab-details">
+      <div class="form-section">
+        <div class="section-title">Empfang / Reception</div>
+        <div class="field"><label>Titel</label><input type="text" id="recTitle" oninput="update()" placeholder="Empfang"></div>
+        <div class="field"><label>Text</label><textarea id="recText" rows="3" oninput="update()" placeholder="Cocktailstunde ab 16:00 Uhr im Schlossgarten. Dinner und Tanz ab 18:00 Uhr."></textarea></div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">Übernachtung <span class="opt">optional</span></div>
+        <div class="field"><label>Titel</label><input type="text" id="hotelTitle" oninput="update()" placeholder="Übernachtung"></div>
+        <div class="field"><label>Text</label><textarea id="hotelText" rows="3" oninput="update()" placeholder="Wir haben Zimmer im Hotel Zum Ritter reserviert. Bitte bis 1. April buchen und 'Hochzeit Anna & Peter' angeben."></textarea></div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">Anreise <span class="opt">optional</span></div>
+        <div class="field"><label>Titel</label><input type="text" id="travelTitle" oninput="update()" placeholder="Anreise"></div>
+        <div class="field"><label>Text</label><textarea id="travelText" rows="3" oninput="update()" placeholder="Parkplätze stehen am Schloss zur Verfügung. Nächster Bahnhof: Heidelberg Hbf (10 Min. zu Fuß)."></textarea></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: RSVP -->
+    <div class="tab-content" id="tab-rsvp">
+      <div class="form-section">
+        <div class="section-title">RSVP Details</div>
+        <div class="field"><label>Antwort bis</label><input type="text" id="rsvpDate" oninput="update()" placeholder="1. April 2026"></div>
+        <div class="field"><label>RSVP Text <span class="opt">optional</span></label><textarea id="rsvpText" rows="2" oninput="update()" placeholder="Bitte meldet euch bis zum 1. April an."></textarea></div>
+        <div class="field"><label>Website / Anmeldelink <span class="opt">optional</span></label><input type="text" id="rsvpUrl" oninput="update()" placeholder="www.anna-und-peter.de/rsvp"></div>
+      </div>
+      <div class="form-section">
+        <div class="section-title">QR-Code <span class="opt">optional</span></div>
+        <div class="photo-upload" onclick="document.getElementById('qrInput').click()">
+          <input type="file" id="qrInput" accept="image/*" onchange="loadQR(this)">
+          <img id="qrPreview" class="photo-preview">
+          <div id="qrPlaceholderUI">
+            <div class="icon">📱</div>
+            <div class="label">QR-Code hochladen</div>
+            <div class="sublabel">PNG oder JPG</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOWNLOADS -->
+    <div class="download-section">
+      <button class="btn-download" onclick="downloadCard('invite')">⬇ Einladung als PDF</button>
+      <button class="btn-download secondary" onclick="downloadCard('details')">⬇ Details-Karte als PDF</button>
+      <button class="btn-download secondary" onclick="downloadCard('rsvp')">⬇ RSVP-Karte als PDF</button>
+      <p class="privacy-note">Keine Datenspeicherung · Chrome / Firefox empfohlen</p>
+    </div>
+  </div>
+
+<!-- PREVIEW -->
+<div class="panel-preview">
+  <div class="preview-label">Einladung (A5)</div>
+  <div id="invite-output" class="classic-card"></div>
+  <div class="preview-label">Details-Karte (A6)</div>
+  <div id="details-output" class="classic-card"></div>
+  <div class="preview-label">RSVP-Karte (A6)</div>
+  <div id="rsvp-output" class="classic-card"></div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="loading-text">PDF wird erstellt…</span>
+</div>
+
+<script>
+var currentTheme = 'classic';
+var photoDataUrl = null;
+var qrDataUrl = null;
+
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>'); }
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  update();
+}
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ge('tab-' + tab).classList.add('active');
+}
+
+function loadPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    photoDataUrl = e.target.result;
+    ge('photoPreview').src = photoDataUrl;
+    ge('photoPreview').style.display = 'block';
+    ge('photoPlaceholderUI').style.display = 'none';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function loadQR(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    qrDataUrl = e.target.result;
+    ge('qrPreview').src = qrDataUrl;
+    ge('qrPreview').style.display = 'block';
+    ge('qrPlaceholderUI').style.display = 'none';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function getCardClass() { return currentTheme + '-card'; }
+
+function update() {
+  var t = getCardClass();
+  var name1 = gv('name1') || 'Anna';
+  var name2 = gv('name2') || 'Peter';
+  var together = gv('togetherText') || 'Gemeinsam mit ihren Familien';
+  var inviteText = gv('inviteText') || 'laden euch herzlich ein zu ihrer Hochzeit';
+  var weekday = gv('weekday') || 'Samstag';
+  var day = gv('day') || '14';
+  var monthyear = gv('monthyear') || 'Juni 2026';
+  var time = gv('time') || '15:00 Uhr';
+  var location = gv('location') || 'Schloss Heidelberg';
+  var address = gv('address');
+  var dresscode = gv('dresscode');
+
+  var photoHtml = photoDataUrl
+    ? '<div class="photo-area"><img src="' + photoDataUrl + '"></div>'
+    : '<div class="photo-area"><div class="photo-placeholder-box">[ Euer Foto ]</div></div>';
+
+  // INVITE
+  var inv = ge('invite-output');
+  inv.className = t;
+  inv.innerHTML =
+    '<hr class="top-rule"><hr class="thin-rule">' +
+    '<div class="together">' + esc(together) + '</div>' +
+    '<div class="names">' + esc(name1) + '</div>' +
+    '<div class="amp">&amp;</div>' +
+    '<div class="names">' + esc(name2) + '</div>' +
+    '<div class="invite-text">' + esc(inviteText) + '</div>' +
+    '<hr class="gold-rule">' +
+    photoHtml +
+    '<hr class="gold-rule">' +
+    '<div class="date-box">' +
+      '<div class="detail-label">' + esc(weekday) + '</div>' +
+      '<div class="day">' + esc(day) + '</div>' +
+      '<div class="month-year">' + esc(monthyear) + '</div>' +
+    '</div>' +
+    '<hr class="gold-rule">' +
+    '<div class="detail-label">Uhrzeit</div>' +
+    '<div class="detail">' + esc(time) + '</div>' +
+    '<div class="detail-label" style="margin-top:8px">Ort</div>' +
+    '<div class="detail">' + esc(location) + '</div>' +
+    (address ? '<div class="detail" style="font-size:11px;opacity:0.7">' + esc(address) + '</div>' : '') +
+    (dresscode ? '<div class="dresscode">' + esc(dresscode) + '</div>' : '') +
+    '<hr class="gold-rule">' +
+    '<hr class="thin-rule"><hr class="top-rule">';
+
+  // DETAILS
+  var recTitle = gv('recTitle') || 'Empfang';
+  var recText = gv('recText') || 'Cocktailstunde ab 16:00 Uhr. Dinner und Tanz ab 18:00 Uhr.';
+  var hotelTitle = gv('hotelTitle');
+  var hotelText = gv('hotelText');
+  var travelTitle = gv('travelTitle');
+  var travelText = gv('travelText');
+
+  var det = ge('details-output');
+  det.className = t;
+  det.innerHTML =
+    '<hr class="top-rule"><hr class="thin-rule">' +
+    '<div class="together" style="margin-top:16px">The Details</div>' +
+    '<hr class="gold-rule">' +
+    '<div class="detail-label">' + esc(recTitle) + '</div>' +
+    '<div class="detail" style="font-size:12px;line-height:1.6;margin-top:4px">' + esc(recText) + '</div>' +
+    (hotelTitle && hotelText ? '<hr class="gold-rule"><div class="detail-label">' + esc(hotelTitle) + '</div><div class="detail" style="font-size:12px;line-height:1.6;margin-top:4px">' + esc(hotelText) + '</div>' : '') +
+    (travelTitle && travelText ? '<hr class="gold-rule"><div class="detail-label">' + esc(travelTitle) + '</div><div class="detail" style="font-size:12px;line-height:1.6;margin-top:4px">' + esc(travelText) + '</div>' : '') +
+    '<hr class="gold-rule">' +
+    '<div class="detail" style="font-size:12px">' + esc(name1) + ' &amp; ' + esc(name2) + ' · ' + esc(monthyear) + '</div>' +
+    '<hr class="thin-rule"><hr class="top-rule">';
+
+  // RSVP
+  var rsvpDate = gv('rsvpDate') || '1. April 2026';
+  var rsvpText = gv('rsvpText') || 'Bitte meldet euch bis zum ' + rsvpDate + ' an.';
+  var rsvpUrl = gv('rsvpUrl');
+
+  var qrHtml = qrDataUrl
+    ? '<img src="' + qrDataUrl + '" style="width:80px;height:80px;object-fit:contain;display:block;margin:8px auto;">'
+    : '<div style="width:80px;height:80px;background:#E8E4DF;display:flex;align-items:center;justify-content:center;font-size:10px;color:#AAA;margin:8px auto;">QR CODE</div>';
+
+  var rsvp = ge('rsvp-output');
+  rsvp.className = t;
+  rsvp.innerHTML =
+    '<hr class="top-rule"><hr class="thin-rule">' +
+    '<div class="together" style="margin-top:16px">Kindly RSVP</div>' +
+    '<hr class="gold-rule">' +
+    '<div class="detail-label">Antwort bis</div>' +
+    '<div class="day" style="font-size:32px;margin:4px 0">' + esc(rsvpDate) + '</div>' +
+    '<hr class="gold-rule">' +
+    '<div class="detail" style="font-size:12px;line-height:1.6">' + esc(rsvpText) + '</div>' +
+    '<hr class="gold-rule">' +
+    qrHtml +
+    (rsvpUrl ? '<div class="detail" style="font-size:11px;margin-top:6px">' + esc(rsvpUrl) + '</div>' : '') +
+    '<hr class="gold-rule">' +
+    '<div class="detail" style="font-size:12px">' + esc(name1) + ' &amp; ' + esc(name2) + '</div>' +
+    '<hr class="thin-rule"><hr class="top-rule">';
+}
+
+function downloadCard(type) {
+  var labels = { invite: 'Einladung', details: 'Details-Karte', rsvp: 'RSVP-Karte' };
+  ge('loading-text').textContent = labels[type] + ' wird erstellt…';
+  ge('loading').classList.add('active');
+
+  var elId = type + '-output';
+  var format = type === 'invite' ? 'a5' : 'a6';
+  var orientation = 'portrait';
+
+  setTimeout(function() {
+    html2canvas(ge(elId), { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null })
+      .then(function(canvas) {
+        var imgData = canvas.toDataURL('image/png');
+        var jsPDF = window.jspdf.jsPDF;
+        var pdf = new jsPDF({ orientation: orientation, unit: 'mm', format: format });
+        var pdfW = pdf.internal.pageSize.getWidth();
+        var pdfH = pdf.internal.pageSize.getHeight();
+        var imgH = canvas.height * pdfW / canvas.width;
+        var yOff = imgH < pdfH ? (pdfH - imgH) / 2 : 0;
+        pdf.addImage(imgData, 'PNG', 0, yOff, pdfW, imgH);
+        var n1 = gv('name1') || 'Einladung';
+        var n2 = gv('name2') || '';
+        pdf.save(n1 + '_' + n2 + '_' + labels[type] + '_WeddingStoryAtelier.pdf');
+        ge('loading').classList.remove('active');
+      })
+      .catch(function() {
+        alert('PDF konnte nicht erstellt werden.');
+        ge('loading').classList.remove('active');
+      });
+  }, 150);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  ge('name1').value = 'Anna';
+  ge('name2').value = 'Peter';
+  ge('togetherText').value = 'Gemeinsam mit ihren Familien';
+  ge('inviteText').value = 'laden euch herzlich ein zu ihrer Hochzeit';
+  ge('weekday').value = 'Samstag';
+  ge('day').value = '14';
+  ge('monthyear').value = 'Juni 2026';
+  ge('time').value = '15:00 Uhr';
+  ge('location').value = 'Schloss Heidelberg';
+  ge('address').value = 'Schlosshof 1, 69117 Heidelberg';
+  ge('dresscode').value = 'Festliche Kleidung';
+  ge('recTitle').value = 'Empfang';
+  ge('recText').value = 'Cocktailstunde ab 16:00 Uhr im Schlossgarten.\nDinner und Tanz ab 18:00 Uhr in der Orangerie.';
+  ge('hotelTitle').value = 'Übernachtung';
+  ge('hotelText').value = 'Wir haben Zimmer im Hotel Zum Ritter reserviert. Bitte bis 1. April buchen und "Hochzeit Anna & Peter" angeben.';
+  ge('travelTitle').value = 'Anreise';
+  ge('travelText').value = 'Parkplätze am Schloss vorhanden. Nächster Bahnhof: Heidelberg Hbf (10 Min. zu Fuß).';
+  ge('rsvpDate').value = '1. April 2026';
+  ge('rsvpText').value = 'Bitte meldet euch bis zum 1. April 2026 an.\nWir freuen uns auf euch!';
+  ge('rsvpUrl').value = 'www.anna-und-peter.de/rsvp';
+  update();
+});
+</script>
+</body>
+</html>

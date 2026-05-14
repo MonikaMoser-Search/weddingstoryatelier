@@ -1,0 +1,1367 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Wedding Quiz Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --accent: #8B6F47;
+    }
+
+    body { background: #F2EFE9; }
+
+
+    /* ===== LEFT PANEL — FORM ===== */
+
+    .panel-form-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 6px;
+    }
+
+    /* ===== LANGUAGE TOGGLE ===== */
+    .lang-toggle {
+      display: flex;
+      border: 1.5px solid var(--rule);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .lang-btn {
+      padding: 6px 12px;
+      border: none;
+      background: white;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      color: var(--light);
+      transition: all 0.15s;
+    }
+
+    .lang-btn.active {
+      background: var(--charcoal);
+      color: white;
+    }
+
+    .panel-form .subtitle {
+      font-size: 13px;
+      color: var(--light);
+      letter-spacing: 0.05em;
+      margin-bottom: 32px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    .style-buttons {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+
+    .style-btn {
+      flex: 1;
+      padding: 10px 6px;
+      border: 1.5px solid var(--rule);
+      background: white;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px;
+      letter-spacing: 0.1em;
+      color: var(--mid);
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+
+    .style-btn.active {
+      border-color: var(--charcoal);
+      background: var(--charcoal);
+      color: white;
+    }
+
+    .style-btn .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    /* Section */
+    .form-section {
+      margin-bottom: 28px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--mid);
+      margin-bottom: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    .question-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding: 12px;
+      background: #FAFAFA;
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+    }
+
+    .question-pair .q-num {
+      grid-column: 1 / -1;
+      font-size: 10px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .question-pair label { font-size: 11px; }
+    .question-pair input { font-size: 13px; padding: 7px 10px; }
+
+    .btn-generate {
+      width: 100%;
+      padding: 15px;
+      background: var(--charcoal);
+      color: white;
+      border: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 16px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+      border-radius: 2px;
+    }
+
+    .btn-generate:hover { opacity: 0.85; }
+
+    .btn-download {
+      width: 100%;
+      padding: 12px;
+      background: transparent;
+      color: var(--charcoal);
+      border: 1.5px solid var(--charcoal);
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+
+    .btn-download:hover {
+      background: var(--charcoal);
+      color: white;
+    }
+
+    .watermark-note {
+      font-size: 11px;
+      color: var(--light);
+      text-align: center;
+      margin-top: 12px;
+      font-style: italic;
+    }
+
+    /* ===== QUIZ CARD ===== */
+    #quiz-output {
+      width: 680px;
+      min-height: 960px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.15);
+      position: relative;
+      transition: all 0.4s ease;
+    }
+
+    /* ===== DESIGN 1: CLASSIC EDITORIAL ===== */
+    .theme-classic {
+      background: #FAF7F2;
+      color: #1A1A1A;
+      font-family: 'Cormorant Garamond', serif;
+      padding: 56px 56px 48px;
+    }
+
+    .theme-classic .quiz-masthead {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+    }
+
+    .theme-classic .top-rule { border-top: 3px solid #1A1A1A; margin-bottom: 5px; }
+    .theme-classic .thin-rule { border-top: 1px solid #1A1A1A; margin-bottom: 16px; }
+    .theme-classic .bottom-thin-rule { border-top: 1px solid #1A1A1A; margin-top: 16px; margin-bottom: 5px; }
+    .theme-classic .bottom-rule { border-top: 3px solid #1A1A1A; }
+
+    .theme-classic .quiz-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .theme-classic .quiz-names {
+      font-size: 15px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #555;
+      margin-bottom: 4px;
+    }
+
+    .theme-classic .quiz-date {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #999;
+    }
+
+    .theme-classic .quiz-intro {
+      font-size: 17px;
+      font-style: italic;
+      color: #555;
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .theme-classic .questions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .theme-classic .q-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #DDD;
+    }
+
+    .theme-classic .q-number {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 4px;
+    }
+
+    .theme-classic .q-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #1A1A1A;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .theme-classic .q-options {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .theme-classic .q-option {
+      font-size: 13px;
+      color: #555;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-classic .q-option .circle {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #BBB;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .theme-classic .answers-bar {
+      margin-top: 28px;
+      padding: 12px 16px;
+      background: #1A1A1A;
+      color: #FAF7F2;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-classic .quiz-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #AAA;
+    }
+
+    /* ===== DESIGN 2: DARK ROMANCE ===== */
+    .theme-dark {
+      background: #1C1410;
+      color: #F0E8D8;
+      font-family: 'Cormorant Garamond', serif;
+      padding: 56px 56px 48px;
+    }
+
+    .theme-dark .quiz-masthead {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+    }
+
+    .theme-dark .top-rule { border-top: 2px solid #8B6F47; margin-bottom: 5px; }
+    .theme-dark .thin-rule { border-top: 1px solid #9A8468; margin-bottom: 16px; }
+    .theme-dark .bottom-thin-rule { border-top: 1px solid #9A8468; margin-top: 16px; margin-bottom: 5px; }
+    .theme-dark .bottom-rule { border-top: 2px solid #8B6F47; }
+
+    .theme-dark .quiz-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 10px;
+      color: #F0E8D8;
+    }
+
+    .theme-dark .quiz-names {
+      font-size: 15px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #D4A85A;
+      margin-bottom: 4px;
+    }
+
+    .theme-dark .quiz-date {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #DEC898;
+    }
+
+    .theme-dark .quiz-intro {
+      font-size: 17px;
+      font-style: italic;
+      color: #D4C4A8;
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .theme-dark .questions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .theme-dark .q-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #5E5040;
+    }
+
+    .theme-dark .q-number {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #C89A5A;
+      margin-bottom: 4px;
+    }
+
+    .theme-dark .q-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #F5EDE0;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .theme-dark .q-options { display: flex; flex-direction: column; gap: 5px; }
+
+    .theme-dark .q-option {
+      font-size: 13px;
+      color: #D4C4A8;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-dark .q-option .circle {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #C08A58;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .theme-dark .answers-bar {
+      margin-top: 28px;
+      padding: 12px 16px;
+      background: #8B6F47;
+      color: #FAF7F2;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-dark .quiz-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #8A7058;
+    }
+
+    /* ===== DESIGN 3: WARM GARDEN ===== */
+    .theme-garden {
+      background: #F5EFE6;
+      color: #3D2B1F;
+      font-family: 'Cormorant Garamond', serif;
+      padding: 56px 56px 48px;
+    }
+
+    .theme-garden .quiz-masthead {
+      text-align: center;
+      margin-bottom: 32px;
+      padding-bottom: 20px;
+    }
+
+    .theme-garden .top-rule { border-top: 3px solid #B07A4A; margin-bottom: 5px; }
+    .theme-garden .thin-rule { border-top: 1px solid #D4B896; margin-bottom: 16px; }
+    .theme-garden .bottom-thin-rule { border-top: 1px solid #D4B896; margin-top: 16px; margin-bottom: 5px; }
+    .theme-garden .bottom-rule { border-top: 3px solid #B07A4A; }
+
+    .theme-garden .quiz-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      margin-bottom: 10px;
+      color: #3D2B1F;
+    }
+
+    .theme-garden .quiz-names {
+      font-size: 15px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #B07A4A;
+      margin-bottom: 4px;
+    }
+
+    .theme-garden .quiz-date {
+      font-size: 13px;
+      letter-spacing: 0.2em;
+      color: #9E8068;
+    }
+
+    .theme-garden .quiz-intro {
+      font-size: 17px;
+      font-style: italic;
+      color: #7A5C42;
+      text-align: center;
+      margin-bottom: 28px;
+      line-height: 1.6;
+    }
+
+    .theme-garden .questions-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .theme-garden .q-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #D4B896;
+    }
+
+    .theme-garden .q-number {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: #B07A4A;
+      margin-bottom: 4px;
+    }
+
+    .theme-garden .q-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #3D2B1F;
+      margin-bottom: 8px;
+      line-height: 1.4;
+      overflow-wrap: break-word;
+      word-break: break-word;
+    }
+
+    .theme-garden .q-options { display: flex; flex-direction: column; gap: 5px; }
+
+    .theme-garden .q-option {
+      font-size: 13px;
+      color: #7A5C42;
+      padding: 4px 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-garden .q-option .circle {
+      width: 16px;
+      height: 16px;
+      border: 1px solid #C4A882;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .theme-garden .answers-bar {
+      margin-top: 28px;
+      padding: 12px 16px;
+      background: #B07A4A;
+      color: #FAF7F2;
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .theme-garden .quiz-footer {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: #C4A882;
+    }
+
+    /* Loading overlay */
+    .loading {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(26,26,26,0.7);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      color: white;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 20px;
+      letter-spacing: 0.15em;
+    }
+    .loading.active { display: flex; }
+    .spinner {
+      width: 40px; height: 40px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== PDF RENDER CONTAINERS ===== */
+    #pdf-quiz-page,
+    #pdf-answers-page {
+      position: fixed;
+      top: -9999px;
+      left: -9999px;
+      width: 680px;
+    }
+
+    /* Answers page styling (shared between preview-hidden and pdf render) */
+    .answers-page-inner {
+      padding: 56px;
+      font-family: 'Cormorant Garamond', serif;
+      background: #FAF7F2;
+    }
+    .bleed-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    #chk-bleed { opacity: 0; position: absolute; pointer-events: none; width: 0; height: 0; }
+    .bleed-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-bottom: 7px; }
+    .bleed-check { width: 14px; height: 14px; border: 1.5px solid #ccc; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 9px; color: transparent; line-height: 1; }
+    #chk-bleed:checked ~ .bleed-row .bleed-check { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+    .bleed-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; }
+    .bleed-off-desc, .bleed-on-desc { font-family: 'DM Sans', sans-serif; font-size: 8px; color: #666; line-height: 1.6; margin: 0; }
+    .bleed-off-desc strong, .bleed-on-desc strong { color: #333; }
+    .bleed-on-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-off-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-on-desc { display: block; }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+  </style>
+<script>
+(function(){var _rc={_id:"WQ-ClassicLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+
+  <!-- LEFT: FORM -->
+  <div class="panel-form">
+    <div class="panel-logo">Wedding Quiz Generator</div>
+    <div class="panel-tagline">Wedding Story Atelier</div>
+
+    <div class="panel-form-header">
+      <div class="lang-toggle">
+        <button class="lang-btn active" onclick="setLang('de', this)">DE</button>
+        <button class="lang-btn" onclick="setLang('en', this)">EN</button>
+      </div>
+    </div>
+
+    <!-- STYLE SELECTOR -->
+    <span class="section-label" id="ui-style-label">Design wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)">
+        <span class="dot" style="background:#1A1A1A"></span>Classic
+      </button>
+      <button class="style-btn" onclick="setTheme('dark', this)">
+        <span class="dot" style="background:#8B6F47"></span>Dark Romance
+      </button>
+      <button class="style-btn" onclick="setTheme('garden', this)">
+        <span class="dot" style="background:#B07A4A"></span>Warm Garden
+      </button>
+    </div>
+
+    <!-- COUPLE INFO -->
+    <div class="form-section">
+      <div class="section-label" id="ui-couple-label">Das Paar</div>
+      <div class="field">
+        <label id="ui-name1-label">Name Partner 1</label>
+        <input type="text" id="name1" placeholder="Anna" oninput="update()" value="Anna">
+      </div>
+      <div class="field">
+        <label id="ui-name2-label">Name Partner 2</label>
+        <input type="text" id="name2" placeholder="Peter" oninput="update()" value="Peter">
+      </div>
+      <div class="field">
+        <label id="ui-date-label">Hochzeitsdatum</label>
+        <input type="text" id="wdate" placeholder="14. Juni 2026" oninput="update()" value="14. Juni 2026">
+      </div>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div class="form-section">
+      <div class="section-label" id="ui-questions-label">8 Fragen — Frage & richtige Antwort eintragen</div>
+
+      <div class="question-pair">
+        <div class="q-num" id="q-num-1">Frage 1</div>
+        <div>
+          <label id="ui-q-label">Frage</label>
+          <input type="text" id="q1" oninput="update()" value="Wo haben sie sich kennengelernt?">
+        </div>
+        <div>
+          <label id="ui-a-label">Richtige Antwort</label>
+          <input type="text" id="a1" oninput="update()" value="In einem Café">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 2</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q2" oninput="update()" value="Was war ihr erstes Date?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a2" oninput="update()" value="Picknick im Park">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 3</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q3" oninput="update()" value="Wer hat zuerst „Ich liebe dich" gesagt?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a3" oninput="update()" value="Anna">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 4</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q4" oninput="update()" value="Was ist ihr Lieblingsfilm?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a4" oninput="update()" value="The Notebook">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 5</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q5" oninput="update()" value="Wo war der Antrag?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a5" oninput="update()" value="Paris, an der Seine">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 6</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q6" oninput="update()" value="Was ist ihr gemeinsames Hobby?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a6" oninput="update()" value="Wandern &amp; Kochen">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 7</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q7" oninput="update()" value="Was ist ihr erster Hochzeitstanz?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a7" oninput="update()" value="Can't Help Falling in Love">
+        </div>
+      </div>
+
+      <div class="question-pair">
+        <div class="q-num">Frage 8</div>
+        <div>
+          <label>Frage</label>
+          <input type="text" id="q8" oninput="update()" value="Wohin geht die Hochzeitsreise?">
+        </div>
+        <div>
+          <label>Richtige Antwort</label>
+          <input type="text" id="a8" oninput="update()" value="Malediven">
+        </div>
+      </div>
+
+    </div>
+
+    <button class="btn-download" onclick="downloadPDF()" id="ui-download-btn">⬇ Als PDF herunterladen</button>
+    <p class="watermark-note">© Wedding Story Atelier — nur für den persönlichen Gebrauch</p>
+    <div class="format-box">
+      <div class="format-title">Papierformat / Paper Format</div>
+      <div class="format-opts">
+        <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>210×297 mm</em></label>
+        <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>8½×11"</em></label>
+      </div>
+    </div>
+    <div class="bleed-box">
+      <input type="checkbox" id="chk-bleed">
+      <label class="bleed-row" for="chk-bleed">
+        <span class="bleed-check">&#10003;</span>
+        <span class="bleed-title">Beschnittzugabe 3 mm</span>
+      </label>
+      <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+      <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+    </div>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+  <!-- RIGHT: PREVIEW -->
+  <div class="panel-preview">
+    <div id="quiz-output" class="theme-classic">
+      <!-- Rendered by JS -->
+    </div>
+  </div>
+
+<!-- PDF render containers are created dynamically in JS -->
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="loading-text">PDF wird erstellt…</span>
+</div>
+
+<script>
+  // =============================================
+  // LANGUAGE STRINGS — all UI & card text here
+  // =============================================
+  const LANG = {
+    de: {
+      // UI panel
+      uiTitle: 'Quiz Generator',
+      uiSubtitle: 'Füll die Felder aus — die Vorschau aktualisiert sich live.',
+      uiStyleLabel: 'Design wählen',
+      uiCoupleLabel: 'Das Paar',
+      uiName1: 'Name Partner 1',
+      uiName2: 'Name Partner 2',
+      uiDateLabel: 'Hochzeitsdatum',
+      uiQuestionsLabel: '8 Fragen — Frage & richtige Antwort eintragen',
+      uiDownloadBtn: '⬇ Als PDF herunterladen',
+      uiWatermark: '© Wedding Story Atelier — nur für den persönlichen Gebrauch',
+      uiLoadingText: 'PDF wird erstellt…',
+      uiQuestionLabel: 'Frage',
+      uiAnswerLabel: 'Richtige Antwort',
+      // Card content
+      cardTitle: 'Wie gut kennt ihr uns?',
+      cardIntro: 'Nur echte Freunde schaffen 8/8 … Kreise deine Antworten ein und vergleich am Tisch.',
+      cardQuestion: 'Frage',
+      cardFooter: '',
+      // Answers page
+      answersTitle: 'Die Antworten',
+      answersIntro: 'Wie gut hast du abgeschnitten? Nur wahre Freunde schaffen 8/8 …',
+      answersFooter: '',
+      // Date placeholder
+      datePlaceholder: '14. Juni 2026',
+      // Question numbering
+      questionNum: (n) => `Frage ${n}`,
+      // Wrong answers — kategorisiert
+      pools: {
+        location: [
+          'Auf einer Party', 'An der Uni', 'Bei der Arbeit', 'Im Urlaub',
+          'Im Kino', 'Im Museum', 'Im Supermarkt', 'Beim Konzert',
+          'Am Strand', 'Zu Hause', 'Im Park', 'Im Café',
+          'In einem Restaurant', 'Im Fitnessstudio', 'Beim Sport',
+          'Rom', 'Paris', 'New York', 'London', 'Barcelona', 'Wien',
+          'Venedig', 'Amsterdam', 'Lissabon', 'Prag',
+          'Japan', 'Italien', 'Thailand', 'Neuseeland', 'Griechenland', 'Island', 'Mallorca',
+          'Auf Reisen', 'Beim Wandern', 'Am See', 'In den Bergen',
+          'Auf einem Berggipfel', 'An der Küste', 'Im Heimatort', 'Auf einem Schiff',
+          'In Florenz', 'In Santorini', 'In Tokio', 'Auf Bali', 'In der Toskana',
+          'Am Eiffelturm', 'Am Meer', 'In einem Schloss', 'Im Ausland',
+        ],
+        person: [
+          'Er', 'Sie', 'Beide gleichzeitig', 'Keiner von beiden',
+          'Die beste Freundin', 'Der beste Freund', 'Niemand',
+          'Die Mutter', 'Der Vater', 'Ein Kollege', 'Eine Kollegin',
+          'Anna', 'Peter', 'Sophia', 'Max', 'Laura', 'Thomas',
+          'Felix', 'Julia', 'Lena', 'Jonas', 'Emma', 'Lukas', 'Marie',
+        ],
+        activity: [
+          'Gemeinsam kochen', 'Wandern', 'Reisen', 'Tanzen',
+          'Sport treiben', 'Filme schauen', 'Lesen', 'Musik hören',
+          'Fotografieren', 'Radfahren', 'Schwimmen', 'Yoga',
+          'Brettspiele spielen', 'Konzerte besuchen', 'Ins Theater gehen',
+          'Picknicken', 'Fahrrad fahren', 'Am Strand liegen',
+          'Museen besuchen', 'Essen gehen', 'Gartenarbeit',
+          'Skifahren', 'Klettern', 'Tauchen', 'Surfen',
+        ],
+        film: [
+          'La La Land', 'Stolz und Vorurteil', 'Casablanca', 'Titanic',
+          'The Notebook', 'Pretty Woman', 'Dirty Dancing', 'Grease',
+          'Schlaflos in Seattle', 'Verrückt nach dir', 'Mamma Mia',
+          'Vier Hochzeiten und ein Todesfall', 'Notting Hill',
+          'Wenn du da bist', 'Lieblingsfilm noch unbekannt',
+          'Ein ganzes halbes Jahr', 'P.S. Ich liebe dich',
+        ],
+        song: [
+          "Can't Help Falling in Love", 'Perfect', 'All of Me', 'A Thousand Years',
+          'Thinking Out Loud', 'Shallow', 'Make You Feel My Love',
+          'At Last', 'Endless Love', 'The Way You Look Tonight',
+          'Marry Me', 'Lucky', 'Better Together', 'I Choose You',
+          'From This Moment On', 'You Are the Best Thing',
+        ],
+        time: [
+          'Nach einer Woche', 'Nach einem Monat', 'Nach drei Monaten',
+          'Nach einem halben Jahr', 'Nach einem Jahr', 'Nach zwei Jahren',
+          'Sofort', 'Erst beim zweiten Date', 'Noch gar nicht',
+          '2018', '2019', '2020', '2021', '2022', '2023', '2024',
+        ],
+      },
+    },
+    en: {
+      // UI panel
+      uiTitle: 'Quiz Generator',
+      uiSubtitle: 'Fill in the details — the preview updates live.',
+      uiStyleLabel: 'Choose your style',
+      uiCoupleLabel: 'The Couple',
+      uiName1: 'Partner 1 Name',
+      uiName2: 'Partner 2 Name',
+      uiDateLabel: 'Wedding Date',
+      uiQuestionsLabel: '8 Questions — Fill in question & correct answer',
+      uiDownloadBtn: '⬇ Download as PDF',
+      uiWatermark: '© Wedding Story Atelier — for personal use only',
+      uiLoadingText: 'Generating your PDF…',
+      uiQuestionLabel: 'Question',
+      uiAnswerLabel: 'Correct Answer',
+      // Card content
+      cardTitle: 'How Well Do You Know Us?',
+      cardIntro: 'Only true friends get 8/8 … Circle your answers and compare with your table.',
+      cardQuestion: 'Question',
+      cardFooter: '',
+      // Answers page
+      answersTitle: 'The Answers',
+      answersIntro: 'How did you do? Only true friends get 8/8 …',
+      answersFooter: '',
+      // Date placeholder
+      datePlaceholder: '14 June 2026',
+      // Question numbering
+      questionNum: (n) => `Question ${n}`,
+      // Wrong answers — categorized
+      pools: {
+        location: [
+          'At a party', 'At university', 'At work', 'On holiday',
+          'At the cinema', 'At the museum', 'At the supermarket', 'At a concert',
+          'At the beach', 'At home', 'In the park', 'At a café',
+          'At a restaurant', 'At the gym', 'At a sports event',
+          'Rome', 'Paris', 'New York', 'London', 'Barcelona', 'Vienna',
+          'Venice', 'Amsterdam', 'Lisbon', 'Prague',
+          'Japan', 'Italy', 'Thailand', 'New Zealand', 'Greece', 'Iceland', 'Mallorca',
+          'While travelling', 'On a hike', 'At the lake', 'In the mountains',
+          'On a mountain top', 'By the coast', 'In their hometown', 'On a boat',
+          'In Florence', 'In Santorini', 'In Tokyo', 'On Bali', 'In Tuscany',
+          'At the Eiffel Tower', 'By the sea', 'In a castle', 'Abroad',
+        ],
+        person: [
+          'Him', 'Her', 'Both at the same time', 'Neither of them',
+          'The best friend', 'A colleague', 'Nobody',
+          'The mother', 'The father', 'A classmate',
+          'Anna', 'Peter', 'Sophie', 'Max', 'Laura', 'Tom',
+          'Felix', 'Julia', 'Lena', 'Jonas', 'Emma', 'Luke', 'Marie',
+        ],
+        activity: [
+          'Cooking together', 'Hiking', 'Travelling', 'Dancing',
+          'Working out', 'Watching films', 'Reading', 'Listening to music',
+          'Photography', 'Cycling', 'Swimming', 'Yoga',
+          'Board games', 'Going to concerts', 'Going to the theatre',
+          'Having a picnic', 'Going for a bike ride', 'Spending a day at the beach',
+          'Visiting museums', 'Eating out', 'Gardening',
+          'Skiing', 'Climbing', 'Diving', 'Surfing',
+        ],
+        film: [
+          'La La Land', 'Pride & Prejudice', 'Casablanca', 'Titanic',
+          'The Notebook', 'Pretty Woman', 'Dirty Dancing', 'Grease',
+          'Sleepless in Seattle', 'Crazy, Stupid, Love', 'Mamma Mia',
+          'Four Weddings and a Funeral', 'Notting Hill',
+          'Me Before You', 'P.S. I Love You',
+          'The Vow', 'About Time', 'Hitch',
+        ],
+        song: [
+          "Can't Help Falling in Love", 'Perfect', 'All of Me', 'A Thousand Years',
+          'Thinking Out Loud', 'Shallow', 'Make You Feel My Love',
+          'At Last', 'Endless Love', 'The Way You Look Tonight',
+          'Marry Me', 'Lucky', 'Better Together', 'I Choose You',
+          'From This Moment On', 'You Are the Best Thing',
+        ],
+        time: [
+          'After a week', 'After a month', 'After three months',
+          'After six months', 'After a year', 'After two years',
+          'Immediately', 'Not until the second date', 'Not yet',
+          '2018', '2019', '2020', '2021', '2022', '2023', '2024',
+        ],
+      },
+    }
+  };
+
+  let currentTheme = 'classic';
+  let currentLang = 'de';
+
+  // Cache: speichert generierte Optionen pro Frage
+  // Schlüssel: "frage|||antwort" — wird nur bei Änderung neu berechnet
+  const optionsCache = {};
+
+  function t() { return LANG[currentLang]; }
+
+  function g(id) {
+    return document.getElementById(id)?.value || '';
+  }
+
+  // =============================================
+  // LANGUAGE SWITCH
+  // =============================================
+  function setLang(lang, btn) {
+    currentLang = lang;
+    // Pools wechseln bei Sprachwechsel → Cache leeren
+    Object.keys(optionsCache).forEach(k => delete optionsCache[k]);
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    updateUI();
+    update();
+  }
+
+  function updateUI() {
+    const s = t();
+    document.getElementById('ui-title').textContent = s.uiTitle;
+    document.getElementById('ui-subtitle').textContent = s.uiSubtitle;
+    document.getElementById('ui-style-label').textContent = s.uiStyleLabel;
+    document.getElementById('ui-couple-label').textContent = s.uiCoupleLabel;
+    document.getElementById('ui-name1-label').textContent = s.uiName1;
+    document.getElementById('ui-name2-label').textContent = s.uiName2;
+    document.getElementById('ui-date-label').textContent = s.uiDateLabel;
+    document.getElementById('ui-questions-label').textContent = s.uiQuestionsLabel;
+    document.getElementById('ui-download-btn').textContent = s.uiDownloadBtn;
+    document.querySelector('.watermark-note').textContent = s.uiWatermark;
+    document.getElementById('ui-q-label').textContent = s.uiQuestionLabel;
+    document.getElementById('ui-a-label').textContent = s.uiAnswerLabel;
+    // Update all question pair labels
+    document.querySelectorAll('.question-pair').forEach((pair, i) => {
+      const labels = pair.querySelectorAll('label');
+      if (labels[0]) labels[0].textContent = s.uiQuestionLabel;
+      if (labels[1]) labels[1].textContent = s.uiAnswerLabel;
+      const qnum = pair.querySelector('.q-num');
+      if (qnum) qnum.textContent = s.questionNum(i + 1);
+    });
+  }
+
+  // =============================================
+  // THEME
+  // =============================================
+  function setTheme(theme, btn) {
+    currentTheme = theme;
+    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    update();
+  }
+
+  // =============================================
+  // WRONG ANSWERS — kategoriebewusste Auswahl
+  // =============================================
+
+  function detectCategory(question) {
+    const q = question.toLowerCase().trim();
+
+    // 1. Fragewort — stärkstes Signal
+    if (/^wo\b|^where\b/.test(q))  return 'location';
+    if (/^wer\b|^who\b/.test(q))   return 'person';
+    if (/^wann\b|^when\b/.test(q)) return 'time';
+
+    // 2. Scoring
+    let score = { location: 0, person: 0, activity: 0, film: 0, song: 0, time: 0 };
+
+    if (/\b(ort|orte|stadt|land|reise|reiseziel|destination|flitterwochen|honeymoon|antrag|proposal|kennenlernt|kennengelernt|wohin|urlaub|holiday|where)\b/.test(q)) score.location += 3;
+    if (/\b(wer|who|name|person|zuerst|first|gesagt|said|ich liebe|love you|bruder|schwester|freund|freundin|mutter|vater|eltern|trauzeugin|trauzeuge|partner)\b/.test(q)) score.person += 3;
+    if (/\b(wann|when|wie lange|how long|seit|since|jahr|year|monat|month|wie viele|how many|datum|anniversary)\b/.test(q)) score.time += 3;
+    if (/\b(hobby|aktivität|activity|sport|gemeinsam|together|spielen|kochen|tanzen|reisen|fotografier|lesen|musik hören|erstes date|first date|erstes mal|first time)\b/.test(q)) score.activity += 3;
+
+    // Aktivitätsfragen: macht/gern/liebsten/Wochenende etc. → starkes Signal
+    if (/\b(macht|machen|gern|am liebsten|liebste|liebsten|lieber|liebe|wochenende|freizeit|free time|favorite thing|favourite thing|enjoy|abend|abends|feierabend|urlaub ohne|entspannen)\b/.test(q)) score.activity += 4;
+
+    // Film vs. Song explizit unterscheiden
+    if (/\b(film|movie|kino|serie|show|lieblingsfilm|lieblingsserie|favorite film|favorite movie)\b/.test(q)) score.film += 4;
+    if (/\b(song|lied|musik|tanz|dance|hochzeitstanz|wedding song|wedding dance|first dance|erster tanz)\b/.test(q)) score.song += 4;
+
+    // Was-Fragen Tiebreaker
+    if (/^was\b|^what\b/.test(q)) {
+      if (score.film === 0 && score.song === 0 && score.activity === 0) score.activity += 1;
+    }
+    if (/^wie\b|^how\b/.test(q)) score.activity += 1;
+
+    const best = Object.entries(score).sort((a, b) => b[1] - a[1])[0];
+    if (best[1] > 0) return best[0];
+    return 'activity';  // Fallback: Aktivitäten statt Film
+  }
+
+  function getWrongAnswers(question, correct, name1, name2) {
+    const pools = t().pools;
+    const category = detectCategory(question);
+
+    // Wer-Fragen: nur echte Namen + "Beide" — keine Fremden aus dem Pool
+    if (category === 'person') {
+      const beide = currentLang === 'de' ? 'Beide' : 'Both';
+      const personSet = [name1, name2, beide]
+        .filter(p => p.toLowerCase() !== correct.toLowerCase());
+      return personSet.slice(0, 2);
+    }
+
+    let pool = [...(pools[category] || pools.activity)];
+    const filtered = pool.filter(p => p.toLowerCase() !== correct.toLowerCase());
+
+    if (filtered.length < 4) {
+      const extra = Object.values(pools).flat()
+        .filter(p => p.toLowerCase() !== correct.toLowerCase());
+      filtered.push(...extra);
+    }
+
+    return [...new Set(filtered)].sort(() => Math.random() - 0.5).slice(0, 2);
+  }
+
+  function buildOptions(question, correct, index, name1, name2) {
+    const key = `${index}|||${question}|||${correct}|||${name1}|||${name2}`;
+    if (optionsCache[key]) return optionsCache[key];
+    const wrongs = getWrongAnswers(question, correct, name1, name2);
+    const opts = [correct, ...wrongs].sort(() => Math.random() - 0.5);
+    optionsCache[key] = opts;
+    return opts;
+  }
+
+  // =============================================
+  // BUILD QUIZ HTML (used for preview AND pdf-page-1)
+  // =============================================
+  function buildQuizHTML(name1, name2, wdate, questions, theme) {
+    const s = t();
+    let qHtml = '';
+    questions.forEach((item, i) => {
+      const opts = buildOptions(item.q, item.a, i, name1, name2);
+      const optHtml = opts.map(o => `
+        <div class="q-option">
+          <div class="circle"></div>
+          <span>${o}</span>
+        </div>
+      `).join('');
+      qHtml += `
+        <div class="q-item">
+          <div class="q-number">${s.questionNum(i + 1)}</div>
+          <div class="q-text">${item.q}</div>
+          <div class="q-options">${optHtml}</div>
+        </div>
+      `;
+    });
+
+    return `
+      <div class="quiz-masthead">
+        <hr class="top-rule">
+        <hr class="thin-rule">
+        <div class="quiz-title">${s.cardTitle}</div>
+        <div class="quiz-names">${name1} &amp; ${name2}</div>
+        <div class="quiz-date">${wdate}</div>
+        <hr class="bottom-thin-rule">
+        <hr class="bottom-rule">
+      </div>
+      <div class="quiz-intro">${s.cardIntro}</div>
+      <div class="questions-grid">${qHtml}</div>
+    `;
+  }
+
+  // =============================================
+  // BUILD ANSWERS HTML
+  // =============================================
+  function buildAnswersHTML(name1, name2, wdate, questions) {
+    const s = t();
+    const listHtml = questions.map((q, i) => `
+      <div style="padding:14px 0; border-bottom:1px solid #DDD;">
+        <div style="font-size:10px; letter-spacing:0.25em; text-transform:uppercase; color:#999; margin-bottom:4px;">${s.questionNum(i + 1)}</div>
+        <div style="font-size:15px; font-weight:600; color:#1A1A1A; margin-bottom:6px; line-height:1.4;">${q.q}</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div style="width:20px; height:20px; background:#1A1A1A; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+            <span style="color:white; font-size:11px; font-weight:bold;">✓</span>
+          </div>
+          <span style="font-size:14px; color:#1A1A1A; font-weight:500;">${q.a}</span>
+        </div>
+      </div>
+    `).join('');
+
+    return `
+      <div style="padding:56px; font-family:'Cormorant Garamond',serif; background:#FAF7F2; min-height:960px;">
+        <div style="text-align:center; margin-bottom:32px;">
+          <div style="border-top:3px solid #1A1A1A; margin-bottom:5px;"></div>
+          <div style="border-top:1px solid #1A1A1A; margin-bottom:16px;"></div>
+          <div style="font-family:'Playfair Display',serif; font-size:42px; font-weight:900; letter-spacing:0.08em; text-transform:uppercase; color:#1A1A1A; margin-bottom:10px;">${s.answersTitle}</div>
+          <div style="font-size:14px; letter-spacing:0.25em; text-transform:uppercase; color:#555; margin-bottom:4px;">${name1} &amp; ${name2}</div>
+          <div style="font-size:12px; letter-spacing:0.2em; color:#999;">${wdate}</div>
+          <div style="border-top:1px solid #1A1A1A; margin-top:16px; margin-bottom:5px;"></div>
+          <div style="border-top:3px solid #1A1A1A;"></div>
+        </div>
+        <div style="font-size:15px; font-style:italic; color:#555; text-align:center; margin-bottom:32px; line-height:1.6;">${s.answersIntro}</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">${listHtml}</div>
+      </div>
+    `;
+  }
+
+  // =============================================
+  // LIVE PREVIEW UPDATE
+  // =============================================
+  function update() {
+    const name1 = g('name1') || 'Anna';
+    const name2 = g('name2') || 'Peter';
+    const wdate = g('wdate') || t().datePlaceholder;
+
+    const questions = [];
+    for (let i = 1; i <= 8; i++) {
+      questions.push({ q: g(`q${i}`) || `${t().uiQuestionLabel} ${i}`, a: g(`a${i}`) || '…' });
+    }
+
+    const out = document.getElementById('quiz-output');
+    out.className = `theme-${currentTheme}`;
+    out.innerHTML = buildQuizHTML(name1, name2, wdate, questions, currentTheme);
+  }
+
+  // =============================================
+  // PDF EXPORT — one canvas per page, no slicing
+  // =============================================
+  async function downloadPDF() {
+    const loading = document.getElementById('loading');
+    document.getElementById('loading-text').textContent = t().uiLoadingText;
+    loading.classList.add('active');
+
+    const fmt = (document.querySelector('input[name="paper-format"]:checked') || {}).value || 'a4';
+    const isLetter = fmt === 'letter';
+    // A4 at 96 dpi = 794×1123 px | US Letter at 96 dpi = 816×1057 px
+    const PAGE_W = isLetter ? 816 : 794;
+    const PAGE_H = isLetter ? 1057 : 1123;
+
+    // Shared styles for the render containers
+    const containerBase = `
+      position: fixed;
+      left: -9999px;
+      top: 0;
+      width: ${PAGE_W}px;
+      height: ${PAGE_H}px;
+      overflow: hidden;
+      box-sizing: border-box;
+    `;
+
+    // Theme-aware colours for the answers page
+    const THEME = {
+      classic: { bg:'#FAF7F2', text:'#1A1A1A', rule:'#1A1A1A', sub:'#555555', muted:'#999999', accent:'#1A1A1A', border:'#DDDDDD' },
+      dark:    { bg:'#1C1410', text:'#F0E8D8', rule:'#8B6F47',  sub:'#D4A85A', muted:'#DEC898', accent:'#8B6F47', border:'#5E5040' },
+      garden:  { bg:'#F5EFE6', text:'#3D2B1F', rule:'#B07A4A',  sub:'#B07A4A', muted:'#9E8068', accent:'#B07A4A', border:'#D4B896' },
+    };
+    const th = THEME[currentTheme] || THEME.classic;
+
+    // Renders a single DOM element (already in body) to a JPEG data URL
+    async function renderPage(el) {
+      const canvas = await html2canvas(el, {
+        scale: 3,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: th.bg,
+        logging: false,
+        width:  PAGE_W,
+        height: PAGE_H,
+        windowWidth:  PAGE_W,
+        windowHeight: PAGE_H,
+      });
+      // JPEG at 0.82 quality → ~200–400 KB per page
+      return canvas.toDataURL('image/jpeg', 0.82);
+    }
+
+    try {
+      const { jsPDF } = window.jspdf;
+      const s = t();
+
+      const name1 = g('name1') || 'Anna';
+      const name2 = g('name2') || 'Peter';
+      const wdate = g('wdate') || s.datePlaceholder;
+      const questions = [];
+      for (let i = 1; i <= 8; i++) {
+        questions.push({
+          q: g(`q${i}`) || `${s.uiQuestionLabel} ${i}`,
+          a: g(`a${i}`) || '…'
+        });
+      }
+
+      // ── PAGE 1: QUIZ ─────────────────────────────
+      const page1 = document.createElement('div');
+      page1.className = `theme-${currentTheme}`;
+      page1.style.cssText = containerBase;
+      // Override padding to scale into A4 height (original design is 680px wide, now 794px)
+      page1.style.padding = '52px 64px 40px';
+      page1.innerHTML = buildQuizHTML(name1, name2, wdate, questions, currentTheme);
+      document.body.appendChild(page1);
+      await document.fonts.ready;
+      await new Promise(r => setTimeout(r, 150));
+      const img1 = await renderPage(page1);
+      document.body.removeChild(page1);
+
+      // ── PAGE 2: ANSWERS ───────────────────────────
+      const ansListHtml = questions.map((q, i) => `
+        <div style="padding:10px 0 8px;border-bottom:1px solid ${th.border};break-inside:avoid;">
+          <div style="font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:${th.sub};margin-bottom:4px;font-family:'DM Sans',sans-serif;">${s.questionNum(i+1)}</div>
+          <div style="font-size:13px;font-weight:600;color:${th.text};margin-bottom:6px;line-height:1.35;font-family:'Playfair Display',serif;overflow-wrap:break-word;">${q.q}</div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:19px;height:19px;background:${th.accent};border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;">
+              <span style="color:#fff;font-size:11px;font-weight:bold;line-height:1;">✓</span>
+            </div>
+            <span style="font-size:13px;color:${th.text};font-weight:500;font-family:'DM Sans',sans-serif;">${q.a}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const page2 = document.createElement('div');
+      page2.style.cssText = containerBase + `background:${th.bg};font-family:'Cormorant Garamond',serif;padding:52px 64px 40px;`;
+      page2.innerHTML = `
+        <div style="text-align:center;margin-bottom:22px;">
+          <div style="border-top:3px solid ${th.rule};margin-bottom:4px;"></div>
+          <div style="border-top:1px solid ${th.rule};margin-bottom:14px;"></div>
+          <div style="font-family:'Playfair Display',serif;font-size:38px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:${th.text};margin-bottom:8px;line-height:1;">${s.answersTitle}</div>
+          <div style="font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:${th.sub};margin-bottom:3px;font-family:'DM Sans',sans-serif;">${name1} &amp; ${name2}</div>
+          <div style="font-size:11px;letter-spacing:.18em;color:${th.muted};font-family:'DM Sans',sans-serif;">${wdate}</div>
+          <div style="border-top:1px solid ${th.rule};margin-top:14px;margin-bottom:4px;"></div>
+          <div style="border-top:3px solid ${th.rule};"></div>
+        </div>
+        <div style="font-size:14px;font-style:italic;color:${th.sub};text-align:center;margin-bottom:22px;line-height:1.5;">${s.answersIntro}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 28px;">${ansListHtml}</div>
+      `;
+      document.body.appendChild(page2);
+      await document.fonts.ready;
+      await new Promise(r => setTimeout(r, 150));
+      const img2 = await renderPage(page2);
+      document.body.removeChild(page2);
+
+      // ── COMPOSE PDF ───────────────────────────────
+      const bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+      const pdfW = isLetter ? 215.9 : 210;
+      const pdfH = isLetter ? 279.4 : 297;
+      const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: bleed ? [pdfW + bleed*2, pdfH + bleed*2] : [pdfW, pdfH] });
+
+      function fillBleed() {
+        if (!bleed) return;
+        const m = th.bg.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F'); }
+      }
+
+      fillBleed();
+      pdf.addImage(img1, 'JPEG', bleed, bleed, pdfW, pdfH);
+      pdf.addPage();
+      fillBleed();
+      pdf.addImage(img2, 'JPEG', bleed, bleed, pdfW, pdfH);
+
+      const n1 = name1.replace(/\s+/g, '_');
+      const n2 = name2.replace(/\s+/g, '_');
+      pdf.save(`${n1}_${n2}_Quiz.pdf`);
+
+    } catch(e) {
+      alert('PDF-Erstellung fehlgeschlagen: ' + e.message);
+      console.error(e);
+    }
+
+    loading.classList.remove('active');
+  }
+
+  // Init — sofort rendern, Fonts als optionaler Bonus
+  updateUI();
+  update();
+  // Nochmal rendern sobald Fonts geladen (verbessert Typografie, kein Blocker)
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => update());
+  }
+</script>
+
+</body>
+</html>

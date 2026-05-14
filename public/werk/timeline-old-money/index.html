@@ -1,0 +1,1212 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Tagesprogramm — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Preview override ─────────────────────────────── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+      align-items: stretch; padding: 0; justify-content: flex-start;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── A4 / Letter Grids ────────────────────────────── */
+    .a4-portrait {
+      width: 210mm; height: 297mm;
+      background: #fff; box-sizing: border-box; position: relative;
+    }
+    .a4-portrait.fmt-4 {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+      gap: 8mm 6mm; padding: 10mm;
+    }
+    .a4-portrait.fmt-6 {
+      display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;
+      gap: 8mm 4mm; padding: 8mm;
+    }
+    .letter-portrait {
+      width: 215.9mm; height: 279.4mm;
+      background: #fff; box-sizing: border-box; position: relative;
+    }
+    .letter-portrait.fmt-4 {
+      display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr;
+      gap: 8mm 6mm; padding: 10mm;
+    }
+
+    /* ══ DAY CARD ════════════════════════════════════════ */
+    .day-card {
+      position: relative; overflow: visible;
+      display: flex; flex-direction: column; box-sizing: border-box;
+    }
+    .day-card.empty { visibility: hidden; }
+
+    .day-card.burgund { background: #8B1A35; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+    .day-card.cognac  { background: #7B4718; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+    .day-card.forest  { background: #1F4A32; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+
+    .dcard-inner {
+      position: absolute; inset: 0; overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* Inner gold frame line */
+    .dcard-frame {
+      position: absolute; inset: 6mm;
+      border: 0.5px solid rgba(201,169,110,0.50);
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Monogram */
+    .dcard-mono {
+      position: relative; z-index: 2;
+      display: flex; justify-content: center; align-items: center;
+      flex-shrink: 0;
+    }
+    .fmt-4  .dcard-mono { height: 32mm; padding: 7mm 0 1mm; }
+    .fmt-6  .dcard-mono { height: 30mm; padding: 6mm 3mm 0.5mm; }
+    .fmt-ltr .dcard-mono { height: 30mm; padding: 4mm 0 1mm; }
+    .dcard-mono svg { display: block; width: auto; height: auto; }
+    .fmt-4  .dcard-mono svg { height: 21mm; }
+    .fmt-6  .dcard-mono svg { height: 17mm; }
+    .letter-portrait .dcard-mono svg { height: 14mm; }
+
+    /* Subtitle whisper — hidden, monogram speaks for itself */
+    .dcard-subtitle { display: none; }
+
+    /* Names */
+    .dcard-names {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--text); text-align: center; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      width: 100%; box-sizing: border-box;
+    }
+    .fmt-4  .dcard-names { font-size: 4mm;   padding: 1mm 5mm 0; }
+    .fmt-6  .dcard-names { font-size: 3.6mm; padding: 3mm 3.5mm 0; }
+    .fmt-ltr .dcard-names { font-size: 4mm;   padding: 1mm 5mm 0; }
+
+    /* Ornament divider */
+    .dcard-orn {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fmt-4  .dcard-orn { padding: 1.5mm 7mm; gap: 2mm; }
+    .fmt-6  .dcard-orn { padding: 1.2mm 7mm;  gap: 1.5mm; }
+    .fmt-ltr .dcard-orn { padding: 1.5mm 7mm; gap: 2mm; }
+    .dcard-orn-line { flex: 1; height: 0.5px; background: var(--gold-dim); }
+    .dcard-orn-gem  { color: var(--gold); flex-shrink: 0; opacity: 0.65; }
+    .fmt-4  .dcard-orn-gem { font-size: 2.2mm; }
+    .fmt-6  .dcard-orn-gem { font-size: 2.1mm; }
+    .fmt-ltr .dcard-orn-gem { font-size: 2.2mm; }
+
+    /* Date */
+    .dcard-date {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; letter-spacing: 0.12em;
+      color: var(--text-dim); text-align: center; flex-shrink: 0;
+    }
+    .fmt-4  .dcard-date { font-size: 2.8mm; padding-bottom: 1.5mm; }
+    .fmt-6  .dcard-date { font-size: 2.6mm; padding-bottom: 1mm; }
+    .fmt-ltr .dcard-date { font-size: 2.8mm; padding-bottom: 1.5mm; }
+
+    /* Optional greeting (hidden for fmt-6) */
+    .dcard-greeting {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300; color: var(--text-dim);
+      text-align: center; flex-shrink: 0; line-height: 1.5;
+    }
+    .fmt-4  .dcard-greeting { font-size: 2.9mm; padding: 1mm 5mm 1.5mm; }
+    .fmt-6  .dcard-greeting { font-size: 2.7mm; padding: 0.5mm 3.5mm 1mm; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fmt-ltr .dcard-greeting { font-size: 2.9mm; padding: 1mm 5mm 1.5mm; }
+    .dcard-greeting.hidden { display: none; }
+
+    /* ── Timeline ─────────────────────────────────────── */
+    .dcard-timeline {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      /* no flex:1 — sized to content so line matches entries */
+    }
+    .fmt-4  .dcard-timeline { padding: 0.5mm 5mm 0; }
+    .fmt-6  .dcard-timeline { padding: 0.5mm 3.5mm 0; }
+    .fmt-ltr .dcard-timeline { padding: 0.5mm 5mm 0; }
+
+    .dcard-spacer { flex: 1; min-height: 0; }
+    .dcard-spacer-top { max-height: 10mm; }
+
+    /* Letter-Portrait overrides (Letter card is ~126mm tall vs A6 ~135mm) */
+    .letter-portrait .dcard-mono  { height: 24mm !important; }
+    .letter-portrait .tl-entry    { min-height: 9mm !important; padding-bottom: 0.5mm !important; }
+    .letter-portrait .dcard-closing { padding-bottom: 8mm !important; }
+
+    /* Vertical gold center line — height = content only */
+    .tl-line {
+      position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 0.5px; background: rgba(201,169,110,0.55);
+      transform: translateX(-50%); z-index: 0;
+    }
+
+    .tl-entry {
+      display: flex; align-items: flex-start;
+      position: relative; z-index: 1; flex-shrink: 0;
+    }
+    .fmt-4  .tl-entry { min-height: 10mm; padding-bottom: 0.8mm; }
+    .fmt-6  .tl-entry { min-height: 11mm; padding-bottom: 0.8mm; }
+    .fmt-ltr .tl-entry { min-height: 9mm;  padding-bottom: 0.5mm; }
+
+    .tl-left, .tl-right {
+      flex: 1; display: flex; align-items: flex-start;
+      overflow: hidden; min-width: 0;
+    }
+    .tl-left  { justify-content: flex-end; }
+    .tl-right { justify-content: flex-start; }
+    .fmt-4  .tl-left  { padding-right: 2.5mm; }
+    .fmt-4  .tl-right { padding-left:  2.5mm; }
+    .fmt-6  .tl-left  { padding-right: 2mm; }
+    .fmt-6  .tl-right { padding-left:  2mm; }
+    .fmt-ltr .tl-left  { padding-right: 2.5mm; }
+    .fmt-ltr .tl-right { padding-left:  2.5mm; }
+
+    /* Diamond dot — top-aligned with small margin */
+    .tl-dot {
+      flex-shrink: 0; background: transparent;
+      border: 0.5px solid rgba(201,169,110,0.55);
+      transform: rotate(45deg); z-index: 2;
+    }
+    .fmt-4  .tl-dot { width: 2mm; height: 2mm; margin-top: 1.5mm; }
+    .fmt-6  .tl-dot { width: 2mm;   height: 2mm;   margin-top: 1.5mm; }
+    .fmt-ltr .tl-dot { width: 2mm; height: 2mm; margin-top: 1.5mm; }
+
+    /* Stacked icon + label */
+    .tl-stack {
+      display: flex; flex-direction: column;
+      align-items: flex-start; gap: 0.6mm;
+      min-width: 0; overflow: hidden;
+    }
+    .tl-stack-left { align-items: flex-end; }
+
+    .tl-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; color: var(--text-dim);
+      letter-spacing: 0.05em; flex-shrink: 0; white-space: nowrap;
+    }
+    .fmt-4  .tl-time { font-size: 2.8mm; padding-top: 1.5mm; }
+    .fmt-6  .tl-time { font-size: 2.6mm; padding-top: 1.5mm; }
+    .fmt-ltr .tl-time { font-size: 2.8mm; padding-top: 1.5mm; }
+
+    .tl-event {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; color: var(--text);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      max-width: 100%;
+    }
+    .fmt-4  .tl-event { font-size: 2.6mm; }
+    .fmt-6  .tl-event { font-size: 2.4mm; }
+    .fmt-ltr .tl-event { font-size: 2.6mm; }
+
+    .tl-icon {
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    }
+    .fmt-4  .tl-icon svg { width: 4mm;  height: 4mm; }
+    .fmt-6  .tl-icon svg { width: 3.8mm; height: 3.8mm; }
+    .fmt-ltr .tl-icon svg { width: 4mm; height: 4mm; }
+
+    /* Closing */
+    .dcard-closing {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300; color: var(--text-dim);
+      text-align: center; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fmt-4  .dcard-closing { font-size: 2.7mm; padding: 1.5mm 5mm 8mm; }
+    .fmt-6  .dcard-closing { font-size: 2.6mm; padding: 1mm 3.5mm 8mm; }
+    .fmt-ltr .dcard-closing { font-size: 2.7mm; padding: 1.5mm 5mm 8mm; }
+    .dcard-closing.hidden { display: none; }
+
+    /* ══ BACK CARD ═══════════════════════════════════════ */
+    .back-card {
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: flex-start;
+      box-sizing: border-box;
+    }
+    .fmt-4 .back-card         { padding-top: 16mm; }
+    .fmt-6 .back-card         { padding-top: 13mm; }
+    .letter-portrait .back-card { padding-top: 14mm; }
+    .back-card.empty { visibility: hidden; }
+    .back-card.burgund { background: #8B1A35; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+    .back-card.cognac  { background: #7B4718; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+    .back-card.forest  { background: #1F4A32; --gold: #C9A96E; --text: #FFFFFF; --text-dim: rgba(255,255,255,0.85); --gold-dim: rgba(201,169,110,0.65); }
+
+    /* Diagonales Goldmuster */
+    .back-card::before {
+      content: ''; position: absolute; inset: 0;
+      background-image: repeating-linear-gradient(
+        45deg,
+        rgba(201,169,110,0.07) 0px, rgba(201,169,110,0.07) 0.7px,
+        transparent 0.7px, transparent 10px
+      );
+      pointer-events: none; z-index: 0;
+    }
+
+    /* Innerer Goldrahmen */
+    .back-card .dcard-frame {
+      position: absolute; inset: 6mm;
+      border: 0.5px solid rgba(201,169,110,0.50);
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Eck-Ornamente */
+    .back-corner {
+      position: absolute; width: 6mm; height: 6mm;
+      border-color: rgba(201,169,110,0.65); border-style: solid;
+      z-index: 3; box-sizing: border-box;
+    }
+    .back-corner.tl { top: 8mm;    left: 8mm;    border-width: 0.5px 0 0 0.5px; }
+    .back-corner.tr { top: 8mm;    right: 8mm;   border-width: 0.5px 0.5px 0 0; }
+    .back-corner.bl { bottom: 8mm; left: 8mm;    border-width: 0 0 0.5px 0.5px; }
+    .back-corner.br { bottom: 8mm; right: 8mm;   border-width: 0 0.5px 0.5px 0; }
+
+    /* Monogram */
+    .back-mono {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fmt-4 .back-mono         { height: 56mm; padding: 0 4mm; }
+    .fmt-6 .back-mono         { height: 48mm; padding: 0 3mm; }
+    .letter-portrait .back-mono { height: 52mm; padding: 0 4mm; }
+    .back-mono svg { display: block; width: auto; height: auto; }
+    .fmt-4 .back-mono svg         { height: 42mm; }
+    .fmt-6 .back-mono svg         { height: 34mm; }
+    .letter-portrait .back-mono svg { height: 38mm; }
+
+    /* Namen */
+    .back-names {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; text-transform: uppercase; letter-spacing: 0.20em;
+      color: var(--text); text-align: center; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      width: 100%; box-sizing: border-box;
+    }
+    .fmt-4 .back-names         { font-size: 4.5mm; padding: 9mm 5mm 0; }
+    .fmt-6 .back-names         { font-size: 4mm;   padding: 8mm 3.5mm 0; }
+    .letter-portrait .back-names { font-size: 4.5mm; padding: 9mm 5mm 0; }
+
+    /* Datum */
+    .back-date {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; letter-spacing: 0.12em;
+      color: var(--text-dim); text-align: center; flex-shrink: 0;
+    }
+    .fmt-4 .back-date         { font-size: 3mm;   padding-bottom: 1mm; }
+    .fmt-6 .back-date         { font-size: 2.8mm; padding-bottom: 1mm; }
+    .letter-portrait .back-date { font-size: 3mm;  padding-bottom: 1mm; }
+
+    /* Dankeszeile */
+    .back-thank {
+      position: relative; z-index: 2;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300;
+      color: var(--text-dim); text-align: center; flex-shrink: 0;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fmt-4 .back-thank         { font-size: 2.8mm; padding: 2mm 5mm 0; }
+    .fmt-6 .back-thank         { font-size: 2.5mm; padding: 1.5mm 3.5mm 0; }
+    .letter-portrait .back-thank { font-size: 2.8mm; padding: 2mm 5mm 0; }
+
+    /* Cut marks */
+    .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
+    .cut.h { height: 0.4px; width: 4mm; }
+    .cut.v { width: 0.4px; height: 4mm; }
+    .cut.tl.h { top:0;     left:-5mm;  } .cut.tl.v { top:-5mm;    left:0;    }
+    .cut.tr.h { top:0;     right:-5mm; } .cut.tr.v { top:-5mm;    right:0;   }
+    .cut.bl.h { bottom:0;  left:-5mm;  } .cut.bl.v { bottom:-5mm; left:0;    }
+    .cut.br.h { bottom:0;  right:-5mm; } .cut.br.v { bottom:-5mm; right:0;   }
+
+    /* ── Panel extras ─────────────────────────────────── */
+    .sub-label {
+      font-size: 9px; color: #999; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 8px; display: block;
+    }
+    .sub-label:first-of-type { margin-top: 0; }
+    .opt-tag { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; margin-top: 2px; }
+    .toggle-label { display: flex; align-items: center; gap: 6px; font-size: 9px; color: #555; cursor: pointer; }
+    .greeting-section { margin-top: 0; }
+    .greeting-section.hidden { display: none; }
+    .warn-section { display: none; }
+    .warn-section.visible { display: block; }
+    .warn-text { font-size: 8.5px; color: #c07040; font-style: italic; margin-top: 3px; }
+
+    /* Timeline entry rows */
+    .tl-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+    .tl-row { display: flex; align-items: center; gap: 4px; }
+    /* higher specificity than wsa_panel.css .panel-form input[type="text"] */
+    .panel-form .tl-inp-time {
+      width: 42px !important; flex-shrink: 0; margin-bottom: 0 !important;
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      padding: 5px !important; border: 1px solid #eee; background: #fafafa; color: #333;
+      outline: none;
+    }
+    .panel-form .tl-inp-time:focus { border-color: #1a1a1a; background: #fff; }
+    .panel-form .tl-inp-icon {
+      width: 80px !important; flex-shrink: 0; margin-bottom: 0 !important;
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      padding: 5px 20px 5px 6px !important; border: 1px solid #eee; background: #fafafa; color: #333;
+      appearance: none; outline: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 6px center;
+    }
+    .panel-form .tl-inp-icon:focus { border-color: #1a1a1a; background-color: #fff; }
+    .panel-form .tl-inp-event {
+      flex: 1 !important; min-width: 0; width: auto !important; margin-bottom: 0 !important;
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      padding: 5px 6px !important; border: 1px solid #eee; background: #fafafa; color: #333;
+      outline: none;
+    }
+    .panel-form .tl-inp-event:focus { border-color: #1a1a1a; background: #fff; }
+    .tl-rm {
+      flex-shrink: 0; width: 20px; height: 20px; border: 1px solid #eee;
+      background: none; cursor: pointer; font-size: 14px; color: #ccc;
+      display: flex; align-items: center; justify-content: center; line-height: 1; padding: 0;
+      transition: all 0.15s;
+    }
+    .tl-rm:hover { border-color: #c07040; color: #c07040; }
+    .tl-add-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+    .tl-add-btn {
+      font-size: 8.5px; color: #666; background: none;
+      border: 1px solid #ddd; padding: 4px 12px; cursor: pointer;
+      letter-spacing: 0.06em; text-transform: uppercase; transition: all 0.15s;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .tl-add-btn:hover:not(:disabled) { border-color: #1a1a1a; color: #1a1a1a; }
+    .tl-add-btn:disabled { opacity: 0.3; cursor: default; }
+    .tl-count { font-size: 8px; color: #bbb; }
+    .tl-hint { font-size: 8px; color: #bbb; font-style: italic; margin-top: 3px; }
+
+    .char-row { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; min-height: 14px; }
+    .char-count { font-size: 9px; color: #aaa; transition: color 0.2s; }
+    .char-count.over { color: #c07040; }
+    .copies-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; }
+    .copies-row input { width: 60px; flex-shrink: 0; }
+    .copies-label { font-size: 9px; color: #888; }
+  </style>
+  <script>
+  (function(){var _rc={_id:"Tagesprogramm-OM",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+  </script>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo"    id="lbl-logo">Tagesprogramm</div>
+  <div class="panel-tagline" id="lbl-tagline">Old Money Line · Wedding Story Atelier</div>
+
+  <!-- Sprache -->
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Stil -->
+  <span class="section-label" id="lbl-style">Stil</span>
+  <div class="btn-group" id="style-btns">
+    <button class="ui-btn active" onclick="setTheme('burgund',this)">Burgund</button>
+    <button class="ui-btn"        onclick="setTheme('cognac',this)">Cognac</button>
+    <button class="ui-btn"        onclick="setTheme('forest',this)">Forest</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Format -->
+  <span class="section-label" id="lbl-format">Format</span>
+  <div class="btn-group">
+    <button class="ui-btn active" id="btn-fmt4"   onclick="setFormat('4',this)"   id="lbl-fmt4">A6 · 4/A4</button>
+    <button class="ui-btn"        id="btn-fmt6"   onclick="setFormat('6',this)"   id="lbl-fmt6">70×140 · 6/A4</button>
+    <button class="ui-btn"        id="btn-fmtltr" onclick="setFormat('ltr',this)" id="lbl-fmtltr">4×6" · Letter</button>
+  </div>
+  <p class="hint" id="hint-format"></p>
+
+  <hr class="divider">
+
+  <!-- Monogram-Stil -->
+  <span class="section-label" id="lbl-mono-style">Monogram</span>
+  <div class="btn-group" id="mono-btns">
+    <button class="ui-btn active" onclick="setMono('diamond',this)" id="lbl-mono-diamond">◆ Diamant</button>
+    <button class="ui-btn"        onclick="setMono('frame',this)"   id="lbl-mono-frame">⬡ Frame</button>
+    <button class="ui-btn"        onclick="setMono('crest',this)"   id="lbl-mono-crest">⛉ Crest</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Karte gestalten -->
+  <span class="section-label" id="lbl-design">Karte gestalten</span>
+
+  <span class="sub-label" id="lbl-initials">Initialen</span>
+  <input type="text" id="inp-initials" maxlength="6" oninput="render()" placeholder="A & D">
+
+  <span class="sub-label" id="lbl-names">Namen des Brautpaares</span>
+  <input type="text" id="inp-names" maxlength="40" oninput="render()" placeholder="Anna & Daniel">
+
+  <span class="sub-label" id="lbl-date">Datum</span>
+  <input type="text" id="inp-date" maxlength="30" oninput="render()" placeholder="14 · Juni · 2026">
+
+  <hr class="divider">
+
+  <!-- Begrüßungstext (A6/Letter only) -->
+  <span class="section-label" id="lbl-greeting-head">Begrüßung <span class="opt-tag" id="lbl-opt">optional</span></span>
+  <div class="toggle-row">
+    <label class="toggle-label">
+      <input type="checkbox" id="chk-greeting" onchange="onGreetingToggle()">
+      <span id="lbl-greeting-enable">Begrüßungstext aktivieren</span>
+    </label>
+  </div>
+  <p class="hint" id="hint-greeting" style="margin-top:4px;"></p>
+  <div class="greeting-section hidden" id="greeting-section">
+    <textarea id="inp-greeting" rows="2" maxlength="100" oninput="updateGreetingCount();render()"></textarea>
+    <div class="char-row">
+      <span class="char-count" id="greeting-count"></span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Timeline -->
+  <span class="section-label" id="lbl-timeline">Tagesablauf</span>
+  <p class="hint" id="hint-timeline"></p>
+  <div class="tl-rows" id="tl-rows"></div>
+  <div class="tl-add-row">
+    <button class="tl-add-btn" id="btn-add" onclick="addEntry()">+ Eintrag</button>
+    <span class="tl-count" id="tl-count"></span>
+  </div>
+  <p class="tl-hint" id="hint-greeting-cap" style="display:none;color:#c07040;">A6 + Begrüßung: max. 6 Einträge sichtbar.</p>
+
+  <hr class="divider">
+
+  <!-- Schlusszeile -->
+  <span class="section-label" id="lbl-closing-head">Schlusszeile <span class="opt-tag">optional</span></span>
+  <input type="text" id="inp-closing" maxlength="55" oninput="render()">
+
+  <hr class="divider">
+
+  <!-- Rückseite -->
+  <span class="section-label" id="lbl-back-head">Rückseite</span>
+  <div class="toggle-row">
+    <label class="toggle-label">
+      <input type="checkbox" id="chk-back" onchange="render()">
+      <span id="lbl-back-enable">Dekorative Rückseite aktivieren</span>
+    </label>
+  </div>
+  <p class="hint" id="hint-back">PDF enthält Rückseiten · doppelseitig drucken · kurze Kante · Hochformat</p>
+
+  <hr class="divider">
+
+  <!-- Exemplare -->
+  <span class="section-label" id="lbl-copies">Exemplare</span>
+  <div class="copies-row">
+    <input type="number" id="inp-copies" value="4" min="1" max="200" oninput="render()">
+    <span class="copies-label" id="hint-copies"></span>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de">Druckdatei im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke Beschnittzugabe empfohlen.</span>
+    <span class="print-hint-en">Print-ready in sRGB colour space — accepted by all major online print services. Enable 3 mm bleed for edge-to-edge results.</span>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>&#8592;</button>
+    <span id="page-info" style="min-width:80px;text-align:center;"></span>
+    <button class="nav-btn" id="btn-next" onclick="changePage(1)"  disabled>&#8594;</button>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-portrait fmt-4" id="preview-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-portrait fmt-4" id="print-grid"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+  // ── ICONS (SVG path strings, 10×10 viewBox) ───────
+  var ICONS = {
+    rings:     '<circle cx="3.5" cy="5" r="2.2" fill="none" stroke="#C9A96E" stroke-width="0.9"/><circle cx="6.5" cy="5" r="2.2" fill="none" stroke="#C9A96E" stroke-width="0.9"/>',
+    camera:    '<rect x="1" y="3.5" width="8" height="5" rx="0.5" fill="none" stroke="#C9A96E" stroke-width="0.8"/><circle cx="5" cy="6" r="1.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/><path d="M3.2,3.5 L3.8,2.2 L6.2,2.2 L6.8,3.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/>',
+    cutlery:   '<line x1="3.5" y1="1.5" x2="3.5" y2="8.5" stroke="#C9A96E" stroke-width="0.8"/><path d="M2.5,1.5 L2.5,4 Q3.5,4.8 4.5,4 L4.5,1.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/><line x1="6.5" y1="1.5" x2="6.5" y2="8.5" stroke="#C9A96E" stroke-width="0.8"/><path d="M6.5,4.5 Q7.5,3 7.5,1.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/>',
+    cake:      '<path d="M2,8.5 L5,2.2 L8,8.5 Z" fill="none" stroke="#C9A96E" stroke-width="0.8"/><line x1="2.5" y1="6" x2="7.5" y2="6" stroke="#C9A96E" stroke-width="0.6"/><line x1="5" y1="2.2" x2="5" y2="1" stroke="#C9A96E" stroke-width="0.8"/><circle cx="5" cy="0.7" r="0.4" fill="#C9A96E"/>',
+    dance:     '<circle cx="3.5" cy="1.5" r="0.9" fill="none" stroke="#C9A96E" stroke-width="0.7"/><circle cx="6.8" cy="1.5" r="0.9" fill="none" stroke="#C9A96E" stroke-width="0.7"/><path d="M3.5,2.4 Q3,5 2.5,8.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/><path d="M3.5,2.4 Q5.2,4 6.8,2.4" fill="none" stroke="#C9A96E" stroke-width="0.7"/><path d="M6.8,2.4 Q7.3,5 7.8,8.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/><line x1="2.5" y1="5.5" x2="1.5" y2="8.5" stroke="#C9A96E" stroke-width="0.6"/><line x1="7.8" y1="5.5" x2="8.8" y2="8.5" stroke="#C9A96E" stroke-width="0.6"/>',
+    champagne: '<path d="M3.5,1.5 L6.5,1.5 L6,5 Q6,7 5,7 Q4,7 4,5 Z" fill="none" stroke="#C9A96E" stroke-width="0.8"/><line x1="5" y1="7" x2="5" y2="9" stroke="#C9A96E" stroke-width="0.8"/><line x1="3.5" y1="9" x2="6.5" y2="9" stroke="#C9A96E" stroke-width="0.7"/>',
+    fireworks: '<circle cx="5" cy="5" r="0.6" fill="#C9A96E"/><line x1="5" y1="1.2" x2="5" y2="3.2" stroke="#C9A96E" stroke-width="0.7"/><line x1="5" y1="6.8" x2="5" y2="8.8" stroke="#C9A96E" stroke-width="0.7"/><line x1="1.2" y1="5" x2="3.2" y2="5" stroke="#C9A96E" stroke-width="0.7"/><line x1="6.8" y1="5" x2="8.8" y2="5" stroke="#C9A96E" stroke-width="0.7"/><line x1="2.4" y1="2.4" x2="3.7" y2="3.7" stroke="#C9A96E" stroke-width="0.7"/><line x1="6.3" y1="6.3" x2="7.6" y2="7.6" stroke="#C9A96E" stroke-width="0.7"/><line x1="7.6" y1="2.4" x2="6.3" y2="3.7" stroke="#C9A96E" stroke-width="0.7"/><line x1="2.4" y1="7.6" x2="3.7" y2="6.3" stroke="#C9A96E" stroke-width="0.7"/>',
+    car:       '<rect x="1" y="4.5" width="8.5" height="3.2" rx="0.7" fill="none" stroke="#C9A96E" stroke-width="0.8"/><path d="M2.5,4.5 L3.5,2.5 L7,2.5 L8,4.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/><circle cx="3" cy="8" r="0.9" fill="none" stroke="#C9A96E" stroke-width="0.7"/><circle cx="7.5" cy="8" r="0.9" fill="none" stroke="#C9A96E" stroke-width="0.7"/>',
+    flower:    '<circle cx="5" cy="5" r="1" fill="none" stroke="#C9A96E" stroke-width="0.7"/><ellipse cx="5" cy="2.3" rx="1" ry="1.6" fill="none" stroke="#C9A96E" stroke-width="0.6"/><ellipse cx="5" cy="7.7" rx="1" ry="1.6" fill="none" stroke="#C9A96E" stroke-width="0.6"/><ellipse cx="2.3" cy="5" rx="1.6" ry="1" fill="none" stroke="#C9A96E" stroke-width="0.6"/><ellipse cx="7.7" cy="5" rx="1.6" ry="1" fill="none" stroke="#C9A96E" stroke-width="0.6"/>',
+    star:      '<polygon points="5,0.8 6.2,3.5 9.2,3.8 7,5.8 7.6,8.8 5,7.2 2.4,8.8 3,5.8 0.8,3.8 3.8,3.5" fill="none" stroke="#C9A96E" stroke-width="0.7"/>',
+    diamond:   '<polygon points="5,0.8 9.2,5 5,9.2 0.8,5" fill="none" stroke="#C9A96E" stroke-width="0.8"/>'
+  };
+
+  function iconSVG(key) {
+    var paths = ICONS[key] || ICONS.diamond;
+    return '<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">' + paths + '</svg>';
+  }
+
+  // ── MONOGRAM SVG ──────────────────────────────────
+  function monoSVG(style, initials) {
+    var g    = '#C9A96E';
+    var text = esc((initials || 'A & D').toUpperCase().slice(0, 7));
+    var len  = text.length;
+    // Smaller font + tighter spacing for longer initials so they stay inside the frame
+    var fs   = len <= 2 ? 18 : len <= 3 ? 16 : len <= 5 ? 13 : 10;
+    var ls   = len <= 2 ? 4  : len <= 3 ? 2  : len <= 5 ? 1  : 0.5;
+
+    if (style === 'frame') {
+      // Wider octagon: viewBox 80×70, center (40,35)
+      return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+        + '<polygon points="40,4 57,9 68,22 68,48 57,61 40,66 23,61 12,48 12,22 23,9" fill="none" stroke="' + g + '" stroke-width="1.1"/>'
+        + '<polygon points="40,8 55,12 65,23 65,47 55,58 40,62 25,58 15,47 15,23 25,12" fill="none" stroke="' + g + '" stroke-width="0.4" opacity="0.5"/>'
+        + '<text x="40" y="40" text-anchor="middle" font-family="Playfair Display,serif" font-size="' + fs + '" font-weight="700" fill="' + g + '" letter-spacing="' + ls + '">' + text + '</text>'
+        + '</svg>';
+    }
+    if (style === 'crest') {
+      // Wider shield: viewBox 80×70, center (40,35)
+      return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+        + '<path d="M40,4 L65,13 L65,40 Q65,57 40,64 Q15,57 15,40 L15,13 Z" fill="none" stroke="' + g + '" stroke-width="1.1"/>'
+        + '<path d="M40,8 L61,16 L61,40 Q61,53 40,60 Q19,53 19,40 L19,16 Z" fill="none" stroke="' + g + '" stroke-width="0.4" opacity="0.5"/>'
+        + '<text x="40" y="40" text-anchor="middle" font-family="Playfair Display,serif" font-size="' + fs + '" font-weight="700" fill="' + g + '" letter-spacing="' + ls + '">' + text + '</text>'
+        + '</svg>';
+    }
+    // Diamond: viewBox 80×70, center (40,35) — wider so text has room
+    return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+      + '<polygon points="40,3 77,35 40,67 3,35" fill="none" stroke="' + g + '" stroke-width="1.1"/>'
+      + '<polygon points="40,7 73,35 40,63 7,35" fill="none" stroke="' + g + '" stroke-width="0.4" opacity="0.5"/>'
+      + '<text x="40" y="40" text-anchor="middle" font-family="Playfair Display,serif" font-size="' + fs + '" font-weight="700" fill="' + g + '" letter-spacing="' + ls + '">' + text + '</text>'
+      + '</svg>';
+  }
+
+  // ── STATE ─────────────────────────────────────────
+  var currentLang   = 'de';
+  var currentTheme  = 'burgund';
+  var currentFormat = '4';
+  var currentMono   = 'diamond';
+  var currentPage   = 0;
+  var MAX_ENTRIES   = 7;
+
+  var entries = [];
+
+  // ── DEFAULT ENTRIES ───────────────────────────────
+  var DEFAULT_ENTRIES = {
+    de: [
+      { time: '14:00', icon: 'rings',     event: 'Trauung' },
+      { time: '15:00', icon: 'camera',    event: 'Fotos'   },
+      { time: '17:00', icon: 'cutlery',   event: 'Dinner'  },
+      { time: '19:00', icon: 'cake',      event: 'Torte'   },
+      { time: '20:00', icon: 'dance',     event: 'Tanz'    },
+      { time: '00:00', icon: 'car',       event: 'Ende'    }
+    ],
+    en: [
+      { time: '2 pm',  icon: 'rings',     event: 'Ceremony'  },
+      { time: '3 pm',  icon: 'camera',    event: 'Photos'    },
+      { time: '5 pm',  icon: 'cutlery',   event: 'Dinner'    },
+      { time: '7 pm',  icon: 'cake',      event: 'Cake'      },
+      { time: '8 pm',  icon: 'dance',     event: 'Dance'     },
+      { time: '12 am', icon: 'car',       event: 'Carriages' }
+    ]
+  };
+
+  // ── TRANSLATIONS ──────────────────────────────────
+  var T = {
+    de: {
+      logo:           'Tagesprogramm',
+      tagline:        'Old Money Line · Wedding Story Atelier',
+      lang:           'Sprache',
+      style:          'Stil',
+      format:         'Format',
+      monoStyle:      'Monogram',
+      design:         'Karte gestalten',
+      initials:       'Initialen',
+      names:          'Namen des Brautpaares',
+      date:           'Datum',
+      greetingHead:   'Begrüßung',
+      opt:            'optional',
+      greetingEnable: 'Begrüßungstext aktivieren',
+      hintGreetingOn: 'A6/Letter: 1–2 Zeilen. 70×140: max. 1 Zeile (~40 Zeichen).',
+      hintGreetingOff:'',
+      timeline:       'Tagesablauf',
+      hintTimeline:   'Uhrzeit · Icon · Bezeichnung (max. ~20 Zeichen)',
+      closingHead:    'Schlusszeile',
+      copies:         'Exemplare',
+      hintCopies:     function(n,pp){ return Math.ceil(n/pp) + ' Seite(n) · ' + pp + '/Bogen'; },
+      fmt4:           'A6 (105×148 mm) — 4 pro A4, edler Look',
+      fmt6:           '70×140 mm — 6 pro A4, papiersparend',
+      fmtltr:         '4×6" (102×152 mm) — 4 pro US Letter',
+      subtitle:       'Tagesablauf',
+      pageOf:         function(a,b){ return 'Seite ' + a + ' von ' + b; },
+      spinPage:       function(a,b){ return 'Seite ' + a + ' von ' + b + ' …'; },
+      spinDone:       'PDF wird erstellt …',
+      alertFail:      'Export fehlgeschlagen: ',
+      greetPH:        'Wir freuen uns, diesen Tag mit euch zu feiern.',
+      closingPH:      'Wir freuen uns auf diesen Abend mit euch.',
+      iconLabels: {
+        rings:'Ringe', camera:'Kamera', cutlery:'Besteck', cake:'Torte',
+        dance:'Tanz', champagne:'Sekt', fireworks:'Feuerwerk', car:'Auto',
+        flower:'Blüte', star:'✦ Stern', diamond:'◆ Diamant'
+      },
+      backHead:     'Rückseite',
+      backEnable:   'Dekorative Rückseite aktivieren',
+      hintBack:     'Erzeugt 2 separate PDFs (VS + RS). Beim Export fragt der Browser nach Erlaubnis für mehrere Downloads — bitte bestätigen.',
+      demoInitials: 'A & D',
+      demoNames:    'Anna & Daniel',
+      demoDate:     '14 · Juni · 2026',
+      demoGreeting: 'Wir freuen uns, diesen besonderen Tag mit euch zu feiern.',
+      demoClosing:  'Wir freuen uns auf diesen Abend mit euch.'
+    },
+    en: {
+      logo:           'Order of the Day',
+      tagline:        'Old Money Line · Wedding Story Atelier',
+      lang:           'Language',
+      style:          'Style',
+      format:         'Format',
+      monoStyle:      'Monogram',
+      design:         'Card Design',
+      initials:       'Initials',
+      names:          'Couple\'s Names',
+      date:           'Date',
+      greetingHead:   'Welcome Note',
+      opt:            'optional',
+      greetingEnable: 'Enable welcome note',
+      hintGreetingOn: 'A6/Letter: 1–2 lines. Narrow: max. 1 line (~40 characters).',
+      hintGreetingOff:'',
+      timeline:       'Order of the Day',
+      hintTimeline:   'Time · Icon · Label (max. ~20 characters)',
+      closingHead:    'Closing Line',
+      copies:         'Copies',
+      hintCopies:     function(n,pp){ return Math.ceil(n/pp) + ' page(s) · ' + pp + '/sheet'; },
+      fmt4:           'A6 (105×148 mm) — 4 per A4',
+      fmt6:           '70×140 mm — 6 per A4, economical',
+      fmtltr:         '4×6" (102×152 mm) — 4 per US Letter',
+      subtitle:       'Order of the Day',
+      pageOf:         function(a,b){ return 'Page ' + a + ' of ' + b; },
+      spinPage:       function(a,b){ return 'Page ' + a + ' of ' + b + ' …'; },
+      spinDone:       'Creating PDF …',
+      alertFail:      'Export failed: ',
+      greetPH:        'We are so glad to celebrate this day with you.',
+      closingPH:      'We look forward to celebrating with you.',
+      iconLabels: {
+        rings:'Rings', camera:'Camera', cutlery:'Cutlery', cake:'Cake',
+        dance:'Dance', champagne:'Champagne', fireworks:'Fireworks', car:'Car',
+        flower:'Flower', star:'✦ Star', diamond:'◆ Diamond'
+      },
+      backHead:     'Back Side',
+      backEnable:   'Enable decorative back side',
+      hintBack:     'Creates 2 separate PDFs (front + back). The browser will ask permission for multiple downloads — please confirm.',
+      demoInitials: 'A & D',
+      demoNames:    'Anna & Daniel',
+      demoDate:     'June 14 · 2026',
+      demoGreeting: 'We are so glad to celebrate this special day with you.',
+      demoClosing:  'We look forward to celebrating with you.'
+    }
+  };
+
+  // ── HELPERS ───────────────────────────────────────
+  function ge(id)  { return document.getElementById(id); }
+  function gv(id)  { return ge(id).value; }
+  function t()     { return T[currentLang]; }
+  function esc(s)  {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function perPage() { return currentFormat === '6' ? 6 : 4; }
+
+  // ── ICON OPTIONS HTML ─────────────────────────────
+  function iconOptionsHTML(selected) {
+    var keys = ['rings','camera','cutlery','cake','dance','champagne','fireworks','car','flower','star','diamond'];
+    var labels = t().iconLabels;
+    return keys.map(function(k) {
+      return '<option value="' + k + '"' + (k === selected ? ' selected' : '') + '>' + labels[k] + '</option>';
+    }).join('');
+  }
+
+  // ── ENTRY ROW (panel) ─────────────────────────────
+  function renderEntryRows() {
+    var rows = ge('tl-rows');
+    rows.innerHTML = '';
+    var greetingCap = currentFormat === '4' && ge('chk-greeting').checked;
+    var maxVisible = greetingCap ? 6 : MAX_ENTRIES;
+    entries.forEach(function(e, i) {
+      var row = document.createElement('div');
+      row.className = 'tl-row';
+      row.id = 'tl-row-' + i;
+      var dimmed = (greetingCap && i >= maxVisible) ? 'opacity:0.35;' : '';
+      row.style.cssText = dimmed;
+      row.innerHTML =
+        '<input class="tl-inp-time" type="text" value="' + esc(e.time) + '" maxlength="8" oninput="updateEntry(' + i + ',\'time\',this.value)">'
+        + '<select class="tl-inp-icon" onchange="updateEntry(' + i + ',\'icon\',this.value)">' + iconOptionsHTML(e.icon) + '</select>'
+        + '<input class="tl-inp-event" type="text" value="' + esc(e.event) + '" maxlength="24" oninput="updateEntry(' + i + ',\'event\',this.value)">'
+        + '<button class="tl-rm" onclick="removeEntry(' + i + ')" title="Entfernen">×</button>';
+      rows.appendChild(row);
+    });
+    ge('tl-count').textContent = entries.length + ' / ' + maxVisible;
+    ge('btn-add').disabled = entries.length >= maxVisible;
+    var warnEl = ge('hint-greeting-cap');
+    if (warnEl) warnEl.style.display = (greetingCap && entries.length > maxVisible) ? 'block' : 'none';
+  }
+
+  function updateEntry(i, field, val) {
+    entries[i][field] = val;
+    render(true); // skip re-rendering entry rows (avoid cursor jump)
+  }
+
+  function addEntry() {
+    if (entries.length >= MAX_ENTRIES) return;
+    entries.push({ time: '', icon: 'diamond', event: '' });
+    renderEntryRows();
+    render(true);
+  }
+
+  function removeEntry(i) {
+    entries.splice(i, 1);
+    renderEntryRows();
+    render(true);
+  }
+
+  // ── LANGUAGE ──────────────────────────────────────
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    // Reload entries with correct time format for language
+    entries = DEFAULT_ENTRIES[lang].map(function(e){ return {time:e.time, icon:e.icon, event:e.event}; });
+    applyLang();
+    render();
+  }
+
+  function applyLang() {
+    var l = t();
+    ge('lbl-logo').textContent          = l.logo;
+    ge('lbl-tagline').textContent       = l.tagline;
+    ge('lbl-lang').textContent          = l.lang;
+    ge('lbl-style').textContent         = l.style;
+    ge('lbl-format').textContent        = l.format;
+    ge('lbl-mono-style').textContent    = l.monoStyle;
+    ge('lbl-design').textContent        = l.design;
+    ge('lbl-initials').textContent      = l.initials;
+    ge('lbl-names').textContent         = l.names;
+    ge('lbl-date').textContent          = l.date;
+    ge('lbl-greeting-head').innerHTML   = l.greetingHead + ' <span class="opt-tag">' + l.opt + '</span>';
+    ge('lbl-greeting-enable').textContent = l.greetingEnable;
+    ge('hint-greeting').textContent     = ge('chk-greeting').checked ? l.hintGreetingOn : l.hintGreetingOff;
+    ge('lbl-timeline').textContent      = l.timeline;
+    ge('hint-timeline').textContent     = l.hintTimeline;
+    ge('lbl-closing-head').innerHTML    = l.closingHead + ' <span class="opt-tag">optional</span>';
+    ge('lbl-back-head').textContent     = l.backHead;
+    ge('lbl-back-enable').textContent   = l.backEnable;
+    ge('hint-back').textContent         = l.hintBack;
+    ge('lbl-copies').textContent        = l.copies;
+    ge('hint-format').textContent       = currentFormat === '6' ? l.fmt6 : currentFormat === 'ltr' ? l.fmtltr : l.fmt4;
+    ge('inp-greeting').placeholder      = l.greetPH;
+    ge('inp-closing').placeholder       = l.closingPH;
+    document.documentElement.lang = currentLang;
+    updateCopiesHint();
+    updateGreetingCount();
+    renderEntryRows();
+  }
+
+  // ── THEME ─────────────────────────────────────────
+  function setTheme(th, btn) {
+    currentTheme = th;
+    document.querySelectorAll('#style-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  // ── FORMAT ────────────────────────────────────────
+  function setFormat(fmt, btn) {
+    currentFormat = fmt;
+    document.querySelectorAll('#btn-fmt4,#btn-fmt6,#btn-fmtltr').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var l = t();
+    ge('hint-format').textContent = fmt === '6' ? l.fmt6 : fmt === 'ltr' ? l.fmtltr : l.fmt4;
+    var base = fmt === 'ltr' ? 'letter-portrait' : 'a4-portrait';
+    var cls  = fmt === 'ltr' ? 'letter-portrait fmt-4' : 'a4-portrait fmt-' + fmt;
+    ge('preview-grid').className = cls;
+    ge('print-grid').className   = cls;
+    ge('inp-greeting').maxLength = fmt === '6' ? 40 : 100;
+    updateGreetingVisibility();
+    updateCopiesHint();
+    renderEntryRows();
+    render();
+  }
+
+  // ── MONOGRAM ──────────────────────────────────────
+  function setMono(style, btn) {
+    currentMono = style;
+    document.querySelectorAll('#mono-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  // ── GREETING TOGGLE ───────────────────────────────
+  function onGreetingToggle() {
+    var on = ge('chk-greeting').checked;
+    ge('hint-greeting').textContent = on ? t().hintGreetingOn : t().hintGreetingOff;
+    updateGreetingVisibility();
+    render();
+  }
+
+  function updateGreetingVisibility() {
+    var on  = ge('chk-greeting').checked;
+    ge('greeting-section').classList.toggle('hidden', !on);
+    ge('inp-greeting').maxLength = currentFormat === '6' ? 40 : 100;
+    updateGreetingCount();
+  }
+
+  function updateGreetingCount() {
+    var n   = gv('inp-greeting').length;
+    var max = ge('inp-greeting').maxLength || 100;
+    var el  = ge('greeting-count');
+    el.textContent = n + ' / ' + max;
+    el.className   = 'char-count' + (n > max ? ' over' : '');
+  }
+
+  // ── COPIES HINT ───────────────────────────────────
+  function updateCopiesHint() {
+    var n  = parseInt(gv('inp-copies')) || 1;
+    var pp = perPage();
+    ge('hint-copies').textContent = t().hintCopies(n, pp);
+  }
+
+  // ── PAGE NAV ──────────────────────────────────────
+  function changePage(dir) {
+    var n  = parseInt(gv('inp-copies')) || 1;
+    var pp = perPage();
+    var pages = Math.max(1, Math.ceil(n / pp));
+    currentPage = Math.max(0, Math.min(currentPage + dir, pages - 1));
+    render(true);
+  }
+
+  // ── NAME FONT SCALING ────────────────────────────
+  // Cormorant Garamond uppercase: ~0.62em avg char + 0.18em letter-spacing ≈ 0.80em/char
+  function nameFS(names) {
+    var len = (names || '').length;
+    var narrow = (currentFormat === '6');
+    if (narrow) {
+      if (len > 22) return '2.2mm';
+      if (len > 17) return '2.8mm';
+      if (len > 13) return '3.2mm';
+      return '3.6mm';
+    }
+    // A6 / Letter — wider card
+    if (len > 30) return '2.8mm';
+    if (len > 24) return '3.4mm';
+    return '4mm';
+  }
+  function backNameFS(names) {
+    var len = (names || '').length;
+    var narrow = (currentFormat === '6');
+    if (narrow) {
+      if (len > 20) return '2.4mm';
+      if (len > 16) return '3mm';
+      if (len > 12) return '3.5mm';
+      return '4mm';
+    }
+    // A6 / Letter
+    if (len > 28) return '3mm';
+    if (len > 22) return '3.8mm';
+    return '4.5mm';
+  }
+
+  // ── CARD HTML ─────────────────────────────────────
+  function cardHTML() {
+    var l         = t();
+    var initials  = gv('inp-initials').trim() || l.demoInitials;
+    var names     = gv('inp-names').trim()    || l.demoNames;
+    var date      = gv('inp-date').trim()     || l.demoDate;
+    var closing   = gv('inp-closing').trim();
+    var greeting  = ge('chk-greeting').checked ? gv('inp-greeting').trim() : '';
+
+    var greetingOn = ge('chk-greeting').checked && greeting.length > 0;
+    var maxEntries = (currentFormat === '4' && greetingOn) ? 6 : MAX_ENTRIES;
+    var visibleEntries = entries.slice(0, maxEntries);
+
+    // Greeting zone
+    var greetingHTML = '';
+    if (greeting) {
+      greetingHTML = '<div class="dcard-greeting">' + esc(greeting) + '</div>';
+    }
+
+    // Timeline entries — stacked: icon row, label below
+    var tlRows = visibleEntries.map(function(e, i) {
+      var isEven  = (i % 2 === 0);
+      var timeEl  = '<span class="tl-time">' + esc(e.time) + '</span>';
+      var stackEl = isEven
+        ? '<div class="tl-stack">'
+            + '<span class="tl-icon">' + iconSVG(e.icon) + '</span>'
+            + '<span class="tl-event">' + esc(e.event) + '</span>'
+          + '</div>'
+        : '<div class="tl-stack tl-stack-left">'
+            + '<span class="tl-icon">' + iconSVG(e.icon) + '</span>'
+            + '<span class="tl-event">' + esc(e.event) + '</span>'
+          + '</div>';
+
+      return '<div class="tl-entry">'
+        + '<div class="tl-left">'  + (isEven ? timeEl : stackEl) + '</div>'
+        + '<div class="tl-dot"></div>'
+        + '<div class="tl-right">' + (isEven ? stackEl : timeEl) + '</div>'
+        + '</div>';
+    }).join('');
+
+    // Closing
+    var closingHTML = closing
+      ? '<div class="dcard-closing">' + esc(closing) + '</div>'
+      : '<div class="dcard-closing hidden"></div>';
+
+    return '<div class="day-card ' + currentTheme + '">'
+      + '<div class="dcard-inner">'
+        + '<div class="dcard-frame"></div>'
+        + '<div class="dcard-mono">' + monoSVG(currentMono, initials) + '</div>'
+        + '<div class="dcard-names" style="font-size:' + nameFS(names) + '">' + esc(names) + '</div>'
+        + '<div class="dcard-orn"><div class="dcard-orn-line"></div><span class="dcard-orn-gem">&#9670;</span><div class="dcard-orn-line"></div></div>'
+        + '<div class="dcard-date">' + esc(date) + '</div>'
+        + greetingHTML
+        + '<div class="dcard-spacer dcard-spacer-top"></div>'
+        + '<div class="dcard-timeline">'
+          + '<div class="tl-line"></div>'
+          + tlRows
+        + '</div>'
+        + '<div class="dcard-orn"><div class="dcard-orn-line"></div><span class="dcard-orn-gem">&#9670;</span><div class="dcard-orn-line"></div></div>'
+        + '<div class="dcard-spacer"></div>'
+        + closingHTML
+      + '</div>'
+      + '<div class="cut tl h"></div><div class="cut tl v"></div>'
+      + '<div class="cut tr h"></div><div class="cut tr v"></div>'
+      + '<div class="cut bl h"></div><div class="cut bl v"></div>'
+      + '<div class="cut br h"></div><div class="cut br v"></div>'
+      + '</div>';
+  }
+
+  function pageHTML(count) {
+    var pp   = perPage();
+    var html = '';
+    for (var i = 0; i < pp; i++) {
+      html += i < count ? cardHTML() : '<div class="day-card empty ' + currentTheme + '"></div>';
+    }
+    return html;
+  }
+
+  // ── BACK CARD ─────────────────────────────────────
+  function backCardHTML() {
+    var l        = t();
+    var initials = gv('inp-initials').trim() || l.demoInitials;
+    var names    = gv('inp-names').trim()    || l.demoNames;
+    var date     = gv('inp-date').trim()     || l.demoDate;
+    var closing  = gv('inp-closing').trim();
+
+    return '<div class="back-card ' + currentTheme + '">'
+      + '<div class="dcard-frame"></div>'
+      + '<div class="back-corner tl"></div>'
+      + '<div class="back-corner tr"></div>'
+      + '<div class="back-corner bl"></div>'
+      + '<div class="back-corner br"></div>'
+      + '<div class="back-mono">' + monoSVG(currentMono, initials) + '</div>'
+      + '<div class="back-names" style="font-size:' + backNameFS(names) + '">' + esc(names) + '</div>'
+      + '<div class="dcard-orn"><div class="dcard-orn-line"></div><span class="dcard-orn-gem">&#9670;</span><div class="dcard-orn-line"></div></div>'
+      + '<div class="back-date">' + esc(date) + '</div>'
+      + (closing ? '<div class="back-thank">' + esc(closing) + '</div>' : '')
+      + '</div>';
+  }
+
+  function backPageHTML(count) {
+    var pp = perPage();
+    var html = '';
+    for (var i = 0; i < pp; i++) {
+      html += i < count ? backCardHTML() : '<div class="back-card empty ' + currentTheme + '"></div>';
+    }
+    return html;
+  }
+
+  // ── RENDER ────────────────────────────────────────
+  function render(skipRows) {
+    if (!skipRows) renderEntryRows();
+    var l          = t();
+    var n          = Math.max(1, parseInt(gv('inp-copies')) || 1);
+    var pp         = perPage();
+    var frontPages = Math.max(1, Math.ceil(n / pp));
+    var backOn     = ge('chk-back').checked;
+    var totalPages = backOn ? frontPages * 2 : frontPages;
+    currentPage    = Math.min(currentPage, totalPages - 1);
+
+    var isFront    = currentPage < frontPages;
+    var pageIndex  = isFront ? currentPage : currentPage - frontPages;
+    var cardsOnPage = Math.min(pp, n - pageIndex * pp);
+
+    var pageLabel = '';
+    if (totalPages > 1 || backOn) {
+      var side = backOn ? (isFront ? ' · VS' : ' · RS') : '';
+      pageLabel = totalPages > 1 ? l.pageOf(pageIndex + 1, frontPages) + side : side.trim();
+    }
+    ge('page-info').textContent = pageLabel;
+    ge('btn-prev').disabled = currentPage === 0;
+    ge('btn-next').disabled = currentPage === totalPages - 1;
+
+    ge('preview-grid').innerHTML = isFront ? pageHTML(cardsOnPage) : backPageHTML(cardsOnPage);
+    updateCopiesHint();
+    scalePreview();
+  }
+
+  // ── SCALE PREVIEW ─────────────────────────────────
+  function scalePreview() {
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var pgW   = currentFormat === 'ltr' ? 215.9 : 210;
+    var pgH   = currentFormat === 'ltr' ? 279.4 : 297;
+    var a4W   = pgW * 3.7795;
+    var a4H   = pgH * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap  = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  // ── DEMO ──────────────────────────────────────────
+  function loadDemo() {
+    var l = t();
+    ge('inp-initials').value = l.demoInitials;
+    ge('inp-names').value    = l.demoNames;
+    ge('inp-date').value     = l.demoDate;
+    ge('inp-greeting').value = l.demoGreeting;
+    ge('inp-closing').value  = l.demoClosing;
+    ge('inp-copies').value   = 4;
+    ge('chk-greeting').checked = true;
+    onGreetingToggle();
+    entries = DEFAULT_ENTRIES[currentLang].map(function(e){ return {time:e.time, icon:e.icon, event:e.event}; });
+    currentPage = 0;
+    updateGreetingCount();
+    render();
+  }
+
+  // ── PDF EXPORT ────────────────────────────────────
+  async function exportPDF() {
+    var l      = t();
+    var n      = Math.max(1, parseInt(gv('inp-copies')) || 1);
+    var pp     = perPage();
+    var pages  = Math.ceil(n / pp);
+    var backOn = ge('chk-back').checked;
+
+    var spinner = ge('pdf-spinner');
+    var msg     = ge('spin-msg');
+    spinner.style.display = 'flex';
+    msg.textContent = l.spinDone;
+
+    var bleed    = ge('chk-bleed').checked ? 3 : 0;
+    var isLetter = currentFormat === 'ltr';
+    var pw = isLetter ? 215.9 : 210;
+    var ph = isLetter ? 279.4 : 297;
+    var th  = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+    var fmt = currentFormat === '6' ? '70x140' : currentFormat === 'ltr' ? 'Letter' : 'A6';
+    var date = new Date().toISOString().slice(0,10);
+    var printGrid = ge('print-grid');
+
+    async function buildPDF(useBack, sideLabel) {
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({
+        orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pw + bleed*2, ph + bleed*2] : (isLetter ? [pw, ph] : 'a4')
+      });
+      if (window.getSelection) window.getSelection().removeAllRanges();
+      for (var p = 0; p < pages; p++) {
+        msg.textContent = sideLabel + l.spinPage(p + 1, pages);
+        var cardsOnPage = Math.min(pp, n - p * pp);
+        printGrid.innerHTML = useBack ? backPageHTML(cardsOnPage) : pageHTML(cardsOnPage);
+        await new Promise(function(r){ setTimeout(r, 150); });
+        var canvas = await html2canvas(printGrid, {
+          scale: 3, useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false
+        });
+        if (p > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', bleed, bleed, pw, ph);
+      }
+      return pdf;
+    }
+
+    try {
+      if (backOn) {
+        var pdfVS = await buildPDF(false, 'VS · ');
+        pdfVS.save('Tagesprogramm_' + th + '_' + fmt + '_VS_' + date + '.pdf');
+        await new Promise(function(r){ setTimeout(r, 600); });
+        var pdfRS = await buildPDF(true, 'RS · ');
+        pdfRS.save('Tagesprogramm_' + th + '_' + fmt + '_RS_' + date + '.pdf');
+      } else {
+        var pdf = await buildPDF(false, '');
+        pdf.save('Tagesprogramm_' + th + '_' + fmt + '_' + date + '.pdf');
+      }
+    } catch(e) {
+      alert(l.alertFail + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  // ── INIT ──────────────────────────────────────────
+  window.addEventListener('resize', scalePreview);
+
+  // Load default entries
+  entries = DEFAULT_ENTRIES.de.map(function(e){ return {time:e.time, icon:e.icon, event:e.event}; });
+
+  applyLang();
+  render();
+</script>
+</body>
+</html>

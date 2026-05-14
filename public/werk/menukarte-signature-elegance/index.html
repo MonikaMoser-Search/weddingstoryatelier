@@ -1,0 +1,1406 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Menükarte — Signature Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ══ Generator-spezifische Ergänzungen ══ */
+
+    /* Tab buttons */
+    .tab-group { display: flex; gap: 3px; margin-bottom: 2px; }
+    .tab-btn {
+      flex: 1; padding: 6px 4px; font-size: 9px;
+      border: 1px solid #d8d5d0; background: #fff; cursor: pointer;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s; color: #444;
+    }
+    .tab-btn:hover  { border-color: #1A1A1A; color: #1A1A1A; }
+    .tab-btn.active { background: #1A1A1A; color: #fff; border-color: #1A1A1A; }
+
+    /* Textarea min-height override */
+    .panel-form textarea { resize: vertical; min-height: 60px; line-height: 1.5; }
+
+    /* Gang blocks */
+    .gang-block {
+      border: 1px solid #f0ede9; margin-bottom: 8px;
+      background: #fdfcfb;
+    }
+    .gang-header {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 9px 0; cursor: default;
+    }
+    .gang-num { font-size: 8px; color: #777; text-transform: uppercase;
+                letter-spacing: 1px; flex: 1; }
+    .gang-remove {
+      font-size: 9px; color: #ccc; background: none; border: none;
+      cursor: pointer; padding: 2px 4px; line-height: 1;
+    }
+    .gang-remove:hover { color: #c0392b; }
+    .gang-body { padding: 6px 9px 8px; }
+
+    /* Allergen toggle + grid */
+    .alg-toggle {
+      font-size: 8px; color: #666; background: none; border: none;
+      cursor: pointer; text-transform: uppercase; letter-spacing: 1px;
+      padding: 4px 0 2px; display: block;
+    }
+    .alg-toggle:hover { color: #1A1A1A; }
+    .alg-grid {
+      display: none; grid-template-columns: 1fr 1fr;
+      gap: 2px 8px; margin-top: 4px;
+    }
+    .alg-grid.open { display: grid; }
+    .alg-item { display: flex; align-items: center; gap: 4px;
+                font-size: 9.5px; color: #555; cursor: pointer; }
+    .alg-item input { width: 11px; height: 11px; cursor: pointer;
+                      accent-color: #1A1A1A; margin: 0; flex-shrink: 0; }
+
+    /* Add gang button */
+    .btn-add {
+      width: 100%; padding: 7px; border: 1px dashed #bbb;
+      background: #fff; font-family: 'DM Sans', sans-serif;
+      font-size: 9px; text-transform: uppercase; letter-spacing: 1px;
+      color: #555; cursor: pointer; transition: all 0.15s;
+    }
+    .btn-add:hover { border-color: #1A1A1A; color: #1A1A1A; }
+
+    /* Slider labels */
+    .slider-row { display: flex; align-items: center; gap: 8px; }
+    .slider-lbl { font-size: 8px; color: #666; min-width: 18px; }
+
+    /* Card-section visibility */
+    .card-section { display: none; }
+    .card-section.visible { display: block; }
+
+    /* ── Generator-specific action buttons ── */
+    .btn-export-all {
+      flex: 2; padding: 9px 4px; background: #5C4A3A; color: #fff; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 8px; text-transform: uppercase;
+      letter-spacing: 1px; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-export-all:hover { background: #7A6350; }
+
+    /* Dot indicators for style buttons */
+    .dot { width: 7px; height: 7px; border-radius: 50%;
+           display: inline-block; margin-right: 3px; vertical-align: middle; }
+    .dot-dark   { background: #1A1A1A; }
+    .dot-garden { background: #4A7C3F; }
+
+    /* ══ CARD (A5 Hochformat) ════════════════════════════ */
+    #card {
+      width: 560px; height: 792px;
+      position: relative; overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.22);
+      flex-shrink: 0;
+      display: flex; flex-direction: column;
+      font-size: calc(10pt * var(--fs-scale, 1));
+    }
+
+    /* ── Themes (gleiche Namen wie Sitzplan Signature Line) ── */
+    #card.highland {
+      background: #FEFCF7; color: #2B4A1F;
+      border: 14px solid #2B4A1F;
+      --accent: #C9A96E; --frame: rgba(43,74,31,0.38);
+      --label: rgba(43,74,31,0.72); --desc: #3D5C30;
+      --rule: rgba(43,74,31,0.18); --title-color: #2B4A1F;
+      --footer-color: rgba(43,74,31,0.55);
+    }
+    #card.coastal {
+      background: #FAFCFE; color: #1A4A6B;
+      border: 14px solid #1A4A6B;
+      --accent: #C9A96E; --frame: rgba(26,74,107,0.38);
+      --label: rgba(26,74,107,0.72); --desc: #255070;
+      --rule: rgba(26,74,107,0.18); --title-color: #1A4A6B;
+      --footer-color: rgba(26,74,107,0.55);
+    }
+    #card.classic {
+      background: #FFFFFF; color: #1A1A1A;
+      --accent: #C9A96E; --frame: rgba(0,0,0,0.22);
+      --label: rgba(0,0,0,0.68); --desc: #444444;
+      --rule: rgba(0,0,0,0.14); --title-color: #1A1A1A;
+      --footer-color: #666666;
+    }
+
+    /* ── Inner frame ── */
+    .card-frame-inner {
+      position: absolute; inset: 7mm; pointer-events: none; z-index: 1;
+      border: 1px solid var(--frame);
+    }
+    /* Classic gets outer frame too (no thick border) */
+    #card.classic .card-frame-inner { inset: 8px; }
+    .card-frame-outer {
+      display: none;
+    }
+    #card.classic .card-frame-outer {
+      display: block; position: absolute; inset: 14px;
+      pointer-events: none; z-index: 1;
+      border: 0.5px solid rgba(0,0,0,0.12);
+    }
+
+    /* ── Body ── */
+    .card-body {
+      flex: 1; position: relative; z-index: 2;
+      padding: 11mm 14mm 9mm;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .card-eyebrow {
+      font-family: 'DM Sans', sans-serif;
+      font-size: calc(0.65em); letter-spacing: 0.45em;
+      color: var(--label);
+      text-align: center; margin-bottom: 2mm;
+    }
+    .card-eyebrow-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: calc(0.82em);
+      color: var(--label); text-align: center;
+      margin-bottom: 3mm; letter-spacing: 0.08em;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: calc(2.4em); font-weight: 700;
+      letter-spacing: 0.28em;
+      text-align: center; color: var(--title-color);
+      line-height: 1.1; margin-bottom: 3mm;
+    }
+    .card-accent-rule {
+      width: 32px; height: 1.5px;
+      background: var(--accent); margin: 0 auto 5mm;
+    }
+
+    /* ── Content area — verteilt Sektionen gleichmäßig ── */
+    .card-content {
+      flex: 1;
+      display: flex; flex-direction: column;
+      justify-content: space-evenly;
+    }
+
+    /* ── Menu sections ── */
+    .menu-section { }
+
+    /* ── Ornament-Trenner (Linie · ◆ · Linie) ── */
+    .orn-sep {
+      display: flex; align-items: center; gap: 5px;
+      margin: 0 auto; width: 85%;
+      padding: 1mm 0;
+    }
+    .orn-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .orn-gem  {
+      font-size: 5px; line-height: 1; flex-shrink: 0;
+      color: var(--accent); letter-spacing: 0;
+    }
+    .section-cat {
+      font-family: 'DM Sans', sans-serif;
+      font-size: calc(0.6em); letter-spacing: 0.28em;
+      color: var(--label);
+      text-align: center; margin-bottom: calc(var(--gap-scale, 1) * 1.5mm);
+    }
+    .course-name {
+      font-family: 'Playfair Display', serif;
+      font-weight: 700; font-style: normal;
+      font-size: calc(1.2em); text-align: center;
+      line-height: 1.25; margin-bottom: 1mm;
+      color: inherit;
+    }
+    .allergen-a {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.52em; font-weight: 500; font-style: normal;
+      vertical-align: super; margin-left: 2px;
+      color: var(--accent); letter-spacing: 0;
+    }
+    .course-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-size: calc(0.96em);
+      text-align: center; color: var(--desc); line-height: 1.45;
+    }
+
+    /* ── Wine sections ── */
+    .wine-section { }
+    .wine-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: italic;
+      font-size: calc(1.22em); text-align: center;
+      line-height: 1.4; margin-bottom: 0.5mm;
+    }
+
+    /* ── Cocktail / Getränke sections ── */
+    .drink-section { }
+    .drink-item {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: italic;
+      font-size: calc(1.18em); text-align: center;
+      line-height: 1.4; margin-bottom: 0.5mm;
+    }
+    .drink-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: calc(0.85em); text-align: center;
+      color: var(--desc); line-height: 1.4;
+    }
+
+    /* ── Footer note ── */
+    .card-footer-note {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: calc(0.8em);
+      text-align: center; color: var(--footer-color);
+      margin-top: auto; padding-top: 5mm;
+    }
+
+    /* ── Allergen card ── */
+    .alg-card-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: calc(0.6em); letter-spacing: 0.3em;
+      color: var(--label);
+      text-align: center; margin-bottom: 4mm;
+    }
+    .alg-entry {
+      margin-bottom: calc(var(--gap-scale, 1) * 3mm);
+    }
+    .alg-entry-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600; font-style: italic;
+      font-size: calc(1.1em); text-align: center;
+      margin-bottom: 0.8mm;
+    }
+    .alg-entry-list {
+      font-family: 'DM Sans', sans-serif;
+      font-size: calc(0.72em); text-align: center;
+      color: var(--desc); letter-spacing: 0.05em;
+    }
+    .alg-sep {
+      border: none; border-top: 0.5px solid var(--rule);
+      margin: calc(var(--gap-scale, 1) * 2.5mm) auto;
+      width: 50%;
+    }
+
+  </style>
+<script>
+(function(){var _rc={_id:"MK-SignatureLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo">Menükarte</div>
+  <div class="panel-tagline">Signature Line · Wedding Story Atelier</div>
+
+  <!-- Sprache -->
+  <span class="section-label">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Stil -->
+  <span class="section-label">Stil</span>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('highland',this)">Highland</button>
+    <button class="ui-btn"        onclick="setTheme('coastal',this)">Coastal</button>
+    <button class="ui-btn"        onclick="setTheme('classic',this)">Classic</button>
+  </div>
+
+  <!-- Karte -->
+  <span class="section-label" style="margin-top:10px;">Karte</span>
+  <div class="tab-group">
+    <button class="tab-btn active" onclick="setCard('menu',this)">Menü</button>
+    <button class="tab-btn"        onclick="setCard('wein',this)">Wein</button>
+    <button class="tab-btn"        onclick="setCard('cocktail',this)">Cocktail</button>
+    <button class="tab-btn"        onclick="setCard('getraenke',this)">Getränke</button>
+  </div>
+  <div class="tab-group" style="margin-top:3px;">
+    <button class="tab-btn" id="tab-allergene" onclick="setCard('allergene',this)">⚑ Allergenkarte</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Gemeinsame Felder -->
+  <span class="section-label">Namen</span>
+  <input type="text" id="inp-names" placeholder="Anna &amp; Peter" oninput="render()">
+
+  <span class="section-label">Datum</span>
+  <input type="text" id="inp-date" placeholder="14. Juni 2026" oninput="render()">
+
+  <span class="section-label">Ort <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+  <input type="text" id="inp-ort" placeholder="Schloss Heidelberg" oninput="render()">
+
+  <hr class="divider">
+
+  <!-- ── MENÜ ── -->
+  <div id="sec-menu" class="card-section visible">
+    <span class="section-label">Gänge</span>
+    <p class="hint">Kategorie leer lassen = kein Label. Vegetarisch / Vegan / Alternative wird automatisch erkannt.</p>
+    <div id="gang-list"></div>
+    <button class="btn-add" onclick="addGang()">+ Gang hinzufügen</button>
+
+    <span class="section-label" style="margin-top:10px;">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-menu-footer" placeholder="Bitte Menüwünsche im Voraus mitteilen." oninput="render()">
+  </div>
+
+  <!-- ── WEIN ── -->
+  <div id="sec-wein" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+
+    <span class="section-label">Weißwein</span>
+    <textarea id="inp-weiss" placeholder="Sancerre Blanc 2021 — Loire Valley&#10;Grauburgunder Spätlese — Pfalz" oninput="render()"></textarea>
+
+    <span class="section-label">Rotwein</span>
+    <textarea id="inp-rot" placeholder="Château Pichon Baron 2018 — Pauillac" oninput="render()"></textarea>
+
+    <span class="section-label">Rosé</span>
+    <textarea id="inp-rose" placeholder="Château Margaux Rosé 2022 — Provence" oninput="render()"></textarea>
+
+    <span class="section-label">Schaumwein / Sekt</span>
+    <textarea id="inp-sekt" placeholder="Champagne Ruinart Blanc de Blancs" oninput="render()"></textarea>
+
+    <span class="section-label">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-wein-footer" placeholder="Alkoholfreie Alternativen auf Anfrage erhältlich." oninput="render()">
+  </div>
+
+  <!-- ── COCKTAIL ── -->
+  <div id="sec-cocktail" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+
+    <span class="section-label">Signature Cocktails</span>
+    <textarea id="inp-sig" placeholder="Anna's Garden Spritz&#10;Peter's Old Fashioned" oninput="render()"></textarea>
+
+    <span class="section-label">Klassiker</span>
+    <textarea id="inp-klass" placeholder="Aperol Spritz&#10;Negroni&#10;Mojito" oninput="render()"></textarea>
+
+    <span class="section-label">Alkoholfrei</span>
+    <textarea id="inp-alk" placeholder="Rose Lemonade&#10;Cucumber Cooler" oninput="render()"></textarea>
+
+    <span class="section-label">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-cocktail-footer" placeholder="" oninput="render()">
+  </div>
+
+  <!-- ── GETRÄNKE ── -->
+  <div id="sec-getraenke" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+
+    <span class="section-label">Wasser</span>
+    <textarea id="inp-wasser" placeholder="Stilles Wasser&#10;Sprudelwasser" oninput="render()"></textarea>
+
+    <span class="section-label">Softdrinks</span>
+    <textarea id="inp-soft" placeholder="Cola · Cola Zero&#10;Fanta · Sprite" oninput="render()"></textarea>
+
+    <span class="section-label">Säfte</span>
+    <textarea id="inp-saefte" placeholder="Orangensaft&#10;Apfelsaft&#10;Multivitamin" oninput="render()"></textarea>
+
+    <span class="section-label">Heißgetränke</span>
+    <textarea id="inp-heiss" placeholder="Kaffee · Espresso&#10;Tee — Auswahl auf Anfrage" oninput="render()"></textarea>
+
+    <span class="section-label" style="margin-top:8px;">Weitere Kategorie 1 <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-extra1-label" placeholder="z.B. Saftschorlen" oninput="render()" style="margin-bottom:2px;">
+    <textarea id="inp-extra1" placeholder="Apfelschorle&#10;Orangenschorle" oninput="render()"></textarea>
+
+    <span class="section-label" style="margin-top:8px;">Weitere Kategorie 2 <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-extra2-label" placeholder="z.B. Spirituosen" oninput="render()" style="margin-bottom:2px;">
+    <textarea id="inp-extra2" placeholder="" oninput="render()"></textarea>
+
+    <span class="section-label" style="margin-top:8px;">Hinweis <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-getr-footer" placeholder="" oninput="render()">
+  </div>
+
+  <hr class="divider">
+
+  <!-- Typografie -->
+  <span class="section-label">Textgröße</span>
+  <div class="slider-row">
+    <span class="slider-lbl">A</span>
+    <input type="range" id="sl-size" min="85" max="130" value="100" oninput="applyTypo()">
+    <span class="slider-lbl" style="text-align:right;font-size:11px;">A</span>
+  </div>
+
+  <span class="section-label" style="margin-top:8px;">Zeilenabstand</span>
+  <div class="slider-row">
+    <span class="slider-lbl" style="font-size:8px;">—</span>
+    <input type="range" id="sl-space" min="60" max="140" value="100" oninput="applyTypo()">
+    <span class="slider-lbl" style="font-size:11px;text-align:right;">≡</span>
+  </div>
+
+  <!-- Format -->
+  <label class="section-label">Format</label>
+  <select id="sel-format">
+    <option value="a3">A3 — 297 × 420 mm</option>
+    <option value="a4" selected>A4 — 210 × 297 mm</option>
+    <option value="letter">Letter — 216 × 279 mm (US)</option>
+    <option value="a5">A5 — 148 × 210 mm</option>
+    <option value="halfletter">Half Letter — 140 × 216 mm (US)</option>
+    <option value="5x7">5×7 in — 127 × 178 mm (US)</option>
+    <option value="a6">A6 — 105 × 148 mm</option>
+  </select>
+
+  <!-- Actions -->
+  <div class="action-row">
+    <button class="btn-demo"       onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export"     onclick="exportCurrent()">PDF</button>
+    <button class="btn-export-all" onclick="exportAll()">Alle PDF</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    Beschnittzugabe 3 mm
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="card" class="highland">
+      <div class="card-frame-outer"></div>
+      <div class="card-frame-inner"></div>
+      <div class="card-body" id="card-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg">PDF wird erstellt …</span>
+</div>
+
+<script>
+// ══ CONSTANTS ══════════════════════════════════════════
+const ALLERGENS = [
+  { code: 'G',  name: 'Gluten'      },
+  { code: 'Kr', name: 'Krebstiere'  },
+  { code: 'E',  name: 'Eier'        },
+  { code: 'F',  name: 'Fisch'       },
+  { code: 'En', name: 'Erdnüsse'    },
+  { code: 'So', name: 'Soja'        },
+  { code: 'Mi', name: 'Milch'       },
+  { code: 'N',  name: 'Nüsse'       },
+  { code: 'Se', name: 'Sellerie'    },
+  { code: 'Sf', name: 'Senf'        },
+  { code: 'Si', name: 'Sesam'       },
+  { code: 'Sw', name: 'Sulfite'     },
+  { code: 'Lu', name: 'Lupinen'     },
+  { code: 'We', name: 'Weichtiere'  },
+];
+
+const VEG_TRIGGER = /vegetarisch|vegan|alternative/i;
+
+// ══ STATE ══════════════════════════════════════════════
+let currentTheme = 'highland';
+let currentCard  = 'menu';
+let currentLang  = 'de';
+
+// ══ ÜBERSETZUNGEN ══════════════════════════════════════
+const I18N = {
+  de: {
+    cardTitles:     { menu: 'Menü', wein: 'Weinkarte', cocktail: 'Cocktails', getraenke: 'Getränke', allergene: 'Hinweise' },
+    weinLabels:     ['Weißwein', 'Rotwein', 'Rosé', 'Schaumwein / Sekt'],
+    cocktailLabels: ['Signature Cocktails', 'Klassiker', 'Alkoholfrei'],
+    drinkLabels:    ['Wasser', 'Softdrinks', 'Säfte', 'Heißgetränke'],
+    algTitle:       'Allergene für unsere Gäste',
+    algCardTitle:   'Hinweise',
+    algNames: {
+      G:'Gluten', Kr:'Krebstiere', E:'Eier', F:'Fisch', En:'Erdnüsse',
+      So:'Soja', Mi:'Milch', N:'Nüsse', Se:'Sellerie', Sf:'Senf',
+      Si:'Sesam', Sw:'Sulfite', Lu:'Lupinen', We:'Weichtiere'
+    },
+  },
+  en: {
+    cardTitles:     { menu: 'Menu', wein: 'Wine List', cocktail: 'Cocktails', getraenke: 'Beverages', allergene: 'Notes' },
+    weinLabels:     ['White Wine', 'Red Wine', 'Rosé', 'Sparkling Wine'],
+    cocktailLabels: ['Signature Cocktails', 'Classics', 'Non-Alcoholic'],
+    drinkLabels:    ['Water', 'Soft Drinks', 'Juices', 'Hot Beverages'],
+    algTitle:       'Allergens for our guests',
+    algCardTitle:   'Notes',
+    algNames: {
+      G:'Gluten', Kr:'Crustaceans', E:'Eggs', F:'Fish', En:'Peanuts',
+      So:'Soya', Mi:'Milk', N:'Nuts', Se:'Celery', Sf:'Mustard',
+      Si:'Sesame', Sw:'Sulphites', Lu:'Lupin', We:'Molluscs'
+    },
+  }
+};
+let gangs = [
+  { kat: 'Aperitif',              name: '',  desc: '', allergens: [] },
+  { kat: 'Vorspeise',             name: '',  desc: '', allergens: [] },
+  { kat: 'Hauptgang',             name: '',  desc: '', allergens: [] },
+  { kat: 'Dessert',               name: '',  desc: '', allergens: [] },
+];
+
+// ══ HELPERS ════════════════════════════════════════════
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value.trim() : ''; }
+function esc(s) {
+  return String(s||'')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function lines(str) {
+  return str.split('\n').map(s => s.trim()).filter(s => s.length > 0);
+}
+
+// ══ THEME / CARD SWITCHING ═════════════════════════════
+function setTheme(t, btn) {
+  currentTheme = t;
+  document.querySelectorAll('.btn-group .ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ge('card').className = 'card ' + t;
+  render();
+}
+
+function setCard(c, btn) {
+  currentCard = c;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ['menu','wein','cocktail','getraenke'].forEach(id => {
+    ge('sec-' + id).classList.toggle('visible', id === c);
+  });
+  loadTypoForCard(c);  // Schriftgröße & Abstand für diese Karte laden
+  render();
+}
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#btn-de, #btn-en').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  render();
+}
+
+function updateAllergenTab() {
+  var tab = ge('tab-allergene');
+  if (!tab) return;
+  var hasAlg = gangs.some(function(g) { return g.allergens.length > 0 && g.name; });
+  tab.style.opacity = hasAlg ? '1' : '0.35';
+  tab.title = hasAlg ? '' : 'Keine Allergene erfasst';
+}
+
+// ══ GANG FORM ══════════════════════════════════════════
+function buildGangForm() {
+  var html = '';
+  gangs.forEach(function(g, i) {
+    var isVeg = VEG_TRIGGER.test(g.kat);
+    var vegLabel = '';
+    if (/vegan/i.test(g.kat))        vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegan</span>';
+    else if (/vegetarisch/i.test(g.kat)) vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegetarisch</span>';
+    else if (/alternative/i.test(g.kat)) vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Alternative</span>';
+
+    html += '<div class="gang-block" id="gang-' + i + '">';
+    html += '<div class="gang-header">';
+    html += '<span class="gang-num">Gang ' + (i+1) + vegLabel + '</span>';
+    if (gangs.length > 1) {
+      html += '<button class="gang-remove" onclick="removeGang(' + i + ')">✕</button>';
+    }
+    html += '</div>';
+    html += '<div class="gang-body">';
+    html += '<input type="text" placeholder="Kategorie (z.B. Vorspeise)" value="' + esc(g.kat) + '" oninput="updateGang(' + i + ',\'kat\',this.value)">';
+    html += '<textarea rows="2" placeholder="Gerichtname (Enter = Zeilenumbruch auf Karte)" style="min-height:0;resize:none;line-height:1.4;" oninput="updateGang(' + i + ',\'name\',this.value)">' + esc(g.name) + '</textarea>';
+    html += '<input type="text" placeholder="Beschreibung" value="' + esc(g.desc) + '" oninput="updateGang(' + i + ',\'desc\',this.value)">';
+
+    // Allergen toggle
+    var hasAlg = g.allergens.length > 0;
+    html += '<button class="alg-toggle" onclick="toggleAllergens(' + i + ')">▾ Allergene' +
+      (hasAlg ? ' <span style="color:#C9A96E;">(' + g.allergens.join(', ') + ')</span>' : '') + '</button>';
+    html += '<div class="alg-grid" id="alg-' + i + '">';
+    ALLERGENS.forEach(function(a) {
+      var checked = g.allergens.indexOf(a.code) > -1 ? 'checked' : '';
+      html += '<label class="alg-item"><input type="checkbox" ' + checked + ' onchange="toggleAllergen(' + i + ',\'' + a.code + '\',this.checked)"> ' + a.code + ' ' + (I18N[currentLang].algNames[a.code] || a.name) + '</label>';
+    });
+    html += '</div>';
+    html += '</div></div>';
+  });
+  ge('gang-list').innerHTML = html;
+}
+
+function updateGang(i, field, val) {
+  gangs[i][field] = val;
+  // Veg-Label in-place aktualisieren — KEIN buildGangForm() (würde Fokus zerstören)
+  if (field === 'kat') {
+    var numEl = document.querySelector('#gang-' + i + ' .gang-num');
+    if (numEl) {
+      var vl = '';
+      if (/vegan/i.test(val))        vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegan</span>';
+      else if (/vegetarisch/i.test(val)) vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegetarisch</span>';
+      else if (/alternative/i.test(val)) vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Alternative</span>';
+      numEl.innerHTML = 'Gang ' + (i + 1) + vl;
+    }
+  }
+  render();
+}
+
+function addGang() {
+  gangs.push({ kat: '', name: '', desc: '', allergens: [] });
+  buildGangForm();
+  render();
+}
+
+function removeGang(i) {
+  gangs.splice(i, 1);
+  buildGangForm();
+  render();
+}
+
+function toggleAllergens(i) {
+  var grid = ge('alg-' + i);
+  if (grid) grid.classList.toggle('open');
+}
+
+function toggleAllergen(gangIdx, code, checked) {
+  var a = gangs[gangIdx].allergens;
+  if (checked && a.indexOf(code) === -1) a.push(code);
+  else if (!checked) { var j = a.indexOf(code); if (j > -1) a.splice(j,1); }
+  buildGangForm();
+  render();
+}
+
+// ══ TYPOGRAPHY — pro Karte gespeichert ═════════════════
+var typoPerCard = {
+  menu:      { size: 100, space: 100 },
+  wein:      { size: 100, space: 100 },
+  cocktail:  { size: 100, space: 100 },
+  getraenke: { size: 100, space: 100 },
+  allergene: { size: 100, space: 100 },
+};
+
+function applyTypo() {
+  var size  = parseInt(ge('sl-size').value);
+  var space = parseInt(ge('sl-space').value);
+  // Werte für aktuelle Karte speichern
+  if (typoPerCard[currentCard]) {
+    typoPerCard[currentCard].size  = size;
+    typoPerCard[currentCard].space = space;
+  }
+  var c = ge('card');
+  c.style.setProperty('--fs-scale',  size  / 100);
+  c.style.setProperty('--gap-scale', space / 100);
+}
+
+function loadTypoForCard(card) {
+  var t = typoPerCard[card] || { size: 100, space: 100 };
+  ge('sl-size').value  = t.size;
+  ge('sl-space').value = t.space;
+  var c = ge('card');
+  c.style.setProperty('--fs-scale',  t.size  / 100);
+  c.style.setProperty('--gap-scale', t.space / 100);
+}
+
+// ══ RENDER ═════════════════════════════════════════════
+function render() {
+  ge('card').className = 'card ' + currentTheme;
+  applyTypo();
+
+  var html;
+
+  if (currentCard === 'allergene') {
+    // Allergenkarte baut eigenen Header — renderHeader() wird nicht aufgerufen
+    html = renderAllergenCard() ||
+      '<div style="padding:20mm;text-align:center;font-family:\'DM Sans\',sans-serif;font-size:11px;color:#aaa;">Noch keine Allergene erfasst.<br>Bitte beim Menü-Tab Allergene anhaken.</div>';
+  } else {
+    html = renderHeader();
+    switch (currentCard) {
+      case 'menu':      html += renderMenu();      break;
+      case 'wein':      html += renderWein();      break;
+      case 'cocktail':  html += renderCocktail();  break;
+      case 'getraenke': html += renderGetraenke(); break;
+    }
+  }
+
+  ge('card-body').innerHTML = html;
+  updateAllergenTab();
+  scalePreview();
+}
+
+function renderHeader() {
+  var names = esc(gv('inp-names'));
+  var date  = esc(gv('inp-date'));
+  var ort   = esc(gv('inp-ort'));
+
+  var titles = I18N[currentLang].cardTitles;
+
+  var sub = [date, ort].filter(Boolean).join(' · ');
+
+  var html = '';
+  if (names) html += '<div class="card-eyebrow">' + names.toUpperCase() + '</div>';
+  if (sub)   html += '<div class="card-eyebrow-sub">' + sub + '</div>';
+  html += '<div class="card-title">' + titles[currentCard].toUpperCase() + '</div>';
+  html += '<div class="card-accent-rule"></div>';
+  html += '<div class="card-content" id="card-content">';
+  return html;
+}
+
+function renderMenu() {
+  var html = '';
+  var hasFooter = gv('inp-menu-footer');
+
+  var firstRendered = true;
+  gangs.forEach(function(g, i) {
+    if (!g.name && !g.kat && !g.desc) return;
+    if (!firstRendered) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    firstRendered = false;
+    html += '<div class="menu-section">';
+
+    if (g.kat) {
+      html += '<div class="section-cat">' + esc(g.kat.toUpperCase()) + '</div>';
+    }
+    if (g.name) {
+      var aMarker = g.allergens.length > 0 ? '<span class="allergen-a">A</span>' : '';
+      var nameLines = g.name.split('\n').map(function(l){ return esc(l.trim()); }).join('<br>');
+      html += '<div class="course-name">' + nameLines + aMarker + '</div>';
+    }
+    if (g.desc) {
+      html += '<div class="course-desc">' + esc(g.desc) + '</div>';
+    }
+    html += '</div>';
+  });
+
+  html += '</div>'; // close card-content
+  if (hasFooter) {
+    html += '<div class="card-footer-note">' + esc(gv('inp-menu-footer')) + '</div>';
+  }
+  return html;
+}
+
+function renderWein() {
+  var wl = I18N[currentLang].weinLabels;
+  var sections = [
+    { id: 'inp-weiss', label: wl[0] },
+    { id: 'inp-rot',   label: wl[1] },
+    { id: 'inp-rose',  label: wl[2] },
+    { id: 'inp-sekt',  label: wl[3] },
+  ];
+
+  var html = '';
+  var first = true;
+
+  sections.forEach(function(s) {
+    var val = gv(s.id);
+    if (!val) return;
+    if (!first) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    first = false;
+    html += '<div class="wine-section">';
+    html += '<div class="section-cat">' + esc(s.label.toUpperCase()) + '</div>';
+    lines(val).forEach(function(l) {
+      html += '<div class="wine-name">' + esc(l) + '</div>';
+    });
+    html += '</div>';
+  });
+
+  html += '</div>'; // close card-content
+  var footer = gv('inp-wein-footer');
+  if (footer) html += '<div class="card-footer-note">' + esc(footer) + '</div>';
+  return html;
+}
+
+function renderCocktail() {
+  var cl = I18N[currentLang].cocktailLabels;
+  var sections = [
+    { id: 'inp-sig',   label: cl[0] },
+    { id: 'inp-klass', label: cl[1] },
+    { id: 'inp-alk',   label: cl[2] },
+  ];
+  return renderDrinkSections(sections, 'inp-cocktail-footer');
+}
+
+function renderGetraenke() {
+  var dl = I18N[currentLang].drinkLabels;
+  var sections = [
+    { id: 'inp-wasser', label: dl[0] },
+    { id: 'inp-soft',   label: dl[1] },
+    { id: 'inp-saefte', label: dl[2] },
+    { id: 'inp-heiss',  label: dl[3] },
+  ];
+  // Extra-Sektionen mit freiem Label
+  var extra1Label = gv('inp-extra1-label');
+  var extra1Val   = gv('inp-extra1');
+  if (extra1Val) sections.push({ id: 'inp-extra1', label: extra1Label || 'Weiteres' });
+
+  var extra2Label = gv('inp-extra2-label');
+  var extra2Val   = gv('inp-extra2');
+  if (extra2Val) sections.push({ id: 'inp-extra2', label: extra2Label || 'Weiteres' });
+
+  return renderDrinkSections(sections, 'inp-getr-footer');
+}
+
+function renderDrinkSections(sections, footerId) {
+  var html = '';
+  var first = true;
+
+  sections.forEach(function(s) {
+    var val = gv(s.id);
+    if (!val) return;
+    if (!first) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    first = false;
+    html += '<div class="drink-section">';
+    html += '<div class="section-cat">' + esc(s.label.toUpperCase()) + '</div>';
+    lines(val).forEach(function(l) {
+      html += '<div class="drink-item">' + esc(l) + '</div>';
+    });
+    html += '</div>';
+  });
+
+  html += '</div>'; // close card-content
+  var footer = gv(footerId);
+  if (footer) html += '<div class="card-footer-note">' + esc(footer) + '</div>';
+  return html;
+}
+
+// ── Allergen card rendering ──────────────────────────
+function renderAllergenCard() {
+  var withAlg = gangs.filter(function(g) { return g.allergens.length > 0 && g.name; });
+  if (withAlg.length === 0) return null;
+
+  var names = esc(gv('inp-names'));
+  var date  = esc(gv('inp-date'));
+  var ort   = esc(gv('inp-ort'));
+  var sub   = [date, ort].filter(Boolean).join(' · ');
+
+  var html = '';
+  if (names) html += '<div class="card-eyebrow">' + names.toUpperCase() + '</div>';
+  if (sub)   html += '<div class="card-eyebrow-sub">' + sub + '</div>';
+  html += '<div class="card-title">' + I18N[currentLang].algCardTitle.toUpperCase() + '</div>';
+  html += '<div class="card-accent-rule"></div>';
+  html += '<div class="alg-card-title">' + I18N[currentLang].algTitle.toUpperCase() + '</div>';
+  html += '<div class="card-content">';
+
+  withAlg.forEach(function(g, i) {
+    if (i > 0) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    html += '<div class="alg-entry">';
+    html += '<div class="alg-entry-name">' + esc(g.name) + '</div>';
+    var names2 = g.allergens.map(function(code) {
+      return I18N[currentLang].algNames[code] || code;
+    });
+    html += '<div class="alg-entry-list">' + esc(names2.join(' · ')) + '</div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  return html;
+}
+
+// ══ SCALE PREVIEW ══════════════════════════════════════
+function scalePreview() {
+  var panel   = document.querySelector('.panel-preview');
+  var card    = ge('card');
+  var scaler  = ge('preview-scaler');
+  var avail   = panel.clientWidth - 64;
+  var scale   = Math.min(1, avail / card.offsetWidth);
+  scaler.style.transform = 'scale(' + scale + ')';
+  scaler.style.height    = (card.offsetHeight * scale) + 'px';
+}
+
+// ══ PDF EXPORT — native vector (jsPDF) ═════════════════
+
+const THEMES_PDF = {
+  highland: { tc:[43,74,31],   bg:[254,252,247], hasBorder:true  },
+  coastal:  { tc:[26,74,107],  bg:[250,252,254], hasBorder:true  },
+  classic:  { tc:[26,26,26],   bg:[255,255,255], hasBorder:false },
+};
+const FILE_PREFIX = 'Menukarte_SignatureLine_';
+
+function makePDF(formatKey, bleedMM) {
+  const FMT = { a3:[297,420], a4:[210,297], letter:[216,279], a5:[148,210], halfletter:[140,216], '5x7':[127,178], a6:[105,148] };
+  const [baseW, baseH] = FMT[formatKey] || FMT.a4;
+  const docW = baseW + bleedMM*2, docH = baseH + bleedMM*2;
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[docW, docH] });
+  if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+  return { pdf, baseW, baseH, bleedMM };
+}
+
+function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
+  const PTmm = 0.3528;
+  const fS   = baseW / 210;
+  const bx   = bleedMM, by = bleedMM;
+
+  const th = THEMES_PDF[currentTheme] || THEMES_PDF.highland;
+  const tc = th.tc, bg = th.bg, hasBorder = th.hasBorder;
+  const ac = [201,169,110];
+
+  function bl(rgb, op) {
+    return [
+      Math.round(rgb[0]*op + bg[0]*(1-op)),
+      Math.round(rgb[1]*op + bg[1]*(1-op)),
+      Math.round(rgb[2]*op + bg[2]*(1-op)),
+    ];
+  }
+  const sf = (rgb) => pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+  const sd = (rgb) => pdf.setDrawColor(rgb[0], rgb[1], rgb[2]);
+  const st = (rgb) => pdf.setTextColor(rgb[0], rgb[1], rgb[2]);
+
+  function setFont(name, style) {
+    if (window.WSA_FONTS) {
+      try { pdf.setFont(name, style); return; } catch(e) {}
+    }
+    const fb = {
+      CormorantGaramond: { light:['Times','normal'], normal:['Times','normal'], italic:['Times','italic'], semibold:['Times','bold'] },
+      PlayfairDisplay:   { bold:['Times','bold'], bolditalic:['Times','bolditalic'] },
+      DMSans:            { normal:['Helvetica','normal'], light:['Helvetica','normal'], medium:['Helvetica','bold'] },
+    };
+    const r = ((fb[name]||{})[style])||['Helvetica','normal'];
+    pdf.setFont(r[0], r[1]);
+  }
+
+  // Background
+  sf(bg); pdf.rect(bx, by, baseW, baseH, 'F');
+
+  // Outer border (highland / coastal only)
+  const BW = hasBorder ? 3.703 * fS : 0;
+  if (hasBorder) {
+    sf(tc);
+    pdf.rect(bx,           by,           baseW, BW,    'F');
+    pdf.rect(bx,           by+baseH-BW,  baseW, BW,    'F');
+    pdf.rect(bx,           by,           BW,    baseH, 'F');
+    pdf.rect(bx+baseW-BW,  by,           BW,    baseH, 'F');
+  }
+
+  // Inner frame
+  // classic: inset 8px ≈ 2.117mm; outer inner-frame at inset 14px ≈ 3.704mm
+  // highland/coastal: BW + 7mm inset
+  if (currentTheme === 'classic') {
+    const fi1 = 2.117 * fS;
+    sd(bl(tc, 0.22)); pdf.setLineWidth(0.25 * fS);
+    pdf.rect(bx + fi1, by + fi1, baseW - fi1*2, baseH - fi1*2, 'S');
+    const fi2 = 3.704 * fS;
+    sd(bl(tc, 0.12)); pdf.setLineWidth(0.15);
+    pdf.rect(bx + fi2, by + fi2, baseW - fi2*2, baseH - fi2*2, 'S');
+  } else {
+    const fi = BW + 7 * fS;
+    sd(bl(tc, 0.32)); pdf.setLineWidth(0.25 * fS);
+    pdf.rect(bx + fi, by + fi, baseW - fi*2, baseH - fi*2, 'S');
+  }
+
+  // Layout
+  const cx     = bx + baseW / 2;
+  const xLeft  = bx + BW + 14 * fS;
+  const xRight = bx + baseW - BW - 14 * fS;
+  const contW  = xRight - xLeft;
+  const yEnd   = by + baseH - BW - 9 * fS;
+  let y        = by + BW + 11 * fS;
+
+  // Title font: Playfair Display bold (coastal: bolditalic)
+  const titleFontName  = 'PlayfairDisplay';
+  const titleFontStyle = (currentTheme === 'coastal') ? 'bolditalic' : 'bold';
+
+  // ── Header ──────────────────────────────────────────
+  const names = gv('inp-names');
+  if (names) {
+    st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6.5 * fS);
+    y += 6.5*fS*PTmm*0.5;
+    pdf.text(names.toUpperCase(), cx, y, {align:'center', baseline:'middle'});
+    y += 6.5*fS*PTmm*0.5 + 2*fS;
+  }
+
+  const date = gv('inp-date');
+  const ort  = gv('inp-ort');
+  const sub  = [date, ort].filter(Boolean).join(' · ');
+  if (sub) {
+    st(bl(tc, 0.68)); setFont('CormorantGaramond','italic'); pdf.setFontSize(8.2 * fS);
+    y += 8.2*fS*PTmm*0.5;
+    pdf.text(sub, cx, y, {align:'center', baseline:'middle'});
+    y += 8.2*fS*PTmm*0.5 + 3*fS;
+  }
+
+  // Card title
+  const cardTitles = I18N[currentLang].cardTitles;
+  const titleText  = (cardTitles[cardType] || cardType).toUpperCase();
+  const titleFS    = 24 * fS;
+  st(tc); setFont(titleFontName, titleFontStyle); pdf.setFontSize(titleFS);
+  y += titleFS*PTmm*0.5;
+  pdf.text(titleText, cx, y, {align:'center', baseline:'middle'});
+  y += titleFS*PTmm*0.5 + 3*fS;
+
+  // Accent rule
+  sf(ac);
+  const ruleW = 8.5 * fS;
+  pdf.rect(cx - ruleW/2, y, ruleW, 0.4*fS, 'F');
+  y += 0.4*fS + 5*fS;
+
+  // ── Content blocks ───────────────────────────────────
+  const contentTopY = y;
+  let footerText = '';
+
+  function buildBlocks(cardType) {
+    const blocks = [];
+
+    function ornSepBlock() {
+      return { type:'orn', height: 3.5*fS };
+    }
+
+    if (cardType === 'menu') {
+      footerText = gv('inp-menu-footer');
+      var first = true;
+      gangs.forEach(function(g) {
+        if (!g.name && !g.kat && !g.desc) return;
+        if (!first) blocks.push(ornSepBlock());
+        first = false;
+        var h = 0;
+        if (g.kat)  h += 6*fS*PTmm + 1.5*fS;
+        if (g.name) {
+          var nl = g.name.split('\n').filter(function(l){return l.trim();}).length;
+          h += nl * (12.8*fS*PTmm*1.3) + 1*fS;
+        }
+        if (g.desc) {
+          setFont('CormorantGaramond','italic'); pdf.setFontSize(9.6*fS);
+          var dl = pdf.splitTextToSize(g.desc, contW * 0.85);
+          h += dl.length * (9.6*fS*PTmm*1.45);
+        }
+        blocks.push({ type:'menu', data:g, height: h });
+      });
+
+    } else if (cardType === 'wein') {
+      footerText = gv('inp-wein-footer');
+      var wl = I18N[currentLang].weinLabels;
+      var secs = [
+        { id:'inp-weiss', label:wl[0] },
+        { id:'inp-rot',   label:wl[1] },
+        { id:'inp-rose',  label:wl[2] },
+        { id:'inp-sekt',  label:wl[3] },
+      ];
+      var first = true;
+      secs.forEach(function(s) {
+        var val = gv(s.id); if (!val) return;
+        if (!first) blocks.push(ornSepBlock());
+        first = false;
+        var ls = lines(val);
+        var h  = 6*fS*PTmm + 1.5*fS + ls.length*(12.2*fS*PTmm*1.4);
+        blocks.push({ type:'drink', data:{ label:s.label, items:ls }, height:h });
+      });
+
+    } else if (cardType === 'cocktail') {
+      footerText = gv('inp-cocktail-footer');
+      var cl = I18N[currentLang].cocktailLabels;
+      var secs = [
+        { id:'inp-sig',   label:cl[0] },
+        { id:'inp-klass', label:cl[1] },
+        { id:'inp-alk',   label:cl[2] },
+      ];
+      var first = true;
+      secs.forEach(function(s) {
+        var val = gv(s.id); if (!val) return;
+        if (!first) blocks.push(ornSepBlock());
+        first = false;
+        var ls = lines(val);
+        var h  = 6*fS*PTmm + 1.5*fS + ls.length*(12.2*fS*PTmm*1.4);
+        blocks.push({ type:'drink', data:{ label:s.label, items:ls }, height:h });
+      });
+
+    } else if (cardType === 'getraenke') {
+      footerText = gv('inp-getr-footer');
+      var dl = I18N[currentLang].drinkLabels;
+      var secs = [
+        { id:'inp-wasser', label:dl[0] },
+        { id:'inp-soft',   label:dl[1] },
+        { id:'inp-saefte', label:dl[2] },
+        { id:'inp-heiss',  label:dl[3] },
+      ];
+      var e1l = gv('inp-extra1-label'), e1v = gv('inp-extra1');
+      var e2l = gv('inp-extra2-label'), e2v = gv('inp-extra2');
+      if (e1v) secs.push({ id:'inp-extra1', label: e1l||'Weiteres' });
+      if (e2v) secs.push({ id:'inp-extra2', label: e2l||'Weiteres' });
+      var first = true;
+      secs.forEach(function(s) {
+        var val = gv(s.id); if (!val) return;
+        if (!first) blocks.push(ornSepBlock());
+        first = false;
+        var ls = lines(val);
+        var h  = 6*fS*PTmm + 1.5*fS + ls.length*(12.2*fS*PTmm*1.4);
+        blocks.push({ type:'drink', data:{ label:s.label, items:ls }, height:h });
+      });
+
+    } else if (cardType === 'allergene') {
+      var algTitleH = 7*fS*PTmm + 4*fS;
+      blocks.push({ type:'algtitle', height: algTitleH });
+
+      var withAlg = gangs.filter(function(g){ return g.allergens.length>0 && g.name; });
+      var first = true;
+      withAlg.forEach(function(g) {
+        if (!first) blocks.push(ornSepBlock());
+        first = false;
+        var h = (11*fS*PTmm + 0.8*fS) + (8.5*fS*PTmm);
+        blocks.push({ type:'alg', data:g, height: h });
+      });
+    }
+
+    return blocks;
+  }
+
+  function drawOrnSep(cy) {
+    var w    = contW * 0.85;
+    var half = w / 2;
+    var gemW = 3 * fS;
+    sd(bl(tc, 0.18)); pdf.setLineWidth(0.25*fS);
+    pdf.line(cx - half, cy, cx - gemW, cy);
+    pdf.line(cx + gemW, cy, cx + half, cy);
+    sf(ac);
+    var gs = 1.2 * fS;
+    pdf.lines([[gs,-gs],[gs,gs],[-gs,gs]], cx-gs, cy-gs, [1,1], 'F', true);
+  }
+
+  var blocks = buildBlocks(cardType);
+  if (blocks.length === 0) return;
+
+  var totalH = blocks.reduce(function(s,b){ return s+b.height; }, 0);
+  var footerH = footerText ? 7*fS : 0;
+  var availH  = yEnd - footerH - contentTopY;
+  var gap     = Math.max(2*fS, (availH - totalH) / (blocks.length + 1));
+
+  var cy = contentTopY + gap;
+
+  blocks.forEach(function(block) {
+    if (block.type === 'orn') {
+      drawOrnSep(cy + block.height/2);
+
+    } else if (block.type === 'algtitle') {
+      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(7*fS);
+      pdf.text(I18N[currentLang].algTitle.toUpperCase(), cx, cy + 7*fS*PTmm*0.5, {align:'center', baseline:'middle'});
+
+    } else if (block.type === 'menu') {
+      var g  = block.data;
+      var ry = cy;
+      if (g.kat) {
+        st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6*fS);
+        ry += 6*fS*PTmm*0.5;
+        pdf.text(g.kat.toUpperCase(), cx, ry, {align:'center', baseline:'middle'});
+        ry += 6*fS*PTmm*0.5 + 1.5*fS;
+      }
+      if (g.name) {
+        // Signature Line course name: PlayfairDisplay bold
+        setFont('PlayfairDisplay','bold'); pdf.setFontSize(12.8*fS);
+        var nameLines = g.name.split('\n').filter(function(l){ return l.trim(); });
+        var lineH = 12.8*fS*PTmm*1.3;
+        nameLines.forEach(function(line, li) {
+          ry += lineH*0.5;
+          var isLast = li === nameLines.length-1;
+          if (isLast && g.allergens.length > 0) {
+            st(tc); pdf.text(line, cx, ry, {align:'center', baseline:'middle'});
+            var nw = pdf.getTextWidth(line);
+            var ax = cx + nw/2 + 1*fS;
+            var ay = ry - 3*fS;
+            st(ac); setFont('DMSans','medium'); pdf.setFontSize(5.5*fS);
+            pdf.text('A', ax, ay, {align:'left', baseline:'middle'});
+            setFont('PlayfairDisplay','bold'); pdf.setFontSize(12.8*fS);
+          } else {
+            st(tc); pdf.text(line, cx, ry, {align:'center', baseline:'middle'});
+          }
+          ry += lineH*0.5;
+        });
+        ry += 1*fS;
+      }
+      if (g.desc) {
+        st(bl(tc, 0.65)); setFont('CormorantGaramond','italic'); pdf.setFontSize(9.6*fS);
+        var splitDesc = pdf.splitTextToSize(g.desc, contW * 0.85);
+        var lineH2 = 9.6*fS*PTmm*1.45;
+        splitDesc.forEach(function(line) {
+          ry += lineH2*0.5;
+          pdf.text(line, cx, ry, {align:'center', baseline:'middle'});
+          ry += lineH2*0.5;
+        });
+      }
+
+    } else if (block.type === 'drink') {
+      var d  = block.data;
+      var ry = cy;
+      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6*fS);
+      ry += 6*fS*PTmm*0.5;
+      pdf.text(d.label.toUpperCase(), cx, ry, {align:'center', baseline:'middle'});
+      ry += 6*fS*PTmm*0.5 + 1.5*fS;
+      setFont('CormorantGaramond','italic'); pdf.setFontSize(12.2*fS);
+      var lineH = 12.2*fS*PTmm*1.4;
+      d.items.forEach(function(item) {
+        ry += lineH*0.5;
+        st(tc); pdf.text(item, cx, ry, {align:'center', baseline:'middle'});
+        ry += lineH*0.5;
+      });
+
+    } else if (block.type === 'alg') {
+      var g  = block.data;
+      var ry = cy;
+      // Signature Line alg-entry-name: CormorantGaramond semibold italic
+      st(tc); setFont('CormorantGaramond','semibold'); pdf.setFontSize(11*fS);
+      ry += 11*fS*PTmm*0.5;
+      pdf.text(g.name, cx, ry, {align:'center', baseline:'middle'});
+      ry += 11*fS*PTmm*0.5 + 0.8*fS;
+      var algNames = g.allergens.map(function(code){ return I18N[currentLang].algNames[code]||code; });
+      st(bl(tc, 0.65)); setFont('DMSans','normal'); pdf.setFontSize(8.5*fS);
+      pdf.text(algNames.join(' · '), cx, ry + 8.5*fS*PTmm*0.5, {align:'center', baseline:'middle'});
+    }
+
+    cy += block.height + gap;
+  });
+
+  // Footer note
+  if (footerText) {
+    st(bl(tc, 0.52)); setFont('CormorantGaramond','italic'); pdf.setFontSize(7*fS);
+    pdf.text(footerText, cx, yEnd - 2*fS, {align:'center', baseline:'middle'});
+  }
+}
+
+async function exportCurrent() {
+  ge('pdf-spinner').style.display = 'flex';
+  ge('spin-msg').textContent = 'PDF wird erstellt …';
+  try {
+    var formatKey = (ge('sel-format') || {}).value || 'a4';
+    var bleedMM   = ge('chk-bleed').checked ? 3 : 0;
+    var o = makePDF(formatKey, bleedMM);
+    drawCardPage(o.pdf, currentCard, o.baseW, o.baseH, o.bleedMM);
+    var n = gv('inp-names').replace(/\s+/g,'_') || 'Karte';
+    o.pdf.save(FILE_PREFIX + n + '_' + currentCard + '_' + formatKey.toUpperCase() + '.pdf');
+  } catch(e) { alert('Export fehlgeschlagen: ' + e.message); console.error(e); }
+  finally { ge('pdf-spinner').style.display = 'none'; }
+}
+
+async function exportAll() {
+  ge('pdf-spinner').style.display = 'flex';
+  ge('spin-msg').textContent = 'Alle Karten werden erstellt …';
+  try {
+    var formatKey = (ge('sel-format') || {}).value || 'a4';
+    var bleedMM   = ge('chk-bleed').checked ? 3 : 0;
+    var FMT = { a3:[297,420], a4:[210,297], letter:[216,279], a5:[148,210], halfletter:[140,216], '5x7':[127,178], a6:[105,148] };
+    var baseW = FMT[formatKey][0], baseH = FMT[formatKey][1];
+    var docW  = baseW + bleedMM*2, docH = baseH + bleedMM*2;
+    var { jsPDF } = window.jspdf;
+    var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[docW,docH] });
+    if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+    var cardsToExport = ['menu'];
+    if (gv('inp-weiss') || gv('inp-rot') || gv('inp-rose') || gv('inp-sekt'))
+      cardsToExport.push('wein');
+    if (gv('inp-sig') || gv('inp-klass') || gv('inp-alk'))
+      cardsToExport.push('cocktail');
+    if (gv('inp-wasser') || gv('inp-soft') || gv('inp-saefte') || gv('inp-heiss'))
+      cardsToExport.push('getraenke');
+    var hasAlg = gangs.some(function(g){ return g.allergens.length>0 && g.name; });
+    if (hasAlg) cardsToExport.push('allergene');
+
+    var first = true;
+    for (var ci = 0; ci < cardsToExport.length; ci++) {
+      var cardType = cardsToExport[ci];
+      ge('spin-msg').textContent = cardType + ' …';
+      if (!first) pdf.addPage([docW, docH]);
+      drawCardPage(pdf, cardType, baseW, baseH, bleedMM);
+      first = false;
+    }
+
+    var n = gv('inp-names').replace(/\s+/g,'_') || 'Hochzeit';
+    pdf.save(FILE_PREFIX + 'komplett_' + n + '_' + formatKey.toUpperCase() + '.pdf');
+  } catch(e) { alert('Export fehlgeschlagen: ' + e.message); console.error(e); }
+  finally { ge('pdf-spinner').style.display = 'none'; }
+}
+
+// ══ DEMO — füllt nur leere Felder ══════════════════════
+function fill(id, val) {
+  var el = ge(id);
+  if (el && !el.value.trim()) el.value = val;
+}
+
+var DEMO = {
+  de: {
+    names: 'Anna & Peter',
+    date:  '14. Juni 2026',
+    ort:   'Schloss Heidelberg',
+    gangs: [
+      { kat: 'Aperitif',                  name: 'Champagner-Empfang',
+        desc: 'Begleiter von kleinen Häppchen aus der Küche', allergens: [] },
+      { kat: 'Vorspeise',                 name: 'Burrata mit Heirloom-Tomaten',
+        desc: 'Mit Basilikumöl, Fleur de Sel und geröstetem Sauerteigbrot', allergens: ['Mi','G'] },
+      { kat: 'Hauptgang',                 name: 'Dry-Aged Rinderfilet',
+        desc: 'Mit Trüffelkartoffeln, grünem Spargel und Bordelaise-Sauce', allergens: [] },
+      { kat: 'Vegetarisch / Alternative', name: 'Gefüllte Zucchiniblüte',
+        desc: 'Mit Ricotta, Pinienkernen und Tomatensauce', allergens: [] },
+      { kat: 'Dessert',                   name: 'Hochzeitstorte',
+        desc: 'Mehrschichtige Vanilletorte mit Himbeerfüllung und Buttercreme', allergens: [] },
+    ],
+    menuFooter: 'Bitte Menüwünsche im Voraus mitteilen.',
+    weiss: 'Sancerre Blanc 2021 — Loire Valley\nGrauburgunder Spätlese — Pfalz',
+    rot:   'Château Pichon Baron 2018 — Pauillac',
+    rose:  'Château Margaux Rosé 2022 — Provence',
+    sekt:  'Champagne Ruinart Blanc de Blancs',
+    weinFooter: 'Alkoholfreie Alternativen auf Anfrage erhältlich.',
+    sig:   "Anna's Garden Spritz\nPeter's Old Fashioned",
+    klass: 'Aperol Spritz\nNegroni\nMojito',
+    alk:   'Rose Lemonade\nGurkenwasser',
+    wasser: 'Stilles Wasser\nSprudelwasser',
+    soft:   'Cola · Cola Zero\nFanta · Sprite',
+    saefte: 'Orangensaft · Apfelsaft\nMultivitamin',
+    heiss:  'Kaffee · Espresso\nTee — Auswahl auf Anfrage',
+  },
+  en: {
+    names: 'Anna & Peter',
+    date:  '14th June 2026',
+    ort:   'Heidelberg Castle',
+    gangs: [
+      { kat: 'Aperitif',               name: 'Champagne Reception',
+        desc: 'Accompanied by delicate canapés from the kitchen', allergens: [] },
+      { kat: 'Starter',                name: 'Burrata with Heirloom Tomatoes',
+        desc: 'With basil oil, Fleur de Sel and toasted sourdough', allergens: ['Mi','G'] },
+      { kat: 'Main Course',            name: 'Dry-Aged Beef Tenderloin',
+        desc: 'With truffle potatoes, green asparagus and Bordelaise sauce', allergens: [] },
+      { kat: 'Vegetarian / Alternative', name: 'Stuffed Zucchini Blossom',
+        desc: 'With ricotta, pine nuts and tomato sauce', allergens: [] },
+      { kat: 'Dessert',                name: 'Wedding Cake',
+        desc: 'Layered vanilla cake with raspberry filling and buttercream', allergens: [] },
+    ],
+    menuFooter: 'Please let us know your menu preferences in advance.',
+    weiss: 'Sancerre Blanc 2021 — Loire Valley\nPinot Gris Spätlese — Pfalz',
+    rot:   'Château Pichon Baron 2018 — Pauillac',
+    rose:  'Château Margaux Rosé 2022 — Provence',
+    sekt:  'Champagne Ruinart Blanc de Blancs',
+    weinFooter: 'Non-alcoholic alternatives available upon request.',
+    sig:   "Anna's Garden Spritz\nPeter's Old Fashioned",
+    klass: 'Aperol Spritz\nNegroni\nMojito',
+    alk:   'Rose Lemonade\nCucumber Cooler',
+    wasser: 'Still Water\nSparkling Water',
+    soft:   'Cola · Cola Zero\nFanta · Sprite',
+    saefte: 'Orange Juice · Apple Juice\nMultivitamin',
+    heiss:  'Coffee · Espresso\nTea — various selections on request',
+  }
+};
+
+function loadDemo() {
+  var d = DEMO[currentLang];
+
+  fill('inp-names', d.names);
+  fill('inp-date',  d.date);
+  fill('inp-ort',   d.ort);
+
+  var hasContent = gangs.some(function(g) { return g.name || g.desc; });
+  if (!hasContent) {
+    gangs = d.gangs.map(function(g) { return Object.assign({}, g); });
+  } else {
+    d.gangs.forEach(function(dg, i) {
+      if (!gangs[i]) gangs[i] = Object.assign({}, dg);
+      else if (!gangs[i].name && !gangs[i].desc) gangs[i] = Object.assign({}, dg);
+    });
+  }
+
+  fill('inp-menu-footer', d.menuFooter);
+  fill('inp-weiss', d.weiss);
+  fill('inp-rot',   d.rot);
+  fill('inp-rose',  d.rose);
+  fill('inp-sekt',  d.sekt);
+  fill('inp-wein-footer', d.weinFooter);
+  fill('inp-sig',   d.sig);
+  fill('inp-klass', d.klass);
+  fill('inp-alk',   d.alk);
+  fill('inp-wasser', d.wasser);
+  fill('inp-soft',   d.soft);
+  fill('inp-saefte', d.saefte);
+  fill('inp-heiss',  d.heiss);
+
+  buildGangForm();
+  render();
+}
+
+// ══ INIT ═══════════════════════════════════════════════
+window.addEventListener('resize', scalePreview);
+buildGangForm();
+render();
+</script>
+</body>
+</html>

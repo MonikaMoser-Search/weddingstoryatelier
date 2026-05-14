@@ -1,0 +1,528 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Save the Date Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Great+Vibes&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --gold: #8B6F47;
+    }
+    body { background: #F2EFE9; }
+    .panel-form h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .panel-form .subtitle {
+      font-size: 13px;
+      color: var(--light);
+      margin-bottom: 28px;
+      padding-bottom: 22px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .style-label {
+      font-size: 11px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 10px;
+      display: block;
+    }
+    .style-buttons { display: flex; gap: 8px; margin-bottom: 28px; }
+    .style-btn {
+      flex: 1;
+      padding: 9px 4px;
+      border: 1.5px solid var(--rule);
+      background: white;
+      cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px;
+      letter-spacing: 0.08em;
+      color: var(--mid);
+      transition: all 0.2s;
+      border-radius: 2px;
+    }
+    .style-btn.active {
+      border-color: var(--charcoal);
+      background: var(--charcoal);
+      color: white;
+    }
+    .dot {
+      width: 9px; height: 9px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 5px;
+      vertical-align: middle;
+    }
+    .form-section { margin-bottom: 24px; }
+    .form-section-title {
+      font-size: 10px;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--light);
+      margin-bottom: 12px;
+      padding-bottom: 7px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .field { margin-bottom: 14px; }
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--mid);
+      margin-bottom: 4px;
+    }
+    .optional-tag {
+      font-size: 10px;
+      color: var(--light);
+      margin-left: 5px;
+      font-style: italic;
+    }
+    input, textarea, select {
+      width: 100%;
+      padding: 9px 11px;
+      border: 1px solid var(--rule);
+      background: #FAFAFA;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--charcoal);
+      border-radius: 2px;
+      transition: border-color 0.2s;
+      outline: none;
+      appearance: none;
+    }
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--charcoal);
+      background: white;
+    }
+    .panel-form textarea { resize: none; line-height: 1.5; }
+    .select-wrapper {
+      position: relative;
+    }
+    .select-wrapper::after {
+      content: '▾';
+      position: absolute;
+      right: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--mid);
+      font-size: 12px;
+    }
+    .char-hint {
+      font-size: 11px;
+      color: var(--light);
+      margin-top: 3px;
+      font-style: italic;
+    }
+    .btn-download {
+      width: 100%;
+      padding: 14px;
+      background: var(--charcoal);
+      color: white;
+      border: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 15px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: opacity 0.2s;
+      border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note {
+      font-size: 11px;
+      color: var(--light);
+      text-align: center;
+      margin-top: 10px;
+      font-style: italic;
+    }
+    .panel-preview {
+      background: #E8E4DE;
+    }
+
+    /* Festes Kartenseitenverhältnis A5/A6 = 1:√2 */
+    #std-output {
+      width: 480px;
+      height: 679px; /* 480 × √2 ≈ 679px — A5 & A6 identisches Verhältnis */
+      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
+      transition: all 0.35s ease;
+      overflow: hidden;
+    }
+
+    /* ── CLASSIC ── */
+    .theme-classic {
+      background: #FAF7F2;
+      padding: 56px 52px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-classic .rule-thick { width: 100%; border-top: 2.5px solid #1A1A1A; margin-bottom: 5px; }
+    .theme-classic .rule-thin  { width: 100%; border-top: 1px solid #1A1A1A; margin-bottom: 20px; }
+    .theme-classic .rule-thin-bot { width: 100%; border-top: 1px solid #1A1A1A; margin-top: 20px; margin-bottom: 5px; }
+    .theme-classic .rule-thick-bot { width: 100%; border-top: 2.5px solid #1A1A1A; }
+    .theme-classic .std-label {
+      font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
+      color: #666; margin-bottom: 18px; margin-top: 8px;
+    }
+    .theme-classic .std-freetext-top {
+      font-family: 'Great Vibes', cursive; font-size: 36px;
+      color: #1A1A1A; line-height: 1.35; margin-bottom: 18px;
+    }
+    .theme-classic .std-names {
+      font-family: 'Playfair Display', serif; font-size: 46px;
+      font-weight: 900; letter-spacing: 0.05em; color: #1A1A1A; line-height: 1;
+    }
+    .theme-classic .std-ampersand {
+      font-family: 'Playfair Display', serif; font-size: 28px;
+      font-weight: 400; font-style: italic; color: #8B6F47; margin: 5px 0;
+    }
+    .theme-classic .std-date {
+      font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #1A1A1A; font-weight: 600; margin-top: 18px; margin-bottom: 4px;
+    }
+    .theme-classic .std-location {
+      font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #888; margin-top: 4px;
+    }
+    .theme-classic .std-freetext-bot {
+      font-size: 13px; letter-spacing: 0.15em; color: #888; margin-top: 8px;
+    }
+
+    /* ── DARK ROMANCE ── */
+    .theme-dark {
+      background: #1C1410;
+      padding: 56px 52px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .theme-dark .corner {
+      position: absolute; width: 60px; height: 60px;
+      border-color: #8B6F47; border-style: solid; opacity: 0.6;
+    }
+    .theme-dark .corner-tl { top: 20px; left: 20px; border-width: 1.5px 0 0 1.5px; }
+    .theme-dark .corner-tr { top: 20px; right: 20px; border-width: 1.5px 1.5px 0 0; }
+    .theme-dark .corner-bl { bottom: 20px; left: 20px; border-width: 0 0 1.5px 1.5px; }
+    .theme-dark .corner-br { bottom: 20px; right: 20px; border-width: 0 1.5px 1.5px 0; }
+    .theme-dark .rule-thick { width: 80%; border-top: 1.5px solid #8B6F47; margin-bottom: 4px; }
+    .theme-dark .rule-thin  { width: 80%; border-top: 0.5px solid #A08868; margin-bottom: 20px; }
+    .theme-dark .rule-thin-bot { width: 80%; border-top: 0.5px solid #A08868; margin-top: 20px; margin-bottom: 4px; }
+    .theme-dark .rule-thick-bot { width: 80%; border-top: 1.5px solid #8B6F47; }
+    .theme-dark .std-label {
+      font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
+      color: #C89A5A; margin-bottom: 18px; margin-top: 8px;
+    }
+    .theme-dark .std-freetext-top {
+      font-family: 'Great Vibes', cursive; font-size: 36px;
+      color: #F0E8D8; line-height: 1.35; margin-bottom: 18px;
+    }
+    .theme-dark .std-names {
+      font-family: 'Playfair Display', serif; font-size: 46px;
+      font-weight: 900; letter-spacing: 0.05em; color: #F0E8D8; line-height: 1;
+    }
+    .theme-dark .std-ampersand {
+      font-family: 'Playfair Display', serif; font-size: 28px;
+      font-style: italic; color: #C89A5A; margin: 5px 0;
+    }
+    .theme-dark .std-date {
+      font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #F0E8D8; font-weight: 600; margin-top: 18px; margin-bottom: 4px;
+    }
+    .theme-dark .std-location {
+      font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #C89A5A; margin-top: 4px;
+    }
+    .theme-dark .std-freetext-bot {
+      font-size: 13px; letter-spacing: 0.15em; color: #C89A5A; margin-top: 8px;
+    }
+
+    /* ── WARM GARDEN ── */
+    .theme-garden {
+      background: #F5EFE6;
+      padding: 56px 52px;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      width: 100%; height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .theme-garden .rule-thick { width: 100%; border-top: 2px solid #B07A4A; margin-bottom: 5px; }
+    .theme-garden .rule-thin  { width: 100%; border-top: 1px solid #D4B896; margin-bottom: 20px; }
+    .theme-garden .rule-thin-bot { width: 100%; border-top: 1px solid #D4B896; margin-top: 20px; margin-bottom: 5px; }
+    .theme-garden .rule-thick-bot { width: 100%; border-top: 2px solid #B07A4A; }
+    .theme-garden .std-label {
+      font-size: 12px; letter-spacing: 0.4em; text-transform: uppercase;
+      color: #8A5A2A; margin-bottom: 18px; margin-top: 8px;
+    }
+    .theme-garden .std-freetext-top {
+      font-family: 'Great Vibes', cursive; font-size: 36px;
+      color: #3D2B1F; line-height: 1.35; margin-bottom: 18px;
+    }
+    .theme-garden .std-names {
+      font-family: 'Playfair Display', serif; font-size: 46px;
+      font-weight: 900; letter-spacing: 0.05em; color: #3D2B1F; line-height: 1;
+    }
+    .theme-garden .std-ampersand {
+      font-family: 'Playfair Display', serif; font-size: 28px;
+      font-style: italic; color: #B07A4A; margin: 5px 0;
+    }
+    .theme-garden .std-date {
+      font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #3D2B1F; font-weight: 600; margin-top: 18px; margin-bottom: 4px;
+    }
+    .theme-garden .std-location {
+      font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: #B07A4A; margin-top: 4px;
+    }
+    .theme-garden .std-freetext-bot {
+      font-size: 13px; letter-spacing: 0.15em; color: #B07A4A; margin-top: 8px;
+    }
+
+    /* Loading */
+    .loading {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,26,26,0.75); z-index: 100;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px;
+      color: white; font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; letter-spacing: 0.15em;
+    }
+    .loading.active { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="panel-form">
+    <div class="panel-logo">Save the Date</div>
+    <div class="panel-tagline">Wedding Story Atelier · Generator</div>
+
+    <span class="style-label">Stil wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)">
+        <span class="dot" style="background:#1A1A1A"></span>Classic
+      </button>
+      <button class="style-btn" onclick="setTheme('dark', this)">
+        <span class="dot" style="background:#8B6F47"></span>Dark Romance
+      </button>
+      <button class="style-btn" onclick="setTheme('garden', this)">
+        <span class="dot" style="background:#B07A4A"></span>Warm Garden
+      </button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Das Paar & das Datum</div>
+      <div class="field">
+        <label>Name Partner 1</label>
+        <input type="text" id="name1" placeholder="Anna" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Name Partner 2</label>
+        <input type="text" id="name2" placeholder="Peter" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Hochzeitsdatum</label>
+        <input type="text" id="wdate" placeholder="14. Juni 2026" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Ort <span class="optional-tag">optional</span></label>
+        <input type="text" id="location" placeholder="Hamburg · Deutschland" oninput="update()">
+        <div class="char-hint">z. B. Stadt, Schloss oder Region</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Persönliche Note</div>
+      <div class="field">
+        <label>Persönliche Nachricht <span class="optional-tag">optional</span></label>
+        <textarea id="freetext1" rows="3" placeholder="Verliebt. Verlobt.&#10;Und schon bald verheiratet." oninput="update()"></textarea>
+        <div class="char-hint">Wird in schöner Schreibschrift angezeigt ✨ &nbsp;·&nbsp; Enter für neue Zeile</div>
+      </div>
+      <div class="field">
+        <label>Abschlusszeile <span class="optional-tag">optional</span></label>
+        <input type="text" id="freetext2" placeholder="Einladung folgt · www.anna-und-peter.de" oninput="update()">
+        <div class="char-hint">Website, "Einladung folgt" oder freilassen</div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Export</div>
+      <div class="field">
+        <label>Format</label>
+        <div class="select-wrapper">
+          <select id="format" onchange="update()">
+            <option value="a6">A6 — Postkarte (105 × 148 mm)</option>
+            <option value="a5">A5 — Karte (148 × 210 mm)</option>
+            <option value="5x7">5×7" — US Standard (127 × 178 mm)</option>
+            <option value="4x6">4×6" — US Postkarte (102 × 152 mm)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-download" onclick="startDownload()">&#11015; Als PDF herunterladen</button>
+    <p class="privacy-note">Keine Datenspeicherung · Alles direkt im Browser · A6, A5, 5×7" oder 4×6"</p>
+  </div>
+
+  <div class="panel-preview">
+    <div id="std-output" class="theme-classic"></div>
+  </div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span>Save the Date wird erstellt…</span>
+</div>
+
+<script>
+var currentTheme = 'classic';
+
+function esc(str) {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+function getValue(id) {
+  var el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  var btns = document.querySelectorAll('.style-btn');
+  for (var i = 0; i < btns.length; i++) {
+    btns[i].classList.remove('active');
+  }
+  btn.classList.add('active');
+  update();
+}
+
+function update() {
+  var name1    = esc(getValue('name1'))    || 'Anna';
+  var name2    = esc(getValue('name2'))    || 'Peter';
+  var wdate    = esc(getValue('wdate'))    || '14. Juni 2026';
+  var location = esc(getValue('location'));
+  var ft1      = getValue('freetext1');
+  var ft2      = getValue('freetext2');
+
+  var out = document.getElementById('std-output');
+  out.className = 'theme-' + currentTheme;
+
+  var corners = '';
+  if (currentTheme === 'dark') {
+    corners = '<div class="corner corner-tl"></div>' +
+              '<div class="corner corner-tr"></div>' +
+              '<div class="corner corner-bl"></div>' +
+              '<div class="corner corner-br"></div>';
+  }
+
+  var ft1Html = '';
+  if (ft1) {
+    var ft1Safe = ft1.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    ft1Html = '<div class="std-freetext-top">' + ft1Safe + '</div>';
+  }
+
+  var locationHtml = '';
+  if (location) {
+    locationHtml = '<div class="std-location">' + location + '</div>';
+  }
+
+  var ft2Html = '';
+  if (ft2) {
+    var ft2Safe = ft2.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    ft2Html = '<div class="std-freetext-bot">' + ft2Safe + '</div>';
+  }
+
+  out.innerHTML =
+    corners +
+    '<hr class="rule-thick">' +
+    '<hr class="rule-thin">' +
+    '<div class="std-label">Save the Date</div>' +
+    ft1Html +
+    '<div class="std-names">' + name1 + '</div>' +
+    '<div class="std-ampersand">&amp;</div>' +
+    '<div class="std-names">' + name2 + '</div>' +
+    '<div class="std-date">' + wdate + '</div>' +
+    locationHtml +
+    ft2Html +
+    '<hr class="rule-thin-bot">' +
+    '<hr class="rule-thick-bot">';
+}
+
+function startDownload() {
+  var loading = document.getElementById('loading');
+  loading.classList.add('active');
+  setTimeout(function() { doDownload(); }, 100);
+}
+
+function doDownload() {
+  var el     = document.getElementById('std-output');
+  var format = getValue('format') || 'a6';
+
+  // A6: 105×148mm | A5: 148×210mm | 5×7": 127×178mm | 4×6": 102×152mm
+  var pdfW = format === 'a5' ? 148 : format === '5x7' ? 127 : format === '4x6' ? 102 : 105;
+  var pdfH = format === 'a5' ? 210 : format === '5x7' ? 178 : format === '4x6' ? 152 : 148;
+
+  html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null })
+    .then(function(canvas) {
+      var imgData = canvas.toDataURL('image/png');
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, pdfH] });
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+      var n1 = getValue('name1') || 'Save';
+      var n2 = getValue('name2') || 'Date';
+      pdf.save(n1 + '_' + n2 + '_SaveTheDate_WeddingStoryAtelier.pdf');
+      document.getElementById('loading').classList.remove('active');
+    })
+    .catch(function() {
+      alert('PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
+      document.getElementById('loading').classList.remove('active');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('name1').value    = 'Anna';
+  document.getElementById('name2').value    = 'Peter';
+  document.getElementById('wdate').value    = '14. Juni 2026';
+  document.getElementById('location').value = 'Hamburg · Deutschland';
+  document.getElementById('freetext1').value = 'Verliebt. Verlobt.\nUnd schon bald verheiratet.';
+  document.getElementById('freetext2').value = 'Einladung folgt';
+  update();
+});
+</script>
+</body>
+</html>

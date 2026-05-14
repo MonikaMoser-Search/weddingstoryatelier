@@ -1,0 +1,864 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Hochzeitszeitung Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --gold: #8B6F47;
+    }
+
+    /* ── FORM PANEL ── */
+    .panel-form { font-size: 13px; }
+
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .form-section { margin-bottom: 20px; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    .opt { font-size: 9px; color: var(--light); margin-left: 4px; font-style: italic; }
+    .maxhint { font-size: 10px; color: var(--light); margin-top: 2px; }
+    .panel-form textarea { resize: none; line-height: 1.5; }
+
+    .timeline-row { display: grid; grid-template-columns: 80px 1fr; gap: 6px; margin-bottom: 6px; }
+    .timeline-row input { font-size: 12px; padding: 6px 8px; }
+
+    /* Photo upload */
+    .photo-upload {
+      border: 2px dashed var(--rule); border-radius: 2px;
+      padding: 16px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: #FAFAFA;
+    }
+    .photo-upload:hover { border-color: var(--charcoal); background: white; }
+    .photo-upload input { display: none; }
+    .photo-upload .icon { font-size: 24px; margin-bottom: 6px; }
+    .photo-upload .label { font-size: 12px; color: var(--mid); }
+    .photo-upload .sublabel { font-size: 10px; color: var(--light); margin-top: 2px; }
+    .photo-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 2px; display: none; }
+
+    .btn-download {
+      width: 100%; padding: 13px; background: var(--charcoal); color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+
+    /* ── NEWSPAPER OUTPUT ── */
+    #newspaper {
+      width: 860px;
+      min-height: 1216px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+
+    /* ════════════════════════════
+       THEME: CLASSIC
+    ════════════════════════════ */
+    .classic { background: #FAF7F2; font-family: 'Cormorant Garamond', serif; padding: 48px 52px 40px; 
+    }
+    .classic .rule-thick { border-top: 3px solid #1A1A1A; margin-bottom: 4px; }
+    .classic .rule-thin  { border-top: 1px solid #1A1A1A; margin-bottom: 16px; }
+    .classic .rule-mid   { border-top: 1px solid #CCCCCC; margin: 14px 0; }
+    .classic .rule-bot-thin { border-top: 1px solid #1A1A1A; margin-top: 14px; margin-bottom: 4px; }
+    .classic .rule-bot-thick { border-top: 3px solid #1A1A1A; }
+
+    .classic .masthead { text-align: center; margin-bottom: 4px; }
+    .classic .paper-name { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; color: #1A1A1A; }
+    .classic .paper-sub { font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase; color: #666; margin-top: 8px; }
+
+    .classic .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 16px; min-height: 280px; }
+    .classic .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+
+    .classic .col-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: #888; margin-bottom: 6px; }
+    .classic .col-rule  { border-top: 1px solid #CCC; margin-bottom: 8px; }
+
+    .classic .headline { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1.2; color: #1A1A1A; font-style: italic; margin-bottom: 8px; }
+    .classic .bodytext { font-size: 13px; line-height: 1.65; color: #333; text-align: justify; }
+    
+
+    .classic .photo-box {
+      width: 100%; aspect-ratio: 4/3; background: #E8E4DF;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden;
+    }
+    .classic .photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .classic .photo-placeholder { font-size: 11px; color: #AAA; text-align: center; padding: 20px; }
+    .classic .photo-caption { font-size: 11px; color: #888; font-style: italic; margin-top: 5px; text-align: center; }
+
+    .classic .monogram-box { border: 2px solid #1A1A1A; padding: 16px; text-align: center; }
+    .classic .mono-names { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #1A1A1A; line-height: 1.2; }
+    .classic .mono-amp { font-size: 16px; font-style: italic; color: var(--gold); margin: 3px 0; }
+    .classic .mono-detail { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #666; margin-top: 8px; }
+
+    .classic .section-banner { text-align: center; margin: 14px 0 6px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #1A1A1A; }
+
+    .classic .timeline-list { list-style: none; }
+    .classic .timeline-list li { display: grid; grid-template-columns: 65px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px solid #EEE; font-size: 13px; align-items: start; }
+    .classic .tl-time { font-weight: 700; color: #1A1A1A; font-size: 12px; }
+    .classic .tl-event { color: #444; }
+
+    .classic .qr-box { border: 1px solid #CCC; padding: 12px; text-align: center; }
+    .classic .qr-placeholder { width: 80px; height: 80px; background: #E8E4DF; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #AAA; }
+    .qr-box img { width: 80px; height: 80px; object-fit: contain; display: block; margin: 0 auto 8px; filter: sepia(0.3); }
+    .classic .qr-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #888; margin-bottom: 4px; }
+    .classic .qr-url { font-size: 12px; color: #1A1A1A; font-weight: 600; word-break: break-all; }
+    .classic .qr-hashtag { font-size: 13px; font-weight: 700; color: #1A1A1A; margin-top: 8px; }
+
+    .classic .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #AAA; }
+
+    /* ════════════════════════════
+       THEME: DARK ROMANCE
+    ════════════════════════════ */
+    .dark { background: #1C1410; font-family: 'Cormorant Garamond', serif; padding: 48px 52px 40px; 
+    }
+    .dark .rule-thick { border-top: 2px solid #8B6F47; margin-bottom: 4px; }
+    .dark .rule-thin  { border-top: 1px solid #A08868; margin-bottom: 16px; }
+    .dark .rule-mid   { border-top: 1px solid #3E3228; margin: 14px 0; }
+    .dark .rule-bot-thin { border-top: 1px solid #A08868; margin-top: 14px; margin-bottom: 4px; }
+    .dark .rule-bot-thick { border-top: 2px solid #8B6F47; }
+
+    .dark .masthead { text-align: center; margin-bottom: 4px; }
+    .dark .paper-name { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; color: #F0E8D8; }
+    .dark .paper-sub { font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase; color: #8B6F47; margin-top: 8px; }
+
+    .dark .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 16px; min-height: 280px; }
+    .dark .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+
+    .dark .col-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: #8B6F47; margin-bottom: 6px; }
+    .dark .col-rule  { border-top: 1px solid #A08868; margin-bottom: 8px; }
+
+    .dark .headline { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1.2; color: #F0E8D8; font-style: italic; margin-bottom: 8px; }
+    .dark .bodytext { font-size: 13px; line-height: 1.65; color: #E0CCA8; text-align: justify; }
+    
+
+    .dark .photo-box { width: 100%; aspect-ratio: 4/3; background: #3E3228; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .dark .photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .dark .photo-placeholder { font-size: 11px; color: #9A8468; text-align: center; padding: 20px; }
+    .dark .photo-caption { font-size: 11px; color: #A89070; font-style: italic; margin-top: 5px; text-align: center; }
+
+    .dark .monogram-box { border: 1px solid #8B6F47; padding: 16px; text-align: center; }
+    .dark .mono-names { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #F0E8D8; line-height: 1.2; }
+    .dark .mono-amp { font-size: 16px; font-style: italic; color: #8B6F47; margin: 3px 0; }
+    .dark .mono-detail { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #8B6F47; margin-top: 8px; }
+
+    .dark .section-banner { text-align: center; margin: 14px 0 6px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #C89A5A; }
+
+    .dark .timeline-list { list-style: none; }
+    .dark .timeline-list li { display: grid; grid-template-columns: 65px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px solid #3E3228; font-size: 13px; align-items: start; }
+    .dark .tl-time { font-weight: 700; color: #C89A5A; font-size: 12px; }
+    .dark .tl-event { color: #E0CCA8; }
+
+    .dark .qr-box { border: 1px solid #A08868; padding: 12px; text-align: center; }
+    .dark .qr-placeholder { width: 80px; height: 80px; background: #3E3228; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #9A8468; }
+    .dark .qr-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #8B6F47; margin-bottom: 4px; }
+    .dark .qr-url { font-size: 12px; color: #D4A85A; font-weight: 600; word-break: break-all; }
+    .dark .qr-hashtag { font-size: 13px; font-weight: 700; color: #C89A5A; margin-top: 8px; }
+
+    .dark .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #8A7A62; }
+
+    /* ════════════════════════════
+       THEME: WARM GARDEN
+    ════════════════════════════ */
+    .garden { background: #F5EFE6; font-family: 'Cormorant Garamond', serif; padding: 48px 52px 40px; 
+    }
+    .garden .rule-thick { border-top: 2.5px solid #B07A4A; margin-bottom: 4px; }
+    .garden .rule-thin  { border-top: 1px solid #D4B896; margin-bottom: 16px; }
+    .garden .rule-mid   { border-top: 1px solid #DDD0BC; margin: 14px 0; }
+    .garden .rule-bot-thin { border-top: 1px solid #D4B896; margin-top: 14px; margin-bottom: 4px; }
+    .garden .rule-bot-thick { border-top: 2.5px solid #B07A4A; }
+
+    .garden .masthead { text-align: center; margin-bottom: 4px; }
+    .garden .paper-name { font-family: 'Playfair Display', serif; font-size: 64px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; line-height: 1; color: #3D2B1F; }
+    .garden .paper-sub { font-size: 12px; letter-spacing: 0.25em; text-transform: uppercase; color: #B07A4A; margin-top: 8px; }
+
+    .garden .cols3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 16px; min-height: 280px; }
+    .garden .cols2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 14px; }
+
+    .garden .col-label { font-size: 9px; letter-spacing: 0.25em; text-transform: uppercase; color: #B07A4A; margin-bottom: 6px; }
+    .garden .col-rule  { border-top: 1px solid #D4B896; margin-bottom: 8px; }
+
+    .garden .headline { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; line-height: 1.2; color: #3D2B1F; font-style: italic; margin-bottom: 8px; }
+    .garden .bodytext { font-size: 13px; line-height: 1.65; color: #5A3E2B; text-align: justify; }
+    
+
+    .garden .photo-box { width: 100%; aspect-ratio: 4/3; background: #E8DDD0; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+    .garden .photo-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .garden .photo-placeholder { font-size: 11px; color: #C4A882; text-align: center; padding: 20px; }
+    .garden .photo-caption { font-size: 11px; color: #9E8068; font-style: italic; margin-top: 5px; text-align: center; }
+
+    .garden .monogram-box { border: 1.5px solid #B07A4A; padding: 16px; text-align: center; }
+    .garden .mono-names { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: #3D2B1F; line-height: 1.2; }
+    .garden .mono-amp { font-size: 16px; font-style: italic; color: #B07A4A; margin: 3px 0; }
+    .garden .mono-detail { font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; color: #9E8068; margin-top: 8px; }
+
+    .garden .section-banner { text-align: center; margin: 14px 0 6px; font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #3D2B1F; }
+
+    .garden .timeline-list { list-style: none; }
+    .garden .timeline-list li { display: grid; grid-template-columns: 65px 1fr; gap: 10px; padding: 7px 0; border-bottom: 1px solid #DDD0BC; font-size: 13px; align-items: start; }
+    .garden .tl-time { font-weight: 700; color: #B07A4A; font-size: 12px; }
+    .garden .tl-event { color: #5A3E2B; }
+
+    .garden .qr-box { border: 1px solid #D4B896; padding: 12px; text-align: center; }
+    .garden .qr-placeholder { width: 80px; height: 80px; background: #E8DDD0; margin: 0 auto 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #C4A882; }
+    .garden .qr-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: #B07A4A; margin-bottom: 4px; }
+    .garden .qr-url { font-size: 12px; color: #3D2B1F; font-weight: 600; word-break: break-all; }
+    .garden .qr-hashtag { font-size: 13px; font-weight: 700; color: #B07A4A; margin-top: 8px; }
+
+    .garden .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #C4A882; }
+
+    /* Article columns bottom */
+    .classic .art-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 0; }
+    .dark .art-cols    { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 0; }
+    .garden .art-cols  { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 0; }
+
+    /* Loading */
+    .loading { display: none; position: fixed; inset: 0; background: rgba(26,26,26,0.78); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: white; font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.15em; }
+    .loading.active { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+<script>
+(function(){var _rc={_id:"WN-Classic",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ── FORM ── -->
+<div class="panel-form">
+    <div class="panel-logo">Hochzeitszeitung</div>
+    <div class="panel-tagline">Wedding Story Atelier</div>
+
+    <span class="section-label" id="lbl-style">Stil wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)"><span class="dot" style="background:#1A1A1A"></span>Classic</button>
+      <button class="style-btn" onclick="setTheme('dark', this)"><span class="dot" style="background:#8B6F47"></span>Dark</button>
+      <button class="style-btn" onclick="setTheme('garden', this)"><span class="dot" style="background:#B07A4A"></span>Garden</button>
+    </div>
+
+    <span class="section-label">Sprache / Language</span>
+    <div class="lang-buttons">
+      <button class="lang-btn active" onclick="switchLang('de', this)">DE &mdash; Deutsch</button>
+      <button class="lang-btn"        onclick="switchLang('en', this)">EN &mdash; English</button>
+    </div>
+
+    <!-- MASTHEAD -->
+    <div class="form-section">
+      <div id="lbl-sec-masthead" class="section-label">Zeitungsname &amp; Ausgabe</div>
+      <div class="field">
+        <label id="lbl-paperName">Zeitungsname <span class="maxhint">(max. 25 Zeichen)</span></label>
+        <input type="text" id="paperName" maxlength="25" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-paperSub">Untertitel <span class="maxhint">(max. 50 Zeichen)</span></label>
+        <input type="text" id="paperSub" maxlength="50" oninput="update()">
+      </div>
+    </div>
+
+    <!-- STORY -->
+    <div class="form-section">
+      <div id="lbl-sec-story" class="section-label">Unsere Geschichte</div>
+      <div class="field">
+        <label id="lbl-headline">Überschrift</label>
+        <input type="text" id="headline" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-story">Text <span id="lbl-story-opt" class="opt">optional — so viel oder wenig wie ihr möchtet</span></label>
+        <textarea id="story" rows="5" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- FOTO -->
+    <div class="form-section">
+      <div id="lbl-sec-photo" class="section-label">Euer Foto</div>
+      <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+        <input type="file" id="photoInput" accept="image/*" onchange="loadPhoto(this)">
+        <img id="photoPreview" class="photo-preview">
+        <div id="photoPlaceholderUI">
+          <div class="icon">📷</div>
+          <div id="lbl-photo-upload" class="label">Foto auswählen</div>
+          <div id="lbl-photo-sub" class="sublabel">JPG, PNG — bleibt lokal auf eurem Gerät</div>
+        </div>
+      </div>
+      <div class="field" style="margin-top:8px">
+        <label id="lbl-photoCaption">Bildunterschrift <span class="opt">optional</span></label>
+        <input type="text" id="photoCaption" oninput="update()" placeholder="Anna &amp; Peter, Juni 2025">
+      </div>
+    </div>
+
+    <!-- MONOGRAMM -->
+    <div class="form-section">
+      <div id="lbl-sec-couple" class="section-label">Das Paar</div>
+      <div class="field">
+        <label id="lbl-name1">Name 1 <span class="maxhint">(max. 20 Zeichen)</span></label>
+        <input type="text" id="name1" maxlength="20" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-name2">Name 2 <span class="maxhint">(max. 20 Zeichen)</span></label>
+        <input type="text" id="name2" maxlength="20" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-wdate">Datum</label>
+        <input type="text" id="wdate" oninput="update()" placeholder="14. Juni 2026">
+      </div>
+      <div class="field">
+        <label id="lbl-wlocation">Ort</label>
+        <input type="text" id="wlocation" oninput="update()" placeholder="Schloss Heidelberg">
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="form-section">
+      <div id="lbl-sec-timeline" class="section-label">Tagesprogramm (6 Slots — leer = unsichtbar)</div>
+      <div id="timeline-rows"></div>
+    </div>
+
+    <!-- ARTIKEL 2 & 3 -->
+    <div class="form-section">
+      <div id="lbl-sec-art2" class="section-label">Zweiter Artikel (linke Spalte)</div>
+      <div class="field">
+        <label id="lbl-art2head">Überschrift <span class="opt">optional</span></label>
+        <input type="text" id="art2head" oninput="update()" placeholder="Der Antrag">
+      </div>
+      <div class="field">
+        <label id="lbl-art2text">Text <span class="opt">optional</span></label>
+        <textarea id="art2text" rows="4" oninput="update()" placeholder="Erzählt von dem besonderen Moment…"></textarea>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div id="lbl-sec-art3" class="section-label">Dritter Artikel (rechte Spalte)</div>
+      <div class="field">
+        <label id="lbl-art3head">Überschrift <span class="opt">optional</span></label>
+        <input type="text" id="art3head" oninput="update()" placeholder="Ein Wort vom Brautpaar">
+      </div>
+      <div class="field">
+        <label id="lbl-art3text">Text <span class="opt">optional</span></label>
+        <textarea id="art3text" rows="4" oninput="update()" placeholder="Liebe Gäste, wir sind so froh, dass ihr heute dabei seid…"></textarea>
+      </div>
+    </div>
+
+    <!-- QR / HASHTAG -->
+    <div class="form-section">
+      <div id="lbl-sec-qr" class="section-label">QR-Code &amp; Hashtag</div>
+      <div class="field">
+        <label id="lbl-qrUpload">QR-Code <span class="opt">optional</span></label>
+        <div class="photo-upload" onclick="document.getElementById('qrInput').click()">
+          <input type="file" id="qrInput" accept="image/*" onchange="loadQR(this)">
+          <img id="qrThumb" class="photo-preview" style="height:60px;">
+          <div id="qrPlaceholderUI">
+            <div class="icon">⬛</div>
+            <div id="lbl-upload-qr" class="label">QR-Code auswählen</div>
+            <div class="sublabel">PNG, JPG &nbsp;·&nbsp; lokal</div>
+          </div>
+        </div>
+        <button id="btn-remove-qr" onclick="removeQR()" style="display:none;font-size:10px;background:none;border:1px solid #ddd;padding:3px 8px;cursor:pointer;margin-top:4px;font-family:inherit;">&#10005; Entfernen</button>
+      </div>
+      <div class="field">
+        <label id="lbl-qrUrl">Website-URL <span class="opt">optional</span></label>
+        <input type="text" id="qrUrl" oninput="update()" placeholder="www.anna-und-peter.de">
+      </div>
+      <div class="field">
+        <label id="lbl-hashtag">Hashtag <span class="opt">optional</span></label>
+        <input type="text" id="hashtag" oninput="update()" placeholder="#AnnaUndPeter2026">
+      </div>
+    </div>
+
+    <div style="margin-bottom:8px">
+      <label id="lbl-paperFormat" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mid);margin-bottom:4px">Papierformat</label>
+      <select id="sel-format" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:13px;color:#333;background:#fff">
+        <option value="a3">A3 — 297 × 420 mm</option>
+        <option value="a4">A4 — 210 × 297 mm</option>
+        <option value="tabloid">US Tabloid — 11 × 17"</option>
+        <option value="letter">US Letter — 8.5 × 11"</option>
+      </select>
+    </div>
+    <button id="btn-download" class="btn-download" onclick="startDownload()">&#11015; Als PDF herunterladen</button>
+    <p id="privacy-note" class="privacy-note">Kein Foto-Upload auf Server · Alles lokal · Chrome / Firefox empfohlen</p>
+    <label class="bleed-label"><input type="checkbox" id="chk-bleed"> <span id="lbl-bleed">Beschnittzugabe 3 mm</span></label>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+<!-- ── PREVIEW ── -->
+<div class="panel-preview">
+  <div id="newspaper" class="classic"></div>
+</div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="loadingText">Hochzeitszeitung wird erstellt…</span>
+</div>
+
+<script>
+var currentTheme = 'classic';
+var currentLang  = 'de';
+var photoDataUrl = null;
+var qrDataUrl    = null;
+
+var defaultTimelines = {
+  de: [
+    ['14:00', 'Einlass & Sektempfang'],
+    ['15:00', 'Trauung'],
+    ['16:00', 'Cocktailstunde & Fotos'],
+    ['18:00', 'Abendessen & Reden'],
+    ['20:00', 'Erster Tanz'],
+    ['21:00', 'Party & Tanz']
+  ],
+  en: [
+    ['2:00 PM', 'Arrival & Welcome Reception'],
+    ['3:00 PM', 'Ceremony'],
+    ['4:00 PM', 'Cocktail Hour & Photos'],
+    ['6:00 PM', 'Dinner & Speeches'],
+    ['8:00 PM', 'First Dance'],
+    ['9:00 PM', 'Party & Dancing']
+  ]
+};
+var defaultTimeline = defaultTimelines.de;
+
+var defaults = {
+  de: {
+    paperName:    'The Daily I Do',
+    paperSub:     'Sonderausgabe · Ausgabe Nr. 1 · 14. Juni 2026',
+    headline:     'Sie haben Ja gesagt!',
+    story:        'Hier erzählt ihr eure Liebesgeschichte. Wie habt ihr euch kennengelernt? Was war euer erstes Date? Wie lief der Antrag? Schreibt so viel oder wenig ihr möchtet — dieser Text ist euer persönlicher Zeitungsartikel.',
+    name1:        'Anna',
+    name2:        'Peter',
+    wdate:        '14. Juni 2026',
+    wlocation:    'Schloss Heidelberg'
+  },
+  en: {
+    paperName:    'The Daily I Do',
+    paperSub:     'Special Edition · Issue No. 1 · June 14, 2026',
+    headline:     'They Said Yes!',
+    story:        'Tell your love story here. How did you meet? What was your first date like? How did the proposal happen? Write as much or as little as you like — this is your personal newspaper article.',
+    name1:        'Emma',
+    name2:        'James',
+    wdate:        'June 14, 2026',
+    wlocation:    'Heidelberg Castle'
+  }
+};
+
+var panelI18n = {
+  'lbl-style':         { de: 'Stil w\u00e4hlen',                                             en: 'Choose Style' },
+  'lbl-sec-masthead':  { de: 'Zeitungsname &amp; Ausgabe',                                   en: 'Newspaper Name &amp; Issue' },
+  'lbl-paperName':     { de: 'Zeitungsname <span class="maxhint">(max. 25 Zeichen)</span>',  en: 'Newspaper Name <span class="maxhint">(max. 25 chars)</span>' },
+  'lbl-paperSub':      { de: 'Untertitel <span class="maxhint">(max. 50 Zeichen)</span>',    en: 'Subtitle <span class="maxhint">(max. 50 chars)</span>' },
+  'lbl-sec-story':     { de: 'Unsere Geschichte',                                            en: 'Our Story' },
+  'lbl-headline':      { de: '\u00dcberschrift',                                             en: 'Headline' },
+  'lbl-story':         { de: 'Text <span id="lbl-story-opt" class="opt">optional \u2014 so viel oder wenig wie ihr m\u00f6chtet</span>', en: 'Text <span id="lbl-story-opt" class="opt">optional \u2014 as much or as little as you like</span>' },
+  'lbl-sec-photo':     { de: 'Euer Foto',                                                    en: 'Your Photo' },
+  'lbl-photo-upload':  { de: 'Foto ausw\u00e4hlen',                                         en: 'Select Photo' },
+  'lbl-photo-sub':     { de: 'JPG, PNG \u2014 bleibt lokal auf eurem Ger\u00e4t',           en: 'JPG, PNG \u2014 stays local on your device' },
+  'lbl-photoCaption':  { de: 'Bildunterschrift <span class="opt">optional</span>',           en: 'Caption <span class="opt">optional</span>' },
+  'lbl-sec-couple':    { de: 'Das Paar',                                                     en: 'The Couple' },
+  'lbl-name1':         { de: 'Name 1 <span class="maxhint">(max. 20 Zeichen)</span>',        en: 'Name 1 <span class="maxhint">(max. 20 chars)</span>' },
+  'lbl-name2':         { de: 'Name 2 <span class="maxhint">(max. 20 Zeichen)</span>',        en: 'Name 2 <span class="maxhint">(max. 20 chars)</span>' },
+  'lbl-wdate':         { de: 'Datum',                                                        en: 'Date' },
+  'lbl-wlocation':     { de: 'Ort',                                                          en: 'Venue' },
+  'lbl-sec-timeline':  { de: 'Tagesprogramm (6 Slots \u2014 leer = unsichtbar)',             en: 'Order of the Day (6 slots \u2014 empty = hidden)' },
+  'lbl-sec-art2':      { de: 'Zweiter Artikel (linke Spalte)',                               en: 'Second Article (left column)' },
+  'lbl-art2head':      { de: '\u00dcberschrift <span class="opt">optional</span>',            en: 'Headline <span class="opt">optional</span>' },
+  'lbl-art2text':      { de: 'Text <span class="opt">optional</span>',                       en: 'Text <span class="opt">optional</span>' },
+  'lbl-sec-art3':      { de: 'Dritter Artikel (rechte Spalte)',                              en: 'Third Article (right column)' },
+  'lbl-art3head':      { de: '\u00dcberschrift <span class="opt">optional</span>',            en: 'Headline <span class="opt">optional</span>' },
+  'lbl-art3text':      { de: 'Text <span class="opt">optional</span>',                       en: 'Text <span class="opt">optional</span>' },
+  'lbl-sec-qr':        { de: 'QR-Code &amp; Hashtag',                                       en: 'QR Code &amp; Hashtag' },
+  'lbl-qrUpload':      { de: 'QR-Code <span class="opt">optional</span>',                   en: 'QR Code <span class="opt">optional</span>' },
+  'lbl-upload-qr':     { de: 'QR-Code ausw\u00e4hlen',                                     en: 'Select QR Code' },
+  'lbl-qrUrl':         { de: 'Website-URL <span class="opt">optional</span>',                en: 'Website URL <span class="opt">optional</span>' },
+  'lbl-hashtag':       { de: 'Hashtag <span class="opt">optional</span>',                    en: 'Hashtag <span class="opt">optional</span>' },
+  'lbl-paperFormat':   { de: 'Papierformat',                                                 en: 'Paper Format' },
+  'btn-download':      { de: '\u2b07 Als PDF herunterladen',                                 en: '\u2b07 Download as PDF' },
+  'privacy-note':      { de: 'Kein Foto-Upload auf Server \u00b7 Alles lokal \u00b7 Chrome / Firefox empfohlen', en: 'No photo upload to server \u00b7 Everything local \u00b7 Chrome / Firefox recommended' },
+  'lbl-bleed':         { de: 'Beschnittzugabe 3\u202fmm',                                   en: 'Bleed 3\u202fmm' },
+  'loadingText':       { de: 'Hochzeitszeitung wird erstellt\u2026',                         en: 'Creating newspaper\u2026' }
+};
+
+var panelPlaceholders = {
+  de: {
+    photoCaption: 'Anna & Peter, Juni 2025',
+    wdate:        '14. Juni 2026',
+    wlocation:    'Schloss Heidelberg',
+    art2head:     'Der Antrag',
+    art2text:     'Erzählt von dem besonderen Moment\u2026',
+    art3head:     'Ein Wort vom Brautpaar',
+    art3text:     'Liebe Gäste, wir sind so froh, dass ihr heute dabei seid\u2026',
+    qrUrl:        'www.anna-und-peter.de',
+    hashtag:      '#AnnaUndPeter2026'
+  },
+  en: {
+    photoCaption: 'Emma & James, June 2025',
+    wdate:        'June 14, 2026',
+    wlocation:    'Heidelberg Castle',
+    art2head:     'The Proposal',
+    art2text:     'Tell us about that special moment\u2026',
+    art3head:     'A Word from the Couple',
+    art3text:     'Dear Guests, we are so glad you are here today\u2026',
+    qrUrl:        'www.emma-and-james.com',
+    hashtag:      '#EmmaAndJames2026'
+  }
+};
+
+function updatePanelLabels(isDE) {
+  var lang = isDE ? 'de' : 'en';
+  Object.keys(panelI18n).forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    var val = panelI18n[id][lang];
+    if (val.indexOf('<') !== -1) { el.innerHTML = val; } else { el.textContent = val; }
+  });
+  var ph = panelPlaceholders[lang];
+  Object.keys(ph).forEach(function(id) { var el = ge(id); if (el) el.placeholder = ph[id]; });
+}
+
+function switchLang(lang, btn) {
+  currentLang = lang;
+  var isDE = lang === 'de';
+  document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  updatePanelLabels(isDE);
+  defaultTimeline = defaultTimelines[lang];
+  var d = defaults[lang];
+  ge('paperName').value = d.paperName;
+  ge('paperSub').value  = d.paperSub;
+  ge('headline').value  = d.headline;
+  ge('story').value     = d.story;
+  ge('name1').value     = d.name1;
+  ge('name2').value     = d.name2;
+  ge('wdate').value     = d.wdate;
+  ge('wlocation').value = d.wlocation;
+  for (var i = 0; i < 6; i++) {
+    ge('tl_time_' + i).value  = defaultTimelines[lang][i][0];
+    ge('tl_event_' + i).value = defaultTimelines[lang][i][1];
+  }
+  update();
+}
+
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/\n/g,'<br>');
+}
+
+// Build timeline rows
+function buildTimeline() {
+  var container = ge('timeline-rows');
+  container.innerHTML = '';
+  for (var i = 0; i < 6; i++) {
+    var row = document.createElement('div');
+    row.className = 'timeline-row';
+    row.innerHTML =
+      '<input type="text" id="tl_time_' + i + '" placeholder="00:00" maxlength="8" oninput="update()">' +
+      '<input type="text" id="tl_event_' + i + '" placeholder="' + (currentLang === 'en' ? 'Event' : 'Programmpunkt') + '" oninput="update()">';
+    container.appendChild(row);
+  }
+}
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  var btns = document.querySelectorAll('.style-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  update();
+}
+
+function cropPhotoToContainer(dataURL, selector, callback) {
+  var tW = 1720; var tH = 1290; /* 860×645 (4:3) × 2 – newspaper always fixed width */
+  var src = new Image();
+  src.onload = function() {
+    var srcR = src.width / src.height;
+    var tgtR = tW / tH;
+    var sx = 0, sy = 0, sw = src.width, sh = src.height;
+    if (srcR > tgtR) { sw = src.height * tgtR; sx = (src.width  - sw) / 2; }
+    else             { sh = src.width  / tgtR; sy = (src.height - sh) / 2; }
+    var c = document.createElement('canvas');
+    c.width = tW; c.height = tH;
+    c.getContext('2d').drawImage(src, sx, sy, sw, sh, 0, 0, tW, tH);
+    callback(c.toDataURL('image/jpeg', 0.85));
+  };
+  src.src = dataURL;
+}
+
+function loadPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    cropPhotoToContainer(e.target.result, '.photo-box', function(cropped) {
+      photoDataUrl = cropped;
+      var preview = ge('photoPreview');
+      preview.src = cropped;
+      preview.style.display = 'block';
+      ge('photoPlaceholderUI').style.display = 'none';
+      update();
+    });
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function loadQR(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    qrDataUrl = e.target.result;
+    ge('qrThumb').src = qrDataUrl;
+    ge('qrThumb').style.display = 'block';
+    ge('qrPlaceholderUI').style.display = 'none';
+    ge('btn-remove-qr').style.display = '';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removeQR() {
+  qrDataUrl = null;
+  ge('qrInput').value = '';
+  ge('qrThumb').style.display = 'none';
+  ge('qrPlaceholderUI').style.display = '';
+  ge('btn-remove-qr').style.display = 'none';
+  update();
+}
+
+function getTimeline() {
+  var items = [];
+  for (var i = 0; i < 6; i++) {
+    var time  = gv('tl_time_' + i).trim();
+    var event = gv('tl_event_' + i).trim();
+    if (time || event) items.push([time, event]);
+  }
+  return items;
+}
+
+function update() {
+  var t = currentTheme;
+  var paperName = gv('paperName') || 'The Daily I Do';
+  var paperSub  = gv('paperSub')  || 'Sonderausgabe · Ausgabe Nr. 1 · ' + (gv('wdate') || '[Datum]');
+  var headline  = gv('headline')  || 'Sie haben Ja gesagt!';
+  var story     = gv('story')     || 'Hier erzählt ihr eure Liebesgeschichte. Wie habt ihr euch kennengelernt? Was war euer erstes Date? Wie lief der Antrag? Schreibt so viel oder so wenig ihr möchtet — dieser Text ist euer persönlicher Zeitungsartikel.';
+  var name1     = gv('name1')     || 'Anna';
+  var name2     = gv('name2')     || 'Peter';
+  var wdate     = gv('wdate')     || '14. Juni 2026';
+  var wloc      = gv('wlocation') || 'Schloss Heidelberg';
+  var caption   = gv('photoCaption');
+  var qrUrl     = gv('qrUrl');
+  var hashtag   = gv('hashtag');
+  var art2head  = gv('art2head');
+  var art2text  = gv('art2text');
+  var art3head  = gv('art3head');
+  var art3text  = gv('art3text');
+  var tl        = getTimeline();
+
+  // Photo HTML
+  var photoContent = photoDataUrl
+    ? '<img src="' + photoDataUrl + '" alt="Hochzeitsfoto">'
+    : '<div class="photo-placeholder">[ Euer Foto hier ]<br><small>Foto oben links auswählen</small></div>';
+
+  // Timeline HTML
+  var tlHtml = '';
+  if (tl.length > 0) {
+    tlHtml = '<ul class="timeline-list">';
+    for (var i = 0; i < tl.length; i++) {
+      tlHtml += '<li><span class="tl-time">' + esc(tl[i][0]) + '</span><span class="tl-event">' + esc(tl[i][1]) + '</span></li>';
+    }
+    tlHtml += '</ul>';
+  }
+
+  // Article 2 & 3 HTML
+  var art2Html = '';
+  var art3Html = '';
+  if (art2head || art2text) {
+    art2Html =
+      '<div class="col-label">' + (art2head ? esc(art2head) : 'Artikel') + '</div>' +
+      '<hr class="col-rule">' +
+      (art2head ? '<div class="headline" style="font-size:20px">' + esc(art2head) + '</div>' : '') +
+      (art2text ? '<div class="bodytext">' + esc(art2text) + '</div>' : '');
+  }
+  if (art3head || art3text) {
+    art3Html =
+      '<div class="col-label">' + (art3head ? esc(art3head) : 'Artikel') + '</div>' +
+      '<hr class="col-rule">' +
+      (art3head ? '<div class="headline" style="font-size:20px">' + esc(art3head) + '</div>' : '') +
+      (art3text ? '<div class="bodytext">' + esc(art3text) + '</div>' : '');
+  }
+
+  // QR/Hashtag HTML
+  var qrHtml = '';
+  if (qrDataUrl || qrUrl || hashtag) {
+    qrHtml = '<div class="qr-box">';
+    if (qrDataUrl) {
+      qrHtml += '<div class="qr-label">Scan &amp; Connect</div>';
+      qrHtml += '<img src="' + qrDataUrl + '" alt="QR-Code">';
+    }
+    if (qrUrl)   qrHtml += '<div class="qr-url">'     + esc(qrUrl)   + '</div>';
+    if (hashtag) qrHtml += '<div class="qr-hashtag">' + esc(hashtag) + '</div>';
+    qrHtml += '</div>';
+  }
+
+  var out = ge('newspaper');
+  out.className = t;
+
+  out.innerHTML =
+    // MASTHEAD
+    '<div class="masthead">' +
+      '<hr class="rule-thick">' +
+      '<hr class="rule-thin">' +
+      '<div class="paper-name">' + esc(paperName) + '</div>' +
+      '<div class="paper-sub">' + esc(paperSub) + '</div>' +
+      '<hr class="rule-bot-thin">' +
+      '<hr class="rule-bot-thick">' +
+    '</div>' +
+
+    // 3 COLS: Story | Photo | Monogram
+    '<div class="cols3">' +
+      // Col 1: Story
+      '<div>' +
+        '<div class="col-label">Breaking News</div>' +
+        '<hr class="col-rule">' +
+        '<div class="headline">' + esc(headline) + '</div>' +
+        '<div class="bodytext">' + esc(story) + '</div>' +
+      '</div>' +
+      // Col 2: Photo
+      '<div>' +
+        '<div class="col-label">Euer Foto</div>' +
+        '<hr class="col-rule">' +
+        '<div class="photo-box">' + photoContent + '</div>' +
+        (caption ? '<div class="photo-caption">' + esc(caption) + '</div>' : '') +
+      '</div>' +
+      // Col 3: Monogram
+      '<div>' +
+        '<div class="col-label">Das Paar</div>' +
+        '<hr class="col-rule">' +
+        '<div class="monogram-box">' +
+          '<div class="mono-names">' + esc(name1) + '</div>' +
+          '<div class="mono-amp">&amp;</div>' +
+          '<div class="mono-names">' + esc(name2) + '</div>' +
+          '<hr class="rule-mid">' +
+          '<div class="mono-detail">' + esc(wdate) + '</div>' +
+          '<div class="mono-detail">' + esc(wloc) + '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // DIVIDER + PROGRAMME
+    '<hr class="rule-mid">' +
+    '<div class="section-banner">✦ ' + (currentLang === 'en' ? 'Wedding Day Programme' : 'Das Hochzeitsprogramm') + ' ✦</div>' +
+    '<hr class="rule-mid">' +
+
+    // 2 COLS: Timeline | QR
+    '<div class="cols2">' +
+      '<div>' +
+        '<div class="col-label">Ablauf des Tages</div>' +
+        '<hr class="col-rule">' +
+        (tlHtml || '<div style="font-size:12px;opacity:0.4">Programmpunkte oben eintragen…</div>') +
+      '</div>' +
+      '<div>' +
+        (qrHtml || '') +
+      '</div>' +
+    '</div>' +
+
+    // ARTICLES 2 & 3
+    ((art2Html || art3Html) ?
+      '<hr class="rule-mid">' +
+      '<div class="art-cols">' +
+        '<div>' + (art2Html || '') + '</div>' +
+        '<div>' + (art3Html || '') + '</div>' +
+      '</div>'
+    : '') +
+
+    // FOOTER
+    '<hr class="rule-bot-thin">' +
+    '<hr class="rule-bot-thick">';
+}
+
+function startDownload() {
+  ge('loading').classList.add('active');
+  setTimeout(doDownload, 150);
+}
+
+function doDownload() {
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var el = ge('newspaper');
+  var bleedRgb = null;
+  if (bleed) {
+    var _bg = getComputedStyle(el).backgroundColor.match(/\d+/g);
+    if (_bg && _bg.length >= 3) bleedRgb = [+_bg[0], +_bg[1], +_bg[2]];
+  }
+  html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null })
+    .then(function(canvas) {
+      var imgData = canvas.toDataURL('image/jpeg', 0.90);
+      var jsPDF = window.jspdf.jsPDF;
+      var fmt  = (document.getElementById('sel-format') || {value:'a3'}).value;
+      var pdfW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+      var pdfH = canvas.height * pdfW / canvas.width;
+      var namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pdfW,pdfH];
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pdfW + bleed * 2, pdfH + bleed * 2] : namedFmt });
+      if (bleedRgb) {
+        pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+        pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+      }
+      pdf.addImage(imgData, 'JPEG', bleed, bleed, pdfW, pdfH);
+      var n1 = gv('name1') || 'Newspaper';
+      var n2 = gv('name2') || '';
+      var suffix = currentLang === 'en' ? '_WeddingNewspaper_WSA.pdf' : '_Hochzeitszeitung_WSA.pdf';
+      pdf.save(n1 + (n2 ? '_' + n2 : '') + suffix);
+      ge('loading').classList.remove('active');
+    })
+    .catch(function(e) {
+      alert(currentLang === 'en' ? 'PDF could not be created. Please try again.' : 'PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
+      ge('loading').classList.remove('active');
+    });
+}
+
+// Init
+document.addEventListener('DOMContentLoaded', function() {
+  buildTimeline();
+
+  ge('paperName').value    = 'The Daily I Do';
+  ge('paperSub').value     = 'Sonderausgabe · Ausgabe Nr. 1 · 14. Juni 2026';
+  ge('headline').value     = 'Sie haben Ja gesagt!';
+  ge('story').value        = 'Hier erzählt ihr eure Liebesgeschichte. Wie habt ihr euch kennengelernt? Was war euer erstes Date? Wie lief der Antrag? Schreibt so viel oder wenig ihr möchtet — dieser Text ist euer persönlicher Zeitungsartikel.';
+  ge('name1').value        = 'Anna';
+  ge('name2').value        = 'Peter';
+  ge('wdate').value        = '14. Juni 2026';
+  ge('wlocation').value    = 'Schloss Heidelberg';
+
+  for (var i = 0; i < 6; i++) {
+    ge('tl_time_' + i).value  = defaultTimeline[i][0];
+    ge('tl_event_' + i).value = defaultTimeline[i][1];
+  }
+
+  update();
+});
+</script>
+</body>
+</html>

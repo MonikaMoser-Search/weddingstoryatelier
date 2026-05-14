@@ -1,0 +1,259 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Save the Date — Luxury Suite 2026</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --gold: #C89A5A; --charcoal: #1A1A1A;
+      --over-light: rgba(255, 255, 255, 0.35); --over-dark: rgba(0, 0, 0, 0.45);
+    }
+
+    .panel-logo { font-size: 20px; }
+    .panel-tagline { margin-bottom: 18px; }
+
+    #std-output { 
+      width: 105mm; height: 148mm; background: white; padding: 15mm;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.12); position: relative; overflow: hidden;
+      background-size: cover; background-position: center;
+    }
+
+    .card-overlay { position: absolute; inset: 0; z-index: 1; transition: background 0.3s; }
+    .card-content { position: relative; z-index: 2; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; }
+
+    .neodeco { color: #FFF; border: 8px double var(--gold); }
+    .neodeco .names { font-family: 'Playfair Display'; font-weight: 700; color: #C89A5A; font-size: 32pt; text-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+    
+    .opera { color: #E0CCA8; border: 4px solid #5A1212; }
+    .opera .names { font-family: 'Playfair Display'; font-style: italic; color: #FFF; font-size: 32pt; text-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+
+    .clouddancer { color: #444; border: 1px solid #D4B896; }
+    .clouddancer .names { font-family: 'Cormorant Garamond'; font-weight: 400; font-size: 36pt; letter-spacing: 2px; text-shadow: 0 1px 5px rgba(0,0,0,0.3); }
+
+    .upload-zone { border: 1px dashed #ddd; padding: 15px; text-align: center; background: #fafafa; cursor: pointer; margin-bottom: 10px; position: relative; font-size: 12px; }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .btn-group { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 15px; }
+    .ui-btn { flex: 1; min-width: calc(33% - 5px); padding: 8px; font-size: 10px; border: 1px solid #eee; background: white; cursor: pointer; text-transform: uppercase; }
+    .ui-btn.active { background: var(--charcoal); color: white; }
+    .export-btn { width: 100%; padding: 18px; background: var(--charcoal); color: white; border: none; cursor: pointer; font-weight: bold; letter-spacing: 2px; text-transform: uppercase; }
+    .bleed-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    #chk-bleed { opacity: 0; position: absolute; pointer-events: none; width: 0; height: 0; }
+    .bleed-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-bottom: 7px; }
+    .bleed-check { width: 14px; height: 14px; border: 1.5px solid #ccc; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 9px; color: transparent; line-height: 1; }
+    #chk-bleed:checked ~ .bleed-row .bleed-check { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+    .bleed-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; }
+    .bleed-off-desc, .bleed-on-desc { font-family: 'DM Sans', sans-serif; font-size: 8px; color: #666; line-height: 1.6; margin: 0; }
+    .bleed-off-desc strong, .bleed-on-desc strong { color: #333; }
+    .bleed-on-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-off-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-on-desc { display: block; }
+  </style>
+<script>
+(function(){var _rc={_id:"STD-LuxusLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<div class="panel-form">
+  <div class="panel-logo">Save the Date</div>
+  <div class="panel-tagline">Luxury Collection · Wedding Story Atelier</div>
+  
+  <label class="section-label">1. Stil wählen</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('neodeco', this)">Neo-Deco</button>
+    <button class="ui-btn" onclick="setTheme('opera', this)">Opera</button>
+    <button class="ui-btn" onclick="setTheme('clouddancer', this)">Cloud</button>
+  </div>
+
+  <label class="section-label">2. Hintergrund Upload</label>
+  <div class="upload-zone">
+    <span>Klicken für Foto oder Material</span>
+    <input type="file" accept="image/*" onchange="loadMedia(this)">
+  </div>
+
+  <label class="section-label">Lesbarkeits-Filter</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setOverlay('transparent', this)">Kein</button>
+    <button class="ui-btn" onclick="setOverlay('rgba(255,255,255,0.40)', this)">Hell</button>
+    <button class="ui-btn" onclick="setOverlay('rgba(0,0,0,0.50)', this)">Dunkel</button>
+  </div>
+
+  <label class="section-label">3. Personalisierung</label>
+  <input type="text" id="n1" value="Anna" oninput="update()">
+  <input type="text" id="n2" value="Peter" oninput="update()">
+  <input type="text" id="date" value="14. Juni 2026" oninput="update()">
+  <input type="text" id="footer" value="Einladung folgt" oninput="update()">
+
+  <label class="section-label">Schriftfarbe – Text</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setColor('#000', this)">Schwarz</button>
+    <button class="ui-btn" onclick="setColor('#fff', this)">Weiß</button>
+    <button class="ui-btn" onclick="setColor('#C89A5A', this)">Gold</button>
+    <button class="ui-btn" onclick="setColor('#8B0000', this)">D.Rot</button>
+    <button class="ui-btn" onclick="setColor('#1A5C2A', this)">D.Grün</button>
+    <button class="ui-btn" onclick="setColor('#1B3A6B', this)">D.Blau</button>
+    <button class="ui-btn" onclick="setColor('#A9A9A9', this)">Silber</button>
+  </div>
+
+  <label class="section-label">Schriftfarbe – Namen</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setNamesColor('', this)">Theme</button>
+    <button class="ui-btn" onclick="setNamesColor('#000', this)">Schwarz</button>
+    <button class="ui-btn" onclick="setNamesColor('#fff', this)">Weiß</button>
+    <button class="ui-btn" onclick="setNamesColor('#C89A5A', this)">Gold</button>
+    <button class="ui-btn" onclick="setNamesColor('#8B0000', this)">D.Rot</button>
+    <button class="ui-btn" onclick="setNamesColor('#1A5C2A', this)">D.Grün</button>
+    <button class="ui-btn" onclick="setNamesColor('#1B3A6B', this)">D.Blau</button>
+    <button class="ui-btn" onclick="setNamesColor('#A9A9A9', this)">Silber</button>
+  </div>
+
+  <button class="export-btn" onclick="downloadPDF()">Export PDF (A6)</button>
+  <div class="bleed-box">
+    <input type="checkbox" id="chk-bleed">
+    <label class="bleed-row" for="chk-bleed">
+      <span class="bleed-check">&#10003;</span>
+      <span class="bleed-title">Beschnittzugabe 3 mm</span>
+    </label>
+    <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+    <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+  </div>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>
+  </div>
+</div>
+
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="std-output" class="neodeco">
+      <div id="std-overlay" class="card-overlay"></div>
+      <div class="card-content">
+        <div style="text-transform:uppercase; letter-spacing:4px; font-size:10pt; margin-bottom:15px;">Save the Date</div>
+        <div class="names" id="out-n1">Anna</div>
+        <div style="font-family:'Cormorant Garamond'; font-style:italic; font-size:20pt; margin:5px 0;">&</div>
+        <div class="names" id="out-n2">Peter</div>
+        <div style="margin-top:20px; font-size:14pt; letter-spacing:2px; font-weight:500;" id="out-date">14. Juni 2026</div>
+        <div style="margin-top:25px; font-size:8pt; opacity:0.6; letter-spacing:1px;" id="out-footer">Einladung folgt</div> </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentTheme = 'neodeco', currentBG = '', currentColor = '#000', currentOverlay = 'transparent', currentNamesColor = '';
+
+function setTheme(t, b) {
+  currentTheme = t;
+  b.parentElement.querySelectorAll('.ui-btn').forEach(btn => btn.classList.remove('active'));
+  b.classList.add('active');
+  update();
+}
+
+function setOverlay(o, b) {
+  currentOverlay = o;
+  b.parentElement.querySelectorAll('.ui-btn').forEach(btn => btn.classList.remove('active'));
+  b.classList.add('active');
+  update();
+}
+
+function setColor(c, b) {
+  currentColor = c;
+  b.parentElement.querySelectorAll('.ui-btn').forEach(btn => btn.classList.remove('active'));
+  b.classList.add('active');
+  update();
+}
+
+function setNamesColor(c, b) {
+  currentNamesColor = c;
+  b.parentElement.querySelectorAll('.ui-btn').forEach(btn => btn.classList.remove('active'));
+  b.classList.add('active');
+  update();
+}
+
+function loadMedia(input) {
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => { currentBG = e.target.result; update(); };
+  reader.readAsDataURL(file);
+}
+
+function update() {
+  const out = document.getElementById('std-output');
+  const overlay = document.getElementById('std-overlay');
+  
+  out.className = currentTheme;
+  out.style.backgroundImage = currentBG ? `url('${currentBG}')` : 'none';
+  out.style.color = currentColor;
+  overlay.style.backgroundColor = currentOverlay;
+
+  const n1el = document.getElementById('out-n1');
+  const n2el = document.getElementById('out-n2');
+  n1el.textContent = document.getElementById('n1').value;
+  n2el.textContent = document.getElementById('n2').value;
+  n1el.style.color = currentNamesColor;
+  n2el.style.color = currentNamesColor;
+  document.getElementById('out-date').textContent = document.getElementById('date').value;
+  document.getElementById('out-footer').textContent = document.getElementById('footer').value; // Live-Update Abschlusszeile
+
+  const scaler = document.getElementById('preview-scaler');
+  const scale = Math.min((window.innerWidth - 450) / 450, 1);
+  scaler.style.transform = `scale(${scale})`;
+}
+
+function downloadPDF() {
+  const el = document.getElementById('std-output');
+  const scaler = document.getElementById('preview-scaler');
+  const prevTransform = scaler.style.transform;
+  scaler.style.transform = 'scale(1)';
+
+  const wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;background:transparent;';
+  const clone = el.cloneNode(true);
+  clone.style.backgroundImage = el.style.backgroundImage;
+  clone.style.color = el.style.color;
+  const origOverlay = document.getElementById('std-overlay');
+  const cloneOverlay = clone.querySelector('.card-overlay');
+  if (origOverlay && cloneOverlay) {
+    cloneOverlay.style.backgroundColor = origOverlay.style.backgroundColor;
+  }
+  wrap.appendChild(clone);
+  document.body.appendChild(wrap);
+
+  const bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  setTimeout(function() {
+    html2canvas(clone, {
+      scale: 3,
+      useCORS: false,
+      allowTaint: true,
+      backgroundColor: null,
+      logging: false,
+      imageTimeout: 0
+    }).then(function(canvas) {
+      document.body.removeChild(wrap);
+      scaler.style.transform = prevTransform;
+      const img = canvas.toDataURL('image/png');
+      const pdf = new window.jspdf.jsPDF('p', 'mm', bleed ? [105 + bleed*2, 148 + bleed*2] : 'a6');
+      pdf.addImage(img, 'PNG', bleed, bleed, 105, 148);
+      const namen = document.getElementById('n1').value || 'SaveTheDate';
+      pdf.save('WSA_SaveTheDate_' + namen + '.pdf');
+    }).catch(function(err) {
+      document.body.removeChild(wrap);
+      scaler.style.transform = prevTransform;
+      console.error(err);
+      alert('Export fehlgeschlagen. Bitte Chrome verwenden.');
+    });
+  }, 300);
+}
+
+update();
+window.onresize = update;
+</script>
+</body>
+</html>

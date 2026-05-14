@@ -1,0 +1,893 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Menü & Getränke — Luxus Line · Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ══ FORM PANEL EXTRAS ═══════════════════════════════════ */
+
+    /* Tab buttons */
+    .tab-group { display:flex; gap:3px; margin-bottom:2px; }
+    .tab-btn {
+      flex:1; padding:6px 4px; font-size:9px; border:1px solid #d8d5d0;
+      background:#fff; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;
+      font-family:'DM Sans',sans-serif; transition:all 0.15s; color:#444;
+    }
+    .tab-btn:hover  { border-color:#1A1A1A; color:#1A1A1A; }
+    .tab-btn.active { background:#1A1A1A; color:#fff; border-color:#1A1A1A; }
+
+    /* Upload zone */
+    .upload-zone {
+      border:1px dashed #ccc; padding:11px; text-align:center;
+      background:#fafafa; cursor:pointer; position:relative;
+      font-size:10px; color:#888; transition:border-color 0.2s, color 0.2s; margin-bottom:4px;
+    }
+    .upload-zone:hover  { border-color:#1A1A1A; color:#1A1A1A; }
+    .upload-zone.loaded { border-color:#C89A5A; color:#C89A5A; }
+    .upload-zone input  { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; }
+    .btn-rm {
+      width:100%; padding:5px; border:1px solid #eee; background:#fafafa;
+      font-family:'DM Sans',sans-serif; font-size:8px; text-transform:uppercase;
+      letter-spacing:1px; color:#999; cursor:pointer; transition:all 0.15s; margin-bottom:6px;
+    }
+    .btn-rm:hover { border-color:#c0392b; color:#c0392b; }
+
+    /* Gang blocks */
+    .gang-block  { border:1px solid #f0ede9; margin-bottom:8px; background:#fdfcfb; }
+    .gang-header { display:flex; align-items:center; gap:6px; padding:7px 9px 0; }
+    .gang-num    { font-size:8px; color:#777; text-transform:uppercase; letter-spacing:1px; flex:1; }
+    .gang-remove { font-size:9px; color:#ccc; background:none; border:none; cursor:pointer; padding:2px 4px; line-height:1; }
+    .gang-remove:hover { color:#c0392b; }
+    .gang-body   { padding:6px 9px 8px; }
+
+    /* Allergen toggle + grid */
+    .alg-toggle { font-size:8px; color:#666; background:none; border:none; cursor:pointer; text-transform:uppercase; letter-spacing:1px; padding:4px 0 2px; display:block; }
+    .alg-toggle:hover { color:#1A1A1A; }
+    .alg-grid { display:none; grid-template-columns:1fr 1fr; gap:2px 8px; margin-top:4px; }
+    .alg-grid.open { display:grid; }
+    .alg-item { display:flex; align-items:center; gap:4px; font-size:9.5px; color:#555; cursor:pointer; }
+    .alg-item input { width:11px; height:11px; cursor:pointer; accent-color:#1A1A1A; margin:0; flex-shrink:0; }
+
+    /* Add gang */
+    .btn-add { width:100%; padding:7px; border:1px dashed #bbb; background:#fff; font-family:'DM Sans',sans-serif; font-size:9px; text-transform:uppercase; letter-spacing:1px; color:#555; cursor:pointer; transition:all 0.15s; }
+    .btn-add:hover { border-color:#1A1A1A; color:#1A1A1A; }
+
+    /* Sliders */
+    .slider-row { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .slider-lbl { font-size:8px; color:#666; min-width:16px; }
+    input[type="range"] { flex:1; -webkit-appearance:none; height:3px; background:#eee; border-radius:2px; outline:none; border:none; padding:0; cursor:pointer; }
+    input[type="range"]::-webkit-slider-thumb { -webkit-appearance:none; width:13px; height:13px; border-radius:50%; background:#1A1A1A; cursor:pointer; }
+
+    /* Section visibility */
+    .card-section { display:none; }
+    .card-section.visible { display:block; }
+
+    /* Allergen form note */
+    .alg-form-note { font-size:9px; color:#888; font-style:italic; line-height:1.65; padding:10px 12px; border:1px solid #f0ede9; background:#fdfcfb; }
+    .alg-form-note strong { color:#555; font-style:normal; }
+
+    /* Actions */
+    .btn-export-all { flex:2; padding:9px 4px; background:#C89A5A; color:#fff; border:none; font-family:'DM Sans',sans-serif; font-size:8px; text-transform:uppercase; letter-spacing:1px; cursor:pointer; transition:background 0.15s; }
+    .btn-export-all:hover { background:#b08448; }
+
+    /* Bleed */
+    .bleed-box { border:1px solid #e8e4df; border-radius:4px; padding:10px 12px; margin-top:8px; background:#faf8f5; }
+    #chk-bleed { opacity:0; position:absolute; pointer-events:none; width:0; height:0; }
+    .bleed-row  { display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; margin-bottom:7px; }
+    .bleed-check { width:14px; height:14px; border:1.5px solid #ccc; border-radius:3px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.15s; font-size:9px; color:transparent; line-height:1; }
+    #chk-bleed:checked ~ .bleed-row .bleed-check { background:#1A1A1A; border-color:#1A1A1A; color:#fff; }
+    .bleed-title { font-size:9px; text-transform:uppercase; letter-spacing:1.2px; color:#333; }
+    .bleed-off-desc, .bleed-on-desc { font-size:8px; color:#666; line-height:1.6; margin:0; }
+    .bleed-on-desc { display:none; }
+    #chk-bleed:checked ~ .bleed-off-desc { display:none; }
+    #chk-bleed:checked ~ .bleed-on-desc  { display:block; }
+
+    /* ══ CARD — DL 105×210 mm ════════════════════════════════ */
+    #card {
+      width:105mm; height:210mm;
+      position:relative; overflow:hidden;
+      box-shadow:0 20px 60px rgba(0,0,0,0.3);
+      flex-shrink:0; display:flex; flex-direction:column;
+      font-size:calc(11pt * var(--fs-scale,1));
+      background-size:cover; background-position:center;
+      background-color:#F2EDE4;
+    }
+    .card-overlay { position:absolute; inset:0; z-index:1; pointer-events:none; transition:background 0.25s; }
+    .card-frame   { position:absolute; inset:7mm; z-index:2; pointer-events:none; border:0.5px solid currentColor; opacity:0.22; }
+    .card-body    { position:relative; z-index:3; flex:1; padding:12mm 10mm 8mm; display:flex; flex-direction:column; }
+
+    /* Header */
+    .card-eyebrow     { font-family:'DM Sans',sans-serif; font-size:calc(0.62em); letter-spacing:0.42em; text-align:center; margin-bottom:1.5mm; opacity:0.88; }
+    .card-eyebrow-sub { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:calc(0.84em); text-align:center; margin-bottom:2.5mm; letter-spacing:0.08em; opacity:0.88; }
+    .card-title       { font-family:'Playfair Display',serif; font-size:calc(2.3em); font-weight:700; text-align:center; line-height:1.1; margin-bottom:2.5mm; text-shadow:0 2px 18px rgba(0,0,0,0.45); }
+    .card-accent-rule { width:28px; height:1.5px; background:#C89A5A; margin:0 auto 4mm; }
+
+    /* Content layout */
+    .card-content { flex:1; display:flex; flex-direction:column; justify-content:space-evenly; }
+
+    /* Ornament separator */
+    .orn-sep  { display:flex; align-items:center; gap:5px; margin:0 auto; width:80%; padding:1mm 0; }
+    .orn-line { flex:1; height:0.5px; background:currentColor; opacity:0.2; }
+    .orn-gem  { font-size:5px; line-height:1; flex-shrink:0; color:#C89A5A; }
+
+    /* Section label */
+    .section-cat { font-family:'DM Sans',sans-serif; font-size:calc(0.60em); letter-spacing:0.28em; text-align:center; margin-bottom:calc(var(--gap-scale,1)*1.5mm); opacity:0.82; }
+
+    /* Menu */
+    .course-name { font-family:'Cormorant Garamond',serif; font-weight:400; font-size:calc(1.30em); text-align:center; line-height:1.25; margin-bottom:1mm; text-shadow:0 1px 10px rgba(0,0,0,0.4); }
+    .allergen-a  { font-family:'DM Sans',sans-serif; font-size:0.5em; font-weight:500; vertical-align:super; margin-left:2px; color:#C89A5A; letter-spacing:0; }
+    .course-desc { font-family:'Cormorant Garamond',serif; font-size:calc(0.95em); text-align:center; line-height:1.45; opacity:0.82; }
+
+    /* Wine / Drinks */
+    .wine-name, .drink-item { font-family:'Cormorant Garamond',serif; font-weight:400; font-style:italic; font-size:calc(1.22em); text-align:center; line-height:1.4; margin-bottom:0.5mm; text-shadow:0 1px 8px rgba(0,0,0,0.35); }
+
+    /* Footer note */
+    .card-footer-note { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:calc(0.78em); text-align:center; opacity:0.72; margin-top:auto; padding-top:4mm; }
+
+    /* Allergen card */
+    .alg-card-title  { font-family:'DM Sans',sans-serif; font-size:calc(0.60em); letter-spacing:0.28em; text-align:center; margin-bottom:3mm; opacity:0.82; }
+    .alg-entry       { margin-bottom:calc(var(--gap-scale,1)*2.8mm); }
+    .alg-entry-name  { font-family:'Cormorant Garamond',serif; font-weight:400; font-style:italic; font-size:calc(1.12em); text-align:center; margin-bottom:0.8mm; text-shadow:0 1px 8px rgba(0,0,0,0.35); }
+    .alg-entry-list  { font-family:'DM Sans',sans-serif; font-size:calc(0.68em); text-align:center; letter-spacing:0.05em; opacity:0.82; }
+
+  </style>
+<script>
+(function(){var _rc={_id:"MG-LuxusLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ════ FORM PANEL ══════════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo">Menü &amp; Getränke</div>
+  <div class="panel-tagline">Luxus Line · Wedding Story Atelier</div>
+
+  <!-- Hintergrund (pro Karte, versteckt bei Allergenkarte) -->
+  <div id="bg-controls">
+    <span class="section-label">Hintergrund-Foto</span>
+    <div class="upload-zone" id="upload-zone">
+      <span id="upload-label">Foto hochladen</span>
+      <input type="file" accept="image/*" onchange="loadPhoto(this)">
+    </div>
+    <button class="btn-rm" onclick="removePhoto()">Foto entfernen</button>
+
+    <span class="section-label">Overlay-Filter</span>
+    <div class="btn-group" id="overlay-group">
+      <button class="ui-btn active" data-val="transparent"          onclick="setOverlay(this)">Kein</button>
+      <button class="ui-btn"        data-val="rgba(255,255,255,0.38)" onclick="setOverlay(this)">Hell</button>
+      <button class="ui-btn"        data-val="rgba(0,0,0,0.48)"      onclick="setOverlay(this)">Dunkel</button>
+    </div>
+
+    <span class="section-label">Schriftfarbe</span>
+    <div class="btn-group" id="color-group">
+      <button class="ui-btn active" data-val="#1A1A1A" onclick="setColor(this)">Schwarz</button>
+      <button class="ui-btn"        data-val="#fff"    onclick="setColor(this)">Weiß</button>
+      <button class="ui-btn"        data-val="#C89A5A" onclick="setColor(this)">Gold</button>
+    </div>
+  </div>
+
+  <!-- Karten-Tabs -->
+  <span class="section-label" style="margin-top:12px;">Karte</span>
+  <div class="tab-group">
+    <button class="tab-btn active" onclick="setCard('menu',this)">Menü</button>
+    <button class="tab-btn"        onclick="setCard('wein',this)">Wein</button>
+    <button class="tab-btn"        onclick="setCard('cocktail',this)">Cocktail</button>
+    <button class="tab-btn"        onclick="setCard('getraenke',this)">Getränke</button>
+  </div>
+  <div class="tab-group" style="margin-top:3px;">
+    <button class="tab-btn" id="tab-allergene" onclick="setCard('allergene',this)">⚑ Allergenkarte</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Gemeinsame Felder -->
+  <span class="section-label">Namen</span>
+  <input type="text" id="inp-names" placeholder="Anna &amp; Peter" oninput="render()">
+
+  <span class="section-label">Datum</span>
+  <input type="text" id="inp-date" placeholder="14. Juni 2026" oninput="render()">
+
+  <span class="section-label">Ort <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+  <input type="text" id="inp-ort" placeholder="Schloss Heidelberg" oninput="render()">
+
+  <hr class="divider">
+
+  <!-- ── MENÜ ── -->
+  <div id="sec-menu" class="card-section visible">
+    <span class="section-label">Gänge</span>
+    <p class="hint">Kategorie leer lassen = kein Label. Vegetarisch / Vegan / Alternative wird automatisch erkannt.</p>
+    <div id="gang-list"></div>
+    <button class="btn-add" onclick="addGang()">+ Gang hinzufügen</button>
+    <span class="section-label" style="margin-top:10px;">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-menu-footer" placeholder="Bitte Menüwünsche im Voraus mitteilen." oninput="render()">
+  </div>
+
+  <!-- ── WEIN ── -->
+  <div id="sec-wein" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+    <span class="section-label">Weißwein</span>
+    <textarea id="inp-weiss" placeholder="Sancerre Blanc 2022 — Loire Valley&#10;Grauburgunder Spätlese — Pfalz" oninput="render()"></textarea>
+    <span class="section-label">Rotwein</span>
+    <textarea id="inp-rot" placeholder="Château Pichon Baron 2018 — Pauillac" oninput="render()"></textarea>
+    <span class="section-label">Rosé</span>
+    <textarea id="inp-rose" placeholder="Château Margaux Rosé 2022 — Provence" oninput="render()"></textarea>
+    <span class="section-label">Schaumwein / Sekt</span>
+    <textarea id="inp-sekt" placeholder="Champagne Ruinart Blanc de Blancs" oninput="render()"></textarea>
+    <span class="section-label">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-wein-footer" placeholder="Alkoholfreie Alternativen auf Anfrage erhältlich." oninput="render()">
+  </div>
+
+  <!-- ── COCKTAIL ── -->
+  <div id="sec-cocktail" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+    <span class="section-label">Signature Cocktails</span>
+    <textarea id="inp-sig" placeholder="Anna's Garden Spritz&#10;Peter's Old Fashioned" oninput="render()"></textarea>
+    <span class="section-label">Klassiker</span>
+    <textarea id="inp-klass" placeholder="Aperol Spritz · Negroni · Mojito" oninput="render()"></textarea>
+    <span class="section-label">Alkoholfrei</span>
+    <textarea id="inp-alk" placeholder="Rose Lemonade&#10;Cucumber Cooler" oninput="render()"></textarea>
+    <span class="section-label">Hinweis <span style="color:#ccc;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-cocktail-footer" placeholder="" oninput="render()">
+  </div>
+
+  <!-- ── GETRÄNKE ── -->
+  <div id="sec-getraenke" class="card-section">
+    <p class="hint">Leer lassen = Kategorie wird ausgeblendet.</p>
+    <span class="section-label">Wasser</span>
+    <textarea id="inp-wasser" placeholder="Stilles Mineralwasser&#10;Sprudelwasser" oninput="render()"></textarea>
+    <span class="section-label">Softdrinks</span>
+    <textarea id="inp-soft" placeholder="Cola · Cola Zero&#10;Fanta · Sprite" oninput="render()"></textarea>
+    <span class="section-label">Säfte</span>
+    <textarea id="inp-saefte" placeholder="Orangensaft&#10;Apfelsaft naturtrüb" oninput="render()"></textarea>
+    <span class="section-label">Heißgetränke</span>
+    <textarea id="inp-heiss" placeholder="Kaffee · Espresso&#10;Tee — Auswahl auf Anfrage" oninput="render()"></textarea>
+    <span class="section-label" style="margin-top:8px;">Weitere Kategorie 1 <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-extra1-label" placeholder="z.B. Saftschorlen" oninput="render()" style="margin-bottom:2px;">
+    <textarea id="inp-extra1" placeholder="Apfelschorle&#10;Orangenschorle" oninput="render()"></textarea>
+    <span class="section-label" style="margin-top:4px;">Weitere Kategorie 2 <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-extra2-label" placeholder="z.B. Spirituosen" oninput="render()" style="margin-bottom:2px;">
+    <textarea id="inp-extra2" placeholder="" oninput="render()"></textarea>
+    <span class="section-label" style="margin-top:8px;">Hinweis <span style="color:#aaa;font-style:italic;font-size:9px;">optional</span></span>
+    <input type="text" id="inp-getr-footer" placeholder="" oninput="render()">
+  </div>
+
+  <!-- ── ALLERGENKARTE (Formular-Info) ── -->
+  <div id="sec-allergene" class="card-section">
+    <div class="alg-form-note">
+      Die Allergenkarte wird automatisch aus dem <strong>Menü-Tab</strong> generiert.<br>
+      Hintergrund, Filter und Schriftfarbe werden ebenfalls vom Menü-Tab übernommen.<br><br>
+      Bitte beim Menü-Tab bei jedem Gang die entsprechenden Allergene anhaken —
+      der Tab <strong>⚑ Allergenkarte</strong> leuchtet auf, sobald Angaben vorhanden sind.
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Typografie -->
+  <span class="section-label">Textgröße</span>
+  <div class="slider-row">
+    <span class="slider-lbl">A</span>
+    <input type="range" id="sl-size" min="80" max="130" value="100" oninput="applyTypo()">
+    <span class="slider-lbl" style="font-size:11px;">A</span>
+  </div>
+  <span class="section-label" style="margin-top:6px;">Zeilenabstand</span>
+  <div class="slider-row">
+    <span class="slider-lbl" style="font-size:8px;">—</span>
+    <input type="range" id="sl-space" min="60" max="140" value="100" oninput="applyTypo()">
+    <span class="slider-lbl" style="font-size:11px;">≡</span>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-row">
+    <button class="btn-demo"       onclick="loadDemo()">▷ Demo</button>
+    <button class="btn-export"     onclick="exportCurrent()">PDF</button>
+    <button class="btn-export-all" onclick="exportAll()">Alle PDF</button>
+  </div>
+
+  <div class="bleed-box">
+    <input type="checkbox" id="chk-bleed">
+    <label class="bleed-row" for="chk-bleed">
+      <span class="bleed-check">&#10003;</span>
+      <span class="bleed-title">Beschnittzugabe 3 mm</span>
+    </label>
+    <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+    <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+  </div>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ═══════════════════════════════════════ -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="card">
+      <div id="card-overlay" class="card-overlay"></div>
+      <div class="card-frame"></div>
+      <div class="card-body" id="card-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg">PDF wird erstellt …</span>
+</div>
+
+<script>
+// ══ KONSTANTEN ══════════════════════════════════════════════
+const ALLERGENS = [
+  { code:'G',  name:'Gluten'      },
+  { code:'Kr', name:'Krebstiere'  },
+  { code:'E',  name:'Eier'        },
+  { code:'F',  name:'Fisch'       },
+  { code:'En', name:'Erdnüsse'    },
+  { code:'So', name:'Soja'        },
+  { code:'Mi', name:'Milch'       },
+  { code:'N',  name:'Nüsse'       },
+  { code:'Se', name:'Sellerie'    },
+  { code:'Sf', name:'Senf'        },
+  { code:'Si', name:'Sesam'       },
+  { code:'Sw', name:'Sulfite'     },
+  { code:'Lu', name:'Lupinen'     },
+  { code:'We', name:'Weichtiere'  },
+];
+
+const CARD_TITLES = {
+  menu:'Menü', wein:'Weinkarte', cocktail:'Cocktails',
+  getraenke:'Getränke', allergene:'Hinweise',
+};
+
+// ══ STATE ══════════════════════════════════════════════════
+let currentCard = 'menu';
+
+// Pro Karte: eigenes Foto, Overlay, Farbe, Typo
+const cardState = {
+  menu:      { bg:'', overlay:'transparent', color:'#1A1A1A', fontScale:100, lineScale:100 },
+  wein:      { bg:'', overlay:'transparent', color:'#1A1A1A', fontScale:100, lineScale:100 },
+  cocktail:  { bg:'', overlay:'transparent', color:'#1A1A1A', fontScale:100, lineScale:100 },
+  getraenke: { bg:'', overlay:'transparent', color:'#1A1A1A', fontScale:100, lineScale:100 },
+};
+
+// Menü-Gänge
+let gangs = [
+  { kat:'Aperitif',  name:'', desc:'', allergens:[] },
+  { kat:'Vorspeise', name:'', desc:'', allergens:[] },
+  { kat:'Hauptgang', name:'', desc:'', allergens:[] },
+  { kat:'Dessert',   name:'', desc:'', allergens:[] },
+];
+
+// ══ HELPERS ════════════════════════════════════════════════
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value.trim() : ''; }
+function esc(s) {
+  return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function lines(str) {
+  return str.split('\n').map(function(s){ return s.trim(); }).filter(function(s){ return s.length > 0; });
+}
+
+// ══ KARTE WECHSELN ═════════════════════════════════════════
+function setCard(id, btn) {
+  currentCard = id;
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  ['menu','wein','cocktail','getraenke','allergene'].forEach(function(s){
+    ge('sec-' + s).classList.toggle('visible', s === id);
+  });
+  // Bg-Controls bei Allergenkarte ausblenden (erbt Menü)
+  ge('bg-controls').style.display = (id === 'allergene') ? 'none' : 'block';
+  // Typo-Slider laden
+  loadTypo(id === 'allergene' ? 'menu' : id);
+  // UI-Controls synchronisieren
+  if (id !== 'allergene') syncUIControls(id);
+  render();
+}
+
+// ══ FOTO UPLOAD ════════════════════════════════════════════
+function loadPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    cardState[currentCard].bg = e.target.result;
+    updateUploadZone();
+    render();
+  };
+  reader.readAsDataURL(file);
+  input.value = ''; // erlaubt erneutes Auswählen derselben Datei
+}
+
+function removePhoto() {
+  if (currentCard === 'allergene') return;
+  cardState[currentCard].bg = '';
+  updateUploadZone();
+  render();
+}
+
+function updateUploadZone() {
+  if (currentCard === 'allergene') return;
+  var zone  = ge('upload-zone');
+  var label = ge('upload-label');
+  var has   = !!cardState[currentCard].bg;
+  zone.classList.toggle('loaded', has);
+  label.textContent = has ? '✓ Foto geladen — zum Ersetzen klicken' : 'Foto hochladen';
+}
+
+// ══ OVERLAY & FARBE ════════════════════════════════════════
+function setOverlay(btn) {
+  cardState[currentCard].overlay = btn.getAttribute('data-val');
+  document.querySelectorAll('#overlay-group .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function setColor(btn) {
+  cardState[currentCard].color = btn.getAttribute('data-val');
+  document.querySelectorAll('#color-group .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function syncUIControls(cardId) {
+  var st = cardState[cardId];
+  document.querySelectorAll('#overlay-group .ui-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-val') === st.overlay);
+  });
+  document.querySelectorAll('#color-group .ui-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-val') === st.color);
+  });
+  updateUploadZone();
+}
+
+// ══ TYPOGRAFIE ═════════════════════════════════════════════
+function applyTypo() {
+  var cardId = currentCard === 'allergene' ? 'menu' : currentCard;
+  var size   = parseInt(ge('sl-size').value);
+  var space  = parseInt(ge('sl-space').value);
+  cardState[cardId].fontScale = size;
+  cardState[cardId].lineScale = space;
+  ge('card').style.setProperty('--fs-scale',  size  / 100);
+  ge('card').style.setProperty('--gap-scale', space / 100);
+}
+
+function loadTypo(cardId) {
+  var st = cardState[cardId];
+  ge('sl-size').value  = st.fontScale;
+  ge('sl-space').value = st.lineScale;
+  ge('card').style.setProperty('--fs-scale',  st.fontScale / 100);
+  ge('card').style.setProperty('--gap-scale', st.lineScale  / 100);
+}
+
+// ══ KARTEN-ELEMENT ZUSTAND ANWENDEN ════════════════════════
+function applyState(cardId) {
+  // Allergenkarte erbt immer den Menü-Zustand
+  var st = cardId === 'allergene' ? cardState.menu : cardState[cardId];
+  var cardEl = ge('card');
+  cardEl.style.backgroundImage = st.bg ? "url('" + st.bg + "')" : 'none';
+  cardEl.style.color           = st.color;
+  ge('card-overlay').style.backgroundColor = st.overlay;
+  cardEl.style.setProperty('--fs-scale',  st.fontScale / 100);
+  cardEl.style.setProperty('--gap-scale', st.lineScale  / 100);
+}
+
+// ══ GANG-FORMULAR ══════════════════════════════════════════
+function buildGangForm() {
+  var html = '';
+  gangs.forEach(function(g, i) {
+    var vegLabel = '';
+    if      (/vegan/i.test(g.kat))       vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegan</span>';
+    else if (/vegetarisch/i.test(g.kat)) vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegetarisch</span>';
+    else if (/alternative/i.test(g.kat)) vegLabel = ' <span style="color:#4A7C3F;font-size:8px;">✦ Alternative</span>';
+
+    html += '<div class="gang-block" id="gang-' + i + '">';
+    html += '<div class="gang-header"><span class="gang-num">Gang ' + (i+1) + vegLabel + '</span>';
+    if (gangs.length > 1) {
+      html += '<button class="gang-remove" onclick="removeGang(' + i + ')">✕</button>';
+    }
+    html += '</div><div class="gang-body">';
+    html += '<input type="text" placeholder="Kategorie (z.B. Vorspeise)" value="' + esc(g.kat) + '" oninput="updateGang(' + i + ',\'kat\',this.value)">';
+    html += '<textarea rows="2" placeholder="Gerichtname (Enter = Zeilenumbruch auf Karte)" style="min-height:0;resize:none;" oninput="updateGang(' + i + ',\'name\',this.value)">' + esc(g.name) + '</textarea>';
+    html += '<input type="text" placeholder="Beschreibung" value="' + esc(g.desc) + '" oninput="updateGang(' + i + ',\'desc\',this.value)">';
+
+    var hasAlg = g.allergens.length > 0;
+    html += '<button class="alg-toggle" onclick="toggleAllergens(' + i + ')">▾ Allergene';
+    if (hasAlg) html += ' <span style="color:#C89A5A;">(' + g.allergens.join(', ') + ')</span>';
+    html += '</button>';
+    html += '<div class="alg-grid" id="alg-' + i + '">';
+    ALLERGENS.forEach(function(a) {
+      var chk = g.allergens.indexOf(a.code) > -1 ? 'checked' : '';
+      html += '<label class="alg-item"><input type="checkbox" ' + chk + ' onchange="toggleAllergen(' + i + ',\'' + a.code + '\',this.checked)"> ' + a.code + ' ' + (I18N[currentLang].algNames[a.code] || a.name) + '</label>';
+    });
+    html += '</div></div></div>';
+  });
+  ge('gang-list').innerHTML = html;
+}
+
+function updateGang(i, field, val) {
+  gangs[i][field] = val;
+  if (field === 'kat') {
+    var numEl = document.querySelector('#gang-' + i + ' .gang-num');
+    if (numEl) {
+      var vl = '';
+      if      (/vegan/i.test(val))       vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegan</span>';
+      else if (/vegetarisch/i.test(val)) vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Vegetarisch</span>';
+      else if (/alternative/i.test(val)) vl = ' <span style="color:#4A7C3F;font-size:8px;">✦ Alternative</span>';
+      numEl.innerHTML = 'Gang ' + (i+1) + vl;
+    }
+  }
+  render();
+}
+
+function addGang() {
+  gangs.push({ kat:'', name:'', desc:'', allergens:[] });
+  buildGangForm();
+  render();
+}
+
+function removeGang(i) {
+  gangs.splice(i, 1);
+  buildGangForm();
+  render();
+}
+
+function toggleAllergens(i) {
+  var grid = ge('alg-' + i);
+  if (grid) grid.classList.toggle('open');
+}
+
+function toggleAllergen(gangIdx, code, checked) {
+  var a = gangs[gangIdx].allergens;
+  if (checked && a.indexOf(code) === -1) {
+    a.push(code);
+  } else if (!checked) {
+    var j = a.indexOf(code);
+    if (j > -1) a.splice(j, 1);
+  }
+  buildGangForm();
+  render();
+}
+
+// ══ ALLERGENKARTE-TAB INDIKATOR ════════════════════════════
+function updateAllergenTab() {
+  var tab = ge('tab-allergene');
+  if (!tab) return;
+  var hasAlg = gangs.some(function(g){ return g.allergens.length > 0 && g.name; });
+  tab.style.opacity = hasAlg ? '1' : '0.38';
+  tab.title = hasAlg ? '' : 'Noch keine Allergene erfasst — bitte im Menü-Tab anhaken';
+}
+
+// ══ RENDER ═════════════════════════════════════════════════
+function render() {
+  ge('card-body').innerHTML = generateHTML(currentCard);
+  applyState(currentCard);
+  if (currentCard !== 'allergene') syncUIControls(currentCard);
+  updateAllergenTab();
+  scalePreview();
+}
+
+function generateHTML(cardId) {
+  if (cardId === 'allergene') {
+    return renderAllergenCard() ||
+      '<div style="padding:16mm 8mm;text-align:center;font-family:\'DM Sans\',sans-serif;font-size:10px;opacity:0.45;line-height:2;">Noch keine Allergene erfasst.<br>Bitte beim Menü-Tab<br>Allergene anhaken.</div>';
+  }
+  var html = renderHeader(cardId);
+  switch (cardId) {
+    case 'menu':      html += renderMenu();      break;
+    case 'wein':      html += renderWein();      break;
+    case 'cocktail':  html += renderCocktail();  break;
+    case 'getraenke': html += renderGetraenke(); break;
+  }
+  return html;
+}
+
+function renderHeader(cardId) {
+  var names = esc(gv('inp-names'));
+  var date  = esc(gv('inp-date'));
+  var ort   = esc(gv('inp-ort'));
+  var sub   = [date, ort].filter(Boolean).join(' · ');
+  var html  = '';
+  if (names) html += '<div class="card-eyebrow">' + names.toUpperCase() + '</div>';
+  if (sub)   html += '<div class="card-eyebrow-sub">' + sub + '</div>';
+  html += '<div class="card-title">' + esc(CARD_TITLES[cardId]).toUpperCase() + '</div>';
+  html += '<div class="card-accent-rule"></div>';
+  html += '<div class="card-content">';
+  return html;
+}
+
+function renderMenu() {
+  var html  = '';
+  var first = true;
+  gangs.forEach(function(g) {
+    if (!g.name && !g.kat && !g.desc) return;
+    if (!first) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    first = false;
+    html += '<div>';
+    if (g.kat)  html += '<div class="section-cat">' + esc(g.kat.toUpperCase()) + '</div>';
+    if (g.name) {
+      var aMarker   = g.allergens.length > 0 ? '<span class="allergen-a">A</span>' : '';
+      var nameLines = g.name.split('\n').map(function(l){ return esc(l.trim()); }).join('<br>');
+      html += '<div class="course-name">' + nameLines + aMarker + '</div>';
+    }
+    if (g.desc) html += '<div class="course-desc">' + esc(g.desc) + '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  var footer = gv('inp-menu-footer');
+  if (footer) html += '<div class="card-footer-note">' + esc(footer) + '</div>';
+  return html;
+}
+
+function renderWein() {
+  var sections = [
+    { id:'inp-weiss', label:'Weißwein'         },
+    { id:'inp-rot',   label:'Rotwein'           },
+    { id:'inp-rose',  label:'Rosé'              },
+    { id:'inp-sekt',  label:'Schaumwein / Sekt' },
+  ];
+  return renderDrinkSections(sections, 'inp-wein-footer', 'wine-name');
+}
+
+function renderCocktail() {
+  var sections = [
+    { id:'inp-sig',   label:'Signature Cocktails' },
+    { id:'inp-klass', label:'Klassiker'            },
+    { id:'inp-alk',   label:'Alkoholfrei'          },
+  ];
+  return renderDrinkSections(sections, 'inp-cocktail-footer', 'drink-item');
+}
+
+function renderGetraenke() {
+  var sections = [
+    { id:'inp-wasser', label:'Wasser'       },
+    { id:'inp-soft',   label:'Softdrinks'   },
+    { id:'inp-saefte', label:'Säfte'        },
+    { id:'inp-heiss',  label:'Heißgetränke' },
+  ];
+  if (gv('inp-extra1')) sections.push({ id:'inp-extra1', label: gv('inp-extra1-label') || 'Weiteres' });
+  if (gv('inp-extra2')) sections.push({ id:'inp-extra2', label: gv('inp-extra2-label') || 'Weiteres' });
+  return renderDrinkSections(sections, 'inp-getr-footer', 'drink-item');
+}
+
+function renderDrinkSections(sections, footerId, itemClass) {
+  var html  = '';
+  var first = true;
+  sections.forEach(function(s) {
+    var val = gv(s.id);
+    if (!val) return;
+    if (!first) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    first = false;
+    html += '<div>';
+    html += '<div class="section-cat">' + esc(s.label.toUpperCase()) + '</div>';
+    lines(val).forEach(function(l) {
+      html += '<div class="' + itemClass + '">' + esc(l) + '</div>';
+    });
+    html += '</div>';
+  });
+  html += '</div>';
+  var footer = gv(footerId);
+  if (footer) html += '<div class="card-footer-note">' + esc(footer) + '</div>';
+  return html;
+}
+
+function renderAllergenCard() {
+  var withAlg = gangs.filter(function(g){ return g.allergens.length > 0 && g.name; });
+  if (withAlg.length === 0) return null;
+
+  var names = esc(gv('inp-names'));
+  var date  = esc(gv('inp-date'));
+  var ort   = esc(gv('inp-ort'));
+  var sub   = [date, ort].filter(Boolean).join(' · ');
+  var html  = '';
+
+  if (names) html += '<div class="card-eyebrow">' + names.toUpperCase() + '</div>';
+  if (sub)   html += '<div class="card-eyebrow-sub">' + sub + '</div>';
+  html += '<div class="card-title">HINWEISE</div>';
+  html += '<div class="card-accent-rule"></div>';
+  html += '<div class="alg-card-title">ALLERGENE FÜR UNSERE GÄSTE</div>';
+  html += '<div class="card-content">';
+
+  withAlg.forEach(function(g, i) {
+    if (i > 0) html += '<div class="orn-sep"><span class="orn-line"></span><span class="orn-gem">◆</span><span class="orn-line"></span></div>';
+    html += '<div class="alg-entry">';
+    html += '<div class="alg-entry-name">' + esc(g.name) + '</div>';
+    var algNames = g.allergens.map(function(code) {
+      var found = ALLERGENS.find(function(a){ return a.code === code; });
+      return found ? found.name : code;
+    });
+    html += '<div class="alg-entry-list">' + esc(algNames.join(' · ')) + '</div>';
+    html += '</div>';
+  });
+
+  html += '</div>';
+  return html;
+}
+
+// ══ VORSCHAU SKALIEREN ═════════════════════════════════════
+function scalePreview() {
+  var panel  = document.querySelector('.panel-preview');
+  var card   = ge('card');
+  var scaler = ge('preview-scaler');
+  var availW = panel.clientWidth  - 64;
+  var availH = panel.clientHeight - 64;
+  var scale  = Math.min(1, availW / card.offsetWidth, availH / card.offsetHeight);
+  scaler.style.transform = 'scale(' + scale + ')';
+  scaler.style.height    = (card.offsetHeight * scale) + 'px';
+}
+
+// ══ PDF EXPORT ═════════════════════════════════════════════
+async function captureForExport(cardId) {
+  var cardEl  = ge('card');
+  var overlay = ge('card-overlay');
+  var scaler  = ge('preview-scaler');
+
+  // Aktuellen Zustand sichern
+  var prevHTML    = ge('card-body').innerHTML;
+  var prevBg      = cardEl.style.backgroundImage;
+  var prevColor   = cardEl.style.color;
+  var prevOvBg    = overlay.style.backgroundColor;
+  var prevTransf  = scaler.style.transform;
+  var prevH       = scaler.style.height;
+  var prevFs      = cardEl.style.getPropertyValue('--fs-scale');
+  var prevGs      = cardEl.style.getPropertyValue('--gap-scale');
+
+  // Ziel-Zustand anwenden
+  var st = cardId === 'allergene' ? cardState.menu : cardState[cardId];
+  cardEl.style.backgroundImage        = st.bg ? "url('" + st.bg + "')" : 'none';
+  cardEl.style.color                  = st.color;
+  overlay.style.backgroundColor       = st.overlay;
+  cardEl.style.setProperty('--fs-scale',  st.fontScale / 100);
+  cardEl.style.setProperty('--gap-scale', st.lineScale  / 100);
+  ge('card-body').innerHTML           = generateHTML(cardId);
+  scaler.style.transform              = 'scale(1)';
+  scaler.style.height                 = '';
+
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  await new Promise(function(r){ setTimeout(r, 220); });
+
+  var canvas = await html2canvas(cardEl, {
+    scale: 3, useCORS: false, allowTaint: true,
+    backgroundColor: null, logging: false,
+  });
+
+  // Zustand wiederherstellen
+  cardEl.style.backgroundImage        = prevBg;
+  cardEl.style.color                  = prevColor;
+  overlay.style.backgroundColor       = prevOvBg;
+  cardEl.style.setProperty('--fs-scale',  prevFs);
+  cardEl.style.setProperty('--gap-scale', prevGs);
+  ge('card-body').innerHTML           = prevHTML;
+  scaler.style.transform              = prevTransf;
+  scaler.style.height                 = prevH;
+  applyState(currentCard);
+  if (window.getSelection) window.getSelection().removeAllRanges();
+  scalePreview();
+
+  return canvas;
+}
+
+async function exportCurrent() {
+  ge('pdf-spinner').style.display = 'flex';
+  ge('spin-msg').textContent = 'PDF wird erstellt …';
+  try {
+    var canvas = await captureForExport(currentCard);
+    var bleed  = ge('chk-bleed').checked ? 3 : 0;
+    var W = 105, H = 210;
+    var pdf = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm',
+      format: bleed ? [W + bleed*2, H + bleed*2] : [W, H] });
+    if (bleed) {
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W + bleed*2, H + bleed*2);
+    } else {
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W, H);
+    }
+    var name = gv('inp-names').replace(/\s+/g,'_') || 'Karte';
+    pdf.save('WSA_LuxusLine_' + name + '_' + currentCard + '.pdf');
+  } catch(e) {
+    alert('Export fehlgeschlagen: ' + e.message);
+  } finally {
+    ge('pdf-spinner').style.display = 'none';
+  }
+}
+
+async function exportAll() {
+  ge('pdf-spinner').style.display = 'flex';
+  ge('spin-msg').textContent = 'Karten werden geprüft …';
+  try {
+    var bleed = ge('chk-bleed').checked ? 3 : 0;
+    var W = 105, H = 210;
+    var pdf = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm',
+      format: bleed ? [W + bleed*2, H + bleed*2] : [W, H] });
+
+    var toExport = [];
+    if (gangs.some(function(g){ return g.name; }))
+      toExport.push('menu');
+    if (gv('inp-weiss') || gv('inp-rot') || gv('inp-rose') || gv('inp-sekt'))
+      toExport.push('wein');
+    if (gv('inp-sig') || gv('inp-klass') || gv('inp-alk'))
+      toExport.push('cocktail');
+    if (gv('inp-wasser') || gv('inp-soft') || gv('inp-saefte') || gv('inp-heiss') || gv('inp-extra1') || gv('inp-extra2'))
+      toExport.push('getraenke');
+    if (gangs.some(function(g){ return g.allergens.length > 0 && g.name; }))
+      toExport.push('allergene');
+
+    if (toExport.length === 0) {
+      alert('Keine Inhalte zum Exportieren. Bitte Felder ausfüllen.');
+      return;
+    }
+
+    var pageNum = 0;
+    for (var i = 0; i < toExport.length; i++) {
+      var cardId = toExport[i];
+      ge('spin-msg').textContent = 'Erstelle: ' + (CARD_TITLES[cardId] || cardId) + ' …';
+      if (pageNum > 0) pdf.addPage();
+      var canvas = await captureForExport(cardId);
+      if (bleed) {
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W + bleed*2, H + bleed*2);
+      } else {
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, W, H);
+      }
+      pageNum++;
+    }
+
+    var name = gv('inp-names').replace(/\s+/g,'_') || 'Hochzeit';
+    pdf.save('WSA_LuxusLine_' + name + '_Alle.pdf');
+  } catch(e) {
+    alert('Export fehlgeschlagen: ' + e.message);
+  } finally {
+    ge('pdf-spinner').style.display = 'none';
+  }
+}
+
+// ══ DEMO DATEN ═════════════════════════════════════════════
+function loadDemo() {
+  ge('inp-names').value = 'Anna & Peter';
+  ge('inp-date').value  = '14. Juni 2026';
+  ge('inp-ort').value   = 'Schloss Heidelberg';
+
+  gangs = [
+    { kat:'Aperitif',    name:'Bellini al Prosecco',        desc:'Pfirsich-Püree · Prosecco · Minze',           allergens:['So','Sw']      },
+    { kat:'Vorspeise',   name:'Lachstatar auf Brioche',     desc:'Avocado · Limetten-Vinaigrette · Dill',       allergens:['F','G','E','Mi']},
+    { kat:'Hauptgang',   name:'Rinderfilet Rossini',        desc:'Trüffel-Demi-glace · Foie-gras · Gratin',     allergens:['G','Mi','E']    },
+    { kat:'Vegetarisch', name:'Ravioli di Ricotta',         desc:'Spinat · Salbeibutter · Parmesan',            allergens:['G','Mi','E','N']},
+    { kat:'Dessert',     name:'Mousse au Chocolat Valrhona',desc:'Waldbeeren · Schlagsahne · Crumble',          allergens:['E','Mi','G']    },
+  ];
+  ge('inp-menu-footer').value = 'Bitte teilen Sie uns Ihre Menüwünsche im Voraus mit.';
+
+  ge('inp-weiss').value  = 'Sancerre Blanc 2022 — Loire Valley\nGrauburgunder Spätlese — Weingut Dr. Bürklin';
+  ge('inp-rot').value    = 'Château Pichon Baron 2018 — Pauillac\nBrunello di Montalcino 2019';
+  ge('inp-rose').value   = 'Château Margaux Rosé 2022 — Provence';
+  ge('inp-sekt').value   = 'Champagne Ruinart Blanc de Blancs\nDom Pérignon 2013';
+  ge('inp-wein-footer').value = 'Alkoholfreie Alternativen auf Anfrage erhältlich.';
+
+  ge('inp-sig').value    = 'The Anna — Holunder, Limette, Prosecco\nThe Peter — Bourbon, Kirsch, Angostura';
+  ge('inp-klass').value  = 'Aperol Spritz · Negroni · Gin Tonic · Mojito';
+  ge('inp-alk').value    = 'Rose Lemonade\nCucumber & Mint Cooler\nPfirsich-Eistee';
+
+  ge('inp-wasser').value = 'Stilles Mineralwasser\nNaturales Sprudelwasser';
+  ge('inp-soft').value   = 'Coca-Cola · Cola Zero\nFanta Orange · Sprite';
+  ge('inp-saefte').value = 'Frisch gepresster Orangensaft\nApfelsaft naturtrüb';
+  ge('inp-heiss').value  = 'Espresso · Cappuccino · Café au Lait\nTee — Auswahl auf Anfrage';
+
+  buildGangForm();
+  render();
+}
+
+// ══ INITIALISIERUNG ════════════════════════════════════════
+window.addEventListener('load', function() {
+  buildGangForm();
+  render();
+});
+window.addEventListener('resize', scalePreview);
+</script>
+</body>
+</html>

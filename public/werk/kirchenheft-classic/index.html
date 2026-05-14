@@ -1,0 +1,1221 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="google" content="notranslate">
+  <title>Wedding Program — Classic Wedding · Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────────────── */
+    :root {
+      --rose:      #B07A7A;
+      --rose-dim:  #8A5A5A;
+      --rose-rule: #C49898;
+      --paper:     #FAFAF7;
+      --ink:       #2E2A27;
+      --ink-dim:   #6B6460;
+      --fine-rule: rgba(176,122,122,0.28);
+    }
+
+    /* ── PANEL OVERRIDES ─────────────────────────────────────────────────── */
+    .ui-group { display: flex; gap: 5px; margin-bottom: 10px; }
+    .ui-btn.active { background: var(--rose); color: #FFF8F5; border-color: var(--rose); }
+
+    .upload-zone {
+      border: 1px dashed #eee; padding: 10px; text-align: center;
+      background: #FAFAFA; cursor: pointer; margin-bottom: 6px;
+      position: relative; font-size: 11px; color: #aaa;
+    }
+    .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; margin: 0; }
+
+    .divider-form { border: none; border-top: 1px solid #f2f0ec; margin: 14px 0; }
+
+    .export-btn {
+      width: 100%; padding: 14px; background: var(--rose); color: #FFF8F5;
+      border: none; cursor: pointer; margin-top: 14px; font-weight: 700;
+      font-family: 'DM Sans', sans-serif; text-transform: uppercase;
+      letter-spacing: 2px; font-size: 12px;
+    }
+    .export-btn:hover { background: var(--rose-dim); }
+    .export-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 6px; }
+    .field-row input { margin-bottom: 0; }
+
+    /* Timeline rows */
+    .timeline-row {
+      display: grid; grid-template-columns: 78px 1fr 26px;
+      gap: 4px; margin-bottom: 4px; align-items: center;
+    }
+    .timeline-row input { margin-bottom: 0; }
+    .btn-remove {
+      background: none; border: 1px solid #ddd; color: #bbb;
+      cursor: pointer; height: 31px; width: 26px;
+      font-size: 15px; line-height: 1; border-radius: 2px;
+      flex-shrink: 0;
+    }
+    .btn-remove:hover { border-color: var(--rose); color: var(--rose); }
+    .btn-add {
+      background: none; border: 1px dashed #ccc; color: #999;
+      cursor: pointer; padding: 6px; width: 100%;
+      font-size: 10px; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .btn-add:hover { border-color: var(--rose); color: var(--rose); }
+
+    /* Block toggles */
+    .block-toggle {
+      display: flex; align-items: center; gap: 8px;
+      margin: 4px 0 5px; cursor: pointer; user-select: none;
+    }
+    .toggle-sw {
+      width: 34px; height: 18px; background: #ddd; border-radius: 9px;
+      position: relative; transition: background 0.2s; flex-shrink: 0;
+    }
+    .toggle-sw::after {
+      content: ''; position: absolute; width: 14px; height: 14px;
+      background: #fff; border-radius: 50%;
+      top: 2px; left: 2px; transition: left 0.2s;
+    }
+    .toggle-sw.on { background: var(--rose); }
+    .toggle-sw.on::after { left: 18px; }
+    .toggle-label {
+      font-family: 'DM Sans', sans-serif; font-size: 10.5px;
+      text-transform: uppercase; letter-spacing: 1.5px; color: #666;
+    }
+    .block-fields { padding-bottom: 4px; }
+
+    /* Party rows */
+    .party-group-lbl {
+      font-size: 9.5px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--rose); margin: 8px 0 3px; display: block;
+    }
+    .party-row { display: grid; grid-template-columns: 1fr 26px; gap: 4px; margin-bottom: 3px; align-items: center; }
+    .party-row input { margin-bottom: 0; }
+    .btn-add-sm {
+      background: none; border: 1px dashed #ddd; color: #aaa;
+      cursor: pointer; padding: 4px; width: 100%;
+      font-size: 9.5px; font-family: 'DM Sans', sans-serif;
+      text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;
+    }
+    .btn-add-sm:hover { border-color: var(--rose); color: var(--rose); }
+
+    /* Format info */
+    .format-info {
+      font-size: 10px; color: #aaa; font-style: italic;
+      padding: 3px 0 8px; line-height: 1.5;
+    }
+
+    /* ── PREVIEW ─────────────────────────────────────────────────────────── */
+    .panel-preview { background: #DDD9D4; }
+    #preview-scaler { transform-origin: top center; }
+
+    /* Tab bar */
+    #preview-tabs {
+      display: flex; justify-content: center; gap: 0; margin-bottom: 20px;
+    }
+    .preview-tab {
+      padding: 9px 26px; cursor: pointer; background: none; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      text-transform: uppercase; letter-spacing: 2px;
+      color: #aaa; border-bottom: 2px solid transparent; transition: all 0.2s;
+    }
+    .preview-tab.active { color: var(--rose-dim); border-bottom: 2px solid var(--rose); }
+    .preview-tab:hover:not(.active) { color: var(--rose); }
+
+    #cards-wrapper {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .card-wrap { display: none; flex-direction: column; align-items: center; }
+    .card-wrap.active { display: flex; }
+
+    /* ══════════════════════════════════════════════════════════════
+       CARDS
+    ══════════════════════════════════════════════════════════════ */
+    .card {
+      position: relative; overflow: hidden;
+      background-color: var(--paper);
+      background-image:
+        radial-gradient(ellipse at 15% 8%,  rgba(176,122,122,0.04) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 92%, rgba(176,122,122,0.03) 0%, transparent 55%);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+      display: flex; flex-direction: column;
+    }
+    .card-de { width: 148mm; height: 210mm; }
+    .card-us { width: 127mm; height: 178mm; }
+
+    .card.overflow-warning {
+      box-shadow: 0 0 0 3px #e53935, 0 8px 30px rgba(0,0,0,0.12) !important;
+    }
+
+    /* ── FRONT ──────────────────────────────────────────────────────────── */
+    .front-photo {
+      flex: 1 1 0; min-height: 35%; overflow: hidden;
+      background: #E8E0D8;
+    }
+    .front-photo img {
+      width: 100%; height: 100%; object-fit: cover;
+      filter: sepia(0.08) contrast(1.02) brightness(1.02) saturate(0.92);
+      display: block;
+    }
+    .front-photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 2mm;
+    }
+    .initials-monogram {
+      font-family: 'Playfair Display', serif; font-style: italic;
+      font-size: 38pt; color: rgba(176,122,122,0.35); line-height: 1;
+      letter-spacing: 2mm;
+    }
+    .initials-rule {
+      width: 12mm; height: 0.5pt; background: rgba(176,122,122,0.2);
+    }
+
+    .front-names-block {
+      flex: 0 0 auto; text-align: center;
+      padding: 5mm 12mm 3.5mm;
+      border-top: 0.5pt solid var(--fine-rule);
+      border-bottom: 0.5pt solid var(--fine-rule);
+    }
+    .front-names {
+      font-family: 'Playfair Display', serif;
+      font-size: 21pt; font-style: italic;
+      line-height: 1.2; color: var(--ink);
+    }
+    .front-names .amp {
+      font-size: 13pt; color: var(--rose);
+      display: inline; margin: 0 2mm;
+    }
+    .front-date-loc {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7.5pt; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--ink-dim);
+      margin-top: 2mm; opacity: 0.8;
+    }
+
+    .front-divider {
+      display: flex; align-items: center; gap: 2.5mm;
+      padding: 3mm 12mm 0; flex: 0 0 auto;
+    }
+    .front-divider-line { flex: 1; border-top: 0.5pt solid var(--fine-rule); }
+    .front-divider-title {
+      font-family: 'DM Sans', sans-serif; font-size: 7pt;
+      letter-spacing: 3.5px; text-transform: uppercase;
+      color: var(--rose-dim); white-space: nowrap; flex-shrink: 0;
+    }
+    .front-divider-title::before,
+    .front-divider-title::after { content: ' ✦ '; opacity: 0.5; font-size: 5.5pt; }
+
+    .front-timeline {
+      flex: 0 0 auto; padding: 2.5mm 12mm 10mm;
+    }
+    .front-timeline table {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11pt; color: var(--ink-dim);
+      line-height: 1.75; width: 100%; border-collapse: collapse;
+    }
+    .front-timeline td { padding: 0.2mm 0; vertical-align: top; }
+    .front-timeline td:first-child {
+      color: var(--rose-dim); padding-right: 4mm;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+      border-bottom: 0.3pt solid rgba(176,122,122,0.12);
+    }
+    .front-timeline td:last-child {
+      border-bottom: 0.3pt solid rgba(176,122,122,0.12);
+    }
+    .front-timeline.no-times td:first-child { display: none; }
+
+    /* ── BACK ───────────────────────────────────────────────────────────── */
+    .back-inner {
+      display: flex; flex-direction: column; justify-content: flex-start;
+      gap: 5mm; height: 100%; padding: 10mm 12mm 10mm;
+      box-sizing: border-box;
+    }
+
+    .back-block { flex: 0 0 auto; }
+    .back-block-gratitude { flex: 0 0 auto; }
+
+    .back-block-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7pt; text-transform: uppercase; letter-spacing: 2.5px;
+      color: var(--rose-dim); border-top: 0.5pt solid var(--fine-rule);
+      border-bottom: 0.5pt solid var(--fine-rule);
+      padding: 1mm 0; margin-bottom: 2.5mm;
+    }
+
+    /* Party output */
+    .party-group-out { margin-bottom: 1.5mm; }
+    .party-group-title-out {
+      font-family: 'DM Sans', sans-serif; font-size: 5.5pt;
+      text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--rose-dim); margin-bottom: 0.3mm;
+    }
+    .party-names-out {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11pt; color: var(--ink-dim); line-height: 1.55;
+    }
+
+    /* Gratitude */
+    .back-gratitude-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11.5pt; line-height: 1.62;
+      color: var(--ink-dim); white-space: pre-wrap;
+      text-align: justify; hyphens: auto;
+    }
+
+    /* QR */
+    .back-qr-row {
+      display: flex; align-items: center; gap: 4mm;
+    }
+    .back-qr-frame {
+      width: 18mm; height: 18mm; flex-shrink: 0;
+      background: #EDE5D8; padding: 1mm;
+      border: 0.5pt solid rgba(176,122,122,0.25);
+    }
+    .back-qr-frame img {
+      width: 100%; height: 100%; object-fit: contain;
+      display: block; filter: sepia(0.4);
+    }
+    .back-qr-texts { flex: 1; }
+    .back-qr-url {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 8.5pt; font-style: italic;
+      color: var(--ink-dim); line-height: 1.4;
+    }
+    .back-qr-hashtag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7pt; color: var(--rose-dim);
+      letter-spacing: 0.5px; display: block; margin-top: 0.8mm;
+    }
+
+    /* Overflow warning */
+    .overflow-bar {
+      display: none; position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(229,57,53,0.92); color: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 8px;
+      text-transform: uppercase; letter-spacing: 1px;
+      text-align: center; padding: 4px 8px;
+    }
+    .card.overflow-warning .overflow-bar { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ FORM ═══════════════════════════════ -->
+<div class="panel-form">
+  <div class="panel-logo">Wedding Program</div>
+  <div class="panel-tagline">Wedding Story Atelier</div>
+
+  <span class="section-label">Sprache / Language</span>
+  <div class="lang-buttons">
+    <button class="lang-btn active" onclick="switchLang('de',this)">DE — Deutsch</button>
+    <button class="lang-btn" onclick="switchLang('en',this)">EN — English</button>
+  </div>
+
+  <span class="section-label" id="lbl-bg">Hintergrundfarbe</span>
+  <div class="ui-group">
+    <button class="ui-btn active" onclick="setBG('#FAFAF7',this)">Ivory White</button>
+    <button class="ui-btn" onclick="setBG('#F5EFE0',this)">Warm Cream</button>
+    <button class="ui-btn" onclick="setBG('#EDECEA',this)">Soft Grey</button>
+  </div>
+
+  <span class="section-label" id="lbl-sec-format">Format</span>
+  <div class="ui-group">
+    <button class="ui-btn active" id="btn-mkt-de" onclick="setMarket('de',this)">DE — A5</button>
+    <button class="ui-btn" id="btn-mkt-us" onclick="setMarket('us',this)">US — 5×7"</button>
+  </div>
+
+  <span class="section-label" id="lbl-sec-output">Ausgabe</span>
+  <div class="ui-group">
+    <button class="ui-btn active" id="btn-out-home" onclick="setOutput('home',this)">Heimdruck</button>
+    <button class="ui-btn" id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+  <div class="format-info" id="format-info"></div>
+
+  <hr class="divider-form">
+
+  <!-- VORDERSEITE -->
+  <span class="section-label" id="lbl-sec-front">Vorderseite — The Soul</span>
+
+  <span class="section-label" id="lbl-photo">Foto</span>
+  <div class="upload-zone">
+    <span id="lbl-upload-photo">Foto hochladen</span>
+    <input type="file" accept="image/*" onchange="loadPhoto(this)">
+  </div>
+  <div id="photo-pos-row" style="display:none;padding:3px 0 7px;">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <span id="lbl-photo-pos" style="font-size:9px;color:#aaa;text-transform:uppercase;letter-spacing:1px;white-space:nowrap;flex-shrink:0;">Bildausschnitt</span>
+      <input type="range" id="photo-pos" min="0" max="100" value="50" oninput="movePhoto(this.value)">
+      <span style="font-size:11px;color:#bbb;">↕</span>
+    </div>
+  </div>
+
+  <span class="section-label" id="lbl-sec-names">Namen</span>
+  <div class="field-row">
+    <input type="text" id="in-name1" value="Anna" oninput="update()" placeholder="Name 1">
+    <input type="text" id="in-name2" value="Peter" oninput="update()" placeholder="Name 2">
+  </div>
+  <div class="field-row">
+    <input type="text" id="in-date" value="14. Juni 2026" oninput="update()" placeholder="Datum">
+    <input type="text" id="in-location" value="St. Maria Kirche" oninput="update()" placeholder="Ort">
+  </div>
+
+  <span class="section-label" id="lbl-sec-ceremony">The Ceremony</span>
+  <input type="text" id="in-ceremony-title" value="Der Ablauf" oninput="update()" style="margin-bottom:8px">
+
+  <div id="timeline-rows"></div>
+  <button class="btn-add" id="btn-add-tl" onclick="addTimelineRow()">+ Punkt hinzufügen</button>
+
+  <hr class="divider-form">
+
+  <!-- RÜCKSEITE -->
+  <span class="section-label" id="lbl-sec-back">Rückseite — The Heart</span>
+
+  <!-- Wedding Party -->
+  <div class="block-toggle" onclick="toggleBlock('party')">
+    <div class="toggle-sw" id="toggle-party"></div>
+    <span class="toggle-label" id="lbl-toggle-party">Wedding Party</span>
+  </div>
+  <div class="block-fields" id="fields-party" style="display:none">
+    <span class="party-group-lbl" id="lbl-pg-moh">Trauzeugin</span>
+    <div id="rows-moh">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+
+    <span class="party-group-lbl" id="lbl-pg-bm">Trauzeuge</span>
+    <div id="rows-bm">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+
+    <span class="party-group-lbl" id="lbl-pg-bmaids">Brautjungfern</span>
+    <div id="rows-bmaids">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+    <button class="btn-add-sm" id="btn-add-bmaids" onclick="addPartyRow('rows-bmaids')">+ hinzufügen</button>
+
+    <span class="party-group-lbl" id="lbl-pg-gmen">Groomsmen</span>
+    <div id="rows-gmen">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+    <button class="btn-add-sm" id="btn-add-gmen" onclick="addPartyRow('rows-gmen')">+ hinzufügen</button>
+
+    <span class="party-group-lbl" id="lbl-pg-pb">Eltern der Braut</span>
+    <div id="rows-pb">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+
+    <span class="party-group-lbl" id="lbl-pg-pg">Eltern des Bräutigams</span>
+    <div id="rows-pg">
+      <div class="party-row">
+        <input type="text" placeholder="Name" oninput="update()">
+        <button class="btn-remove" onclick="removeRow(this)">×</button>
+      </div>
+    </div>
+
+    <span class="party-group-lbl" id="lbl-pg-extra">Blumenkind / Ringträger</span>
+    <div id="rows-extra"></div>
+    <button class="btn-add-sm" id="btn-add-extra" onclick="addPartyRow('rows-extra')">+ hinzufügen</button>
+  </div>
+
+  <!-- Freifeld 1 -->
+  <div class="block-toggle" onclick="toggleBlock('free1')">
+    <div class="toggle-sw" id="toggle-free1"></div>
+    <span class="toggle-label" id="lbl-toggle-free1">Freifeld 1</span>
+  </div>
+  <div class="block-fields" id="fields-free1" style="display:none">
+    <input type="text" id="in-free1-title" oninput="update()" placeholder="Überschrift" style="margin-bottom:5px">
+    <textarea id="in-free1-text" rows="3" oninput="update()" placeholder="Text …"></textarea>
+  </div>
+
+  <!-- Freifeld 2 -->
+  <div class="block-toggle" onclick="toggleBlock('free2')">
+    <div class="toggle-sw" id="toggle-free2"></div>
+    <span class="toggle-label" id="lbl-toggle-free2">Freifeld 2</span>
+  </div>
+  <div class="block-fields" id="fields-free2" style="display:none">
+    <input type="text" id="in-free2-title" oninput="update()" placeholder="Überschrift" style="margin-bottom:5px">
+    <textarea id="in-free2-text" rows="3" oninput="update()" placeholder="Text …"></textarea>
+  </div>
+
+  <!-- QR / Hashtag -->
+  <div class="block-toggle" onclick="toggleBlock('qr')">
+    <div class="toggle-sw" id="toggle-qr"></div>
+    <span class="toggle-label" id="lbl-toggle-qr">QR · Hashtag</span>
+  </div>
+  <div class="block-fields" id="fields-qr" style="display:none">
+    <div class="upload-zone">
+      <span id="lbl-upload-qr">QR-Code hochladen</span>
+      <input type="file" accept="image/*" onchange="loadQR(this)">
+    </div>
+    <input type="text" id="in-url" value="" oninput="update()" placeholder="www.anna-peter.de">
+    <input type="text" id="in-hashtag" value="" oninput="update()" placeholder="#AnnaPeter2026">
+  </div>
+
+  <!-- Note of Gratitude -->
+  <div class="block-toggle" onclick="toggleBlock('gratitude')">
+    <div class="toggle-sw on" id="toggle-gratitude"></div>
+    <span class="toggle-label" id="lbl-toggle-gratitude">Dankestext</span>
+  </div>
+  <div class="block-fields" id="fields-gratitude">
+    <textarea id="in-gratitude" rows="4" oninput="update()">Liebe Gäste,
+wir sind so glücklich, diesen besonderen Tag mit euch zu teilen. Eure Anwesenheit bedeutet uns alles.</textarea>
+  </div>
+
+  <hr class="divider-form">
+
+  <button class="export-btn" id="btn-export" onclick="downloadPDF()">⬇ PDF exportieren</button>
+
+
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PREVIEW ═══════════════════════════════ -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="preview-tabs">
+      <button class="preview-tab active" id="lbl-front" onclick="switchTab('front')">Vorderseite · Front</button>
+      <button class="preview-tab" id="lbl-back" onclick="switchTab('back')">Rückseite · Back</button>
+    </div>
+    <div id="cards-wrapper">
+
+      <!-- FRONT CARD -->
+      <div class="card-wrap active" id="wrap-front">
+        <div id="card-front" class="card card-de">
+          <div class="front-photo">
+            <img id="img-main" src="" style="display:none" alt="">
+            <div class="front-photo-placeholder" id="photo-placeholder">
+              <div class="initials-rule"></div>
+              <div class="initials-monogram" id="out-initials">A &amp; P</div>
+              <div class="initials-rule"></div>
+            </div>
+          </div>
+          <div class="front-names-block">
+            <div class="front-names" id="out-names">Anna<span class="amp">&amp;</span>Peter</div>
+            <div class="front-date-loc" id="out-date-loc">14. Juni 2026 · St. Maria Kirche</div>
+          </div>
+          <div class="front-divider">
+            <div class="front-divider-line"></div>
+            <div class="front-divider-title" id="out-ceremony-title">Der Ablauf</div>
+            <div class="front-divider-line"></div>
+          </div>
+          <div class="front-timeline" id="front-timeline-wrap">
+            <table id="out-timeline-table"></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- BACK CARD -->
+      <div class="card-wrap" id="wrap-back">
+        <div id="card-back" class="card card-de">
+          <div class="back-inner" id="back-inner">
+
+            <!-- Wedding Party -->
+            <div class="back-block" id="out-party-block" style="display:none">
+              <div class="back-block-label" id="out-party-label">Wedding Party</div>
+              <div id="out-party-content"></div>
+            </div>
+
+            <!-- Freifeld 1 -->
+            <div class="back-block" id="out-free1-block" style="display:none">
+              <div class="back-block-label" id="out-free1-label"></div>
+              <div class="back-gratitude-text" id="out-free1-text"></div>
+            </div>
+
+            <!-- Freifeld 2 -->
+            <div class="back-block" id="out-free2-block" style="display:none">
+              <div class="back-block-label" id="out-free2-label"></div>
+              <div class="back-gratitude-text" id="out-free2-text"></div>
+            </div>
+
+            <!-- QR -->
+            <div class="back-block" id="out-qr-block" style="display:none">
+              <div class="back-block-label" id="out-qr-label">Scan &amp; Connect</div>
+              <div class="back-qr-row">
+                <div class="back-qr-frame" id="out-qr-frame" style="display:none">
+                  <img id="img-qr" src="" style="display:none" alt="">
+                </div>
+                <div class="back-qr-texts">
+                  <div class="back-qr-url" id="out-url"></div>
+                  <span class="back-qr-hashtag" id="out-hashtag"></span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Gratitude (last — closing statement) -->
+            <div class="back-block" id="out-gratitude-block">
+              <div class="back-block-label" id="out-gratitude-label">Dankesworte</div>
+              <div class="back-gratitude-text" id="out-gratitude-text"></div>
+            </div>
+
+          </div>
+          <div class="overflow-bar" id="overflow-bar">⚠ Inhalt überläuft — bitte kürzen</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var currentBG     = '#FAFAF7';
+var currentLang   = 'de';
+var rawPhotoURL   = null;
+var photoYPos     = 50;
+var currentMarket = 'de';
+var currentOutput = 'home';
+
+var blockState = { party: false, gratitude: true, free1: false, free2: false, qr: false };
+
+/* ── I18N ──────────────────────────────────────────────────────── */
+var fieldDefaults = {
+  de: {
+    'in-name1':          'Anna',
+    'in-name2':          'Peter',
+    'in-date':           '14. Juni 2026',
+    'in-location':       'St. Maria Kirche',
+    'in-ceremony-title': 'Der Ablauf',
+    'in-gratitude':      'Liebe Gäste,\nwir sind so glücklich, diesen besonderen Tag mit euch zu teilen. Eure Anwesenheit bedeutet uns alles.'
+  },
+  en: {
+    'in-name1':          'Emma',
+    'in-name2':          'James',
+    'in-date':           'June 14, 2026',
+    'in-location':       'St. Mary\'s Church',
+    'in-ceremony-title': 'Order of Service',
+    'in-gratitude':      'Dear Guests,\nWe are so grateful you are here to share this special day with us. Your presence means everything to us.'
+  }
+};
+
+var timelineDefaults = {
+  de: [
+    ['14:00', 'Einzug der Braut'],
+    ['14:05', 'Begrüßung'],
+    ['14:15', 'Lied'],
+    ['14:25', 'Predigt'],
+    ['14:45', 'Ringtausch & Ja-Wort']
+  ],
+  en: [
+    ['2:00 PM', 'Processional'],
+    ['2:10 PM', 'Welcome'],
+    ['2:20 PM', 'Reading'],
+    ['2:30 PM', 'Sermon'],
+    ['2:50 PM', 'Exchange of Vows']
+  ]
+};
+
+var panelLabels = {
+  'lbl-bg':             { de: 'Hintergrundfarbe',               en: 'Background Colour' },
+  'lbl-sec-format':     { de: 'Format',                         en: 'Format' },
+  'lbl-sec-output':     { de: 'Ausgabe',                        en: 'Output' },
+  'btn-out-home':       { de: 'Heimdruck',                      en: 'Home Print' },
+  'btn-out-print':      { de: 'Druckerei',                      en: 'Print Service' },
+  'lbl-sec-front':      { de: 'Vorderseite — The Soul',         en: 'Front — The Soul' },
+  'lbl-photo':          { de: 'Foto',                           en: 'Photo' },
+  'lbl-sec-names':      { de: 'Namen & Datum',                  en: 'Names & Date' },
+  'lbl-sec-ceremony':   { de: 'The Ceremony',                   en: 'The Ceremony' },
+  'btn-add-tl':         { de: '+ Punkt hinzufügen',             en: '+ Add item' },
+  'lbl-sec-back':       { de: 'Rückseite — The Heart',          en: 'Back — The Heart' },
+  'lbl-toggle-party':   { de: 'Wedding Party',                  en: 'Wedding Party' },
+  'lbl-toggle-gratitude':{ de: 'Dankestext',                   en: 'Note of Gratitude' },
+  'lbl-toggle-free1':   { de: 'Freifeld 1',                      en: 'Free Field 1' },
+  'lbl-toggle-free2':   { de: 'Freifeld 2',                      en: 'Free Field 2' },
+  'lbl-toggle-qr':      { de: 'QR · Hashtag',                   en: 'QR · Hashtag' },
+  'lbl-upload-photo':   { de: 'Foto hochladen',                 en: 'Upload Photo' },
+  'lbl-photo-pos':      { de: 'Bildausschnitt',                 en: 'Crop position' },
+  'lbl-upload-qr':      { de: 'QR-Code hochladen',              en: 'Upload QR Code' },
+  'btn-export':         { de: '⬇ PDF exportieren',              en: '⬇ Export PDF' },
+  'lbl-bleed':          { de: 'Beschnittzugabe 3\u202fmm',      en: 'Bleed 3\u202fmm' },
+  'lbl-front':          { de: 'Vorderseite · Front',            en: 'Front' },
+  'lbl-back':           { de: 'Rückseite · Back',               en: 'Back' },
+  // party group labels
+  'lbl-pg-moh':         { de: 'Trauzeugin',                     en: 'Maid of Honor' },
+  'lbl-pg-bm':          { de: 'Trauzeuge',                      en: 'Best Man' },
+  'lbl-pg-bmaids':      { de: 'Brautjungfern',                  en: 'Bridesmaids' },
+  'lbl-pg-gmen':        { de: 'Groomsmen',                      en: 'Groomsmen' },
+  'lbl-pg-pb':          { de: 'Eltern der Braut',               en: 'Parents of the Bride' },
+  'lbl-pg-pg':          { de: 'Eltern des Bräutigams',          en: 'Parents of the Groom' },
+  'lbl-pg-extra':       { de: 'Blumenkind / Ringträger',        en: 'Flower Girl / Ring Bearer' },
+  'btn-add-bmaids':     { de: '+ hinzufügen',                   en: '+ Add bridesmaid' },
+  'btn-add-gmen':       { de: '+ hinzufügen',                   en: '+ Add groomsman' },
+  'btn-add-extra':      { de: '+ hinzufügen',                   en: '+ Add person' },
+  // output labels
+  'out-party-label':    { de: 'Hochzeitsgesellschaft',           en: 'Wedding Party' },
+  'out-gratitude-label':{ de: 'Dankesworte',                    en: 'Note of Gratitude' },
+  'out-qr-label':       { de: 'Scan & Connect',                 en: 'Scan & Connect' },
+  'overflow-bar':       { de: '⚠ Inhalt überläuft — bitte kürzen', en: '⚠ Content overflow — please shorten' }
+};
+
+var partyGroups = [
+  { id: 'rows-moh',    labelId: 'lbl-pg-moh' },
+  { id: 'rows-bm',     labelId: 'lbl-pg-bm' },
+  { id: 'rows-bmaids', labelId: 'lbl-pg-bmaids' },
+  { id: 'rows-gmen',   labelId: 'lbl-pg-gmen' },
+  { id: 'rows-pb',     labelId: 'lbl-pg-pb' },
+  { id: 'rows-pg',     labelId: 'lbl-pg-pg' },
+  { id: 'rows-extra',  labelId: 'lbl-pg-extra' }
+];
+
+/* ── HELPERS ───────────────────────────────────────────────────── */
+function ge(id) { return document.getElementById(id); }
+
+function updatePanelLabels() {
+  var lang = currentLang;
+  Object.keys(panelLabels).forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    var val = panelLabels[id][lang];
+    if (!val) return;
+    if (val.indexOf('<') !== -1) el.innerHTML = val;
+    else el.textContent = val;
+  });
+  // Placeholders
+  var tlRows = ge('timeline-rows').querySelectorAll('.timeline-row');
+  tlRows.forEach(function(row) {
+    var ins = row.querySelectorAll('input');
+    ins[0].placeholder = lang === 'de' ? 'Uhrzeit' : 'Time';
+    ins[1].placeholder = lang === 'de' ? 'Programmpunkt' : 'Item';
+  });
+}
+
+function updateFormatInfo() {
+  var isDE   = currentMarket === 'de';
+  var isHome = currentOutput === 'home';
+  var texts = {
+    de: {
+      'de-home':  'A4 quer drucken, mittig falten → A5 Heft',
+      'de-print': 'A4 / A5, 2 Seiten mit Beschnitt',
+      'us-home':  'A4 quer drucken, mittig schneiden → 5×7"',
+      'us-print': '5×7" (127×178 mm), 2 Seiten mit Beschnitt'
+    },
+    en: {
+      'de-home':  'Print A4 landscape, fold in half → A5 booklet',
+      'de-print': 'A4 / A5, 2 pages with bleed',
+      'us-home':  'Print A4 landscape, cut in half → 5×7" cards',
+      'us-print': '5×7" (127×178 mm), 2 pages with bleed'
+    }
+  };
+  var key = (isDE ? 'de' : 'us') + '-' + (isHome ? 'home' : 'print');
+  ge('format-info').textContent = texts[currentLang][key];
+}
+
+/* ── LANG ──────────────────────────────────────────────────────── */
+function switchLang(lang, btn) {
+  var oldLang = currentLang;
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+
+  Object.keys(fieldDefaults.de).forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    if (el.value === '' || el.value === fieldDefaults[oldLang][id]) {
+      el.value = fieldDefaults[lang][id];
+    }
+  });
+
+  if (isTimelineDefault(oldLang)) rebuildTimeline(lang);
+  updatePanelLabels();
+  updateFormatInfo();
+  update();
+}
+
+/* ── BG ────────────────────────────────────────────────────────── */
+function setBG(color, btn) {
+  currentBG = color;
+  document.querySelectorAll('.ui-group .ui-btn').forEach(function(b) {
+    if (b.getAttribute('onclick') && b.getAttribute('onclick').indexOf('setBG') !== -1)
+      b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  ge('card-front').style.backgroundColor = color;
+  ge('card-back').style.backgroundColor  = color;
+}
+
+/* ── MARKET / OUTPUT ───────────────────────────────────────────── */
+function setMarket(m, btn) {
+  currentMarket = m;
+  ['btn-mkt-de','btn-mkt-us'].forEach(function(id) { ge(id).classList.remove('active'); });
+  btn.classList.add('active');
+  var cls = 'card ' + (m === 'us' ? 'card-us' : 'card-de');
+  ge('card-front').className = cls;
+  ge('card-back').className  = cls;
+  ge('card-front').style.backgroundColor = currentBG;
+  ge('card-back').style.backgroundColor  = currentBG;
+  updateFormatInfo();
+  rescale();
+  checkOverflow();
+}
+
+function setOutput(o, btn) {
+  currentOutput = o;
+  ['btn-out-home','btn-out-print'].forEach(function(id) { ge(id).classList.remove('active'); });
+  btn.classList.add('active');
+  updateFormatInfo();
+}
+
+/* ── TIMELINE ──────────────────────────────────────────────────── */
+function makeTimelineRow(time, text) {
+  var lang = currentLang;
+  var div = document.createElement('div');
+  div.className = 'timeline-row';
+  div.innerHTML =
+    '<input type="text" placeholder="' + (lang === 'de' ? 'Uhrzeit' : 'Time') +
+    '" value="' + esc(time) + '" oninput="update()">' +
+    '<input type="text" placeholder="' + (lang === 'de' ? 'Programmpunkt' : 'Item') +
+    '" value="' + esc(text) + '" oninput="update()">' +
+    '<button class="btn-remove" onclick="removeRow(this)">×</button>';
+  return div;
+}
+
+function esc(s) { return (s||'').replace(/"/g,'&quot;'); }
+
+function rebuildTimeline(lang) {
+  var c = ge('timeline-rows');
+  c.innerHTML = '';
+  timelineDefaults[lang || currentLang].forEach(function(r) {
+    c.appendChild(makeTimelineRow(r[0], r[1]));
+  });
+}
+
+function isTimelineDefault(lang) {
+  var l   = lang || currentLang;
+  var c   = ge('timeline-rows');
+  var rows = c.querySelectorAll('.timeline-row');
+  var def  = timelineDefaults[l];
+  if (rows.length !== def.length) return false;
+  for (var i = 0; i < rows.length; i++) {
+    var ins = rows[i].querySelectorAll('input');
+    if (ins[0].value !== def[i][0] || ins[1].value !== def[i][1]) return false;
+  }
+  return true;
+}
+
+function addTimelineRow() {
+  ge('timeline-rows').appendChild(makeTimelineRow('', ''));
+  update();
+}
+
+function removeRow(btn) {
+  var row = btn.parentElement;
+  if (row) { row.remove(); update(); }
+}
+
+/* ── PARTY ROWS ────────────────────────────────────────────────── */
+function addPartyRow(containerId) {
+  var c = ge(containerId);
+  var div = document.createElement('div');
+  div.className = 'party-row';
+  div.innerHTML = '<input type="text" placeholder="Name" oninput="update()"><button class="btn-remove" onclick="removeRow(this)">×</button>';
+  c.appendChild(div);
+  update();
+}
+
+/* ── BLOCK TOGGLES ─────────────────────────────────────────────── */
+function toggleBlock(name) {
+  blockState[name] = !blockState[name];
+  var sw = ge('toggle-' + name);
+  if (blockState[name]) sw.classList.add('on'); else sw.classList.remove('on');
+  var fields = ge('fields-' + name);
+  if (fields) fields.style.display = blockState[name] ? 'block' : 'none';
+  var outBlock = ge('out-' + name + '-block');
+  if (outBlock) outBlock.style.display = blockState[name] ? '' : 'none';
+  update();
+}
+
+/* ── PHOTO ─────────────────────────────────────────────────────── */
+function loadPhoto(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    rawPhotoURL = e.target.result;
+    photoYPos = 50;
+    ge('photo-pos').value = 50;
+    ge('photo-pos-row').style.display = 'block';
+    cropAndShow(function() { update(); });
+  };
+  reader.readAsDataURL(file);
+}
+
+function movePhoto(val) {
+  photoYPos = parseInt(val, 10);
+  cropAndShow(function() {});
+}
+
+function cropAndShow(done) {
+  var area = ge('card-front').querySelector('.front-photo');
+  var tW = area.offsetWidth  > 20 ? area.offsetWidth  * 2 : 600;
+  var tH = area.offsetHeight > 20 ? area.offsetHeight * 2 : 480;
+  cropFromRaw(rawPhotoURL, tW, tH, function(cropped) {
+    ge('img-main').src = cropped;
+    ge('img-main').style.display = 'block';
+    ge('photo-placeholder').style.display = 'none';
+    done();
+  });
+}
+
+function cropFromRaw(dataURL, tW, tH, callback) {
+  var src = new Image();
+  src.onload = function() {
+    var srcR = src.width / src.height, tgtR = tW / tH;
+    var sx = 0, sy = 0, sw = src.width, sh = src.height;
+    if (srcR > tgtR) {
+      sw = src.height * tgtR;
+      sx = (src.width - sw) / 2;
+    } else {
+      sh = src.width / tgtR;
+      sy = (src.height - sh) * (photoYPos / 100);
+    }
+    var c = document.createElement('canvas');
+    c.width = tW; c.height = tH;
+    c.getContext('2d').drawImage(src, sx, sy, sw, sh, 0, 0, tW, tH);
+    callback(c.toDataURL('image/jpeg', 0.85));
+  };
+  src.src = dataURL;
+}
+
+/* ── QR ────────────────────────────────────────────────────────── */
+function loadQR(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    ge('img-qr').src = e.target.result;
+    ge('img-qr').style.display = 'block';
+    ge('out-qr-frame').style.display = 'block';
+    update();
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── UPDATE ────────────────────────────────────────────────────── */
+function update() {
+  ge('card-front').style.backgroundColor = currentBG;
+  ge('card-back').style.backgroundColor  = currentBG;
+
+  // Names
+  var n1 = ge('in-name1').value;
+  var n2 = ge('in-name2').value;
+  ge('out-names').innerHTML = n1 + '<span class="amp">&amp;</span>' + n2;
+  var i1 = n1.trim().charAt(0).toUpperCase() || '·';
+  var i2 = n2.trim().charAt(0).toUpperCase() || '·';
+  ge('out-initials').innerHTML = i1 + ' &amp; ' + i2;
+
+  // Date + location
+  var d = ge('in-date').value;
+  var l = ge('in-location').value;
+  ge('out-date-loc').textContent = d + (l ? ' · ' + l : '');
+
+  // Ceremony title
+  ge('out-ceremony-title').textContent = ge('in-ceremony-title').value;
+
+  // Timeline
+  buildOutputTimeline();
+
+  // Back blocks
+  if (blockState.party)     buildPartyOutput();
+  if (blockState.gratitude) ge('out-gratitude-text').textContent = ge('in-gratitude').value;
+  if (blockState.free1) {
+    ge('out-free1-label').textContent = ge('in-free1-title').value;
+    ge('out-free1-text').textContent  = ge('in-free1-text').value;
+  }
+  if (blockState.free2) {
+    ge('out-free2-label').textContent = ge('in-free2-title').value;
+    ge('out-free2-text').textContent  = ge('in-free2-text').value;
+  }
+  if (blockState.qr) {
+    var url     = ge('in-url').value.trim();
+    var hashtag = ge('in-hashtag').value.trim();
+    ge('out-url').textContent     = url;
+    ge('out-hashtag').textContent = hashtag;
+    var hasImg = ge('img-qr').src && ge('img-qr').style.display !== 'none';
+    ge('out-qr-frame').style.display = hasImg ? 'block' : 'none';
+  }
+
+  checkOverflow();
+}
+
+function buildOutputTimeline() {
+  var table   = ge('out-timeline-table');
+  var wrapper = ge('front-timeline-wrap');
+  table.innerHTML = '';
+  var rows = ge('timeline-rows').querySelectorAll('.timeline-row');
+  var hasTime = false;
+
+  rows.forEach(function(row) {
+    var ins  = row.querySelectorAll('input');
+    var time = ins[0].value.trim();
+    var text = ins[1].value.trim();
+    if (!text) return;
+    if (time) hasTime = true;
+    var tr = document.createElement('tr');
+    var t1 = document.createElement('td');
+    var t2 = document.createElement('td');
+    t1.textContent = time;
+    t2.textContent = text;
+    tr.appendChild(t1); tr.appendChild(t2);
+    table.appendChild(tr);
+  });
+
+  if (hasTime) wrapper.classList.remove('no-times');
+  else         wrapper.classList.add('no-times');
+}
+
+function buildPartyOutput() {
+  var out = ge('out-party-content');
+  out.innerHTML = '';
+  partyGroups.forEach(function(g) {
+    var container = ge(g.id);
+    if (!container) return;
+    var names = [];
+    container.querySelectorAll('input').forEach(function(inp) {
+      if (inp.value.trim()) names.push(inp.value.trim());
+    });
+    if (!names.length) return;
+    var labelEl = ge(g.labelId);
+    var groupDiv = document.createElement('div');
+    groupDiv.className = 'party-group-out';
+    if (labelEl && labelEl.textContent) {
+      var t = document.createElement('div');
+      t.className = 'party-group-title-out';
+      t.textContent = labelEl.textContent;
+      groupDiv.appendChild(t);
+    }
+    var n = document.createElement('div');
+    n.className = 'party-names-out';
+    n.textContent = names.join(' · ');
+    groupDiv.appendChild(n);
+    out.appendChild(groupDiv);
+  });
+}
+
+/* ── OVERFLOW ──────────────────────────────────────────────────── */
+function checkOverflow() {
+  var card  = ge('card-back');
+  var inner = ge('back-inner');
+  if (!card || !inner) return;
+  var over = inner.scrollHeight > card.clientHeight + 2;
+  if (over) card.classList.add('overflow-warning');
+  else      card.classList.remove('overflow-warning');
+  ge('overflow-bar').textContent = currentLang === 'de'
+    ? '⚠ Inhalt überläuft — bitte kürzen'
+    : '⚠ Content overflow — please shorten';
+}
+
+/* ── TAB SWITCH ─────────────────────────────────────────────────── */
+function switchTab(side) {
+  ge('wrap-front').classList.toggle('active', side === 'front');
+  ge('wrap-back').classList.toggle('active',  side === 'back');
+  ge('lbl-front').classList.toggle('active',  side === 'front');
+  ge('lbl-back').classList.toggle('active',   side === 'back');
+}
+
+/* ── SCALE ─────────────────────────────────────────────────────── */
+function rescale() {
+  var PX_PER_MM = 3.7795;
+  var cardW = currentMarket === 'us' ? 127 : 148;
+  var cardH = currentMarket === 'us' ? 178 : 210;
+  var totalW = cardW * PX_PER_MM;
+  var availW = window.innerWidth - 360 - 72;
+  var scale  = Math.min(availW / totalW, 1.0) * 0.94;
+  ge('preview-scaler').style.transform = 'scale(' + scale + ')';
+  var naturalH = (cardH * PX_PER_MM) + 60;
+  ge('preview-scaler').style.height = (naturalH * scale + 40) + 'px';
+  ge('preview-scaler').style.width  = (totalW * scale) + 'px';
+}
+
+/* ── EXPORT ────────────────────────────────────────────────────── */
+function downloadPDF() {
+  var btn = ge('btn-export');
+  var orig = btn.textContent;
+  btn.textContent = currentLang === 'de' ? 'Wird erstellt…' : 'Creating…';
+  btn.disabled = true;
+
+  var bleed  = currentOutput === 'print' ? 3 : 0;
+  var isUS   = currentMarket === 'us';
+  var isHome = currentOutput === 'home';
+  var done   = function() { btn.textContent = orig; btn.disabled = false; };
+
+  if (isHome) exportHome(bleed, isUS, done);
+  else        exportPrint(bleed, isUS, done);
+}
+
+function captureCard(cardId, callback) {
+  var card   = ge(cardId);
+  var scaler = ge('preview-scaler');
+  var prevTr = scaler.style.transform;
+  scaler.style.transform = 'scale(1)';
+
+  function doCapture(mainSrc) {
+    var clone = card.cloneNode(true);
+    clone.style.cssText += ';position:fixed;left:-9999px;top:0;z-index:-1;';
+    clone.style.backgroundColor = currentBG;
+
+    var clImg = clone.querySelector('#img-main');
+    if (clImg) { clImg.src = mainSrc; clImg.style.display = ge('img-main').style.display; }
+    var clQr = clone.querySelector('#img-qr');
+    var origQr = ge('img-qr');
+    if (origQr && clQr) { clQr.src = origQr.src; clQr.style.display = origQr.style.display; }
+
+    document.body.appendChild(clone);
+    setTimeout(function() {
+      html2canvas(clone, {
+        scale: 3, useCORS: false, allowTaint: true,
+        backgroundColor: currentBG, logging: false, imageTimeout: 0
+      }).then(function(canvas) {
+        document.body.removeChild(clone);
+        scaler.style.transform = prevTr;
+        callback(canvas);
+      }).catch(function() {
+        document.body.removeChild(clone);
+        scaler.style.transform = prevTr;
+        callback(null);
+      });
+    }, 300);
+  }
+
+  // Re-crop from raw at current photo-area dimensions to avoid html2canvas stretch
+  if (rawPhotoURL && cardId === 'card-front' && ge('img-main').style.display !== 'none') {
+    var area = card.querySelector('.front-photo');
+    var tW = area.offsetWidth  > 20 ? area.offsetWidth  * 3 : 900;
+    var tH = area.offsetHeight > 20 ? area.offsetHeight * 3 : 720;
+    cropFromRaw(rawPhotoURL, tW, tH, doCapture);
+  } else {
+    doCapture(ge('img-main').src);
+  }
+}
+
+function cropMarks(pdf, x, y, w, h) {
+  var gap = 2, len = 5;
+  pdf.setDrawColor(160, 140, 140);
+  pdf.setLineWidth(0.2);
+  pdf.setLineDash([]);
+  // top-left
+  pdf.line(x - gap - len, y,         x - gap,         y);
+  pdf.line(x,             y - gap - len, x,             y - gap);
+  // top-right
+  pdf.line(x + w + gap,   y,         x + w + gap + len, y);
+  pdf.line(x + w,         y - gap - len, x + w,         y - gap);
+  // bottom-left
+  pdf.line(x - gap - len, y + h,     x - gap,         y + h);
+  pdf.line(x,             y + h + gap, x,             y + h + gap + len);
+  // bottom-right
+  pdf.line(x + w + gap,   y + h,     x + w + gap + len, y + h);
+  pdf.line(x + w,         y + h + gap, x + w,         y + h + gap + len);
+}
+
+function exportHome(bleed, isUS, done) {
+  // A4 landscape: 297 × 210 mm — front left, back right
+  var cardW = isUS ? 127 : 148;
+  var cardH = isUS ? 178 : 210;
+  var pdfW  = 297 + bleed * 2;
+  var pdfH  = 210 + bleed * 2;
+
+  captureCard('card-front', function(frontC) {
+    if (!frontC) { alert(currentLang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.'); done(); return; }
+    captureCard('card-back', function(backC) {
+      if (!backC) { alert(currentLang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.'); done(); return; }
+
+      var pdf    = new window.jspdf.jsPDF('l', 'mm', [pdfW, pdfH]);
+      var halfW  = 297 / 2;
+      var marginV = (210 - cardH) / 2 + bleed;
+      var frontX, backX;
+
+      if (isUS) {
+        // Center each card in its half
+        var marginH = (halfW - cardW) / 2;
+        frontX = marginH + bleed;
+        backX  = halfW + marginH + bleed;
+      } else {
+        // DE: A5 fills the half exactly (148 ≈ 148.5mm)
+        frontX = bleed;
+        backX  = halfW + bleed;
+      }
+
+      pdf.addImage(frontC.toDataURL('image/jpeg', 0.90), 'JPEG', frontX, marginV, cardW, cardH);
+      pdf.addImage(backC.toDataURL('image/jpeg',  0.90), 'JPEG', backX,  marginV, cardW, cardH);
+
+      // Crop marks for US 5×7" (card doesn't fill A4 half, so marks show where to cut)
+      if (isUS) {
+        cropMarks(pdf, frontX, marginV, cardW, cardH);
+        cropMarks(pdf, backX,  marginV, cardW, cardH);
+      }
+
+      // Fold/cut guide
+      if (!bleed) {
+        pdf.setDrawColor(180, 160, 160);
+        pdf.setLineWidth(0.15);
+        pdf.setLineDash([1.5, 2], 0);
+        pdf.line(halfW, 2, halfW, 208);
+      }
+
+      var n1     = ge('in-name1').value || 'Wedding';
+      var suffix = isUS ? 'USProgram_Home_' : 'Kirchenprogramm_Home_';
+      pdf.save('WSA_' + suffix + n1 + '.pdf');
+      done();
+    });
+  });
+}
+
+function exportPrint(bleed, isUS, done) {
+  var cardW  = isUS ? 127 : 148;
+  var cardH  = isUS ? 178 : 210;
+  var pdfW   = cardW + bleed * 2;
+  var pdfH   = cardH + bleed * 2;
+  var orient = 'p'; // both A5 and 5×7" are portrait
+
+  captureCard('card-front', function(frontC) {
+    if (!frontC) { alert(currentLang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.'); done(); return; }
+    captureCard('card-back', function(backC) {
+      if (!backC) { alert(currentLang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.'); done(); return; }
+
+      var pdf = new window.jspdf.jsPDF(orient, 'mm', [pdfW, pdfH]);
+      pdf.addImage(frontC.toDataURL('image/jpeg', 0.90), 'JPEG', 0, 0, pdfW, pdfH);
+      pdf.addPage([pdfW, pdfH], orient);
+      pdf.addImage(backC.toDataURL('image/jpeg',  0.90), 'JPEG', 0, 0, pdfW, pdfH);
+
+      var n1     = ge('in-name1').value || 'Wedding';
+      var suffix = isUS ? 'USProgram_Print_' : 'Kirchenprogramm_Print_';
+      pdf.save('WSA_' + suffix + n1 + '.pdf');
+      done();
+    });
+  });
+}
+
+/* ── INIT ──────────────────────────────────────────────────────── */
+window.onload = function() {
+  rebuildTimeline('de');
+  updatePanelLabels();
+  updateFormatInfo();
+  update();
+  rescale();
+};
+
+window.onresize = rescale;
+</script>
+</body>
+</html>

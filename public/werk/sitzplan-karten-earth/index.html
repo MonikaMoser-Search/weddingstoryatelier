@@ -1,0 +1,1139 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Sitzplan — Modern Earth Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Theme Dots ── */
+    .theme-dots { display: flex; gap: 8px; margin: 6px 0 2px; }
+    .theme-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2.5px solid transparent; cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; }
+    .theme-dot:hover  { transform: scale(1.12); }
+
+    /* ── Table Blocks ── */
+    .table-block {
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 8px 0 10px; border-bottom: 1px solid #f0ede8;
+    }
+    .table-block:last-child { border-bottom: none; }
+    .table-block.is-active .block-head { background: #fdf8f5; }
+
+    .block-head {
+      display: flex; align-items: center; gap: 6px;
+      padding: 3px 5px; transition: background 0.15s;
+    }
+    .block-num {
+      width: 16px; flex-shrink: 0; text-align: right;
+      font-size: 9px; color: #bbb; font-family: 'DM Sans', sans-serif;
+    }
+    .block-name-input {
+      flex: 1; border: 1px solid #eee; padding: 5px 7px;
+      font-size: 11px; font-family: 'DM Sans', sans-serif;
+      background: #fafafa; color: #333; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .block-name-input:focus { border-color: #A0522D; background: #fff; }
+
+    .btn-photo {
+      flex-shrink: 0; height: 28px; padding: 0 8px;
+      border: 1px solid #eee; background: #fafafa;
+      cursor: pointer; font-size: 9px;
+      display: flex; align-items: center; gap: 4px;
+      position: relative; transition: border-color 0.15s, background 0.15s;
+      color: #aaa; white-space: nowrap; letter-spacing: 0.5px;
+      font-family: 'DM Sans', sans-serif; text-transform: uppercase;
+    }
+    .btn-photo:hover     { border-color: #aaa; color: #555; background: #f5f5f5; }
+    .btn-photo.has-photo { border-color: #A0522D; background: #fdf8f5; color: #A0522D; }
+    .btn-photo input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .photo-y-wrap { flex-shrink: 0; display: flex; align-items: center; }
+    .photo-y-slider {
+      width: 52px; height: 4px; cursor: pointer; accent-color: #A0522D;
+    }
+    .btn-rm {
+      flex-shrink: 0; width: 16px; height: 16px;
+      border: none; background: none; cursor: pointer;
+      font-size: 14px; color: #d0ccc8; padding: 0; line-height: 1;
+      transition: color 0.12s;
+    }
+    .btn-rm:hover { color: #999; }
+
+    .block-body {
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 0 5px 0 27px;
+    }
+    .names-textarea {
+      width: 100%; min-height: 58px; max-height: 160px;
+      border: 1px solid #eee; padding: 5px 7px;
+      font-size: 10.5px; font-family: 'DM Sans', sans-serif;
+      background: #fafafa; color: #333; outline: none;
+      resize: vertical; box-sizing: border-box; line-height: 1.55;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .names-textarea:focus { border-color: #A0522D; background: #fff; }
+
+    .block-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .btn-sort {
+      font-size: 8.5px; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.6px; text-transform: uppercase;
+      border: 1px solid #e8e4df; background: #fafafa;
+      padding: 3px 8px; cursor: pointer; color: #bbb;
+      transition: color 0.12s, border-color 0.12s;
+    }
+    .btn-sort:hover       { color: #888; border-color: #ccc; }
+    .btn-sort.is-sorted   { border-color: #A0522D; color: #A0522D; background: #fdf8f5; }
+    .btn-del-block {
+      font-size: 8px; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 0.5px; text-transform: uppercase;
+      border: none; background: none;
+      padding: 3px 4px; cursor: pointer; color: #d0ccc8;
+      transition: color 0.12s;
+    }
+    .btn-del-block:hover { color: #999; }
+
+    .btn-add-table {
+      width: 100%; margin-top: 8px; padding: 7px;
+      border: 1px dashed #d8d4ce; background: none;
+      font-size: 9px; font-family: 'DM Sans', sans-serif;
+      letter-spacing: 1px; text-transform: uppercase; color: #aaa;
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-add-table:hover { border-color: #A0522D; color: #A0522D; }
+    .btn-add-table:disabled { opacity: 0.3; cursor: default; }
+
+    /* ── Preview Panel ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #ECEAE4;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; width: 100%; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ══════════════════════════════════════════════════════
+       SITZPLAN-KARTE — MODERN EARTH COLLECTION
+    ══════════════════════════════════════════════════════ */
+    .sitzplan-card {
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      width: 148mm; height: 210mm;
+    }
+
+    .sitzplan-card.terracotta {
+      color: #A0522D;
+      border: 5mm solid #A0522D;
+      --accent:      #C4784A;
+      --frame:       rgba(160,82,45,0.26);
+      --rule:        rgba(160,82,45,0.20);
+      --names-color: #783E22;
+    }
+    .sitzplan-card.sage {
+      color: #8F9779;
+      border: 5mm solid #8F9779;
+      --accent:      #C9A96E;
+      --frame:       rgba(143,151,121,0.30);
+      --rule:        rgba(143,151,121,0.22);
+      --names-color: #6B715B;
+    }
+    .sitzplan-card.clay {
+      color: #96897F;
+      border: 5mm solid #96897F;
+      --accent:      #C4A09E;
+      --frame:       rgba(150,137,127,0.26);
+      --rule:        rgba(150,137,127,0.20);
+      --names-color: #706660;
+    }
+
+    .card-inner-frame {
+      position: absolute; inset: 3mm; pointer-events: none; z-index: 2;
+      border: 0.4px solid var(--frame);
+    }
+
+    /* Photo wrapper — JS controls width/height/marginTop */
+    .photo-frame-wrapper {
+      flex-shrink: 0; position: relative;
+      margin-left: auto; margin-right: auto;
+    }
+    .card-photo-top {
+      width: 100%; height: 100%;
+      overflow: hidden; position: relative; z-index: 1;
+    }
+
+    /* Doppel-Rechteck-Eckenmarken: oben-rechts + unten-links
+       --cm-off und --cm-line werden per JS formatabhängig gesetzt */
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off, 4mm) + var(--cm-line, 18mm));
+      height: calc(var(--cm-off, 4mm) + var(--cm-line, 18mm));
+      pointer-events: none; z-index: 3;
+    }
+    .corner-mark::before,
+    .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line, 18mm); height: var(--cm-line, 18mm);
+    }
+    /* oben-rechts */
+    .corner-mark.tr {
+      top:   calc(-1 * var(--cm-off, 4mm));
+      right: calc(-1 * var(--cm-off, 4mm));
+    }
+    .corner-mark.tr::before {
+      top: 0; right: 0;
+      border-top:   0.4px solid var(--frame);
+      border-right: 0.4px solid var(--frame);
+    }
+    .corner-mark.tr::after {
+      top: var(--cm-off, 4mm); right: var(--cm-off, 4mm);
+      border-top:   0.4px solid var(--frame);
+      border-right: 0.4px solid var(--frame);
+    }
+    /* unten-links */
+    .corner-mark.bl {
+      bottom: calc(-1 * var(--cm-off, 4mm));
+      left:   calc(-1 * var(--cm-off, 4mm));
+    }
+    .corner-mark.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.4px solid var(--frame);
+      border-left:   0.4px solid var(--frame);
+    }
+    .corner-mark.bl::after {
+      bottom: var(--cm-off, 4mm); left: var(--cm-off, 4mm);
+      border-bottom: 0.4px solid var(--frame);
+      border-left:   0.4px solid var(--frame);
+    }
+    .card-photo-top img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    .photo-placeholder {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(0,0,0,0.035);
+      border-bottom: 1px dashed var(--frame);
+    }
+    .photo-placeholder span {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7px; letter-spacing: 3px; text-transform: uppercase; opacity: 0.3;
+    }
+
+    /* Text area — below photo */
+    .card-text-section {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; padding: 0 8mm 5mm;
+      overflow: hidden; position: relative; z-index: 1;
+    }
+
+    .card-table-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      text-align: center; line-height: 1.1;
+      color: inherit; flex-shrink: 0;
+      margin-top: 6mm; margin-bottom: 0;
+    }
+    .card-table-name.len-xs { font-size: 34pt; }
+    .card-table-name.len-s  { font-size: 27pt; }
+    .card-table-name.len-m  { font-size: 23pt; }
+    .card-table-name.len-l  { font-size: 20pt; }
+
+    .card-orn-sep {
+      display: flex; align-items: center; gap: 5px;
+      width: 55%; margin: 4mm 0 3mm; flex-shrink: 0;
+    }
+    .card-orn-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .card-orn-dot  { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* Names list */
+    .card-names-area {
+      flex: 1; display: flex; align-items: center;
+      justify-content: center; width: 100%; gap: 7mm;
+      overflow: hidden;
+      padding-top: 2mm; padding-bottom: 12mm;
+    }
+    .names-column {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .name-entry {
+      font-family: 'Montserrat', sans-serif; font-weight: 300;
+      letter-spacing: 0.09em; text-transform: uppercase;
+      color: var(--names-color); text-align: center; line-height: 1.75;
+      white-space: nowrap;
+    }
+    .names-empty {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7px; letter-spacing: 2px; text-transform: uppercase;
+      opacity: 0.25; align-self: center;
+    }
+  </style>
+<script>
+(function(){var _rc={_id:"SP-Earth",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════════ -->
+<form class="panel-form" onsubmit="return false">
+
+  <div class="panel-logo">WSA</div>
+  <div class="panel-tagline" id="lbl-tagline">Sitzplan · Modern Earth Collection</div>
+
+  <div class="btn-group" id="lang-btns" style="margin:6px 0 10px">
+    <button type="button" class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button type="button" class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- 1 · Design -->
+  <label class="section-label">1 · Design</label>
+  <div class="theme-dots">
+    <button type="button" class="theme-dot active" data-theme="terracotta"
+      style="background:#A0522D" title="Terracotta" onclick="setTheme('terracotta')"></button>
+    <button type="button" class="theme-dot" data-theme="sage"
+      style="background:#8F9779" title="Eucalyptus" onclick="setTheme('sage')"></button>
+    <button type="button" class="theme-dot" data-theme="clay"
+      style="background:#96897F" title="Warm Taupe" onclick="setTheme('clay')"></button>
+  </div>
+
+  <!-- 2 · Hintergrund -->
+  <label class="section-label" style="margin-top:8px;">2 · Hintergrund</label>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-bg-1" onclick="setBg('#FAF9F6',this)">Off-White</button>
+    <button type="button" class="ui-btn"        id="btn-bg-2" onclick="setBg('#F5F5DC',this)">Sandstone</button>
+  </div>
+
+  <!-- 3 · Format -->
+  <label class="section-label" style="margin-top:8px;">3 · Format</label>
+  <select id="sel-format" onchange="onFormatChange()">
+    <option value="a5">A5 — 148 × 210 mm</option>
+    <option value="us57">5×7" — 127 × 178 mm</option>
+  </select>
+
+  <hr class="divider">
+
+  <!-- 4 · Tische -->
+  <label class="section-label" id="lbl-sec4">4 · Tische</label>
+  <div id="table-blocks"></div>
+  <button type="button" class="btn-add-table" id="btn-add-table" onclick="addTable()">
+    + Tisch hinzufügen
+  </button>
+
+  <hr class="divider" style="margin-top:14px">
+
+  <div class="action-row">
+    <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <button type="button" class="btn-export" id="btn-export" onclick="exportPDF()">PDF exportieren</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
+  <div class="print-hint">
+    <span id="lbl-print-hint">Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.</span>
+  </div>
+
+</form>
+
+<!-- ════ PREVIEW PANEL ══════════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navCard(-1)" disabled>‹</button>
+    <span id="nav-label">1 / 4</span>
+    <button class="nav-btn" id="btn-next" onclick="navCard(1)">›</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div class="sitzplan-card terracotta" id="card-preview" style="background:#FAF9F6" spellcheck="false">
+        <div class="card-inner-frame"></div>
+        <div class="photo-frame-wrapper" id="prev-photo-wrapper">
+          <div class="card-photo-top" id="prev-photo">
+            <div class="photo-placeholder" id="prev-photo-ph">
+              <span id="lbl-photo-ph">Foto hochladen</span>
+            </div>
+          </div>
+          <div class="corner-mark tr"></div>
+          <div class="corner-mark bl"></div>
+        </div>
+        <div class="card-text-section">
+          <div class="card-table-name len-s" id="prev-name">Florida</div>
+          <div class="card-orn-sep">
+            <span class="card-orn-line"></span>
+            <span class="card-orn-dot"></span>
+            <span class="card-orn-line"></span>
+          </div>
+          <div class="card-names-area" id="prev-names"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SPINNER ════════════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════
+// ÜBERSETZUNGEN
+// ════════════════════════════════════════════════════════════
+var T = {
+  de: {
+    tagline:    'Sitzplan · Modern Earth Collection',
+    sec4:       '4 · Tische',
+    namePH:     'z. B. Florida, Bali, Toskana …',
+    namesPH:    'Namen eingeben, ein Name pro Zeile',
+    fotoBtnAdd: '+ Foto',  fotoBtnHas: '✓ Foto',
+    fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
+    sliderTitle: 'Bildausschnitt vertikal',
+    btnRm:      'Foto entfernen',
+    btnSort:    'A–Z',
+    btnDel:     'entfernen',
+    btnAdd:     '+ Tisch hinzufügen',
+    photoPH:    'Foto hochladen',
+    btnExport:  'PDF exportieren',
+    bleed:      'Beschnittzugabe 3 mm',
+    printHint:  'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.',
+    alertEmpty: 'Bitte mindestens einen Tisch mit Name und Foto anlegen.',
+    alertNoPhoto: 'Kein Foto hochgeladen für: ',
+    alertFail:  'Export fehlgeschlagen: ',
+    spinPDF:    'PDF wird erstellt …',
+    spinPage:   function(c,t){ return 'Karte ' + c + ' von ' + t + ' …'; },
+    demo: [
+      { name: 'Florida',   names: 'Sophie Wagner\nLukas Bauer\nEmma Schulz\nJonas Fischer\nMia Hoffmann\nPaul Schneider' },
+      { name: 'Bali',      names: 'Hannah Meyer\nTim Richter\nLaura Braun\nFelix Koch\nAnna Krüger\nMoritz Wolf\nLisa Neumann' },
+      { name: 'New York',  names: 'Max Schmidt\nJulia Müller\nDavid Becker\nSarah Weber' },
+      { name: 'Toskana',   names: 'Lena Schäfer\nThomas Zimmermann\nMarie Klein\nStefan Groß' },
+    ],
+  },
+  en: {
+    tagline:    'Seating Plan · Modern Earth Collection',
+    sec4:       '4 · Tables',
+    namePH:     'e. g. Florida, Bali, Tuscany …',
+    namesPH:    'Enter names, one per line',
+    fotoBtnAdd: '+ Photo', fotoBtnHas: '✓ Photo',
+    fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
+    sliderTitle: 'Vertical crop',
+    btnRm:      'Remove photo',
+    btnSort:    'A–Z',
+    btnDel:     'remove',
+    btnAdd:     '+ Add table',
+    photoPH:    'Upload photo',
+    btnExport:  'Export PDF',
+    bleed:      'Bleed 3 mm',
+    printHint:  'File in sRGB color space, print-ready for all major online printers. Enable bleed for borderless prints.',
+    alertEmpty: 'Please add at least one table with a name and photo.',
+    alertNoPhoto: 'No photo uploaded for: ',
+    alertFail:  'Export failed: ',
+    spinPDF:    'Creating PDF …',
+    spinPage:   function(c,t){ return 'Card ' + c + ' of ' + t + ' …'; },
+    demo: [
+      { name: 'Florida',  names: 'Sophie Wagner\nLukas Bauer\nEmma Schulz\nJonas Fischer\nMia Hoffmann\nPaul Schneider' },
+      { name: 'Bali',     names: 'Hannah Meyer\nTim Richter\nLaura Braun\nFelix Koch\nAnna Krueger\nMoritz Wolf\nLisa Neumann' },
+      { name: 'New York', names: 'Max Schmidt\nJulia Mueller\nDavid Becker\nSarah Weber' },
+      { name: 'Tuscany',  names: 'Lena Schaefer\nThomas Zimmermann\nMarie Klein\nStefan Gross' },
+    ],
+  },
+};
+
+function tt() { return T[currentLang]; }
+
+// ════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════
+var currentTheme = 'terracotta';
+var currentBg    = '#FAF9F6';
+var currentCard  = 0;
+var currentLang  = 'de';
+var MAX_TABLES   = 8;
+
+var tables = [];
+
+function makeTable() {
+  return { name: '', photo: null, photoY: 50, names: '', sorted: false };
+}
+
+// ════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', function() {
+  for (var i = 0; i < 4; i++) tables.push(makeTable());
+  buildTableBlocks();
+  renderPreview();
+  scalePreview();
+  window.addEventListener('resize', scalePreview);
+});
+
+// ════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════
+function ge(id) { return document.getElementById(id); }
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function nameSizeClass(txt) {
+  var n = txt.replace(/\s/g,'').length;
+  return n <= 3 ? 'len-xs' : n <= 6 ? 'len-s' : n <= 10 ? 'len-m' : 'len-l';
+}
+
+function parseNames(text, sorted) {
+  var arr = text.split('\n')
+    .map(function(n){ return n.trim(); })
+    .filter(function(n){ return n !== ''; });
+  if (sorted) arr.sort(function(a,b){ return a.localeCompare(b, undefined, {sensitivity:'base'}); });
+  return arr;
+}
+
+// ════════════════════════════════════════════════════════════
+// FOTO-KOMPRIMIERUNG
+// ════════════════════════════════════════════════════════════
+function compressImage(file, maxPx, quality) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        var canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// TABLE BLOCKS BAUEN
+// ════════════════════════════════════════════════════════════
+function buildTableBlocks() {
+  var container = ge('table-blocks');
+  container.innerHTML = '';
+
+  tables.forEach(function(t, i) {
+    var block = document.createElement('div');
+    block.className = 'table-block' + (i === currentCard ? ' is-active' : '');
+    block.id = 'block-' + i;
+
+    // ── Header ──
+    var head = document.createElement('div');
+    head.className = 'block-head';
+
+    var num = document.createElement('div');
+    num.className = 'block-num';
+    num.textContent = i + 1;
+    head.appendChild(num);
+
+    var nameInp = document.createElement('input');
+    nameInp.type = 'text';
+    nameInp.className = 'block-name-input';
+    nameInp.placeholder = tt().namePH;
+    nameInp.value = t.name;
+    nameInp.oninput = (function(idx){ return function(e){
+      tables[idx].name = e.target.value;
+      if (idx === currentCard) renderPreview();
+    }; })(i);
+    nameInp.onfocus = (function(idx){ return function(){
+      setCurrentCard(idx);
+    }; })(i);
+    head.appendChild(nameInp);
+
+    var btnP = document.createElement('div');
+    btnP.className = 'btn-photo' + (t.photo ? ' has-photo' : '');
+    btnP.title = t.photo ? tt().fotoTitleHas : tt().fotoTitleAdd;
+    btnP.innerHTML = (t.photo ? tt().fotoBtnHas : tt().fotoBtnAdd);
+    var fi = document.createElement('input');
+    fi.type = 'file'; fi.accept = 'image/*';
+    fi.onchange = (function(idx){ return function(e){
+      if (!e.target.files[0]) return;
+      compressImage(e.target.files[0], 1600, 0.85).then(function(data){
+        tables[idx].photo = data;
+        setCurrentCard(idx);
+        buildTableBlocks(); renderPreview();
+      });
+    }; })(i);
+    btnP.appendChild(fi);
+    head.appendChild(btnP);
+
+    if (t.photo) {
+      var yWrap = document.createElement('div');
+      yWrap.className = 'photo-y-wrap';
+      var slider = document.createElement('input');
+      slider.type = 'range'; slider.min = '0'; slider.max = '100';
+      slider.value = t.photoY != null ? t.photoY : 50;
+      slider.className = 'photo-y-slider';
+      slider.title = tt().sliderTitle;
+      slider.oninput = (function(idx){ return function(e){
+        tables[idx].photoY = parseInt(e.target.value);
+        if (idx === currentCard) renderPreview();
+      }; })(i);
+      yWrap.appendChild(slider);
+      head.appendChild(yWrap);
+
+      var btnR = document.createElement('button');
+      btnR.type = 'button'; btnR.className = 'btn-rm'; btnR.title = tt().btnRm;
+      btnR.textContent = '×';
+      btnR.onclick = (function(idx){ return function(){
+        tables[idx].photo = null; tables[idx].photoY = 50;
+        buildTableBlocks();
+        if (idx === currentCard) renderPreview();
+      }; })(i);
+      head.appendChild(btnR);
+    }
+
+    block.appendChild(head);
+
+    // ── Body: Names textarea ──
+    var body = document.createElement('div');
+    body.className = 'block-body';
+
+    var ta = document.createElement('textarea');
+    ta.className = 'names-textarea';
+    ta.placeholder = tt().namesPH;
+    ta.value = t.names;
+    ta.oninput = (function(idx){ return function(e){
+      tables[idx].names = e.target.value;
+      if (idx === currentCard) renderPreview();
+    }; })(i);
+    ta.onfocus = (function(idx){ return function(){
+      setCurrentCard(idx);
+    }; })(i);
+    body.appendChild(ta);
+
+    // ── Footer: Sort + Delete ──
+    var footer = document.createElement('div');
+    footer.className = 'block-footer';
+
+    var btnSort = document.createElement('button');
+    btnSort.type = 'button';
+    btnSort.className = 'btn-sort' + (t.sorted ? ' is-sorted' : '');
+    btnSort.textContent = tt().btnSort;
+    btnSort.onclick = (function(idx){ return function(){
+      tables[idx].sorted = !tables[idx].sorted;
+      buildTableBlocks();
+      if (idx === currentCard) renderPreview();
+    }; })(i);
+    footer.appendChild(btnSort);
+
+    if (tables.length > 1) {
+      var btnDel = document.createElement('button');
+      btnDel.type = 'button'; btnDel.className = 'btn-del-block';
+      btnDel.textContent = tt().btnDel;
+      btnDel.onclick = (function(idx){ return function(){
+        tables.splice(idx, 1);
+        if (currentCard >= tables.length) currentCard = tables.length - 1;
+        buildTableBlocks(); renderPreview(); updateNav();
+      }; })(i);
+      footer.appendChild(btnDel);
+    }
+
+    body.appendChild(footer);
+    block.appendChild(body);
+    container.appendChild(block);
+  });
+
+  var btnAdd = ge('btn-add-table');
+  btnAdd.textContent = tt().btnAdd;
+  btnAdd.disabled = tables.length >= MAX_TABLES;
+}
+
+function setCurrentCard(idx) {
+  currentCard = idx;
+  document.querySelectorAll('.table-block').forEach(function(b, i){
+    b.classList.toggle('is-active', i === idx);
+  });
+  renderPreview(); updateNav();
+}
+
+function addTable() {
+  if (tables.length >= MAX_TABLES) return;
+  tables.push(makeTable());
+  buildTableBlocks();
+  setCurrentCard(tables.length - 1);
+  // Scroll to new block
+  var blocks = document.querySelectorAll('.table-block');
+  if (blocks.length) blocks[blocks.length - 1].scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+// ════════════════════════════════════════════════════════════
+// SPRACHE
+// ════════════════════════════════════════════════════════════
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var l = tt();
+  ge('lbl-tagline').textContent    = l.tagline;
+  ge('lbl-sec4').textContent       = l.sec4;
+  ge('btn-export').textContent     = l.btnExport;
+  ge('lbl-bleed').textContent      = l.bleed;
+  ge('lbl-print-hint').textContent = l.printHint;
+  ge('lbl-photo-ph').textContent   = l.photoPH;
+  document.documentElement.lang   = lang;
+  buildTableBlocks();
+}
+
+// ════════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════════
+function setTheme(theme) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-dot').forEach(function(d){
+    d.classList.toggle('active', d.dataset.theme === theme);
+  });
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// HINTERGRUND
+// ════════════════════════════════════════════════════════════
+function setBg(bg, btn) {
+  currentBg = bg;
+  document.querySelectorAll('#btn-bg-1, #btn-bg-2').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// FORMAT
+// ════════════════════════════════════════════════════════════
+function onFormatChange() { renderPreview(); scalePreview(); }
+
+// ════════════════════════════════════════════════════════════
+// NAMES HTML BAUEN
+// ════════════════════════════════════════════════════════════
+function buildNamesHTML(namesText, sorted) {
+  var names = parseNames(namesText, sorted);
+  var n = names.length;
+  if (n === 0) return '<span class="names-empty">— Namen eingeben —</span>';
+
+  var cols       = n <= 7 ? 1 : 2;
+  var fontSize   = '8.5pt';
+  var lineHeight = n <= 4 ? '2.2'   : n <= 7  ? '1.95'  : '1.75';
+
+  var colStyle = 'font-size:' + fontSize + ';line-height:' + lineHeight;
+
+  if (cols === 1) {
+    var html = '<div class="names-column" style="' + colStyle + '">';
+    names.forEach(function(name){ html += '<div class="name-entry">' + esc(name) + '</div>'; });
+    html += '</div>';
+    return html;
+  }
+
+  var split = Math.ceil(n / 2);
+  var col1 = names.slice(0, split);
+  var col2 = names.slice(split);
+
+  var html = '<div class="names-column" style="' + colStyle + '">';
+  col1.forEach(function(name){ html += '<div class="name-entry">' + esc(name) + '</div>'; });
+  html += '</div>';
+  html += '<div class="names-column" style="' + colStyle + '">';
+  col2.forEach(function(name){ html += '<div class="name-entry">' + esc(name) + '</div>'; });
+  html += '</div>';
+  return html;
+}
+
+// ════════════════════════════════════════════════════════════
+// VORSCHAU RENDERN
+// ════════════════════════════════════════════════════════════
+function renderPreview() {
+  var card = ge('card-preview');
+  var fmt  = ge('sel-format').value;
+  var t    = tables[currentCard] || makeTable();
+
+  var FMT  = { a5:[148,210], us57:[127,178] };
+  var dims = FMT[fmt] || FMT.a5;
+  var fS   = dims[0] / 148;
+
+  card.style.width      = dims[0] + 'mm';
+  card.style.height     = dims[1] + 'mm';
+  card.className        = 'sitzplan-card ' + currentTheme;
+  card.style.background = currentBg;
+
+  // Photo wrapper: 100×110mm near-square, JS-skaliert
+  var photoEl      = ge('prev-photo');
+  var wrapperEl    = ge('prev-photo-wrapper');
+  wrapperEl.style.width     = (93 * fS) + 'mm';
+  wrapperEl.style.height    = (102 * fS) + 'mm';
+  wrapperEl.style.marginTop = (11  * fS) + 'mm';
+  wrapperEl.style.setProperty('--cm-off',  (4  * fS) + 'mm');
+  wrapperEl.style.setProperty('--cm-line', (18 * fS) + 'mm');
+
+  if (t.photo) {
+    var yPos = t.photoY != null ? t.photoY : 50;
+    photoEl.innerHTML = '<img src="' + t.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;object-position:center ' + yPos + '%">';
+  } else {
+    photoEl.innerHTML = '<div class="photo-placeholder"><span id="lbl-photo-ph">' + esc(tt().photoPH) + '</span></div>';
+  }
+
+  // Table name
+  var nameEl = ge('prev-name');
+  var txt = t.name || '—';
+  nameEl.textContent = txt;
+  nameEl.className   = 'card-table-name ' + nameSizeClass(txt);
+
+  // Names list
+  ge('prev-names').innerHTML = buildNamesHTML(t.names, t.sorted);
+
+  updateNav();
+  scalePreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════════
+function navCard(dir) {
+  var next = Math.max(0, Math.min(tables.length - 1, currentCard + dir));
+  setCurrentCard(next);
+}
+
+function updateNav() {
+  ge('btn-prev').disabled = currentCard === 0;
+  ge('btn-next').disabled = currentCard === tables.length - 1;
+  var t   = tables[currentCard] || makeTable();
+  var lbl = t.name || ('Tisch ' + (currentCard + 1));
+  ge('nav-label').textContent = lbl + '\u2002\u00B7\u2002' + (currentCard + 1) + ' / ' + tables.length;
+}
+
+// ════════════════════════════════════════════════════════════
+// SKALIERUNG
+// ════════════════════════════════════════════════════════════
+function scalePreview() {
+  var area = ge('preview-area');
+  if (!area || area.clientWidth <= 0) { requestAnimationFrame(scalePreview); return; }
+  var fmt  = ge('sel-format').value;
+  var FMT  = { a5:[148,210], us57:[127,178] };
+  var dims = FMT[fmt] || FMT.a5;
+  var PX   = 96 / 25.4;
+  var cardW = dims[0] * PX, cardH = dims[1] * PX;
+  var wrap  = ge('preview-wrap');
+  var avW   = area.clientWidth  - 48;
+  var avH   = area.clientHeight - 48;
+  var scale = Math.min(avW / cardW, avH / cardH, 1);
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.left = Math.round((area.clientWidth  - cardW * scale) / 2) + 'px';
+  wrap.style.top  = Math.round((area.clientHeight - cardH * scale) / 2) + 'px';
+}
+
+// ════════════════════════════════════════════════════════════
+// DEMO
+// ════════════════════════════════════════════════════════════
+function loadDemo() {
+  var demo = tt().demo;
+  tables = [];
+  demo.forEach(function(d){
+    var t = makeTable();
+    t.name = d.name; t.names = d.names;
+    tables.push(t);
+  });
+  currentCard = 0;
+  buildTableBlocks(); renderPreview();
+}
+
+// ════════════════════════════════════════════════════════════
+// FOTO ZUSCHNEIDEN
+// ════════════════════════════════════════════════════════════
+function cropPhoto(base64, targetW, targetH, yPercent) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var srcR = img.width / img.height;
+      var tgtR = targetW / targetH;
+      var sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        sh = img.height; sw = sh * tgtR;
+        sx = (img.width - sw) / 2; sy = 0;
+      } else {
+        sw = img.width; sh = sw / tgtR;
+        sx = 0;
+        var maxY = img.height - sh;
+        sy = maxY * ((yPercent != null ? yPercent : 50) / 100);
+      }
+      var c = document.createElement('canvas');
+      c.width = Math.round(sw); c.height = Math.round(sh);
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.90));
+    };
+    img.src = base64;
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// PDF EXPORT
+// ════════════════════════════════════════════════════════════
+function exportPDF() {
+  exportPDF_vector().catch(function(e){ alert(tt().alertFail + e.message); });
+}
+
+async function exportPDF_vector() {
+  var l        = tt();
+  var toExport = tables.filter(function(t){ return t.name.trim() !== '' && t.photo !== null; });
+
+  if (toExport.length === 0) { alert(l.alertEmpty); return; }
+
+  // Warn about tables with name but no photo
+  var missing = tables.filter(function(t){ return t.name.trim() !== '' && t.photo === null; });
+  if (missing.length > 0) {
+    var names = missing.map(function(t){ return '"' + t.name + '"'; }).join(', ');
+    if (!confirm(l.alertNoPhoto + names + '\n\nTrotzdem exportieren?')) return;
+  }
+
+  var fmt     = ge('sel-format').value;
+  var bleedMM = ge('chk-bleed').checked ? 3 : 0;
+  var FMT     = { a5:[148,210], us57:[127,178] };
+  var dims    = FMT[fmt] || FMT.a5;
+  var baseW   = dims[0], baseH = dims[1];
+  var fS      = baseW / 148;
+  var docW    = baseW + bleedMM * 2, docH = baseH + bleedMM * 2;
+  var bx      = bleedMM, by = bleedMM;
+
+  var spinner = ge('pdf-spinner');
+  var msg     = ge('spin-msg');
+  spinner.style.display = 'flex';
+  msg.textContent = l.spinPDF;
+
+  try {
+    var { jsPDF } = window.jspdf;
+    var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[docW, docH] });
+    if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+    // ── Farbpalette ──
+    var THEMES = {
+      terracotta: { tc:[160,82,45],   ac:[196,120,74]  },
+      sage:       { tc:[143,151,121], ac:[201,169,110] },
+      clay:       { tc:[150,137,127], ac:[196,160,158] },
+    };
+    var th = THEMES[currentTheme] || THEMES.terracotta;
+    var tc = th.tc, ac = th.ac;
+    var bg = (currentBg === '#F5F5DC') ? [245,245,220] : [250,249,246];
+
+    function bl(rgb, op) {
+      return [
+        Math.round(rgb[0]*op + bg[0]*(1-op)),
+        Math.round(rgb[1]*op + bg[1]*(1-op)),
+        Math.round(rgb[2]*op + bg[2]*(1-op)),
+      ];
+    }
+    var sf = function(rgb){ pdf.setFillColor(rgb[0], rgb[1], rgb[2]); };
+    var sd = function(rgb){ pdf.setDrawColor(rgb[0], rgb[1], rgb[2]); };
+    var st = function(rgb){ pdf.setTextColor(rgb[0], rgb[1], rgb[2]); };
+
+    function setFont(name, style) {
+      var keyMap = {
+        'CormorantGaramond-italic': 'CormorantGaramond-Italic',
+        'CormorantGaramond-normal': 'CormorantGaramond-Regular',
+        'Montserrat-normal':        'Montserrat-Regular',
+        'DMSans-normal':            'DMSans-Regular',
+      };
+      var fontKey = keyMap[name + '-' + style];
+      if (window.WSA_FONTS && fontKey && WSA_FONTS.has(fontKey)) {
+        pdf.setFont(name, style);
+      } else {
+        var fb = {
+          CormorantGaramond: { italic:['Times','italic'], normal:['Times','normal'] },
+          Montserrat:        { normal:['Helvetica','normal'] },
+          DMSans:            { normal:['Helvetica','normal'] },
+        };
+        var r = ((fb[name]||{})[style]) || ['Helvetica','normal'];
+        pdf.setFont(r[0], r[1]);
+      }
+    }
+
+    var PTmm = 0.3528;
+    var BW   = 5 * fS;   // Randbreite
+    var fi   = BW + 3 * fS; // Innenrahmen-Abstand
+    var cx   = bx + baseW / 2;
+
+    // Foto: 100×110mm near-square, zentriert, 4mm Abstand vom Rahmen
+    var photoAreaW  = 93 * fS;
+    var photoAreaH  = 102 * fS;
+    var photoX      = bx + (baseW - photoAreaW) / 2;
+    var photoTopY   = by + BW + 11 * fS;
+
+    for (var i = 0; i < toExport.length; i++) {
+      var t = toExport[i];
+      msg.textContent = l.spinPage(i + 1, toExport.length);
+      if (i > 0) pdf.addPage();
+
+      // ── Hintergrund ──
+      sf(bg); pdf.rect(0, 0, docW, docH, 'F');
+
+      // ── Außenrahmen ──
+      sf(tc);
+      pdf.rect(0,           0,           docW,    BW+by,  'F');
+      pdf.rect(0,           docH-BW-by,  docW,    BW+by,  'F');
+      pdf.rect(0,           0,           BW+bx,   docH,   'F');
+      pdf.rect(docW-BW-bx,  0,           BW+bx,   docH,   'F');
+
+      // ── Innenrahmen ──
+      sd(bl(tc, 0.26)); pdf.setLineWidth(0.25 * fS);
+      pdf.rect(bx+fi, by+fi, baseW-fi*2, baseH-fi*2, 'S');
+
+      // ── Foto ──
+      var cropped = await cropPhoto(t.photo, photoAreaW, photoAreaH, t.photoY != null ? t.photoY : 50);
+      pdf.addImage(cropped, 'JPEG', photoX, photoTopY, photoAreaW, photoAreaH);
+
+      // ── Eckenmarken: doppeltes versetztes Rechteck, TR + BL ──
+      var CL  = 18 * fS;   // Linienlänge pro Seite
+      var OFF = 4  * fS;   // Versatz zwischen den zwei Rechtecken
+      var pR  = photoX + photoAreaW;
+      var pB  = photoTopY + photoAreaH;
+      var cornerColor = bl(tc, 0.22);
+      sd(cornerColor); pdf.setLineWidth(0.3);
+      // oben-rechts — innere L (an der Fotokante)
+      pdf.line(pR - CL,       photoTopY,       pR,           photoTopY);
+      pdf.line(pR,             photoTopY,       pR,           photoTopY + CL);
+      // oben-rechts — äußere L (OFF versetzt)
+      pdf.line(pR - CL + OFF, photoTopY - OFF, pR + OFF,     photoTopY - OFF);
+      pdf.line(pR + OFF,       photoTopY - OFF, pR + OFF,     photoTopY + CL - OFF);
+      // unten-links — innere L
+      pdf.line(photoX,         pB,              photoX + CL,  pB);
+      pdf.line(photoX,         pB - CL,         photoX,       pB);
+      // unten-links — äußere L
+      pdf.line(photoX - OFF,   pB + OFF,        photoX + CL - OFF, pB + OFF);
+      pdf.line(photoX - OFF,   pB - CL + OFF,   photoX - OFF, pB + OFF);
+
+      // ── Textbereich: beginnt unter dem Foto ──
+      var GAP_AFTER_PHOTO = 7 * fS;
+      var yText    = photoTopY + photoAreaH + GAP_AFTER_PHOTO;
+      var yBottom  = by + baseH - BW - 4 * fS;
+
+      // Namensliste: 25% dunkler als Themefarbe für Druckkontrast bei kleiner Schrift
+      // Auf Sandstone zusätzlich weitere 10% für Sage/Clay
+      var nameTc = [Math.round(tc[0]*0.75), Math.round(tc[1]*0.75), Math.round(tc[2]*0.75)];
+      if (currentBg === '#F5F5DC' && currentTheme !== 'terracotta') {
+        nameTc = [Math.round(tc[0]*0.65), Math.round(tc[1]*0.65), Math.round(tc[2]*0.65)];
+      }
+      // Tischname behält die volle Themefarbe (groß genug)
+      var textTc = tc;
+
+      // ── Tischname (Cormorant Garamond italic) ──
+      var nameText = t.name;
+      var nLen     = nameText.replace(/\s/g,'').length;
+      var nameFS   = (nLen <= 3 ? 34 : nLen <= 6 ? 27 : nLen <= 10 ? 23 : 20) * fS;
+      st(textTc);
+      setFont('CormorantGaramond', 'italic');
+      pdf.setFontSize(nameFS);
+      pdf.setCharSpace(0);
+      var nameW = pdf.getTextWidth(nameText);
+      var nameY = yText + nameFS * PTmm * 0.5;
+      pdf.text(nameText, cx - nameW / 2, nameY, { baseline:'middle' });
+      var yAfterName = nameY + nameFS * PTmm * 0.5;
+
+      // ── Ornament: Linie · Punkt · Linie ──
+      var GAP_ORN  = 4.5 * fS;
+      var ornW_pdf = (baseW - 2*BW - 16*fS) * 0.55;
+      var dotR     = 1.3 * fS;
+      var gap      = 3 * fS;
+      var oy       = yAfterName + GAP_ORN;
+      sd(bl(tc, 0.20)); pdf.setLineWidth(0.2);
+      pdf.line(cx - ornW_pdf/2,       oy, cx - dotR - gap, oy);
+      pdf.line(cx + dotR + gap,       oy, cx + ornW_pdf/2, oy);
+      sf(ac); pdf.circle(cx, oy, dotR, 'F');
+      var yAfterOrn = oy + GAP_ORN;
+
+      // ── Namensliste ──
+      var namesH    = yBottom - yAfterOrn;
+      var namesW    = baseW - 2*BW - 16*fS;
+      var names     = parseNames(t.names, t.sorted);
+      var n         = names.length;
+
+      if (n > 0) {
+        var cols  = n <= 7 ? 1 : 2;
+        var split = cols === 2 ? Math.ceil(n / 2) : n;
+        var col1  = names.slice(0, split);
+        var col2  = names.slice(split);
+
+        var baseFontPt = 8.5 * fS;
+        var lineH      = baseFontPt * PTmm * 1.75;
+        var maxRows    = cols === 1 ? n : split;
+        var totalTextH = maxRows * lineH;
+        if (totalTextH > namesH) {
+          lineH      = namesH / maxRows;
+          baseFontPt = Math.max(5.5 * fS, lineH / (PTmm * 1.75));
+        }
+
+        // Letter-spacing
+        var charSp = 0.07 * baseFontPt * PTmm;
+
+        setFont('Montserrat', 'normal');
+        pdf.setFontSize(baseFontPt);
+        st(nameTc);
+
+        function drawNamesCol(colNames, colCX, yStart) {
+          colNames.forEach(function(name, ni) {
+            var upperName = name.toUpperCase();
+            var y = yStart + ni * lineH + lineH * 0.5;
+            pdf.setCharSpace(0);
+            var tw = pdf.getTextWidth(upperName);
+            var totalW = tw + charSp * Math.max(0, upperName.length - 1);
+            pdf.setCharSpace(charSp);
+            pdf.text(upperName, colCX - totalW / 2, y, { baseline:'middle' });
+          });
+          pdf.setCharSpace(0);
+        }
+
+        if (cols === 1) {
+          drawNamesCol(col1, cx, yAfterOrn);
+        } else {
+          var colGap = 8 * fS;
+          var colW   = (namesW - colGap) / 2;
+          var cx1    = cx - colGap/2 - colW/2;
+          var cx2    = cx + colGap/2 + colW/2;
+          drawNamesCol(col1, cx1, yAfterOrn);
+          drawNamesCol(col2, cx2, yAfterOrn);
+        }
+      }
+    }
+
+    var FMT_NAMES = { a5:'A5', us57:'5x7' };
+    var dateStr   = new Date().toISOString().slice(0,10);
+    pdf.save('WSA_Sitzplan_Earth_' + FMT_NAMES[fmt] + '_' + dateStr + '.pdf');
+
+  } catch(e) {
+    throw e;
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>

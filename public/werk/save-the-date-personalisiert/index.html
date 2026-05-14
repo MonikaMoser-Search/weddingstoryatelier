@@ -1,0 +1,1226 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Save the Date — Personalisiert · Old Money Line · Wedding Story Atelier</title>
+  <!-- Eine Schriftfamilie: Cormorant Garamond 300 · 400 · 600 — kein Kursiv -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+
+    /* ── Preview ──────────────────────────────────────── */
+    .panel-preview {
+      flex:1; display:flex; flex-direction:column;
+      overflow:hidden; background:#EAE6DF;
+      align-items:stretch; padding:0;
+    }
+    .page-nav {
+      height:40px; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center; gap:12px;
+      font-size:9px; color:#888; text-transform:uppercase; letter-spacing:1.5px;
+    }
+    .nav-btn {
+      width:26px; height:26px; border:1px solid #d0cdc8;
+      background:#fff; cursor:pointer; font-size:13px;
+      display:flex; align-items:center; justify-content:center;
+      color:#555; transition:all 0.15s; flex-shrink:0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color:#1A1A1A; color:#1A1A1A; }
+    .nav-btn:disabled { opacity:0.3; cursor:default; }
+    .preview-area { flex:1; position:relative; overflow:hidden; }
+    #preview-wrap { position:absolute; transform-origin:top left; }
+
+    /* ── Papierblätter ────────────────────────────────── */
+    .std-page {
+      background:#fff;
+      box-shadow:0 12px 40px rgba(0,0,0,0.20);
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:1fr 1fr;
+      gap:0; overflow:hidden; box-sizing:border-box;
+    }
+    .std-page.a4     { width:210mm;   height:297mm;   }
+    .std-page.letter { width:215.9mm; height:279.4mm; }
+    .std-page.single { width:105mm;   height:148mm;
+                       display:grid; grid-template-columns:1fr; grid-template-rows:1fr; }
+
+    /* ── A6-Karte Vorderseite ─────────────────────────── */
+    .std-card {
+      position:relative; overflow:hidden; box-sizing:border-box;
+    }
+    .std-card.empty { visibility:hidden; }
+
+    /* Themes — Vorderseite
+       Farbpalette Vorderseite (Crème-Fläche):
+         --text      → Dunkelbraun / Charcoal  (Hero: Namen, Datum)
+         --text-body → abgedunkelt 65 %        (Anrede, Fließtext)
+         --text-dim  → abgedunkelt 42 %        (Ort, Footer)
+         --gold      → Gold                    (Siegel, "&", Label, Linien)
+       --theme wird NUR für den Farbrand-Hintergrund genutzt, NICHT im Text.
+    */
+    .std-card.burgund { background:#8B1A35; --theme:#8B1A35; --gold:#C9A96E; --text:#1C1008; --text-body:rgba(28,16,8,0.80); --text-dim:rgba(28,16,8,0.42); --gold-dim:rgba(201,169,110,0.65); }
+    .std-card.cognac  { background:#7B4718; --theme:#7B4718; --gold:#C9A96E; --text:#1C1008; --text-body:rgba(28,16,8,0.80); --text-dim:rgba(28,16,8,0.42); --gold-dim:rgba(201,169,110,0.65); }
+    .std-card.forest  { background:#1F4A32; --theme:#1F4A32; --gold:#C9A96E; --text:#1C1008; --text-body:rgba(28,16,8,0.80); --text-dim:rgba(28,16,8,0.42); --gold-dim:rgba(201,169,110,0.65); }
+
+    /* Diagonales Muster auf dem Farbrand */
+    .std-card::before {
+      content:''; position:absolute; inset:0; z-index:0;
+      background-image:repeating-linear-gradient(
+        45deg,
+        rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 0.6px,
+        transparent 0.6px, transparent 8px
+      );
+      pointer-events:none;
+    }
+
+    /* Crème-Innenfläche — sitzt über dem farbigen Rand */
+    .card-cream {
+      position:absolute; inset:5mm;
+      background:#FAF7F2; z-index:1; pointer-events:none;
+    }
+
+    /* Innerer Goldrahmen — 2 mm innerhalb der Crème-Kante */
+    .card-frame {
+      position:absolute; inset:7mm;
+      border:0.5px solid var(--gold-dim);
+      pointer-events:none; z-index:2;
+    }
+
+    /* Eck-Ornamente */
+    .card-corner {
+      position:absolute; width:5mm; height:5mm;
+      border-color:var(--gold-dim); border-style:solid;
+      z-index:4; box-sizing:border-box; pointer-events:none;
+    }
+    .card-corner.tl { top:7mm;    left:7mm;    border-width:0.5px 0 0 0.5px; }
+    .card-corner.tr { top:7mm;    right:7mm;   border-width:0.5px 0.5px 0 0; }
+    .card-corner.bl { bottom:7mm; left:7mm;    border-width:0 0 0.5px 0.5px; }
+    .card-corner.br { bottom:7mm; right:7mm;   border-width:0 0.5px 0.5px 0; }
+
+    /* Inhalt — 11 mm vom Kartenrand */
+    .card-content {
+      position:absolute; z-index:3; inset:11mm;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:flex-start;
+    }
+
+    /*
+     * TYPOGRAFIE-SYSTEM — Editorial / Old Money
+     * ════════════════════════════════════════════════
+     * EINE Schriftfamilie: Cormorant Garamond
+     * KEIN Kursiv, KEINE Zierschriften
+     *
+     * Hierarchie (Größe & Gewicht):
+     *  1. Namen      → SemiBold 600, 7.5 mm   charcoal  (Hero)
+     *  2. Datum      → SemiBold 600, 4.2 mm   charcoal  (Highlight)
+     *  3. Anrede     → Regular  400, 3.2 mm   charcoal  (Persönlich)
+     *  4. Fließtext  → Light    300, 3.0 mm   65 %      (Ruhig)
+     *  5. SAVE THE DATE → Regular 400, 2.5 mm gold      (Label)
+     *  6. Footer     → Light    300, 2.4 mm   42 %      (Dezent)
+     *
+     * Farben im Text: charcoal + gold — kein --theme
+     * ════════════════════════════════════════════════
+     */
+
+    /* Siegel — sichtbare Marke, nicht dominant */
+    .card-seal {
+      flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      height:22mm; margin-bottom:2.5mm;
+    }
+    .card-seal svg { height:18mm; width:auto; display:block; }
+
+    /* ① SAVE THE DATE — Label, Gold, dezent */
+    .card-std-label {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:600; letter-spacing:0.36em;
+      text-transform:uppercase;
+      color:var(--gold);
+      font-size:2.6mm;
+      text-align:center; flex-shrink:0;
+      margin-bottom:4.5mm;
+    }
+
+    /* Trennlinie ——◆—— */
+    .card-rule {
+      display:flex; align-items:center; gap:3mm;
+      width:65%; flex-shrink:0;
+      margin-bottom:0;
+    }
+    .card-rule-line { flex:1; height:0.5px; background:var(--gold-dim); }
+    .card-rule-gem  {
+      width:1.4mm; height:1.4mm; flex-shrink:0;
+      border:0.5px solid var(--gold-dim); transform:rotate(45deg);
+    }
+
+    /* Abstandhalter */
+    .card-gap-xs  { flex-shrink:0; height:3mm; }   /* nach zweiter Regel */
+    .card-gap-s   { flex-shrink:0; height:2.5mm; } /* zwischen Siegel und Regel */
+    .card-gap-m   { flex-shrink:0; height:7mm; }   /* zwischen Regel und Namen */
+    .card-gap-txt { flex-shrink:0; height:9mm; }   /* vor Textblock = klarer Abschnitt */
+
+    /* ② NAMEN — Hero-Element */
+    .card-names {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:600; letter-spacing:0.14em;
+      text-transform:uppercase;
+      color:var(--text);
+      font-size:7.5mm; line-height:1.0;
+      text-align:center; flex-shrink:0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+
+    /* & — stiller Verbinder zwischen den Namen */
+    .card-and {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:300; color:var(--gold-dim);
+      font-size:2.8mm; letter-spacing:0.14em;
+      text-transform:uppercase;
+      margin:2mm 0; flex-shrink:0;
+    }
+
+    /*
+     * UNTERER TEXTBLOCK: eine Einheit
+     * Anrede -> Fliesstext -> Datum -> Fliesstext
+     * Text fuehrt zum Datum hin, kein separater Block.
+     */
+
+    /* Anrede "Liebe Brigitte," */
+    .card-greeting {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:400; color:var(--text);
+      font-size:3.2mm; letter-spacing:0.03em;
+      text-align:center; flex-shrink:0;
+      margin-bottom:3mm;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+
+    /* Fliesstext — 80 %, gut lesbar, kein Kursiv */
+    .card-body {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:300; color:var(--text-body);
+      font-size:3.2mm; letter-spacing:0.02em; line-height:1.75;
+      text-align:center; flex-shrink:0; max-width:100%;
+    }
+
+    /* Datum — Handlungspunkt, gleiche Farbe wie Namen */
+    .card-date-inline {
+      font-family:'Cormorant Garamond',serif;
+      font-weight:600; letter-spacing:0.14em;
+      text-transform:uppercase; color:var(--text);
+      font-size:4.2mm; text-align:center; flex-shrink:0;
+      margin:3.5mm 0 2.5mm;
+    }
+
+    /* Spacer schliesst Textblock nach unten ab */
+    .card-spacer { flex:1; min-height:5mm; }
+
+    /* ── Rückseite — Vollfarben, großes Wappen ────────── */
+    .back-card {
+      position:relative; overflow:hidden; box-sizing:border-box;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:flex-start;
+      padding-top:16mm;
+    }
+    .back-card.empty { visibility:hidden; }
+
+    /* Themes — Rückseite */
+    .back-card.burgund { background:#8B1A35; --gold:#C9A96E; --text:#fff; --text-dim:rgba(255,255,255,0.82); --gold-dim:rgba(201,169,110,0.60); }
+    .back-card.cognac  { background:#7B4718; --gold:#C9A96E; --text:#fff; --text-dim:rgba(255,255,255,0.82); --gold-dim:rgba(201,169,110,0.60); }
+    .back-card.forest  { background:#1F4A32; --gold:#C9A96E; --text:#fff; --text-dim:rgba(255,255,255,0.82); --gold-dim:rgba(201,169,110,0.60); }
+
+    /* Diagonales Goldmuster */
+    .back-card::before {
+      content:''; position:absolute; inset:0; z-index:0;
+      background-image:repeating-linear-gradient(
+        45deg,
+        rgba(201,169,110,0.07) 0px, rgba(201,169,110,0.07) 0.7px,
+        transparent 0.7px, transparent 10px
+      );
+      pointer-events:none;
+    }
+
+    /* Innerer Goldrahmen */
+    .back-card .bc-frame {
+      position:absolute; inset:6mm;
+      border:0.5px solid rgba(201,169,110,0.50);
+      pointer-events:none; z-index:1;
+    }
+
+    /* Eck-Ornamente Rückseite */
+    .bc-corner {
+      position:absolute; width:6mm; height:6mm;
+      border-color:rgba(201,169,110,0.65); border-style:solid;
+      z-index:3; box-sizing:border-box; pointer-events:none;
+    }
+    .bc-corner.tl { top:8mm;    left:8mm;    border-width:0.5px 0 0 0.5px; }
+    .bc-corner.tr { top:8mm;    right:8mm;   border-width:0.5px 0.5px 0 0; }
+    .bc-corner.bl { bottom:8mm; left:8mm;    border-width:0 0 0.5px 0.5px; }
+    .bc-corner.br { bottom:8mm; right:8mm;   border-width:0 0.5px 0.5px 0; }
+
+    /* Großes Monogramm — Herzstück der Rückseite */
+    .bc-mono {
+      position:relative; z-index:2; flex-shrink:0;
+      display:flex; align-items:center; justify-content:center;
+      height:62mm; padding:0 5mm;
+    }
+    .bc-mono svg { display:block; height:48mm; width:auto; }
+
+    /* Ornamentlinie */
+    .bc-rule {
+      position:relative; z-index:2;
+      display:flex; align-items:center; gap:2mm;
+      width:68mm; flex-shrink:0;
+    }
+    .bc-rule-line { flex:1; height:0.4px; background:rgba(201,169,110,0.55); }
+    .bc-rule-gem  {
+      width:1.8mm; height:1.8mm; flex-shrink:0;
+      border:0.4px solid rgba(201,169,110,0.55); transform:rotate(45deg);
+    }
+
+    /* Namen — Rückseite: Cormorant getracked, klar lesbar auf Vollfarbe */
+    .bc-names {
+      position:relative; z-index:2; flex-shrink:0;
+      font-family:'Cormorant Garamond',serif;
+      font-weight:400; text-transform:uppercase; letter-spacing:0.25em;
+      color:var(--text); text-align:center;
+      font-size:4.5mm; padding:8mm 5mm 0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+
+    /* Datum — gleiche Ebene, zurückgenommen */
+    .bc-date {
+      position:relative; z-index:2; flex-shrink:0;
+      font-family:'Cormorant Garamond',serif;
+      font-weight:300; letter-spacing:0.14em;
+      color:var(--text-dim); text-align:center;
+      font-size:3mm; padding:2.5mm 0 0;
+    }
+
+    /* Dankeszeile — leiseste Ebene */
+    .bc-thank {
+      position:relative; z-index:2; flex-shrink:0;
+      font-family:'Cormorant Garamond',serif;
+      font-weight:300; letter-spacing:0.05em;
+      color:var(--text-dim); text-align:center;
+      font-size:2.8mm; padding:4mm 6mm 0;
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%;
+    }
+    .bc-thank.hidden { display:none; }
+
+    /* ── Panel-Extras ─────────────────────────────────── */
+    .sub-label {
+      font-size:9px; color:#999; text-transform:uppercase;
+      letter-spacing:0.08em; margin-bottom:3px; margin-top:8px; display:block;
+    }
+    .sub-label:first-of-type { margin-top:0; }
+    .opt-tag { color:#ccc; font-style:italic; font-size:9px; text-transform:none; letter-spacing:0; }
+
+    /* Textvarianten-Buttons */
+    .var-row { display:grid; grid-template-columns:repeat(4,1fr); gap:4px; margin-bottom:5px; }
+    .var-btn {
+      padding:5px 3px; border:1px solid #eee;
+      background:#fff; cursor:pointer; font-size:9px;
+      color:#888; text-align:center; transition:all 0.15s;
+      font-family:'DM Sans',sans-serif; letter-spacing:0.03em;
+    }
+    .var-btn:hover  { border-color:#1a1a1a; color:#1a1a1a; }
+    .var-btn.active { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+    .var-btn.shuffle {
+      grid-column:1/-1; background:#f7f5f2; color:#666;
+      border-color:#e0ddd8; font-size:8.5px; letter-spacing:0.04em;
+    }
+    .var-btn.shuffle:hover { background:#1a1a1a; color:#fff; border-color:#1a1a1a; }
+
+    .custom-text-section { margin-top:4px; }
+    .custom-text-section.hidden { display:none; }
+
+    .panel-form textarea {
+      width:100%; resize:vertical;
+      font-family:'DM Sans',sans-serif; font-size:9px;
+      padding:7px 9px; border:1px solid #eee; background:#fafafa;
+      color:#333; outline:none; box-sizing:border-box;
+      line-height:1.5; margin-bottom:0;
+    }
+    .panel-form textarea:focus { border-color:#1a1a1a; background:#fff; }
+    .panel-form textarea.guest-area { min-height:130px; }
+    .panel-form textarea.custom-area { min-height:70px; }
+
+    .guest-hint { font-size:8px; color:#bbb; font-style:italic; margin-top:3px; }
+    .guest-count { font-size:9px; color:#bbb; text-align:right; margin-top:2px; }
+    .guest-count.warn { color:#c07040; }
+
+    /* ── Spinner ──────────────────────────────────────── */
+    #pdf-spinner {
+      display:none; position:fixed; inset:0;
+      background:rgba(255,255,255,0.92); z-index:999;
+      align-items:center; justify-content:center; flex-direction:column; gap:14px;
+    }
+    .spin-ring {
+      width:34px; height:34px;
+      border:2.5px solid #eee; border-top-color:#1A1A1A;
+      border-radius:50%; animation:wsa-spin 0.7s linear infinite;
+    }
+    @keyframes wsa-spin { to { transform:rotate(360deg); } }
+    #spin-msg { font-size:9px; color:#888; letter-spacing:1.5px; text-transform:uppercase; }
+
+  </style>
+</head>
+<body>
+
+<!-- ════ FORMULAR-PANEL ════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo"    id="lbl-logo">Save the Date</div>
+  <div class="panel-tagline" id="lbl-tagline">Personalisiert · Old Money Line · Wedding Story Atelier</div>
+
+  <!-- Sprache -->
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Stil -->
+  <span class="section-label" id="lbl-style">Stil</span>
+  <div class="btn-group" id="style-btns">
+    <button class="ui-btn active" onclick="setTheme('burgund',this)">Burgund</button>
+    <button class="ui-btn"        onclick="setTheme('cognac',this)">Cognac</button>
+    <button class="ui-btn"        onclick="setTheme('forest',this)">Forest</button>
+  </div>
+
+  <!-- Papierformat -->
+  <span class="section-label" id="lbl-paper">Papierformat</span>
+  <div class="btn-group" id="paper-btns">
+    <button class="ui-btn active" onclick="setPaper('a4',this)"    id="btn-a4">A4 · 4 Karten</button>
+    <button class="ui-btn"        onclick="setPaper('letter',this)" id="btn-letter">US Letter · 4 Karten</button>
+  </div>
+
+  <!-- Monogramm -->
+  <span class="section-label" id="lbl-mono-style">Monogramm-Siegel</span>
+  <div class="btn-group" id="mono-btns">
+    <button class="ui-btn active" onclick="setMono('diamond',this)">◆ Diamant</button>
+    <button class="ui-btn"        onclick="setMono('frame',this)">⬡ Frame</button>
+    <button class="ui-btn"        onclick="setMono('crest',this)">⛉ Crest</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Karte gestalten -->
+  <span class="section-label" id="lbl-design">Karte gestalten</span>
+
+  <span class="sub-label" id="lbl-initials">Initialen</span>
+  <input type="text" id="inp-initials" maxlength="6" oninput="render()" placeholder="A & D">
+
+  <span class="sub-label" id="lbl-name1">Name 1</span>
+  <input type="text" id="inp-name1" maxlength="25" oninput="render()" placeholder="Anna">
+
+  <span class="sub-label" id="lbl-name2">Name 2</span>
+  <input type="text" id="inp-name2" maxlength="25" oninput="render()" placeholder="Daniel">
+
+  <span class="sub-label" id="lbl-date">Datum</span>
+  <input type="text" id="inp-date" maxlength="30" oninput="render()" placeholder="14 · Juni · 2026">
+
+  <hr class="divider">
+
+  <!-- Einladungstext -->
+  <span class="section-label" id="lbl-text-head">Einladungstext</span>
+
+  <div class="var-row" id="var-row">
+    <button class="var-btn active" onclick="setVariant(0,this)">1</button>
+    <button class="var-btn"        onclick="setVariant(1,this)">2</button>
+    <button class="var-btn"        onclick="setVariant(2,this)">3</button>
+    <button class="var-btn"        onclick="setVariant(3,this)">4</button>
+    <button class="var-btn shuffle" onclick="shuffleVariant()">↺ &nbsp;Zufällig</button>
+    <button class="var-btn" id="btn-custom" onclick="setVariant('custom',this)" style="grid-column:1/-1;">✎ &nbsp;Eigener Text</button>
+  </div>
+
+  <p class="hint" id="variant-preview" style="font-style:italic;color:#aaa;font-size:8.5px;min-height:28px;"></p>
+
+  <div class="custom-text-section hidden" id="custom-text-section">
+    <textarea class="custom-area" id="inp-custom-text" maxlength="160"
+      placeholder="Eigenen Text … {datum} wird durch das Datum ersetzt."
+      oninput="render()"></textarea>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Gästeliste -->
+  <span class="section-label" id="lbl-guests-head">Gästeliste</span>
+  <p class="hint" id="hint-guests"></p>
+  <textarea class="guest-area" id="inp-guests" oninput="onGuestsInput()"></textarea>
+  <div class="guest-count" id="guest-count">0 Gäste</div>
+
+  <hr class="divider">
+
+  <!-- Rückseite -->
+  <span class="section-label" id="lbl-back-head">Rückseite</span>
+  <div style="display:flex;align-items:center;gap:6px;">
+    <label style="display:flex;align-items:center;gap:6px;font-size:9px;color:#555;cursor:pointer;">
+      <input type="checkbox" id="chk-back" onchange="render()">
+      <span id="lbl-back-enable">Dekorative Rückseite aktivieren</span>
+    </label>
+  </div>
+  <p class="hint" id="hint-back">Erstellt 2 PDFs (VS + RS). Browser fragt nach Erlaubnis — bitte bestätigen.</p>
+
+  <div id="back-thank-section" style="display:none;">
+    <span class="sub-label" id="lbl-thank">Dankeszeile <span class="opt-tag">optional</span></span>
+    <input type="text" id="inp-thank" maxlength="60" oninput="render()" placeholder="Wir freuen uns auf diesen besonderen Tag mit euch.">
+  </div>
+
+  <hr class="divider">
+
+  <span class="section-label" id="lbl-output">Ausgabe</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+
+  <div class="action-row" style="margin-top:8px">
+    <button class="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <label class="bleed-label" id="marks-row">
+    <input type="checkbox" id="chk-marks" onchange="render()">
+    <span id="lbl-marks">Schnittmarken / Cut marks</span>
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de" id="phint-de">4 Karten pro Bogen · sRGB · scale:3 (~288 DPI). Auf A6 schneiden oder einzeln drucken.</span>
+    <span class="print-hint-en" id="phint-en">4 cards per sheet · sRGB · scale:3 (~288 DPI). Cut to size or print individually.</span>
+  </div>
+
+</div>
+
+<!-- ════ VORSCHAU-PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>&#8592;</button>
+    <span id="page-info" style="min-width:110px;text-align:center;"></span>
+    <button class="nav-btn" id="btn-next" onclick="changePage(1)"  disabled>&#8594;</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div class="std-page a4" id="preview-page"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ VERSTECKTER DRUCKBEREICH ══════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;overflow:hidden;">
+  <div class="std-page a4" id="print-page"></div>
+</div>
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;overflow:hidden;">
+  <div class="std-page single" id="print-page-single"></div>
+</div>
+
+<!-- ════ SPINNER ════════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg">Erstelle PDF…</span>
+</div>
+
+<script>
+/* ══════════════════════════════════════════
+   ZUSTAND
+══════════════════════════════════════════ */
+var currentLang    = 'de';
+var currentTheme   = 'burgund';
+var currentPaper   = 'a4';
+var currentMono    = 'diamond';
+var currentVariant = 0;
+var currentPage    = 0;
+var currentOutput  = 'home';
+var guests         = [];
+
+/* ══════════════════════════════════════════
+   ÜBERSETZUNGEN
+══════════════════════════════════════════ */
+var T = {
+  de: {
+    logo:'Save the Date', tagline:'Personalisiert · Old Money Line · Wedding Story Atelier',
+    lang:'Sprache', style:'Stil', paper:'Papierformat', monoStyle:'Monogramm-Siegel',
+    design:'Karte gestalten',
+    initials:'Initialen', name1:'Name 1', name2:'Name 2', date:'Datum',
+    textHead:'Einladungstext',
+    guestsHead:'Gästeliste',
+    hintGuests:'Ein Gast pro Zeile. Anrede automatisch:',
+    hintGuestsEx:'Brigitte, w  →  Liebe Brigitte, (du)\nThomas, m  →  Lieber Thomas, (du)\nFamilie Müller  →  Liebe Familie Müller, (ihr)\nAnna & Michael  →  Liebe Anna & Michael, (ihr)\nSchneider, S  →  Schneider, (Sie)',
+    guestsPlaceholder:'Brigitte, w\nThomas, m\nAnna & Michael\nFamilie Müller',
+    stdLabel:'Save the Date',
+    salutW:'Liebe', salutM:'Lieber', salutN:'Liebe', salutS:'',
+    and:'&',
+    /* {datum} wird als eigene Zeile im Textblock dargestellt */
+    variants:[
+      'wir freuen uns, diesen besonderen Tag mit dir zu feiern, und bitten dich, dir den {datum} bereits vorzumerken.',
+      'dieser Tag wäre ohne dich nicht vollständig. Bitte halte dir den {datum} bereits frei.',
+      'es wäre uns eine große Freude, gemeinsam mit dir zu feiern. Bitte merke dir den {datum} bereits vor.',
+      'wir würden uns von Herzen freuen, dich dabei zu haben, und bitten dich, dir den {datum} freizuhalten.'
+    ],
+    variantsIhr:[
+      'wir freuen uns, diesen besonderen Tag mit euch zu feiern, und bitten euch, den {datum} bereits vorzumerken.',
+      'dieser Tag wäre ohne euch nicht vollständig. Bitte haltet euch den {datum} bereits frei.',
+      'es wäre uns eine große Freude, gemeinsam mit euch zu feiern. Bitte merkt euch den {datum} bereits vor.',
+      'wir würden uns von Herzen freuen, euch dabei zu haben, und bitten euch, den {datum} freizuhalten.'
+    ],
+    variantsSie:[
+      'wir freuen uns, diesen besonderen Tag mit Ihnen zu feiern, und bitten Sie, sich den {datum} bereits vorzumerken.',
+      'dieser Tag wäre ohne Sie nicht vollständig. Bitte halten Sie sich den {datum} bereits frei.',
+      'es wäre uns eine große Freude, gemeinsam mit Ihnen zu feiern. Bitte merken Sie sich den {datum} bereits vor.',
+      'wir würden uns von Herzen freuen, Sie dabei zu haben, und bitten Sie, den {datum} freizuhalten.'
+    ],
+    spinPage: function(p,t){ return 'Seite '+p+' von '+t+' …'; },
+    spinDone:'PDF wird gespeichert …',
+    alertFail:'PDF-Fehler: ',
+    pageOf: function(a,b){ return 'Seite '+a+' von '+b; },
+    guestCount: function(n){ return n===1?'1 Gast':n+' Gäste'; },
+    backHead:'Rückseite', backEnable:'Dekorative Rückseite aktivieren',
+    hintBack:'Erstellt 2 PDFs (VS + RS). Browser fragt nach Erlaubnis — bitte bestätigen.',
+    thankLbl:'Dankeszeile',
+    outputLbl:'Ausgabe',
+    demoGuests:'Brigitte, w\nThomas, m\nAnna & Michael\nFamilie Müller',
+    demoName1:'Anna', demoName2:'Daniel',
+    demoDate:'14 · Juni · 2026',
+    demoLoc:'Villa Rosenberg · München',
+    demoInitials:'A & D'
+  },
+  en: {
+    logo:'Save the Date', tagline:'Personalised · Old Money Line · Wedding Story Atelier',
+    lang:'Language', style:'Style', paper:'Paper Format', monoStyle:'Monogram Seal',
+    design:'Card Design',
+    initials:'Initials', name1:'Name 1', name2:'Name 2', date:'Date',
+    textHead:'Invitation Text',
+    guestsHead:'Guest List',
+    hintGuests:'One guest per line. Salutation auto-generated:',
+    hintGuestsEx:'Brigitte, w  →  Dear Brigitte, (you)\nThomas, m  →  Dear Thomas, (you)\nFamily Miller  →  Dear Family Miller, (you all)\nAnna & Michael  →  Dear Anna & Michael, (you all)\nMiller, S  →  Miller, (formal)',
+    guestsPlaceholder:'Brigitte, w\nThomas, m\nAnna & Michael\nFamily Miller',
+    stdLabel:'Save the Date',
+    salutW:'Dear', salutM:'Dear', salutN:'Dear', salutS:'',
+    and:'&',
+    /* {datum} is rendered as its own line within the text block */
+    variants:[
+      'we would love for you to join us and kindly ask you to save {datum} in your calendar.',
+      'this day would not be complete without you. Please save {datum} and join us.',
+      'it would be our greatest joy to celebrate with you. Please keep {datum} free for us.',
+      'we would be delighted to have you with us. Please save {datum} in your diary.'
+    ],
+    variantsIhr:[
+      'we would love for you both to join us and kindly ask you to save {datum} in your calendar.',
+      'this day would not be complete without you. Please save {datum} and join us.',
+      'it would be our greatest joy to celebrate with you. Please keep {datum} free for us.',
+      'we would be delighted to have you with us. Please save {datum} in your diary.'
+    ],
+    variantsSie:[
+      'we would love for you to join us and kindly ask you to save {datum} in your calendar.',
+      'this day would not be complete without you. Please save {datum} and join us.',
+      'it would be our greatest joy to celebrate with you. Please keep {datum} free for us.',
+      'we would be delighted to have you with us. Please save {datum} in your diary.'
+    ],
+    spinPage: function(p,t){ return 'Page '+p+' of '+t+' …'; },
+    spinDone:'Saving PDF …',
+    alertFail:'PDF error: ',
+    pageOf: function(a,b){ return 'Page '+a+' of '+b; },
+    guestCount: function(n){ return n===1?'1 guest':n+' guests'; },
+    backHead:'Back Side', backEnable:'Enable decorative back side',
+    hintBack:'Creates 2 PDFs (front + back). Browser will ask permission — please confirm.',
+    thankLbl:'Thank-you line',
+    outputLbl:'Output',
+    demoGuests:'Brigitte, w\nThomas, m\nAnna & Michael\nFamily Miller',
+    demoName1:'Anna', demoName2:'Daniel',
+    demoDate:'June 14 · 2026',
+    demoLoc:'Villa Rosenberg · London',
+    demoInitials:'A & D'
+  }
+};
+
+function t()    { return T[currentLang]; }
+function ge(id) { return document.getElementById(id); }
+function gv(id) { return ge(id).value.trim(); }
+function esc(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* Papiermaße */
+var PAPER = {
+  a4:     { w:210,   h:297,   label:'A4' },
+  letter: { w:215.9, h:279.4, label:'Letter' }
+};
+
+/* ══════════════════════════════════════════
+   MONOGRAMM-SVG — zwei Größen
+   small : Vorderseite (23 mm Höhe per CSS)
+   large : Rückseite   (48 mm Höhe per CSS)
+══════════════════════════════════════════ */
+function monoSVG(style, initials, size) {
+  var g    = '#C9A96E';
+  var text = esc((initials || 'A & D').toUpperCase().slice(0,7));
+  var len  = text.length;
+
+  /* Schriftgröße skaliert mit SVG-Größe */
+  var fs, ls;
+  if (size === 'large') {
+    fs = len <= 2 ? 18 : len <= 3 ? 16 : len <= 5 ? 13 : 10;
+    ls = len <= 2 ? 4  : len <= 3 ? 2  : len <= 5 ? 1  : 0.5;
+  } else {
+    fs = len <= 2 ? 14 : len <= 3 ? 12 : len <= 5 ? 10 : 8;
+    ls = len <= 2 ? 3  : len <= 3 ? 1.5: len <= 5 ? 0.5: 0;
+  }
+
+  /* Einheitlich: Cormorant Garamond SemiBold im Siegel */
+  var fw = '600';
+  if (style === 'frame') {
+    return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+      +'<polygon points="40,4 57,9 68,22 68,48 57,61 40,66 23,61 12,48 12,22 23,9" fill="none" stroke="'+g+'" stroke-width="1.2"/>'
+      +'<polygon points="40,8 55,12 65,23 65,47 55,58 40,62 25,58 15,47 15,23 25,12" fill="none" stroke="'+g+'" stroke-width="0.4" opacity="0.5"/>'
+      +'<text x="40" y="40" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond,serif" font-size="'+fs+'" font-weight="'+fw+'" fill="'+g+'" letter-spacing="'+ls+'">'+text+'</text>'
+      +'</svg>';
+  }
+  if (style === 'crest') {
+    return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+      +'<path d="M40,4 L65,13 L65,40 Q65,57 40,65 Q15,57 15,40 L15,13 Z" fill="none" stroke="'+g+'" stroke-width="1.2"/>'
+      +'<path d="M40,8 L61,16 L61,40 Q61,53 40,61 Q19,53 19,40 L19,16 Z" fill="none" stroke="'+g+'" stroke-width="0.4" opacity="0.5"/>'
+      +'<text x="40" y="40" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond,serif" font-size="'+fs+'" font-weight="'+fw+'" fill="'+g+'" letter-spacing="'+ls+'">'+text+'</text>'
+      +'</svg>';
+  }
+  /* Diamant (Standard) */
+  return '<svg viewBox="0 0 80 70" xmlns="http://www.w3.org/2000/svg" style="display:block;">'
+    +'<polygon points="40,3 77,35 40,67 3,35" fill="none" stroke="'+g+'" stroke-width="1.2"/>'
+    +'<polygon points="40,7 73,35 40,63 7,35" fill="none" stroke="'+g+'" stroke-width="0.4" opacity="0.5"/>'
+    +'<text x="40" y="37" text-anchor="middle" dominant-baseline="middle" font-family="Cormorant Garamond,serif" font-size="'+fs+'" font-weight="'+fw+'" fill="'+g+'" letter-spacing="'+ls+'">'+text+'</text>'
+    +'</svg>';
+}
+
+/* ══════════════════════════════════════════
+   GÄSTELISTE PARSEN
+   Format: "Name" / "Name, w" / "Name, m" / "Name, S"
+   w → Liebe (du) / m → Lieber (du) / (keins) → Liebe (du/ihr)
+   Familie … oder … & … → ihr-Form automatisch
+   S → Sie-Form (kein Anrede-Präfix)
+══════════════════════════════════════════ */
+function parseGuests(raw) {
+  var l = t();
+  return raw.split('\n')
+    .map(function(line){ return line.trim(); })
+    .filter(function(line){ return line.length > 0; })
+    .map(function(line){
+      var comma = line.lastIndexOf(',');
+      var name, suffix;
+      if (comma !== -1) {
+        var suf = line.slice(comma+1).trim().toLowerCase();
+        if (suf === 'w' || suf === 'm' || suf === 's') {
+          name   = line.slice(0, comma).trim();
+          suffix = suf;
+        } else {
+          name   = line;
+          suffix = '';
+        }
+      } else {
+        name   = line;
+        suffix = '';
+      }
+
+      var pronoun;
+      if (suffix === 's') {
+        pronoun = 'sie';
+      } else if (/\s*&\s*/.test(name) || /^familie\b/i.test(name)) {
+        pronoun = 'ihr';
+      } else {
+        pronoun = 'du';
+      }
+
+      var salut;
+      if      (suffix === 'm') salut = l.salutM;
+      else if (suffix === 's') salut = l.salutS || '';
+      else                     salut = l.salutW;
+
+      var greeting = salut ? salut + ' ' + name : name;
+      return { name:name, suffix:suffix, pronoun:pronoun, greeting:greeting };
+    });
+}
+
+function onGuestsInput() {
+  guests = parseGuests(ge('inp-guests').value);
+  var el = ge('guest-count');
+  el.textContent = t().guestCount(guests.length);
+  el.className   = 'guest-count'+(guests.length > 200 ? ' warn' : '');
+  render();
+}
+
+/* ══════════════════════════════════════════
+   TEXTBLOCK-HTML
+   Baut Anrede + Text + Datum-Zeile als eine Einheit.
+   {datum} → eigene Zeile (card-date-inline), nicht inline.
+   Text fuehrt ZUM Datum hin.
+══════════════════════════════════════════ */
+function buildTextBlockHTML(guest, data) {
+  var pronoun = guest ? (guest.pronoun || 'du') : 'du';
+  var varSet = pronoun === 'ihr' ? (t().variantsIhr || t().variants)
+             : pronoun === 'sie' ? (t().variantsSie || t().variants)
+             : t().variants;
+  var template = currentVariant === 'custom'
+    ? gv('inp-custom-text')
+    : (varSet[currentVariant] || '');
+  var greeting = guest ? guest.greeting : '';
+
+  var greetHTML = greeting
+    ? '<div class="card-greeting">'+esc(greeting)+','+'</div>'
+    : '';
+
+  var dateEl = data.date
+    ? '<div class="card-date-inline">'+esc(data.date)+'</div>'
+    : '';
+
+  var bodyHTML;
+  var idx = template.indexOf('{datum}');
+  if (idx !== -1) {
+    var before = template.slice(0, idx).trim();
+    var after  = template.slice(idx + 7).trim();
+    bodyHTML = (before ? '<div class="card-body">'+esc(before)+'</div>' : '')
+             + dateEl
+             + (after  ? '<div class="card-body">'+esc(after)+'</div>'  : '');
+  } else {
+    bodyHTML = '<div class="card-body">'+esc(template)+'</div>' + dateEl;
+  }
+
+  return greetHTML + bodyHTML;
+}
+
+/* ══════════════════════════════════════════
+   NAMEN-SKALIERUNG
+   Basis: laengerer der beiden Namen.
+   font-size + letter-spacing skalieren gemeinsam,
+   sodass keine sichtbare Automatik entsteht.
+   card-and margin passt sich ebenfalls an.
+══════════════════════════════════════════ */
+function getNameStyle(n1, n2) {
+  var len = Math.max(n1.replace(/\s/g,'').length, n2.replace(/\s/g,'').length);
+  if      (len <= 7)  return { fs:'7.5mm', ls:'0.14em', andM:'2mm'   };
+  else if (len <= 9)  return { fs:'6.8mm', ls:'0.11em', andM:'1.5mm' };
+  else if (len <= 11) return { fs:'6.2mm', ls:'0.11em', andM:'1.5mm' };
+  else if (len <= 13) return { fs:'5.6mm', ls:'0.09em', andM:'1mm'   };
+  else                return { fs:'5.2mm', ls:'0.09em', andM:'1mm'   };
+}
+
+/* ══════════════════════════════════════════
+   KARTEN-HTML
+   Layout (oben nach unten):
+     SAVE THE DATE  →  Siegel  →  ——◆——
+     ANNA / & / DANIEL  (dynamisch skaliert)
+     [grosser Abstand]  →  ——◆——
+     Liebe Brigitte,
+     wir freuen uns ...
+     14. JUNI 2026          <- Datum als Handlungspunkt
+     bereits vorzumerken.
+     [Spacer]
+══════════════════════════════════════════ */
+var RULE = '<div class="card-rule"><div class="card-rule-line"></div>'
+         + '<div class="card-rule-gem"></div><div class="card-rule-line"></div></div>';
+
+function buildCard(guest, data) {
+  var ns = getNameStyle(data.name1, data.name2);
+  var nStyle = 'font-size:'+ns.fs+';letter-spacing:'+ns.ls+';';
+  var aStyle = 'margin:'+ns.andM+' 0;';
+
+  return '<div class="std-card '+data.theme+'">'
+    +'<div class="card-cream"></div>'
+    +'<div class="card-frame"></div>'
+    +'<div class="card-corner tl"></div><div class="card-corner tr"></div>'
+    +'<div class="card-corner bl"></div><div class="card-corner br"></div>'
+    +'<div class="card-content">'
+
+      /* KOPF */
+      +'<div class="card-std-label">'+esc(t().stdLabel)+'</div>'
+      +'<div class="card-seal">'+monoSVG(data.mono, data.initials, 'small')+'</div>'
+      +'<div class="card-gap-s"></div>'
+      +RULE
+      +'<div class="card-gap-m"></div>'
+
+      /* HERO: Namen — dynamisch skaliert, beide gleich gross */
+      +'<div class="card-names" style="'+nStyle+'">'+esc(data.name1)+'</div>'
+      +'<div class="card-and"   style="'+aStyle+'">'+esc(data.and)+'</div>'
+      +'<div class="card-names" style="'+nStyle+'">'+esc(data.name2)+'</div>'
+
+      /* Grosser Abstand = klarer Abschnitt */
+      +'<div class="card-gap-txt"></div>'
+      +RULE
+      +'<div class="card-gap-xs"></div>'
+
+      /* EINLADUNGSEINHEIT: Text fuehrt zum Datum */
+      + buildTextBlockHTML(guest, data)
+
+      +'<div class="card-spacer"></div>'
+
+    +'</div>'
+  +'</div>';
+}
+
+function buildBackCard(data) {
+  var showThank = data.thank && data.thank.length > 0;
+  return '<div class="back-card '+data.theme+'">'
+    +'<div class="bc-frame"></div>'
+    +'<div class="bc-corner tl"></div><div class="bc-corner tr"></div>'
+    +'<div class="bc-corner bl"></div><div class="bc-corner br"></div>'
+    +'<div class="bc-mono">'+monoSVG(data.mono, data.initials, 'large')+'</div>'
+    +'<div class="bc-rule"><div class="bc-rule-line"></div><div class="bc-rule-gem"></div><div class="bc-rule-line"></div></div>'
+    +'<div class="bc-names">'+esc(data.name1)+' '+esc(data.and)+' '+esc(data.name2)+'</div>'
+    +(data.date ? '<div class="bc-date">'+esc(data.date)+'</div>' : '')
+    +'<div class="bc-thank'+(showThank?'':' hidden')+'">'+esc(data.thank||'')+'</div>'
+  +'</div>';
+}
+
+function buildEmptyCard(isBack) {
+  return isBack
+    ? '<div class="back-card empty '+currentTheme+'"></div>'
+    : '<div class="std-card empty '+currentTheme+'"></div>';
+}
+
+/* ══════════════════════════════════════════
+   SEITEN-HTML (4 Karten pro Bogen)
+══════════════════════════════════════════ */
+function buildCutMarksHTML(pw, ph) {
+  var cx = pw / 2, cy = ph / 2;
+  var gap = 1.5, len = 5;
+  var lines = [
+    [cx-gap-len, cy,      cx-gap, cy     ],
+    [cx+gap,     cy,      cx+gap+len, cy ],
+    [cx,         cy-gap-len, cx, cy-gap  ],
+    [cx,         cy+gap,  cx, cy+gap+len ],
+  ];
+  var segs = lines.map(function(l){
+    return '<line x1="'+l[0]+'" y1="'+l[1]+'" x2="'+l[2]+'" y2="'+l[3]+'" stroke="#555" stroke-width="0.3"/>';
+  }).join('');
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+pw+' '+ph+'" '
+       + 'style="position:absolute;inset:0;width:100%;height:100%;z-index:100;pointer-events:none;overflow:visible">'
+       + segs + '</svg>';
+}
+
+function buildPageHTML(guestSlice, data, isBack) {
+  var html = '';
+  for (var i = 0; i < 4; i++) {
+    var g = guestSlice[i];
+    if (g !== undefined) {
+      html += isBack ? buildBackCard(data) : buildCard(g, data);
+    } else {
+      html += buildEmptyCard(isBack);
+    }
+  }
+  if (ge('chk-marks') && ge('chk-marks').checked) {
+    var p = PAPER[currentPaper];
+    html += buildCutMarksHTML(p.w, p.h);
+  }
+  return html;
+}
+
+/* ══════════════════════════════════════════
+   DATEN SAMMELN
+══════════════════════════════════════════ */
+function getData() {
+  var l = t();
+  return {
+    theme:    currentTheme,
+    mono:     currentMono,
+    initials: gv('inp-initials') || l.demoInitials,
+    name1:    gv('inp-name1')    || l.demoName1,
+    name2:    gv('inp-name2')    || l.demoName2,
+    date:     gv('inp-date'),
+    thank:    gv('inp-thank'),
+    and:      l.and
+  };
+}
+
+/* ══════════════════════════════════════════
+   VORSCHAU SKALIEREN
+══════════════════════════════════════════ */
+function scalePreview() {
+  var area = ge('preview-area');
+  var wrap = ge('preview-wrap');
+  var p    = PAPER[currentPaper];
+  var pgW  = p.w * 3.7795;
+  var pgH  = p.h * 3.7795;
+  var avW  = area.clientWidth  - 40;
+  var avH  = area.clientHeight - 40;
+  if (avW <= 0) avW = 600;
+  if (avH <= 0) avH = 800;
+  var scale = Math.min(avW / pgW, avH / pgH, 1);
+  wrap.style.transform = 'scale('+scale+')';
+  wrap.style.left = Math.round((area.clientWidth  - pgW*scale)/2)+'px';
+  wrap.style.top  = Math.round((area.clientHeight - pgH*scale)/2)+'px';
+}
+
+/* ══════════════════════════════════════════
+   RENDER
+══════════════════════════════════════════ */
+function render() {
+  var data    = getData();
+  var hasBack = ge('chk-back').checked;
+  var list    = guests.length > 0 ? guests : [{ name:'', gender:'', greeting:'' }, null, null, null];
+  var frontPages = Math.max(1, Math.ceil(list.length / 4));
+  var totalPages = hasBack ? frontPages * 2 : frontPages;
+  currentPage = Math.min(currentPage, totalPages-1);
+
+  var isFront   = currentPage < frontPages;
+  var pageIndex = isFront ? currentPage : currentPage - frontPages;
+  var slice     = list.slice(pageIndex*4, pageIndex*4+4);
+
+  ge('preview-page').innerHTML = buildPageHTML(slice, data, !isFront);
+
+  /* Navigation */
+  ge('btn-prev').disabled = currentPage === 0;
+  ge('btn-next').disabled = currentPage >= totalPages-1;
+
+  var sideLabel = '';
+  if (hasBack) sideLabel = isFront ? ' · VS' : ' · RS';
+  var pageLabel = totalPages > 1
+    ? t().pageOf(pageIndex+1, frontPages) + sideLabel
+    : (sideLabel.trim() || '');
+  ge('page-info').textContent = pageLabel
+    + (list.length > 0 ? ' · '+t().guestCount(guests.length) : '');
+
+  /* Rückseiten-Eingaben zeigen/verstecken */
+  ge('back-thank-section').style.display = hasBack ? 'block' : 'none';
+
+  scalePreview();
+}
+
+/* ══════════════════════════════════════════
+   PDF-EXPORT
+══════════════════════════════════════════ */
+async function exportPDF() {
+  var data    = getData();
+  var hasBack = ge('chk-back').checked;
+  var list    = guests.length > 0 ? guests : [{ name:'', gender:'', greeting:'' }];
+  var label   = currentTheme+'_'+currentMono;
+  var dateStr = new Date().toISOString().slice(0,10);
+
+  var spinner = ge('pdf-spinner');
+  var msg     = ge('spin-msg');
+  spinner.style.display = 'flex';
+
+  try {
+    var { jsPDF } = window.jspdf;
+
+    if (currentOutput === 'print') {
+      /* ── Druckerei: 1 Karte pro Seite, A6 + 3 mm Beschnitt ── */
+      var bleed = 3, cW = 105, cH = 148;
+      var pgW = cW + bleed*2, pgH = cH + bleed*2;
+      var pps = ge('print-page-single');
+
+      var pdfVS = new jsPDF({ orientation:'portrait', unit:'mm', format:[pgW, pgH] });
+      for (var i = 0; i < list.length; i++) {
+        msg.textContent = 'VS · '+t().spinPage(i+1, list.length);
+        pps.innerHTML = buildCard(list[i], data);
+        await new Promise(function(r){ setTimeout(r,150); });
+        var cvs = await html2canvas(pps,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+        if (i > 0) pdfVS.addPage([pgW, pgH]);
+        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.92),'JPEG', bleed, bleed, cW, cH);
+      }
+      msg.textContent = t().spinDone;
+      pdfVS.save('SaveTheDate_VS_'+label+'_OldMoney_Druck_'+dateStr+'.pdf');
+
+      if (hasBack) {
+        await new Promise(function(r){ setTimeout(r,400); });
+        var pdfRS = new jsPDF({ orientation:'portrait', unit:'mm', format:[pgW, pgH] });
+        for (var k = 0; k < list.length; k++) {
+          msg.textContent = 'RS · '+t().spinPage(k+1, list.length);
+          pps.innerHTML = buildBackCard(data);
+          await new Promise(function(r){ setTimeout(r,150); });
+          var cvsR = await html2canvas(pps,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+          if (k > 0) pdfRS.addPage([pgW, pgH]);
+          pdfRS.addImage(cvsR.toDataURL('image/jpeg',0.92),'JPEG', bleed, bleed, cW, cH);
+        }
+        pdfRS.save('SaveTheDate_RS_'+label+'_OldMoney_Druck_'+dateStr+'.pdf');
+      }
+
+    } else {
+      /* ── Heimdruck: 4 Karten pro Bogen ── */
+      var pages = Math.max(1, Math.ceil(list.length / 4));
+      var p     = PAPER[currentPaper];
+      var pp    = ge('print-page');
+
+      var pdfVS = new jsPDF({ orientation:'portrait', unit:'mm', format:[p.w, p.h] });
+      for (var i = 0; i < pages; i++) {
+        msg.textContent = 'VS · '+t().spinPage(i+1, pages);
+        var slice = list.slice(i*4, i*4+4);
+        pp.innerHTML = buildPageHTML(slice, data, false);
+        await new Promise(function(r){ setTimeout(r,150); });
+        var cvs = await html2canvas(pp,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+        if (i > 0) pdfVS.addPage();
+        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.92),'JPEG',0,0,p.w,p.h);
+      }
+      msg.textContent = t().spinDone;
+      pdfVS.save('SaveTheDate_VS_'+label+'_'+p.label+'_OldMoney_'+dateStr+'.pdf');
+
+      if (hasBack) {
+        await new Promise(function(r){ setTimeout(r,400); });
+        var pdfRS = new jsPDF({ orientation:'portrait', unit:'mm', format:[p.w, p.h] });
+        for (var j = 0; j < pages; j++) {
+          msg.textContent = 'RS · '+t().spinPage(j+1, pages);
+          var sl       = list.slice(j*4, j*4+4);
+          var mirrored = sl.length > 1
+            ? [(sl[1]||null),(sl[0]||null),(sl[3]||null),(sl[2]||null)]
+            : sl;
+          pp.innerHTML = buildPageHTML(mirrored, data, true);
+          await new Promise(function(r){ setTimeout(r,150); });
+          var cvs2 = await html2canvas(pp,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
+          if (j > 0) pdfRS.addPage();
+          pdfRS.addImage(cvs2.toDataURL('image/jpeg',0.92),'JPEG',0,0,p.w,p.h);
+        }
+        pdfRS.save('SaveTheDate_RS_'+label+'_'+p.label+'_OldMoney_'+dateStr+'.pdf');
+      }
+    }
+
+  } catch(e) {
+    alert(t().alertFail + e.message);
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+
+/* ══════════════════════════════════════════
+   UI-STEUERUNG
+══════════════════════════════════════════ */
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  /* Gästeliste neu parsen (Anreden aktualisieren) */
+  if (ge('inp-guests').value.trim()) {
+    guests = parseGuests(ge('inp-guests').value);
+    ge('guest-count').textContent = t().guestCount(guests.length);
+  }
+  applyLang();
+  loadDemo();
+}
+
+function setTheme(th, btn) {
+  currentTheme = th;
+  document.querySelectorAll('#style-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function setPaper(paper, btn) {
+  currentPaper = paper;
+  document.querySelectorAll('#paper-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  /* Vorschau-Seite und Druckseite auf neues Format umstellen */
+  ge('preview-page').className = 'std-page '+paper;
+  ge('print-page').className   = 'std-page '+paper;
+  render();
+}
+
+function setMono(style, btn) {
+  currentMono = style;
+  document.querySelectorAll('#mono-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  render();
+}
+
+function setOutput(mode, btn) {
+  currentOutput = mode;
+  document.querySelectorAll('#btn-out-home,#btn-out-print').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var isPrint = mode === 'print';
+  ge('marks-row').style.display = isPrint ? 'none' : '';
+  ge('phint-de').textContent = isPrint
+    ? '1 Karte pro Seite · A6 + 3 mm Beschnitt · für Online-Druckereien. Jede Seite 1× drucken lassen.'
+    : '4 Karten pro Bogen · sRGB · scale:3 (~288 DPI). Auf A6 schneiden oder einzeln drucken.';
+  ge('phint-en').textContent = isPrint
+    ? '1 card per page · A6 + 3 mm bleed · for online print services. Print each page once.'
+    : '4 cards per sheet · sRGB · scale:3 (~288 DPI). Cut to size or print individually.';
+}
+
+function setVariant(v, btn) {
+  currentVariant = v;
+  document.querySelectorAll('#var-row .var-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var isCustom = (v === 'custom');
+  ge('custom-text-section').classList.toggle('hidden', !isCustom);
+  if (!isCustom) {
+    var preview = t().variants[v] || '';
+    ge('variant-preview').textContent = '»'+preview.substring(0,72)+(preview.length>72?'…':'')+'«';
+  } else {
+    ge('variant-preview').textContent = '';
+  }
+  render();
+}
+
+function shuffleVariant() {
+  var next = Math.floor(Math.random() * 4);
+  if (next === currentVariant) next = (next+1) % 4;
+  var numbered = Array.from(ge('var-row').querySelectorAll('.var-btn')).filter(function(b){
+    return !b.classList.contains('shuffle') && b.id !== 'btn-custom' && b.textContent.trim().length === 1;
+  });
+  if (numbered[next]) setVariant(next, numbered[next]);
+}
+
+function changePage(dir) {
+  var list  = guests.length > 0 ? guests : [null];
+  var fp    = Math.max(1, Math.ceil(list.length / 4));
+  var total = ge('chk-back').checked ? fp*2 : fp;
+  currentPage = Math.max(0, Math.min(currentPage+dir, total-1));
+  render();
+}
+
+function applyLang() {
+  var l = t();
+  ge('lbl-logo').textContent         = l.logo;
+  ge('lbl-tagline').textContent      = l.tagline;
+  ge('lbl-lang').textContent         = l.lang;
+  ge('lbl-style').textContent        = l.style;
+  ge('lbl-paper').textContent        = l.paper;
+  ge('lbl-mono-style').textContent   = l.monoStyle;
+  ge('lbl-design').textContent       = l.design;
+  ge('lbl-initials').textContent     = l.initials;
+  ge('lbl-name1').textContent        = l.name1;
+  ge('lbl-name2').textContent        = l.name2;
+  ge('lbl-date').textContent         = l.date;
+  ge('lbl-text-head').textContent    = l.textHead;
+  ge('lbl-guests-head').textContent  = l.guestsHead;
+  ge('hint-guests').innerHTML        = l.hintGuests
+    +'<br><em style="color:#bbb;white-space:pre-line;">'+esc(l.hintGuestsEx)+'</em>';
+  ge('inp-guests').placeholder       = l.guestsPlaceholder;
+  ge('lbl-back-head').textContent    = l.backHead;
+  ge('lbl-back-enable').textContent  = l.backEnable;
+  ge('hint-back').textContent        = l.hintBack;
+  ge('lbl-thank').innerHTML          = l.thankLbl+' <span class="opt-tag">optional</span>';
+  ge('lbl-output').textContent       = l.outputLbl;
+  document.documentElement.lang     = currentLang;
+
+  if (typeof currentVariant === 'number') {
+    var preview = l.variants[currentVariant] || '';
+    ge('variant-preview').textContent = '»'+preview.substring(0,72)+(preview.length>72?'…':'')+'«';
+  }
+  ge('guest-count').textContent = l.guestCount(guests.length);
+}
+
+/* ══════════════════════════════════════════
+   DEMO
+══════════════════════════════════════════ */
+function loadDemo() {
+  var l = t();
+  ge('inp-initials').value = l.demoInitials;
+  ge('inp-name1').value    = l.demoName1;
+  ge('inp-name2').value    = l.demoName2;
+  ge('inp-date').value     = l.demoDate;
+  ge('inp-guests').value   = l.demoGuests;
+  guests = parseGuests(l.demoGuests);
+  ge('guest-count').textContent = l.guestCount(guests.length);
+  currentPage = 0;
+  render();
+}
+
+/* ══════════════════════════════════════════
+   INITIALISIERUNG
+══════════════════════════════════════════ */
+window.addEventListener('resize', scalePreview);
+applyLang();
+setVariant(0, ge('var-row').querySelectorAll('.var-btn')[0]);
+loadDemo();
+</script>
+</body>
+</html>

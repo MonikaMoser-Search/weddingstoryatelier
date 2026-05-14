@@ -1,0 +1,756 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Sitzplan alphabetisch — Signature Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Generator-spezifische Ergänzungen ── */
+    .guest-count      { font-size: 9px; color: #bbb; text-align: right; margin-top: 3px; }
+    .guest-count.warn { color: #c0392b; font-weight: 500; }
+    .panel-form textarea { min-height: 200px; flex: 1; }
+
+    /* ══ POSTER ══════════════════════════════════ */
+    #poster {
+      width: 210mm; height: 297mm;
+      position: relative; overflow: hidden;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.22);
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Themes ── */
+    #poster.highland { background-color: #FEFCF7; color: #2B4A1F; border: 14px solid #2B4A1F; }
+    #poster.coastal  { background-color: #FAFCFE; color: #1A4A6B; border: 14px solid #1A4A6B; }
+    #poster.classic  { background-color: #FFFFFF;  color: #1A1A1A; }
+
+    /* ── Inner frame ── */
+    .poster-frame { position: absolute; inset: 7mm; pointer-events: none; z-index: 1; }
+    .highland .poster-frame { border: 1px solid rgba(43,74,31,0.38); }
+    .coastal  .poster-frame { border: 1px solid rgba(26,74,107,0.38); }
+    .classic  .poster-frame { border: 1px solid rgba(0,0,0,0.22); }
+
+    /* ── Body ── */
+    .poster-body {
+      flex: 1; min-height: 0;
+      display: flex; flex-direction: column;
+      padding: 13mm 14mm 10mm;
+      position: relative; z-index: 2;
+    }
+
+    /* ── Header ── */
+    #poster-header { text-align: center; flex-shrink: 0; margin-bottom: 6mm; }
+    .poster-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-size: 7pt;
+      letter-spacing: 5px; text-transform: uppercase; opacity: 0.42; margin-bottom: 2.5mm;
+    }
+    .poster-title {
+      font-family: 'Playfair Display', serif; font-size: 24pt;
+      font-weight: 700; letter-spacing: 6px; text-transform: uppercase; line-height: 1.1;
+    }
+    .highland .poster-title { color: #2B4A1F; }
+    .coastal  .poster-title { color: #1A4A6B; font-style: italic; }
+    .classic  .poster-title { color: #1A1A1A; }
+    .poster-subtitle {
+      margin-top: 2mm; font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10pt; letter-spacing: 1.5px; opacity: 0.62;
+    }
+    .poster-rule { width: 30mm; height: 1px; margin: 4mm auto 0; }
+    .highland .poster-rule { background: rgba(43,74,31,0.38); }
+    .coastal  .poster-rule { background: rgba(26,74,107,0.38); }
+    .classic  .poster-rule { background: rgba(0,0,0,0.28); }
+
+    /* ── Alpha list wrapper ── */
+    #alpha-wrapper { flex: 1; min-height: 0; overflow: hidden; }
+
+    /* ── Alpha list (CSS columns) ── */
+    #alpha-list {
+      column-count: var(--cols, 3);
+      column-gap: 7mm;
+      column-fill: balance;
+    }
+
+    /* ── Buchstabengruppe — nie über Spalten brechen ── */
+    .alpha-group {
+      break-inside: avoid;
+      page-break-inside: avoid;
+      text-align: center;
+      margin-bottom: var(--group-mb, 4.5mm);
+    }
+
+    /* ── Ornament (identisch zu Tischkarten) ── */
+    .grp-orn { display: block; line-height: 0; margin-bottom: var(--orn-mb, 2mm); }
+    .grp-orn svg { display: inline-block; width: 100%; height: auto; max-width: var(--orn-w, 72px); }
+    .highland .grp-orn { color: rgba(43,74,31,0.62); }
+    .coastal  .grp-orn { color: rgba(26,74,107,0.62); }
+    .classic  .grp-orn { color: rgba(0,0,0,0.48); }
+
+    /* ── Buchstabe ── */
+    .alpha-letter {
+      font-family: 'Playfair Display', serif;
+      font-size: var(--fs-letter, 13pt);
+      font-weight: 700; line-height: 1;
+      margin-bottom: var(--letter-mb, 1.2mm);
+    }
+    .highland .alpha-letter { color: #2B4A1F; }
+    .coastal  .alpha-letter { color: #1A4A6B; }
+    .classic  .alpha-letter { color: #1A1A1A; }
+
+    /* ── Diamant-Trennlinie ── */
+    .alpha-diamond-rule {
+      display: flex; align-items: center; gap: 4px;
+      margin-bottom: var(--header-mb, 2mm);
+    }
+    .adr-line { flex: 1; height: 1px; }
+    .highland .adr-line { background: rgba(43,74,31,0.20); }
+    .coastal  .adr-line { background: rgba(26,74,107,0.20); }
+    .classic  .adr-line { background: rgba(0,0,0,0.18); }
+    .adr-gem  { font-size: 5pt; line-height: 1; flex-shrink: 0; font-style: normal; }
+    .highland .adr-gem { color: rgba(43,74,31,0.52); }
+    .coastal  .adr-gem { color: rgba(26,74,107,0.52); }
+    .classic  .adr-gem { color: rgba(0,0,0,0.40); }
+
+    /* ── Gasteintrag: Name · Tisch X ── */
+    .alpha-entry {
+      display: flex; align-items: baseline;
+      padding: var(--entry-py, 1.0mm) 0;
+      text-align: left;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    /* Feiner Trenner zwischen Einträgen (wie bei Tischkarten) */
+    .highland .alpha-entry { border-bottom: 1px dotted rgba(43,74,31,0.10); }
+    .coastal  .alpha-entry { border-bottom: 1px dotted rgba(26,74,107,0.10); }
+    .classic  .alpha-entry { border-bottom: 1px dotted rgba(0,0,0,0.09); }
+    .alpha-entry:last-child { border-bottom: none; }
+
+    /* 3 Spalten (viele Gäste): Name streckt sich, Tisch rechtsbündig ausgerichtet */
+    .entry-name {
+      font-size: var(--fs-entry, 8pt);
+      flex: 1; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap;
+      letter-spacing: 0.2px;
+    }
+    .entry-sep {
+      font-size: var(--fs-entry, 8pt);
+      flex-shrink: 0; padding: 0 1.5mm;
+      opacity: 0.35;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .entry-table {
+      font-size: var(--fs-table, 7.5pt);
+      flex-shrink: 0;
+      min-width: var(--table-w, 11mm);
+      text-align: right;
+      letter-spacing: 0.3px;
+      opacity: 0.68;
+    }
+
+    /* 1–2 Spalten (wenig Gäste): kompakt, zentriert, kein Strecken */
+    #alpha-list.compact .alpha-entry {
+      width: fit-content;
+      margin: 0 auto;
+    }
+    #alpha-list.compact .entry-name {
+      flex: 0 0 auto;
+    }
+    #alpha-list.compact .entry-table {
+      min-width: 0;
+      text-align: left;
+    }
+
+    /* ── Footer ── */
+    #poster-footer { text-align: center; flex-shrink: 0; margin-top: 5mm; }
+    .footer-ornament { display: inline-flex; align-items: center; gap: 3.5mm; }
+    .f-line { display: inline-block; width: 22mm; height: 1px; }
+    .highland .f-line { background: rgba(43,74,31,0.28); }
+    .coastal  .f-line { background: rgba(26,74,107,0.28); }
+    .classic  .f-line { background: rgba(0,0,0,0.22); }
+    .f-dot { width: 3px; height: 3px; border-radius: 50%; display: inline-block; }
+    .highland .f-dot { background: rgba(43,74,31,0.45); }
+    .coastal  .f-dot { background: rgba(26,74,107,0.45); }
+    .classic  .f-dot { background: rgba(0,0,0,0.38); }
+
+  </style>
+<script>
+(function(){var _rc={_id:"SP-Alpha-SignatureLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- LEFT PANEL -->
+<div class="panel-form">
+  <div class="panel-logo">Sitzplan</div>
+  <div class="panel-tagline">Signature Line · bis 65 Gäste</div>
+
+  <label class="section-label">1 · Stil</label>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('highland',this)">Highland</button>
+    <button class="ui-btn"        onclick="setTheme('coastal',this)">Coastal</button>
+    <button class="ui-btn"        onclick="setTheme('classic',this)">Classic</button>
+  </div>
+
+  <hr class="divider">
+
+  <label class="section-label">2 · Titel</label>
+  <input type="text" id="inp-title" placeholder="SITZPLAN" oninput="renderPoster()">
+
+  <label class="section-label">Untertitel</label>
+  <input type="text" id="inp-subtitle" placeholder="Anna &amp; Maximilian · 12. Juli 2026" oninput="renderPoster()">
+
+  <hr class="divider">
+
+  <label class="section-label">3 · Gästeliste einfügen</label>
+  <p class="hint">Eine Person pro Zeile:<br>Vorname Nachname, Tisch 1</p>
+  <textarea id="inp-guests"
+    placeholder="Anna Müller, Tisch 1&#10;Herbert Schmidt, Tisch 5&#10;Lena Gruber, Tisch 1"
+    oninput="onGuestsInput()"></textarea>
+  <div class="guest-count" id="guest-count">0 Gäste</div>
+
+  <label class="section-label">4 · Druckformat</label>
+  <select id="sel-format">
+    <option value="a4" selected>A4 — 210 × 297 mm</option>
+    <option value="letter">Letter — 216 × 279 mm (US)</option>
+    <option value="a3">A3 — 297 × 420 mm</option>
+    <option value="tabloid">Tabloid — 279 × 432 mm (US)</option>
+    <option value="a2">A2 — 420 × 594 mm</option>
+    <option value="a1">A1 — 594 × 841 mm</option>
+    <option value="a0">A0 — 841 × 1189 mm</option>
+  </select>
+
+  <div class="action-row">
+    <button class="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <label class="bleed-label"><input type="checkbox" id="chk-bleed"> Beschnittzugabe 3 mm</label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+</div>
+
+<!-- RIGHT PANEL -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="poster" class="highland">
+      <div class="poster-frame"></div>
+      <div class="poster-body">
+
+        <div id="poster-header">
+          <div class="poster-eyebrow">Seating Chart</div>
+          <div class="poster-title" id="poster-title">SITZPLAN</div>
+          <div class="poster-subtitle" id="poster-subtitle" style="display:none;"></div>
+          <div class="poster-rule"></div>
+        </div>
+
+        <div id="alpha-wrapper">
+          <div id="alpha-list"></div>
+        </div>
+
+        <div id="poster-footer">
+          <div class="footer-ornament">
+            <span class="f-line"></span>
+            <span class="f-dot"></span>
+            <span class="f-line"></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SPINNER -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span>PDF wird erstellt …</span>
+</div>
+
+<script>
+let currentTheme = 'highland';
+
+// ── Basisgrößen ────────────────────────────────────────
+const BASE = {
+  letter:   13,    // pt  — Buchstabe
+  entry:    8.0,   // pt  — Gastname
+  table:    7.5,   // pt  — Tischnummer
+  tableW:   11,    // mm  — Mindestbreite Tischspalte (für Ausrichtung)
+  groupMb:  4.5,   // mm  — Abstand zwischen Gruppen
+  entryPy:  1.0,   // mm  — Padding pro Zeile
+  headerMb: 1.8,   // mm  — Abstand nach Diamant-Linie
+  letterMb: 1.2,   // mm  — Abstand nach Buchstabe
+  ornW:     72,    // px  — Ornament-Breite
+  ornMb:    2.0,   // mm  — Abstand nach Ornament
+};
+
+// ── SVG Ornament (identisch zu Tischkarten) ────────────
+const ORN_SMALL = `<svg viewBox="0 0 90 12" xmlns="http://www.w3.org/2000/svg"
+  fill="none" stroke="currentColor" stroke-linecap="round">
+  <line x1="6" y1="6" x2="37" y2="6" stroke-width="0.72" opacity="0.80"/>
+  <line x1="53" y1="6" x2="84" y2="6" stroke-width="0.72" opacity="0.80"/>
+  <path d="M 45,3 L 48,6 L 45,9 L 42,6 Z" fill="currentColor" stroke="none" opacity="0.82"/>
+  <circle cx="6"  cy="6" r="1.4" fill="currentColor" stroke="none" opacity="0.58"/>
+  <circle cx="84" cy="6" r="1.4" fill="currentColor" stroke="none" opacity="0.58"/>
+</svg>`;
+
+// ── Hilfsfunktionen ────────────────────────────────────
+function esc(s) {
+  return (s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function toSortKey(n) {
+  return n.toLowerCase()
+    .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+    .replace(/[^a-z0-9]/g,'');
+}
+function parseGuests(raw) {
+  if (!raw.trim()) return [];
+  return raw.split('\n').map(l => l.trim()).filter(Boolean).map(line => {
+    const ci = line.lastIndexOf(',');
+    if (ci === -1) return null;
+    const name  = line.slice(0, ci).trim();
+    const table = line.slice(ci + 1).trim();
+    if (!name || !table) return null;
+    const parts    = name.split(/\s+/).filter(Boolean);
+    const lastName = parts[parts.length - 1] || name;
+    return { name, table, sortKey: toSortKey(lastName), groupKey: lastName[0].toUpperCase() };
+  }).filter(Boolean);
+}
+
+// ── Controls ──────────────────────────────────────────
+function onGuestsInput() {
+  const n  = parseGuests(document.getElementById('inp-guests').value).length;
+  const el = document.getElementById('guest-count');
+  el.textContent = n + ' Gäste' + (n > 65 ? ' — max. 65 empfohlen' : '');
+  el.className   = 'guest-count' + (n > 65 ? ' warn' : '');
+  renderPoster();
+}
+function setTheme(t, btn) {
+  currentTheme = t;
+  btn.parentElement.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPoster();
+}
+
+// ── Inhaltsskalierung ─────────────────────────────────
+function applyContentScale(s) {
+  const p = document.getElementById('poster');
+  p.style.setProperty('--fs-letter',  (BASE.letter   * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-entry',   (BASE.entry    * s).toFixed(1) + 'pt');
+  p.style.setProperty('--fs-table',   (BASE.table    * s).toFixed(1) + 'pt');
+  p.style.setProperty('--table-w',    (BASE.tableW   * s).toFixed(1) + 'mm');
+  p.style.setProperty('--group-mb',   (BASE.groupMb  * s).toFixed(2) + 'mm');
+  p.style.setProperty('--entry-py',   (BASE.entryPy  * s).toFixed(2) + 'mm');
+  p.style.setProperty('--header-mb',  (BASE.headerMb * s).toFixed(2) + 'mm');
+  p.style.setProperty('--letter-mb',  (BASE.letterMb * s).toFixed(2) + 'mm');
+  p.style.setProperty('--orn-w',      (BASE.ornW     * s).toFixed(0) + 'px');
+  p.style.setProperty('--orn-mb',     (BASE.ornMb    * s).toFixed(2) + 'mm');
+}
+
+function autoScale() {
+  applyContentScale(1.0);
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const wrapper = document.getElementById('alpha-wrapper');
+    const list    = document.getElementById('alpha-list');
+    if (!list.children.length) { scalePreview(); return; }
+    const availH  = wrapper.clientHeight;
+    const actualH = list.scrollHeight;
+    if (!availH || !actualH) { scalePreview(); return; }
+    // Stufenlos skalieren: bei wenig Inhalt vergrößern, bei viel Inhalt verkleinern — max. 200 %, min. 62 %
+    const s = Math.min(availH / actualH * 0.975, 2.0);
+    applyContentScale(Math.max(s, 0.62));
+    requestAnimationFrame(() => scalePreview());
+  }));
+}
+
+// ── Poster rendern ────────────────────────────────────
+function renderPoster() {
+  const poster = document.getElementById('poster');
+  poster.className = currentTheme;
+
+  document.getElementById('poster-title').textContent =
+    document.getElementById('inp-title').value.trim() || 'SITZPLAN';
+  const sub   = document.getElementById('inp-subtitle').value.trim();
+  const subEl = document.getElementById('poster-subtitle');
+  subEl.textContent   = sub;
+  subEl.style.display = sub ? '' : 'none';
+
+  // Parsen & sortieren
+  const guests = parseGuests(document.getElementById('inp-guests').value);
+  guests.sort((a, b) => a.sortKey.localeCompare(b.sortKey, 'de'));
+
+  // Spaltenanzahl + kompakt-Modus
+  const cols = guests.length <= 20 ? 1 : guests.length <= 35 ? 2 : 3;
+  const list2 = document.getElementById('alpha-list');
+  list2.style.setProperty('--cols', cols);
+  list2.classList.toggle('compact', cols <= 2); // kompakt bei 1–2 Spalten
+
+  // Gruppieren
+  const groups = {};
+  guests.forEach(g => {
+    if (!groups[g.groupKey]) groups[g.groupKey] = [];
+    groups[g.groupKey].push(g);
+  });
+
+  const list = document.getElementById('alpha-list');
+  if (!guests.length) { list.innerHTML = ''; autoScale(); return; }
+
+  list.innerHTML = Object.keys(groups).sort().map(letter =>
+    `<div class="alpha-group">
+      <div class="grp-orn">${ORN_SMALL}</div>
+      <div class="alpha-letter">${letter}</div>
+      <div class="alpha-diamond-rule">
+        <span class="adr-line"></span>
+        <span class="adr-gem">◆</span>
+        <span class="adr-line"></span>
+      </div>
+      ${groups[letter].map(g =>
+        `<div class="alpha-entry">
+          <span class="entry-name">${esc(g.name)}</span>
+          <span class="entry-sep">·</span>
+          <span class="entry-table">${esc(g.table)}</span>
+        </div>`
+      ).join('')}
+    </div>`
+  ).join('');
+
+  autoScale();
+}
+
+// ── Vorschau skalieren ────────────────────────────────
+function scalePreview() {
+  const scaler   = document.getElementById('preview-scaler');
+  const panel    = document.querySelector('.panel-preview');
+  const avail    = panel.clientWidth - 72;
+  const posterEl = document.getElementById('poster');
+  const scale    = Math.min(avail / posterEl.offsetWidth, 1);
+  scaler.style.transform = `scale(${scale})`;
+  scaler.style.height    = (posterEl.offsetHeight * scale) + 'px';
+}
+
+// ── PDF Export (native Vektor — kein html2canvas) ─────
+function exportPDF() {
+  const spinner = document.getElementById('pdf-spinner');
+  spinner.style.display = 'flex';
+  try {
+    exportPDF_vector();
+  } catch(e) {
+    alert('Export fehlgeschlagen: ' + e.message);
+    console.error(e);
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+
+function exportPDF_vector() {
+  const { jsPDF } = window.jspdf;
+
+  // ── Format ──────────────────────────────────────────
+  const formatKey = (document.getElementById('sel-format') || {}).value || 'a4';
+  const bleedMM   = document.getElementById('chk-bleed').checked ? 3 : 0;
+  const FMT = { a4:[210,297], letter:[216,279], a3:[297,420], tabloid:[279,432], a2:[420,594], a1:[594,841], a0:[841,1189] };
+  const [baseW, baseH] = FMT[formatKey] || FMT.a4;
+  const fS   = baseW / 210;
+  const docW = baseW + bleedMM * 2;
+  const docH = baseH + bleedMM * 2;
+  const bx   = bleedMM, by = bleedMM;
+
+  const pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[docW, docH] });
+  if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+
+  // ── Themes ───────────────────────────────��───────────
+  // Classic hat keinen Außenrahmen und weißen Hintergrund
+  const THEMES = {
+    highland: { tc:[43,74,31],   bg:[254,252,247], hasBorder:true  },
+    coastal:  { tc:[26,74,107],  bg:[250,252,254], hasBorder:true  },
+    classic:  { tc:[26,26,26],   bg:[255,255,255], hasBorder:false },
+  };
+  const th = THEMES[currentTheme] || THEMES.highland;
+  const tc = th.tc, bg = th.bg;
+
+  function bl(rgb, op) {
+    return [
+      Math.round(rgb[0]*op + bg[0]*(1-op)),
+      Math.round(rgb[1]*op + bg[1]*(1-op)),
+      Math.round(rgb[2]*op + bg[2]*(1-op)),
+    ];
+  }
+  const sf = (rgb) => pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+  const sd = (rgb) => pdf.setDrawColor(rgb[0], rgb[1], rgb[2]);
+  const st = (rgb) => pdf.setTextColor(rgb[0], rgb[1], rgb[2]);
+
+  function setFont(name, style) {
+    const keyMap = {
+      'CormorantGaramond-light':'CormorantGaramond-Light','CormorantGaramond-normal':'CormorantGaramond-Regular',
+      'CormorantGaramond-italic':'CormorantGaramond-Italic','CormorantGaramond-semibold':'CormorantGaramond-SemiBold',
+      'PlayfairDisplay-bold':'PlayfairDisplay-Bold','PlayfairDisplay-bolditalic':'PlayfairDisplay-BoldItalic',
+      'DMSans-normal':'DMSans-Regular','DMSans-light':'DMSans-Light','DMSans-medium':'DMSans-Medium',
+    };
+    const fontKey = keyMap[name+'-'+style];
+    if (window.WSA_FONTS && fontKey && WSA_FONTS.has(fontKey)) {
+      pdf.setFont(name, style);
+    } else {
+      const fb = {
+        CormorantGaramond: { normal:['Times','normal'], italic:['Times','italic'], light:['Times','normal'], semibold:['Times','bold'] },
+        PlayfairDisplay:   { bold:['Times','bold'], bolditalic:['Times','bolditalic'] },
+        DMSans:            { normal:['Helvetica','normal'], light:['Helvetica','normal'], medium:['Helvetica','bold'] },
+      };
+      const r = ((fb[name]||{})[style])||['Helvetica','normal'];
+      pdf.setFont(r[0], r[1]);
+    }
+  }
+
+  const PTmm = 0.3528;
+
+  // ── Hintergrund ──────────────────────────────────────
+  sf(bg); pdf.rect(bx, by, baseW, baseH, 'F');
+
+  // ── Außenrahmen (nur highland + coastal) ─────────────
+  const BW = th.hasBorder ? 3.703 * fS : 0;
+  if (th.hasBorder) {
+    sf(tc);
+    pdf.rect(bx,          by,           baseW, BW,    'F');
+    pdf.rect(bx,          by+baseH-BW,  baseW, BW,    'F');
+    pdf.rect(bx,          by,           BW,    baseH, 'F');
+    pdf.rect(bx+baseW-BW, by,           BW,    baseH, 'F');
+  }
+
+  // ── Innenrahmen ──────────────────────────────���────────
+  const fi = 7 * fS;
+  const frameOp = currentTheme === 'classic' ? 0.22 : 0.38;
+  sd(bl(tc, frameOp)); pdf.setLineWidth(0.25 * fS);
+  pdf.rect(bx+fi, by+fi, baseW-fi*2, baseH-fi*2, 'S');
+
+  // ── Layout ───────────────────────────────��────────────
+  const PL = BW + 14*fS, PR = PL;
+  const PT = BW + 13*fS, PB = BW + 10*fS;
+  const cxPage = bx + baseW/2;
+  const contX  = bx + PL;
+  const contY  = by + PT;
+  const contW  = baseW - PL - PR;
+  const contH  = baseH - PT - PB;
+
+  // ── Header ───────────────────────────────────────────
+  let y = contY;
+
+  // Eyebrow
+  const eyeFS = 7 * fS;
+  st(bl(tc, 0.42)); setFont('DMSans','normal'); pdf.setFontSize(eyeFS);
+  y += eyeFS * PTmm * 0.5;
+  pdf.text('SEATING CHART', cxPage, y, { align:'center', baseline:'middle' });
+  y += eyeFS * PTmm * 0.5 + 2.5*fS;
+
+  // Titel — Signature Line: PlayfairDisplay Bold
+  // Coastal: kursiv
+  const titleFS  = 24 * fS;
+  const titleTxt = document.getElementById('inp-title').value.trim() || 'SITZPLAN';
+  const titleStyle = currentTheme === 'coastal' ? 'bolditalic' : 'bold';
+  st(tc); setFont('PlayfairDisplay', titleStyle); pdf.setFontSize(titleFS);
+  y += titleFS * PTmm * 0.5;
+  pdf.text(titleTxt, cxPage, y, { align:'center', baseline:'middle' });
+  y += titleFS * PTmm * 0.5 + 2*fS;
+
+  // Untertitel
+  const subTxt = document.getElementById('inp-subtitle').value.trim();
+  if (subTxt) {
+    const subFS = 10 * fS;
+    st(bl(tc, 0.62)); setFont('CormorantGaramond','italic'); pdf.setFontSize(subFS);
+    y += 2*fS + subFS * PTmm * 0.5;
+    pdf.text(subTxt, cxPage, y, { align:'center', baseline:'middle' });
+    y += subFS * PTmm * 0.5 + 2*fS;
+  }
+
+  // Trennlinie
+  y += 4*fS;
+  const ruleOp = currentTheme === 'classic' ? 0.28 : 0.38;
+  sd(bl(tc, ruleOp)); pdf.setLineWidth(0.25*fS);
+  pdf.line(cxPage - 15*fS, y, cxPage + 15*fS, y);
+  y += 6*fS;
+
+  const listTopY   = y;
+  const footerH    = 8 * fS;
+  const listAvailH = contY + contH - footerH - listTopY;
+
+  // ── Gästedaten ────────────────────────────────��──────
+  const guests = parseGuests(document.getElementById('inp-guests').value);
+  guests.sort((a,b) => a.sortKey.localeCompare(b.sortKey,'de'));
+  const groupsMap = {};
+  guests.forEach(g => { if (!groupsMap[g.groupKey]) groupsMap[g.groupKey]=[]; groupsMap[g.groupKey].push(g); });
+  const groupLetters = Object.keys(groupsMap).sort();
+  const cols = guests.length <= 20 ? 1 : guests.length <= 35 ? 2 : 3;
+
+  // ── Höhenberechnung ───────────────────────────────────
+  const H_ORN=5.5, H_LETTER=13*PTmm+1.2, H_DIARULE=3.5, H_ENTRY=8*PTmm+2.0, H_GROUPMB=4.5;
+
+  function rawGroupH(letter) {
+    return (H_ORN + H_LETTER + H_DIARULE + groupsMap[letter].length * H_ENTRY + H_GROUPMB) * fS;
+  }
+
+  // Spaltenverteilung (balanciert)
+  const totalH  = groupLetters.reduce((s,l) => s + rawGroupH(l), 0);
+  const targetH = totalH / cols;
+  const colCont = Array.from({length:cols}, () => []);
+  let curCol=0, curColH=0;
+  groupLetters.forEach(letter => {
+    const gh = rawGroupH(letter);
+    colCont[curCol].push(letter);
+    curColH += gh;
+    if (curCol < cols-1 && curColH >= targetH) { curCol++; curColH=0; }
+  });
+
+  const maxColH = Math.max(...colCont.map(col => col.reduce((s,l) => s+rawGroupH(l), 0)));
+  const cS = guests.length ? Math.min(listAvailH / maxColH, 2.0) : 1.0;
+
+  const FS_LETTER = 13  * fS * cS;
+  const FS_ENTRY  = 8.0 * fS * cS;
+  const FS_TABLE  = 7.5 * fS * cS;
+  const h_orn     = H_ORN     * fS * cS;
+  const h_letter  = H_LETTER  * fS * cS;
+  const h_diaRule = H_DIARULE * fS * cS;
+  const h_entry   = H_ENTRY   * fS * cS;
+  const h_groupMb = H_GROUPMB * fS * cS;
+  const colGap    = 7 * fS;
+  const colW      = (contW - colGap*(cols-1)) / cols;
+
+  // ── Ornament ────────────────────────────────���────────
+  function drawOrnament(cx_o, topY, w) {
+    const s = w / 90, my = topY + 6*s;
+    sd(bl(tc, 0.80)); pdf.setLineWidth(Math.max(0.72*s, 0.08));
+    pdf.line(cx_o - w/2 + 6*s,  my, cx_o - w/2 + 37*s, my);
+    pdf.line(cx_o - w/2 + 53*s, my, cx_o - w/2 + 84*s, my);
+    sf(bl(tc, 0.82));
+    pdf.lines([[3*s,3*s],[-3*s,3*s],[-3*s,-3*s]], cx_o - w/2 + 45*s, topY + 3*s, [1,1], 'F', true);
+    sf(bl(tc, 0.58));
+    pdf.circle(cx_o - w/2 + 6*s,  my, Math.max(1.4*s, 0.1), 'F');
+    pdf.circle(cx_o - w/2 + 84*s, my, Math.max(1.4*s, 0.1), 'F');
+  }
+
+  // ── Gruppen zeichnen ──────────────────────────────���───
+  for (let c=0; c<cols; c++) {
+    const colX  = contX + c*(colW + colGap);
+    const colCx = colX + colW/2;
+    let   gy    = listTopY;
+
+    colCont[c].forEach(letter => {
+      // Ornament
+      drawOrnament(colCx, gy, Math.min(colW * 0.85, 72 * fS * cS));
+      gy += h_orn;
+
+      // Buchstabe — Signature Line: PlayfairDisplay Bold
+      st(tc); setFont('PlayfairDisplay','bold'); pdf.setFontSize(FS_LETTER);
+      pdf.text(letter, colCx, gy + FS_LETTER*PTmm*0.5, { align:'center', baseline:'middle' });
+      gy += h_letter;
+
+      // Diamant-Trennlinie
+      const drGap = 2.5*fS*cS, drHalf = colW*0.30;
+      const dRuleY = gy + 1.5*fS*cS;
+      sd(bl(tc, 0.20)); pdf.setLineWidth(0.25*fS);
+      pdf.line(colCx - drHalf, dRuleY, colCx - drGap, dRuleY);
+      pdf.line(colCx + drGap,  dRuleY, colCx + drHalf, dRuleY);
+      const gs = 1.6*fS*cS;
+      sf(bl(tc, 0.52));
+      pdf.lines([[gs,-gs],[gs,gs],[-gs,gs]], colCx - gs, dRuleY, [1,1], 'F', true);
+      gy += h_diaRule;
+
+      // Einträge
+      groupsMap[letter].forEach(g => {
+        const midY  = gy + h_entry/2;
+        const nameX = colX + 1.0*fS;
+        const sepX  = colX + colW*0.66;
+        const tabX  = colX + colW - 1.0*fS;
+        const maxNW = colW * 0.58;
+
+        st(tc); setFont('CormorantGaramond','normal'); pdf.setFontSize(FS_ENTRY);
+        pdf.text(pdf.splitTextToSize(g.name, maxNW)[0], nameX, midY, { baseline:'middle' });
+
+        st(bl(tc, 0.35)); pdf.setFont('Helvetica','normal'); pdf.setFontSize(FS_ENTRY);
+        pdf.text('\u00B7', sepX, midY, { align:'center', baseline:'middle' });
+
+        st(bl(tc, 0.68)); setFont('CormorantGaramond','normal'); pdf.setFontSize(FS_TABLE);
+        pdf.text(g.table, tabX, midY, { align:'right', baseline:'middle' });
+
+        gy += h_entry;
+      });
+
+      gy += h_groupMb;
+    });
+  }
+
+  // ── Footer ─────────────────────────────────��──────────
+  const fY = by + baseH - PB + 3*fS, fLineW = 22*fS, fGap = 3.5*fS;
+  const footerOp = currentTheme === 'classic' ? 0.22 : 0.28;
+  sd(bl(tc, footerOp)); pdf.setLineWidth(0.25*fS);
+  pdf.line(cxPage - fGap - fLineW, fY, cxPage - fGap, fY);
+  pdf.line(cxPage + fGap,          fY, cxPage + fGap + fLineW, fY);
+  sf(bl(tc, currentTheme === 'classic' ? 0.35 : 0.45));
+  pdf.circle(cxPage, fY, 0.75*fS, 'F');
+
+  // ── Speichern ─────────────────────────────────────────
+  const saveName = (document.getElementById('inp-title').value.trim() || 'Sitzplan').replace(/\s+/g,'_');
+  pdf.save('Sitzplan_SignatureLine_' + saveName + '_' + formatKey.toUpperCase() + '.pdf');
+}
+
+// ── Demo ──────────────────────────────────────────────
+function loadDemo() {
+  document.getElementById('inp-title').value    = 'SITZPLAN';
+  document.getElementById('inp-subtitle').value = 'Anna & Maximilian · 12. Juli 2026';
+  document.getElementById('inp-guests').value   =
+`Anna Müller, Tisch 1
+Maximilian Becker, Tisch 1
+Ursula Becker, Tisch 1
+Gerhard Becker, Tisch 1
+Peter Braun, Tisch 8
+Sabine Fischer, Tisch 3
+Karl Fischer, Tisch 3
+Lena Gruber, Tisch 9
+Claudia Hoffmann, Tisch 4
+Emma Hoffmann, Tisch 4
+Daniel Krause, Tisch 7
+Stefan Klein, Tisch 4
+Ben Koch, Tisch 5
+Ingrid Lange, Tisch 2
+Werner Lange, Tisch 2
+Brigitte Müller, Tisch 2
+Heinz Müller, Tisch 2
+Sophia Meier, Tisch 3
+Leon Neumann, Tisch 9
+Julia Richter, Tisch 5
+Manfred Roth, Tisch 8
+Elise Roth, Tisch 8
+Petra Schäfer, Tisch 6
+Herbert Schmidt, Tisch 5
+Thomas Schulz, Tisch 7
+Ralf Vogt, Tisch 6
+Marina Bauer, Tisch 7
+Helga Wagner, Tisch 6
+Jonas Weber, Tisch 3
+Mia Zimmermann, Tisch 9
+Christine Arnold, Tisch 2
+Hans-Peter Berger, Tisch 3
+Eva Dörfler, Tisch 5
+Friedrich Eichner, Tisch 6
+Gabi Fink, Tisch 7
+Irene Grunewald, Tisch 8
+Josef Huber, Tisch 1
+Katharina Jakobi, Tisch 4
+Ludwig Kaufmann, Tisch 9
+Monika Lehner, Tisch 2
+Norbert Ott, Tisch 3
+Oskar Pfeiffer, Tisch 5
+Renate Sommer, Tisch 6
+Siegfried Tanner, Tisch 7
+Theresa Unger, Tisch 8
+Viktor Weidner, Tisch 1
+Waltraud Xander, Tisch 4
+Yvonne Ziegler, Tisch 9`;
+  onGuestsInput();
+}
+
+// ── Start ─────────────────────────────────────────────
+renderPoster();
+window.addEventListener('resize', scalePreview);
+</script>
+</body>
+</html>

@@ -1,0 +1,655 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Platzkarten mit Foto — Modern Earth Collection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    .opt-tag    { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
+
+    .guest-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; margin-bottom: 2px; min-height: 16px; }
+    .guest-count { font-size: 9px; color: #aaa; }
+    .guest-warn  { font-size: 8.5px; color: #c07040; font-style: italic; }
+
+    /* ══ PHOTO UPLOAD UI ══════════════════════════════ */
+    .photo-upload-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .photo-file-btn {
+      display: inline-block; padding: 5px 10px;
+      border: 1px solid #d0cdc8; background: #fff;
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      letter-spacing: 0.06em; color: #555; cursor: pointer;
+      white-space: nowrap; transition: border-color 0.15s;
+    }
+    .photo-file-btn:hover { border-color: #888; }
+    .photo-file-btn input[type="file"] { display: none; }
+    .photo-filename {
+      font-size: 9px; color: #888; overflow: hidden;
+      text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0;
+    }
+    .btn-remove-photo {
+      font-size: 9px; color: #c07040; background: none;
+      border: none; cursor: pointer; padding: 0;
+      letter-spacing: 0.04em; flex-shrink: 0;
+    }
+
+    /* ══ RIGHT PANEL ═══════════════════════════════════ */
+    .panel-preview { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #ECEAE4; align-items: stretch; padding: 0; justify-content: flex-start; }
+
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ══ A4 LANDSCAPE ══════════════════════════════════ */
+    .a4-landscape {
+      width: 297mm; height: 210mm; background: #fff;
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6mm 5mm; padding: 10mm;
+      box-sizing: border-box; position: relative;
+    }
+    .letter-landscape {
+      width: 279.4mm; height: 215.9mm; background: #fff;
+      display: grid; grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6mm 5mm; padding: 10mm;
+      box-sizing: border-box; position: relative;
+    }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+
+    /* ══ PLACE CARD BASE ═══════════════════════════════ */
+    .place-card {
+      position: relative; overflow: visible;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .place-card.empty { visibility: hidden; }
+
+    /* ══ MODERN EARTH THEMES ══════════════════════════
+       Background is applied inline (user-selectable).
+       Theme defines: border color, text color, CSS vars.     */
+
+    /* ── Terracotta Dusk #A0522D ── */
+    .place-card.terracotta {
+      color: #A0522D;
+      border: 8px solid #A0522D;
+      --accent: #C4784A;
+      --frame:  rgba(160,82,45,0.26);
+      --rule:   rgba(160,82,45,0.20);
+      --label:  rgba(160,82,45,0.80);
+    }
+
+    /* ── Eucalyptus Mist #8F9779 ── */
+    .place-card.sage {
+      color: #8F9779;
+      border: 8px solid #8F9779;
+      --accent: #C9A96E;
+      --frame:  rgba(143,151,121,0.30);
+      --rule:   rgba(143,151,121,0.22);
+      --label:  rgba(143,151,121,0.85);
+    }
+
+    /* ── Stone Taupe #96897F ── */
+    .place-card.clay {
+      color: #96897F;
+      border: 8px solid #96897F;
+      --accent: #C4A09E;
+      --frame:  rgba(150,137,127,0.26);
+      --rule:   rgba(150,137,127,0.20);
+      --label:  rgba(150,137,127,0.85);
+    }
+
+    /* ── Frames (no-photo mode) ── */
+    .pcard-frame-outer, .pcard-frame-inner { display: none; pointer-events: none; position: absolute; z-index: 1; }
+
+    .place-card.terracotta .pcard-frame-inner,
+    .place-card.sage       .pcard-frame-inner {
+      display: block; inset: 4mm; border: 0.5px solid var(--frame);
+    }
+    .place-card.clay .pcard-frame-inner {
+      display: block; inset: 4mm; border: 0.5px solid var(--frame);
+    }
+
+    /* ── No-photo: centered content ── */
+    .pcard-content {
+      position: relative; z-index: 2;
+      width: 100%; padding: 0 7mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 2mm;
+    }
+    .pcard-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      font-size: 7mm; text-align: center; line-height: 1.2; color: inherit;
+    }
+
+    /* ── Modern Break: Montserrat für die Zusatzzeile ── */
+    .pcard-motto {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 400;
+      font-size: 2.5mm;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--label);
+      text-align: center;
+      margin-top: 0.5mm;
+    }
+
+    .orn-sep { display: flex; align-items: center; gap: 5px; width: 68%; margin-bottom: 1mm; }
+    .orn-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .orn-dot  { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ══ PHOTO MODE LAYOUT ═════════════════════════════ */
+    .place-card.has-photo {
+      flex-direction: row; align-items: stretch;
+      justify-content: flex-start; overflow: hidden;
+    }
+    .place-card.has-photo .pcard-frame-outer,
+    .place-card.has-photo .pcard-frame-inner { display: none !important; }
+
+    .pcard-photo-col { width: 30%; flex-shrink: 0; overflow: hidden; position: relative; }
+    .pcard-photo-bg {
+      width: 100%; height: 100%;
+      background-size: cover; background-position: center center; background-repeat: no-repeat;
+    }
+
+    .pcard-vdivider {
+      flex-shrink: 0; width: 0.5px; background: var(--rule);
+      margin: 6mm 0; position: relative; z-index: 2;
+    }
+
+    .pcard-text-col {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 0 5mm; gap: 2mm; position: relative; z-index: 2;
+    }
+    .pcard-text-col .pcard-name  { font-size: 7mm; }
+    .pcard-text-col .pcard-motto { margin-top: 0; }
+    .pcard-orn-micro { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ── Cut marks ── */
+    .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
+    .cut.h { height: 0.4px; width: 4mm; }
+    .cut.v { width:  0.4px; height: 4mm; }
+    .cut.tl.h { top: 0;       left:  -5mm; } .cut.tl.v { top: -5mm;    left:  0;    }
+    .cut.tr.h { top: 0;       right: -5mm; } .cut.tr.v { top: -5mm;    right: 0;    }
+    .cut.bl.h { bottom: 0;    left:  -5mm; } .cut.bl.v { bottom: -5mm; left:  0;    }
+    .cut.br.h { bottom: 0;    right: -5mm; } .cut.br.v { bottom: -5mm; right: 0;    }
+
+  </style>
+<script>
+(function(){var _rc={_id:"PK-Foto-Earth",_v:"1.1",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo" id="lbl-logo">Platzkarten mit Foto</div>
+  <div class="panel-tagline">Modern Earth Collection · Wedding Story Atelier</div>
+
+  <!-- Sprache -->
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Farbwelt -->
+  <span class="section-label" id="lbl-style">Farbwelt</span>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('terracotta',this)">Terracotta</button>
+    <button class="ui-btn"        onclick="setTheme('sage',this)">Eucalyptus</button>
+    <button class="ui-btn"        onclick="setTheme('clay',this)">Warm Taupe</button>
+  </div>
+
+  <!-- Hintergrund -->
+  <span class="section-label" id="lbl-bg" style="margin-top:8px;">Hintergrund</span>
+  <div class="btn-group">
+    <button class="ui-btn active" id="btn-bg-1" onclick="setBg('#FAF9F6',this)">Off-White</button>
+    <button class="ui-btn"        id="btn-bg-2" onclick="setBg('#F5F5DC',this)">Sandstone</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Foto -->
+  <span class="section-label" id="lbl-photo">Foto <span class="opt-tag">optional</span></span>
+  <p class="hint" id="hint-photo">Ein Foto für alle Karten — z. B. Paarfoto, Ringfoto, Blumendetail.</p>
+  <div class="photo-upload-row">
+    <label class="photo-file-btn">
+      <input type="file" id="inp-photo" accept="image/*" onchange="loadPhoto(this)">
+      <span id="photo-btn-text">Foto auswählen …</span>
+    </label>
+    <span class="photo-filename" id="photo-filename"></span>
+    <button class="btn-remove-photo" id="btn-remove-photo" onclick="removePhoto()" style="display:none;">✕ entfernen</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Zusatzzeile -->
+  <span class="section-label" id="lbl-subtitle">Zusatzzeile <span class="opt-tag" id="lbl-opt">optional</span></span>
+  <input type="text" id="inp-motto" placeholder="z. B. Anna &amp; Tobias · 15. August 2026" oninput="render()">
+  <p class="hint" id="hint-subtitle">Erscheint in Montserrat unter dem Namen — auf allen Karten gleich.</p>
+
+  <hr class="divider">
+
+  <!-- Gästeliste -->
+  <span class="section-label" id="lbl-guests">Gästeliste</span>
+  <p class="hint" id="hint-guests">Ein Name pro Zeile — max. 60 Gäste.</p>
+  <textarea id="inp-guests" rows="13"
+    placeholder="Maria Müller&#10;Jonas Weber&#10;Anna &amp; Peter Schmidt&#10;..."
+    oninput="render()"></textarea>
+  <div class="guest-meta">
+    <span class="guest-count" id="guest-count"></span>
+    <span class="guest-warn"  id="guest-warn"></span>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <div class="format-box">
+    <div class="format-title">Papierformat / Paper Format</div>
+    <div class="format-opts">
+      <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>297×210 mm</em></label>
+      <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>11×8½"</em></label>
+    </div>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    Beschnittzugabe 3 mm
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>&#8592;</button>
+    <span id="page-info" style="min-width:80px;text-align:center;"></span>
+    <button class="nav-btn" id="btn-next" onclick="changePage(1)"  disabled>&#8594;</button>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-landscape" id="preview-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-landscape" id="print-grid"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────
+  var currentTheme  = 'terracotta';
+  var currentBg     = '#FAF9F6';
+  var currentLang   = 'de';
+  var currentPage   = 0;
+  var photoDataURL  = null;
+  var photoFileName = '';
+  var MAX      = 60;
+  var PER_PAGE = 6;
+
+  // ── TRANSLATIONS ───────────────────────────────────
+  var T = {
+    de: {
+      logo:             'Platzkarten mit Foto',
+      lang:             'Sprache',
+      style:            'Farbwelt',
+      bg:               'Hintergrund',
+      photo:            'Foto',
+      photoBtn:         'Foto auswählen …',
+      photoRemove:      '✕ entfernen',
+      subtitle:         'Zusatzzeile',
+      opt:              'optional',
+      hintSubtitle:     'Erscheint in Montserrat unter dem Namen — auf allen Karten gleich.',
+      mottoPlaceholder: 'z. B. Anna & Tobias · 15. August 2026',
+      guests:           'Gästeliste',
+      hintGuests:       'Ein Name pro Zeile — max. 60 Gäste.',
+      guestsPlaceholder:'Maria Müller\nJonas Weber\nAnna & Peter Schmidt\n...',
+      singular:         ' Gast',
+      plural:           ' Gäste',
+      limitWarn:        'Maximum erreicht (60)',
+      pageOf:           function(c,t){ return 'Seite ' + c + ' von ' + t; },
+      spinPage:         function(c,t){ return 'Seite ' + c + ' von ' + t + ' …'; },
+      spinDone:         'PDF wird erstellt …',
+      alertEmpty:       'Bitte zuerst Gäste eintragen.',
+      alertFail:        'Export fehlgeschlagen: ',
+      demoNames: [
+        'Maria Müller', 'Jonas Weber', 'Anna & Peter Schmidt',
+        'Sophie Hoffmann', 'Lena Braun', 'Maximilian Koch',
+        'Emma Fischer', 'Paul Richter', 'Klara Becker',
+        'Thomas Schäfer', 'Laura Klein', 'Florian Bauer'
+      ],
+      demoMotto: 'Anna & Tobias · 15. August 2026'
+    },
+    en: {
+      logo:             'Place Cards with Photo',
+      lang:             'Language',
+      style:            'Colour',
+      bg:               'Background',
+      photo:            'Photo',
+      photoBtn:         'Choose photo …',
+      photoRemove:      '✕ remove',
+      subtitle:         'Subtitle',
+      opt:              'optional',
+      hintSubtitle:     'Appears in Montserrat below each name — same on all cards.',
+      mottoPlaceholder: 'e.g. Anna & Tobias · August 15, 2026',
+      guests:           'Guest List',
+      hintGuests:       'One name per line — max. 60 guests.',
+      guestsPlaceholder:'Emily Johnson\nJames & Sarah Williams\nOlivia Brown\n...',
+      singular:         ' guest',
+      plural:           ' guests',
+      limitWarn:        'Limit reached (60)',
+      pageOf:           function(c,t){ return 'Page ' + c + ' of ' + t; },
+      spinPage:         function(c,t){ return 'Page ' + c + ' of ' + t + ' …'; },
+      spinDone:         'Creating PDF …',
+      alertEmpty:       'Please add guests first.',
+      alertFail:        'Export failed: ',
+      demoNames: [
+        'Emily Johnson', 'James & Sarah Williams', 'Olivia Brown',
+        'William Taylor', 'Charlotte Davis', 'Henry Wilson',
+        'Amelia Moore', 'George Anderson', 'Isabella Thomas',
+        'Alexander White', 'Sophia Harris', 'Oliver Martin'
+      ],
+      demoMotto: 'Anna & Tobias · August 15, 2026'
+    }
+  };
+
+  // ── HELPERS ────────────────────────────────────────
+  function ge(id) { return document.getElementById(id); }
+  function gv(id) { return ge(id).value; }
+  function t()    { return T[currentLang]; }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function parseGuests(raw) {
+    return raw.split('\n').map(function(l){ return l.trim(); })
+              .filter(Boolean).slice(0, MAX);
+  }
+  function cutMarks() {
+    return '<div class="cut tl h"></div><div class="cut tl v"></div>'
+         + '<div class="cut tr h"></div><div class="cut tr v"></div>'
+         + '<div class="cut bl h"></div><div class="cut bl v"></div>'
+         + '<div class="cut br h"></div><div class="cut br v"></div>';
+  }
+
+  // ── PHOTO ──────────────────────────────────────────
+  function loadPhoto(input) {
+    var file = input.files[0];
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      compressPhoto(e.target.result, function(compressed) {
+        photoDataURL  = compressed;
+        photoFileName = file.name;
+        ge('photo-filename').textContent = file.name;
+        ge('btn-remove-photo').style.display = '';
+        render();
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function compressPhoto(dataURL, callback) {
+    var img = new Image();
+    img.onload = function() {
+      var tW = 560, tH = 810;
+      var srcRatio = img.width / img.height;
+      var tgtRatio = tW / tH;
+      var sx = 0, sy = 0, sw = img.width, sh = img.height;
+      if (srcRatio > tgtRatio) { sw = img.height * tgtRatio; sx = (img.width - sw) / 2; }
+      else                     { sh = img.width / tgtRatio;  sy = (img.height - sh) / 2; }
+      var c = document.createElement('canvas');
+      c.width = tW; c.height = tH;
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, tW, tH);
+      callback(c.toDataURL('image/jpeg', 0.82));
+    };
+    img.src = dataURL;
+  }
+
+  function removePhoto() {
+    photoDataURL = null; photoFileName = '';
+    ge('inp-photo').value = '';
+    ge('photo-filename').textContent = '';
+    ge('btn-remove-photo').style.display = 'none';
+    render();
+  }
+
+  // ── LANGUAGE ───────────────────────────────────────
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#btn-de, #btn-en').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    applyLang(); render();
+  }
+
+  function applyLang() {
+    var l = t();
+    ge('lbl-logo').textContent       = l.logo;
+    ge('lbl-lang').textContent       = l.lang;
+    ge('lbl-style').textContent      = l.style;
+    ge('lbl-bg').textContent         = l.bg;
+    ge('lbl-subtitle').innerHTML     = l.subtitle + ' <span class="opt-tag">' + l.opt + '</span>';
+    ge('hint-subtitle').textContent  = l.hintSubtitle;
+    ge('inp-motto').placeholder      = l.mottoPlaceholder;
+    ge('lbl-guests').textContent     = l.guests;
+    ge('hint-guests').textContent    = l.hintGuests;
+    ge('inp-guests').placeholder     = l.guestsPlaceholder;
+    ge('photo-btn-text').textContent = l.photoBtn;
+    ge('btn-remove-photo').textContent = l.photoRemove;
+    document.documentElement.lang   = currentLang;
+  }
+
+  // ── THEME & BACKGROUND ─────────────────────────────
+  function setTheme(th, btn) {
+    currentTheme = th;
+    document.querySelectorAll('.btn-group .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ge('btn-' + currentLang).classList.add('active');
+    // re-activate background button
+    if (currentBg === '#FAF9F6') ge('btn-bg-1').classList.add('active');
+    else                         ge('btn-bg-2').classList.add('active');
+    render();
+  }
+
+  function setBg(bg, btn) {
+    currentBg = bg;
+    document.querySelectorAll('#btn-bg-1, #btn-bg-2').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  // ── PAGE NAV ───────────────────────────────────────
+  function changePage(dir) {
+    var guests = parseGuests(gv('inp-guests'));
+    var pages  = Math.max(1, Math.ceil(guests.length / PER_PAGE));
+    currentPage = Math.max(0, Math.min(currentPage + dir, pages - 1));
+    render();
+  }
+
+  // ── CARD HTML ──────────────────────────────────────
+  function cardHTML(name, motto) {
+    var bg       = 'background:' + currentBg + ';';
+    var mottoLine = motto ? '<div class="pcard-motto">' + esc(motto) + '</div>' : '';
+
+    if (photoDataURL) {
+      var ornMicro = motto ? '<div class="pcard-orn-micro"></div>' : '';
+      return '<div class="place-card ' + currentTheme + ' has-photo" style="' + bg + '">'
+        + '<div class="pcard-photo-col">'
+          + '<div class="pcard-photo-bg" style="background-image:url(\'' + photoDataURL + '\')"></div>'
+        + '</div>'
+        + '<div class="pcard-vdivider"></div>'
+        + '<div class="pcard-text-col">'
+          + '<div class="pcard-name">' + esc(name) + '</div>'
+          + ornMicro + mottoLine
+        + '</div>'
+        + cutMarks()
+        + '</div>';
+    }
+
+    return '<div class="place-card ' + currentTheme + '" style="' + bg + '">'
+      + '<div class="pcard-frame-outer"></div>'
+      + '<div class="pcard-frame-inner"></div>'
+      + '<div class="pcard-content">'
+        + '<div class="orn-sep"><span class="orn-line"></span><span class="orn-dot"></span><span class="orn-line"></span></div>'
+        + '<div class="pcard-name">' + esc(name) + '</div>'
+        + mottoLine
+      + '</div>'
+      + cutMarks()
+      + '</div>';
+  }
+
+  function pageHTML(pageGuests, motto) {
+    var html = '';
+    for (var i = 0; i < PER_PAGE; i++) {
+      html += i < pageGuests.length
+        ? cardHTML(pageGuests[i], motto)
+        : '<div class="place-card empty ' + currentTheme + '" style="background:' + currentBg + ';"></div>';
+    }
+    return html;
+  }
+
+  // ── RENDER ─────────────────────────────────────────
+  function render() {
+    var l      = t();
+    var guests = parseGuests(gv('inp-guests'));
+    var motto  = gv('inp-motto').trim();
+    var pages  = Math.max(1, Math.ceil(guests.length / PER_PAGE));
+    currentPage = Math.min(currentPage, pages - 1);
+
+    var n = guests.length;
+    ge('guest-count').textContent = n > 0 ? n + (n === 1 ? l.singular : l.plural) : '';
+    ge('guest-warn').textContent  = n >= MAX ? l.limitWarn : '';
+
+    var showNav = pages > 1;
+    ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
+    ge('btn-prev').disabled = currentPage === 0;
+    ge('btn-next').disabled = currentPage === pages - 1;
+
+    var pageGuests = guests.slice(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE);
+    ge('preview-grid').innerHTML = pageHTML(pageGuests, motto);
+    scalePreview();
+  }
+
+  // ── SCALE PREVIEW ──────────────────────────────────
+  function scalePreview() {
+    var area = document.querySelector('.preview-area');
+    var avW  = area.clientWidth  - 40;
+    var avH  = area.clientHeight - 40;
+    var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
+    var pgW = isLetter ? 279.4 : 297;
+    var pgH = isLetter ? 215.9 : 210;
+    ge('preview-grid').className = isLetter ? 'letter-landscape' : 'a4-landscape';
+    var a4W  = pgW * 3.7795;
+    var a4H  = pgH * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  // ── DEMO ───────────────────────────────────────────
+  function loadDemo() {
+    var l = t();
+    ge('inp-guests').value = l.demoNames.join('\n');
+    ge('inp-motto').value  = l.demoMotto;
+    currentPage = 0; render();
+  }
+
+  // ── PDF EXPORT ─────────────────────────────────────
+  async function exportPDF() {
+    var l      = t();
+    var guests = parseGuests(gv('inp-guests'));
+    if (guests.length === 0) { alert(l.alertEmpty); return; }
+
+    var motto   = gv('inp-motto').trim();
+    var pages   = Math.ceil(guests.length / PER_PAGE);
+    var spinner = ge('pdf-spinner');
+    var msg     = ge('spin-msg');
+    spinner.style.display = 'flex';
+    msg.textContent = l.spinDone;
+
+    try {
+      var bleed = ge('chk-bleed').checked ? 3 : 0;
+      var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
+      var pw = isLetter ? 279.4 : 297;
+      var ph = isLetter ? 215.9 : 210;
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm',
+        format: bleed ? [pw + bleed * 2, ph + bleed * 2] : (isLetter ? [pw, ph] : 'a4') });
+      var printGrid = ge('print-grid');
+      printGrid.className = isLetter ? 'letter-landscape' : 'a4-landscape';
+      if (window.getSelection) window.getSelection().removeAllRanges();
+
+      for (var p = 0; p < pages; p++) {
+        msg.textContent = l.spinPage(p + 1, pages);
+        var pageGuests = guests.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
+        printGrid.innerHTML = pageHTML(pageGuests, motto);
+        await new Promise(function(r){ setTimeout(r, 150); });
+        var canvas = await html2canvas(printGrid, {
+          scale: 3, useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false
+        });
+        if (p > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', bleed, bleed, pw, ph);
+      }
+
+      pdf.save('Place_Cards_Earth_' + new Date().toISOString().slice(0,10) + '.pdf');
+
+    } catch(e) {
+      alert(l.alertFail + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  // ── INIT ───────────────────────────────────────────
+  window.addEventListener('resize', scalePreview);
+  document.querySelectorAll('input[name="paper-format"]').forEach(function(r) {
+    r.addEventListener('change', scalePreview);
+  });
+  applyLang(); render();
+</script>
+</body>
+</html>

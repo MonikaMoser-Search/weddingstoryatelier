@@ -1,0 +1,722 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Welcome Letter Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+    }
+    body { background: #ECEAE4; }
+
+
+    /* ── FORM PANEL ── */
+    .panel-form {
+      position: sticky; top: 0;
+      height: calc(100vh - 44px);
+    }
+    .panel-form h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; margin-bottom: 4px; }
+    .panel-form .subtitle { font-size: 12px; color: var(--light); margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .form-section { margin-bottom: 20px; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    .opt { font-size: 9px; color: var(--light); margin-left: 4px; font-style: italic; }
+
+    /* ── FONT SIZE SLIDER ── */
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-val {
+      flex-shrink: 0; min-width: 34px; text-align: right;
+      font-size: 12px; color: var(--charcoal); font-weight: 500;
+    }
+
+    /* Photo upload */
+    .photo-upload {
+      border: 2px dashed var(--rule); border-radius: 2px;
+      padding: 16px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: #FAFAFA;
+    }
+    .photo-upload:hover { border-color: var(--charcoal); background: white; }
+    .photo-upload input { display: none; }
+    .photo-upload .pu-icon { font-size: 24px; margin-bottom: 6px; }
+    .photo-upload .pu-label { font-size: 12px; color: var(--mid); }
+    .photo-upload .pu-sub { font-size: 10px; color: var(--light); margin-top: 2px; }
+    .photo-preview { width: 100%; height: 100px; object-fit: cover; border-radius: 2px; display: none; }
+
+    .btn-download {
+      width: 100%; padding: 13px; background: var(--charcoal); color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+
+    /* ── LANGUAGE TOGGLE ── */
+    .lang-buttons { display: flex; gap: 4px; margin-bottom: 24px; }
+    .lang-btn {
+      flex: 1; padding: 7px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .lang-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+
+    /* ── WARNING STATE (custom content when switching language) ── */
+    .field-warn input[type="text"],
+    .field-warn textarea {
+      border-color: #C8920A !important;
+      background: #FFFBEB !important;
+    }
+    .field-warn-hint {
+      font-size: 10px; color: #9A6E00; margin-top: 3px; font-style: italic;
+    }
+
+    /* ── PREVIEW PANEL ── */
+    .panel-preview { overflow-y: auto; }
+
+    /* ── LETTER WRAPPER ──
+       Fixed A4 proportions. Overflow is clipped — content never
+       bleeds onto a second PDF page.                              */
+    #welcome-letter {
+      width: 720px;
+      height: 1018px;        /* A4 ratio at 720 px width */
+      overflow: hidden;      /* hard clip — no second page */
+      box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* ════════════════════════════════════════
+       THEME: HIGHLAND
+       Background: very warm off-white
+       Accent: deep forest green #2B4A1F
+    ════════════════════════════════════════ */
+    .highland {
+      background: #FEFCF7;
+      padding: 48px 56px 44px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    /* Double frame — outer */
+    .highland::before {
+      content: '';
+      position: absolute; inset: 11px;
+      border: 1.5px solid rgba(43,74,31,0.55);
+      pointer-events: none; z-index: 2;
+    }
+    /* Double frame — inner */
+    .highland::after {
+      content: '';
+      position: absolute; inset: 17px;
+      border: 0.5px solid rgba(43,74,31,0.28);
+      pointer-events: none; z-index: 2;
+    }
+
+    .highland .letter-top {
+      display: grid; grid-template-columns: 1fr 1.3fr;
+      gap: 32px; margin-bottom: 32px; align-items: center;
+    }
+    .highland .letter-location {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px; font-weight: 900;
+      color: #2B4A1F; letter-spacing: 0.02em; line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .highland .location-rule {
+      width: 46px; height: 0;
+      border: none; border-top: 2px solid #5C7A4A;
+      margin-bottom: 11px;
+    }
+    .highland .letter-subt {
+      font-size: 13.5px; color: #5C7A4A;
+      line-height: 1.65; font-style: italic;
+    }
+    .highland .photo-area {
+      width: 100%; aspect-ratio: 4/3;
+      background: #D2E4C6;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .highland .photo-area img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .highland .photo-ph {
+      font-size: 12px; color: #7AA064; text-align: center; padding: 20px;
+      font-family: 'DM Sans', sans-serif; line-height: 1.6;
+    }
+    .highland .letter-divider {
+      border: none; border-top: 1px solid rgba(43,74,31,0.25);
+      margin: 0 0 24px;
+    }
+    .highland .greeting-line {
+      font-size: 18px; color: #2B4A1F;
+      margin-bottom: 12px; font-style: italic;
+    }
+    .highland .body-text {
+      /* font-size set via JS slider */
+      line-height: 1.8; color: #222820;
+      text-align: justify; margin-bottom: 24px;
+    }
+    .highland .tips-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px; font-weight: 700;
+      color: #2B4A1F; letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .highland .tip-row {
+      display: grid; grid-template-columns: 14px 1fr;
+      gap: 11px; margin-bottom: 8px;
+      /* font-size set via JS slider */
+      line-height: 1.7; color: #222820;
+    }
+    .highland .tip-dash { color: #5C7A4A; font-size: 15px; line-height: 1.6; }
+    .highland .tips-spacer { height: 22px; }
+    .highland .signature-area { margin-top: 28px; }
+    .highland .sign-greeting {
+      font-size: 15px; color: #8A9E82; font-style: italic; margin-bottom: 1px;
+    }
+    .highland .sign-names {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; font-weight: 900;
+      color: #2B4A1F; line-height: 1.1; letter-spacing: 0.02em;
+    }
+    .highland .letter-footer {
+      position: absolute; bottom: 26px; left: 0; right: 0;
+      text-align: center;
+      font-size: 8.5px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #B0C2A8;
+    }
+
+    /* ════════════════════════════════════════
+       THEME: COASTAL
+       Background: very cool off-white
+       Accent: deep ocean blue #1A4A6B
+    ════════════════════════════════════════ */
+    .coastal {
+      background: #FAFCFE;
+      padding: 48px 56px 44px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+
+    .coastal::before {
+      content: '';
+      position: absolute; inset: 11px;
+      border: 1.5px solid rgba(26,74,107,0.5);
+      pointer-events: none; z-index: 2;
+    }
+    .coastal::after {
+      content: '';
+      position: absolute; inset: 17px;
+      border: 0.5px solid rgba(26,74,107,0.25);
+      pointer-events: none; z-index: 2;
+    }
+
+    .coastal .letter-top {
+      display: grid; grid-template-columns: 1fr 1.3fr;
+      gap: 32px; margin-bottom: 32px; align-items: center;
+    }
+    .coastal .letter-location {
+      font-family: 'Playfair Display', serif;
+      font-size: 34px; font-weight: 900;
+      color: #1A4A6B; letter-spacing: 0.02em; line-height: 1.1;
+      margin-bottom: 10px;
+    }
+    .coastal .location-rule {
+      width: 46px; height: 0;
+      border: none; border-top: 2px solid #4A7E9C;
+      margin-bottom: 11px;
+    }
+    .coastal .letter-subt {
+      font-size: 13.5px; color: #4A7E9C;
+      line-height: 1.65; font-style: italic;
+    }
+    .coastal .photo-area {
+      width: 100%; aspect-ratio: 4/3;
+      background: #BAD0DC;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    .coastal .photo-area img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .coastal .photo-ph {
+      font-size: 12px; color: #6A9EB8; text-align: center; padding: 20px;
+      font-family: 'DM Sans', sans-serif; line-height: 1.6;
+    }
+    .coastal .letter-divider {
+      border: none; border-top: 1px solid rgba(26,74,107,0.22);
+      margin: 0 0 24px;
+    }
+    .coastal .greeting-line {
+      font-size: 18px; color: #1A4A6B;
+      margin-bottom: 12px; font-style: italic;
+    }
+    .coastal .body-text {
+      line-height: 1.8; color: #18202C;
+      text-align: justify; margin-bottom: 24px;
+    }
+    .coastal .tips-heading {
+      font-family: 'Playfair Display', serif;
+      font-size: 11px; font-weight: 700;
+      color: #1A4A6B; letter-spacing: 0.2em;
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .coastal .tip-row {
+      display: grid; grid-template-columns: 14px 1fr;
+      gap: 11px; margin-bottom: 8px;
+      line-height: 1.7; color: #18202C;
+    }
+    .coastal .tip-dash { color: #4A7E9C; font-size: 15px; line-height: 1.6; }
+    .coastal .tips-spacer { height: 22px; }
+    .coastal .signature-area { margin-top: 28px; }
+    .coastal .sign-greeting {
+      font-size: 15px; color: #8AACBF; font-style: italic; margin-bottom: 1px;
+    }
+    .coastal .sign-names {
+      font-family: 'Playfair Display', serif;
+      font-size: 32px; font-weight: 900;
+      color: #1A4A6B; line-height: 1.1; letter-spacing: 0.02em;
+    }
+    .coastal .letter-footer {
+      position: absolute; bottom: 26px; left: 0; right: 0;
+      text-align: center;
+      font-size: 8.5px; letter-spacing: 0.22em;
+      text-transform: uppercase; color: #96B4C6;
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,26,26,0.78); z-index: 100;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; color: white;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; letter-spacing: 0.15em;
+    }
+    .loading.active { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+<script>
+(function(){var _rc={_id:"WL-SignatureLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+
+  <!-- ── FORM ── -->
+  <div class="panel-form">
+    <h2>Welcome Letter</h2>
+    <p class="subtitle">Daten eingeben — der Brief aktualisiert sich live.</p>
+
+    <!-- DESIGN -->
+    <span class="section-label">Design wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('highland', this)">
+        <span class="dot" style="background:#2B4A1F"></span>Highland
+      </button>
+      <button class="style-btn" onclick="setTheme('coastal', this)">
+        <span class="dot" style="background:#1A4A6B"></span>Coastal
+      </button>
+    </div>
+
+    <!-- SPRACHE -->
+    <span class="section-label">Sprache / Language</span>
+    <div class="lang-buttons">
+      <button class="lang-btn active" onclick="switchLang('de', this)">DE &mdash; Deutsch</button>
+      <button class="lang-btn" onclick="switchLang('en', this)">EN &mdash; English</button>
+    </div>
+
+    <!-- SCHRIFTGRÖSSE -->
+    <div class="form-section">
+      <div class="section-label">Schriftgröße — Texte</div>
+      <div class="field">
+        <label>Einleitung, Tipps &amp; Abschluss</label>
+        <div class="slider-row">
+          <input type="range" id="fontSizeSlider" min="11" max="18" step="0.5" value="15"
+                 oninput="ge('fontSizeVal').textContent=this.value+' pt'; update()">
+          <span class="slider-val" id="fontSizeVal">15 pt</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TITEL & KURZTEXT -->
+    <div class="form-section">
+      <div class="section-label">Titel &amp; Kurztext (oben links)</div>
+      <div class="field">
+        <label>Destination / Titel</label>
+        <input type="text" id="letterTitle" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Kurztext unter Titel <span class="opt">optional</span></label>
+        <textarea id="letterSubt" rows="2" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- BILD -->
+    <div class="form-section">
+      <div class="section-label">Bild (oben rechts)</div>
+      <div class="photo-upload" onclick="document.getElementById('photoInput').click()">
+        <input type="file" id="photoInput" accept="image/*" onchange="loadPhoto(this)">
+        <img id="photoPreview" class="photo-preview">
+        <div id="photoPlaceholderUI">
+          <div class="pu-icon">🖼</div>
+          <div class="pu-label">Bild auswählen</div>
+          <div class="pu-sub">JPG, PNG — bleibt lokal auf Ihrem Gerät</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EINLEITUNG -->
+    <div class="form-section">
+      <div class="section-label">Einleitung</div>
+      <div class="field">
+        <label>Anredezeile</label>
+        <input type="text" id="greetingLine" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Einleitungstext <span class="opt">Enter = Leerzeile im Brief</span></label>
+        <textarea id="introText" rows="5" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- 4 TIPPS -->
+    <div class="form-section">
+      <div class="section-label">4 Tipps</div>
+      <div class="field">
+        <label>Abschnittsüberschrift</label>
+        <input type="text" id="tipsHeading" oninput="update()">
+      </div>
+      <div class="field"><label>Tipp 1</label><input type="text" id="tip1" oninput="update()"></div>
+      <div class="field"><label>Tipp 2</label><input type="text" id="tip2" oninput="update()"></div>
+      <div class="field"><label>Tipp 3</label><input type="text" id="tip3" oninput="update()"></div>
+      <div class="field"><label>Tipp 4</label><input type="text" id="tip4" oninput="update()"></div>
+    </div>
+
+    <!-- ABSCHLUSS -->
+    <div class="form-section">
+      <div class="section-label">Abschlusstext <span class="opt">Enter = Leerzeile im Brief</span></div>
+      <div class="field">
+        <textarea id="closingText" rows="4" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- UNTERSCHRIFT -->
+    <div class="form-section">
+      <div class="section-label">Grußformel &amp; Namen</div>
+      <div class="field">
+        <label>Grußformel</label>
+        <input type="text" id="signGreeting" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Namen</label>
+        <input type="text" id="signNames" oninput="update()">
+      </div>
+    </div>
+
+    <button class="btn-download" onclick="startDownload()">&#11015; Als PDF herunterladen</button>
+    <p class="privacy-note">Kein Upload auf Server &nbsp;·&nbsp; Alles lokal &nbsp;·&nbsp; Chrome / Firefox empfohlen</p>
+    <div class="format-box">
+      <div class="format-title">Papierformat / Paper Format</div>
+      <div class="format-opts">
+        <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>210×297 mm</em></label>
+        <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>8½×11"</em></label>
+      </div>
+    </div>
+    <label class="bleed-label"><input type="checkbox" id="chk-bleed"> Beschnittzugabe 3 mm</label>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+  <!-- ── PREVIEW ── -->
+  <div class="panel-preview">
+    <div id="welcome-letter" class="highland"></div>
+  </div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span>Welcome Letter wird erstellt&hellip;</span>
+</div>
+
+<script>
+var currentTheme = 'highland';
+var currentLang  = 'de';
+var photoDataUrl = null;
+
+/* ── Default texts per language ── */
+var defaults = {
+  de: {
+    letterSubt:   'Euer pers\u00f6nlicher Reisebegleiter',
+    greetingLine: 'Liebe G\u00e4ste,',
+    introText:    'wir freuen uns unendlich, diese besondere Reise mit euch zu teilen. Die schottischen Highlands haben unser Herz gestohlen \u2014 und wir hoffen, sie stehlen bald auch eures.',
+    tipsHeading:  'Unsere Highlights f\u00fcr euch',
+    tip1:         'Besucht Eilean Donan \u2014 das wohl romantischste Schloss Schottlands, besonders im Morgenlicht.',
+    tip2:         'Kehrt in einen lokalen Pub ein, bestellt einen Whisky und lauscht den Geschichten der Einheimischen.',
+    tip3:         'Wacht einmal fr\u00fch auf: der Sonnenaufgang \u00fcber den Highlands ist ein Anblick, den ihr nie vergessen werdet.',
+    tip4:         'Packt immer eine Jacke ein \u2014 das Wetter in den Highlands \u00e4ndert sich oft mehrmals am Tag.',
+    closingText:  'Wir k\u00f6nnen es kaum erwarten, mit euch durch die Highlands zu streifen, Geschichten zu teilen und unvergessliche Erinnerungen zu schaffen.',
+    signGreeting: 'Eure'
+  },
+  en: {
+    letterSubt:   'Your personal travel companion',
+    greetingLine: 'Dear Guests,',
+    introText:    'we are so thrilled to share this special journey with you. The Scottish Highlands cast their spell on us the moment we arrived \u2014 and we hope they will do the same for you.',
+    tipsHeading:  'Our Highlights for You',
+    tip1:         'Visit Eilean Donan \u2014 one of Scotland\u2019s most romantic castles, especially beautiful in the morning light.',
+    tip2:         'Stop by a local pub, order a whisky and listen to the stories of the locals.',
+    tip3:         'Wake up early at least once: the sunrise over the Highlands is a sight you will never forget.',
+    tip4:         'Always pack a jacket \u2014 the weather in the Highlands can change several times a day.',
+    closingText:  'We can\u2019t wait to roam the Highlands with you, share stories and create memories that will last a lifetime.',
+    signGreeting: 'Yours,'
+  }
+};
+
+/* Fields controlled by the language toggle (personal fields like title & names are excluded). */
+var langFields = ['letterSubt','greetingLine','introText','tipsHeading','tip1','tip2','tip3','tip4','closingText','signGreeting'];
+
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+
+/* Escapes HTML special chars and preserves manual line breaks. */
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+}
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  var btns = document.querySelectorAll('.style-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  update();
+}
+
+function switchLang(lang, btn) {
+  var oldLang = currentLang;
+  currentLang = lang;
+
+  var btns = document.querySelectorAll('.lang-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+
+  var isEN = lang === 'en';
+
+  for (var j = 0; j < langFields.length; j++) {
+    var id  = langFields[j];
+    var el  = ge(id);
+    if (!el) continue;
+
+    var current    = el.value;
+    var oldDefault = defaults[oldLang][id] || '';
+    var newDefault = defaults[lang][id]    || '';
+
+    /* Clear any existing warning first */
+    var fieldDiv = el.closest ? el.closest('.field') : el.parentNode;
+    fieldDiv.classList.remove('field-warn');
+    var hint = fieldDiv.querySelector('.field-warn-hint');
+    if (hint) hint.remove();
+
+    /* Tip fields: if currently empty, keep them empty regardless of defaults */
+    var isTipField = (id === 'tip1' || id === 'tip2' || id === 'tip3' || id === 'tip4');
+    if (isTipField && current === '') {
+      el.value = '';
+    } else if (current === '' || current === oldDefault) {
+      /* Untouched — safe to replace */
+      el.value = newDefault;
+    } else {
+      /* Custom content — highlight and ask user to review */
+      fieldDiv.classList.add('field-warn');
+      var h = document.createElement('div');
+      h.className = 'field-warn-hint';
+      h.textContent = isEN ? '\u26a0 Please review manually' : '\u26a0 Bitte manuell pr\u00fcfen';
+      fieldDiv.appendChild(h);
+    }
+  }
+
+  update();
+}
+
+function loadPhoto(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    photoDataUrl = e.target.result;
+    var preview = ge('photoPreview');
+    preview.src = photoDataUrl;
+    preview.style.display = 'block';
+    ge('photoPlaceholderUI').style.display = 'none';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function update() {
+  var t = currentTheme;
+  var fs = parseFloat(gv('fontSizeSlider') || '15');
+
+  var letterTitle  = gv('letterTitle')  || 'Scottish Highlands';
+  var letterSubt   = gv('letterSubt');
+  var greetingLine = gv('greetingLine') || 'Liebe G\u00e4ste,';
+  var introText    = gv('introText')    || 'wir freuen uns unendlich, diese besondere Reise mit euch zu teilen. Die schottischen Highlands haben unser Herz gestohlen \u2014 und wir hoffen, sie stehlen bald auch eures.';
+  var tipsHeading  = gv('tipsHeading') || 'Unsere Highlights f\u00fcr euch';
+  var tip1 = gv('tip1');
+  var tip2 = gv('tip2');
+  var tip3 = gv('tip3');
+  var tip4 = gv('tip4');
+  var closingText  = gv('closingText')  || 'Wir k\u00f6nnen es kaum erwarten, mit euch durch die Highlands zu streifen, Geschichten zu teilen und unvergessliche Erinnerungen zu schaffen.';
+  var signGreeting = gv('signGreeting') || 'Eure';
+  var signNames    = gv('signNames')    || 'Sophie \u0026 Jonas';
+
+  /* font-size as inline style — applied to body text and each tip row */
+  var fss = 'style="font-size:' + fs + 'px"';
+
+  var photoHtml = photoDataUrl
+    ? '<img src="' + photoDataUrl + '" alt="Bild">'
+    : '<div class="photo-ph">[ Euer Bild hier ]<br><small style="font-size:10px;opacity:0.7">Bild links ausw\u00e4hlen</small></div>';
+
+  var out = ge('welcome-letter');
+  out.className = t;
+
+  out.innerHTML =
+    // ── TOP ROW: title + photo ──
+    '<div class="letter-top">' +
+      '<div>' +
+        '<div class="letter-location">' + esc(letterTitle) + '</div>' +
+        '<hr class="location-rule">' +
+        (letterSubt ? '<div class="letter-subt">' + esc(letterSubt) + '</div>' : '') +
+      '</div>' +
+      '<div>' +
+        '<div class="photo-area">' + photoHtml + '</div>' +
+      '</div>' +
+    '</div>' +
+
+    // ── DIVIDER ──
+    '<hr class="letter-divider">' +
+
+    // ── GREETING ──
+    '<div class="greeting-line">' + esc(greetingLine) + '</div>' +
+
+    // ── INTRO ──
+    '<div class="body-text" ' + fss + '>' + esc(introText) + '</div>' +
+
+    // ── TIPS HEADING ──
+    '<div class="tips-heading">' + esc(tipsHeading) + '</div>' +
+
+    // ── FOUR TIPS (only render non-empty entries) ──
+    (tip1.trim() ? '<div class="tip-row" ' + fss + '><span class="tip-dash">\u2014</span><span>' + esc(tip1) + '</span></div>' : '') +
+    (tip2.trim() ? '<div class="tip-row" ' + fss + '><span class="tip-dash">\u2014</span><span>' + esc(tip2) + '</span></div>' : '') +
+    (tip3.trim() ? '<div class="tip-row" ' + fss + '><span class="tip-dash">\u2014</span><span>' + esc(tip3) + '</span></div>' : '') +
+    (tip4.trim() ? '<div class="tip-row" ' + fss + '><span class="tip-dash">\u2014</span><span>' + esc(tip4) + '</span></div>' : '') +
+
+    '<div class="tips-spacer"></div>' +
+
+    // ── CLOSING ──
+    '<div class="body-text" ' + fss + ' style="font-size:' + fs + 'px;margin-bottom:0">' + esc(closingText) + '</div>' +
+
+    // ── SIGNATURE ──
+    '<div class="signature-area">' +
+      '<div class="sign-greeting">' + esc(signGreeting) + '</div>' +
+      '<div class="sign-names">' + esc(signNames) + '</div>' +
+    '</div>' +
+
+    '';
+}
+
+function startDownload() {
+  ge('loading').classList.add('active');
+  setTimeout(doDownload, 150);
+}
+
+function doDownload() {
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var fmt = (document.querySelector('input[name="paper-format"]:checked') || {}).value || 'a4';
+  var isLetter = fmt === 'letter';
+  var el = ge('welcome-letter');
+  var bleedRgb = null;
+  if (bleed) {
+    var _bg = getComputedStyle(el).backgroundColor.match(/\d+/g);
+    if (_bg && _bg.length >= 3) bleedRgb = [+_bg[0], +_bg[1], +_bg[2]];
+  }
+  html2canvas(el, { scale: 3, useCORS: true, allowTaint: true, backgroundColor: null })
+    .then(function(canvas) {
+      var imgData = canvas.toDataURL('image/jpeg', 0.90);
+      var jsPDF = window.jspdf.jsPDF;
+      var pdfW = isLetter ? 215.9 : 297;
+      var pdfH = canvas.height * pdfW / canvas.width;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pdfW + bleed * 2, pdfH + bleed * 2] : [pdfW, pdfH] });
+      if (bleedRgb) {
+        pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+        pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+      }
+      pdf.addImage(imgData, 'JPEG', bleed, bleed, pdfW, pdfH);
+      var names = (gv('signNames') || 'WelcomeLetter')
+        .replace(/[^a-zA-Z0-9\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc\u00df &]/g, '_');
+      pdf.save(names + '_WelcomeLetter_WSA.pdf');
+      ge('loading').classList.remove('active');
+    })
+    .catch(function() {
+      alert('PDF konnte nicht erstellt werden. Bitte erneut versuchen.');
+      ge('loading').classList.remove('active');
+    });
+}
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', function() {
+  /* Fill all language-controlled fields from the defaults object */
+  for (var i = 0; i < langFields.length; i++) {
+    var el = ge(langFields[i]);
+    if (el) el.value = defaults.de[langFields[i]] || '';
+  }
+  ge('letterTitle').value = 'Scottish Highlands';
+  ge('signNames').value   = 'Sophie \u0026 Jonas';
+
+  /* When the user types in any warned field, clear the warning immediately */
+  document.querySelector('.panel-form').addEventListener('input', function(e) {
+    var fieldDiv = e.target.closest ? e.target.closest('.field') : null;
+    if (!fieldDiv) return;
+    fieldDiv.classList.remove('field-warn');
+    var hint = fieldDiv.querySelector('.field-warn-hint');
+    if (hint) hint.remove();
+  });
+
+  update();
+});
+</script>
+</body>
+</html>

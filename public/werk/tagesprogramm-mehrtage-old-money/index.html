@@ -1,0 +1,1248 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Tagesprogramm Generator — Old Money Line · Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+    }
+    body { background: #ECEAE4; }
+
+
+    /* ── FORM PANEL ── */
+    .panel-form {
+      position: sticky; top: 0;
+      height: calc(100vh - 44px);
+    }
+    .panel-form h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; margin-bottom: 4px; }
+    .panel-form .subtitle { font-size: 12px; color: var(--light); margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .days-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .days-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.05em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .days-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+
+    /* ── LANGUAGE TOGGLE ── */
+    .lang-buttons { display: flex; gap: 4px; margin-bottom: 24px; }
+    .lang-btn {
+      flex: 1; padding: 7px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; font-weight: 500; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .lang-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+
+    /* ── WARN STATE (custom content when switching language) ── */
+    .field-warn input[type="text"],
+    .field-warn textarea {
+      border-color: #C8920A !important;
+      background: #FFFBEB !important;
+    }
+    .field-warn-hint { font-size: 10px; color: #9A6E00; margin-top: 3px; font-style: italic; }
+
+    .form-section { margin-bottom: 20px; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    .opt { font-size: 9px; color: var(--light); margin-left: 4px; font-style: italic; }
+
+    .slider-row { display: flex; align-items: center; gap: 10px; }
+    .slider-val { flex-shrink: 0; min-width: 34px; text-align: right; font-size: 12px; color: var(--charcoal); font-weight: 500; }
+
+    .day-form-section { display: none; }
+    .day-form-section.visible { display: block; }
+
+    /* ── QR Upload (form panel) ── */
+    .qr-upload {
+      border: 2px dashed var(--rule); border-radius: 2px;
+      padding: 12px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: #FAFAFA;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .qr-upload:hover { border-color: var(--charcoal); background: white; }
+    .qr-upload input { display: none; }
+    .qr-thumb {
+      width: 52px; height: 52px; object-fit: contain;
+      border-radius: 2px; flex-shrink: 0; display: none;
+    }
+    .qr-ph-icon { font-size: 22px; flex-shrink: 0; }
+    .qr-ph-text { text-align: left; }
+    .qr-ph-label { font-size: 12px; color: var(--mid); }
+    .qr-ph-sub { font-size: 10px; color: var(--light); margin-top: 1px; }
+    .qr-remove {
+      margin-left: auto; font-size: 10px; color: var(--light);
+      background: none; border: none; cursor: pointer;
+      padding: 2px 6px; border-radius: 2px; flex-shrink: 0;
+      display: none;
+    }
+    .qr-remove:hover { color: var(--charcoal); }
+
+    .btn-download {
+      width: 100%; padding: 13px; background: #8B1A35; color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+
+    /* ── PREVIEW PANEL ── */
+    .panel-preview {
+      background: #DEDAD4; align-items: flex-start;
+      justify-content: center; padding: 40px 32px; overflow-y: auto;
+    }
+
+    /* ── A4 DOCUMENT ── */
+    #tagesprogramm {
+      width: 720px;
+      height: 1018px;
+      overflow: hidden;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.22);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* ════════════════════════════════════════
+       THEME: BURGUND  Accent: #8B1A35
+    ════════════════════════════════════════ */
+    .burgund {
+      background: #FEF8F7;
+      padding: 48px 64px 44px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .burgund::before {
+      content: ''; position: absolute; inset: 11px;
+      border: 1.5px solid rgba(139,26,53,0.55);
+      pointer-events: none; z-index: 2;
+    }
+    .burgund::after {
+      content: ''; position: absolute; inset: 17px;
+      border: 0.5px solid rgba(139,26,53,0.28);
+      pointer-events: none; z-index: 2;
+    }
+
+    /* Burgund — banner */
+    .burgund .doc-banner {
+      margin: -48px -64px 32px;
+      height: 80px;
+      background: #8B1A35;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .burgund .doc-banner-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: normal;
+      font-size: 13.5px; letter-spacing: 0.52em;
+      text-transform: uppercase;
+      color: #F8E8EC;
+      padding-left: 0.52em;
+    }
+
+    /* Burgund — document header */
+    .burgund .doc-header { text-align: center; margin-bottom: 22px; }
+    .burgund .doc-event-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300;
+      color: #8B1A35; letter-spacing: 0.06em; line-height: 1.1;
+      margin-bottom: 7px;
+    }
+    .burgund .doc-event-subtitle {
+      font-size: 13px; color: #9D5F75;
+      font-style: italic; line-height: 1.5; margin-bottom: 10px;
+    }
+    .burgund .doc-rule {
+      border: none; border-top: 1.5px solid rgba(139,26,53,0.38);
+      width: 68px; margin: 0 auto;
+    }
+
+    /* Burgund — day blocks */
+    .burgund .doc-divider {
+      border: none; border-top: 1px solid rgba(139,26,53,0.16);
+      margin: 15px 0;
+    }
+    .burgund .day-block { margin-bottom: 0; }
+    .burgund .day-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px; font-weight: 500;
+      color: #8B1A35; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .burgund .day-rule {
+      border: none; border-top: 1px solid rgba(139,26,53,0.2);
+      margin-bottom: 9px;
+    }
+
+    /* Burgund — timeline entry (two-column) */
+    .burgund .tl-row {
+      display: flex; align-items: stretch;
+      margin-bottom: 4px;
+    }
+    .burgund .tl-time {
+      flex: 0 0 58px;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-right: 14px;
+      border-right: 1px solid rgba(139,26,53,0.26);
+      font-family: 'Cormorant Garamond', serif; font-weight: 400;
+      color: #8B1A35;
+    }
+    .burgund .tl-body { flex: 1; padding-left: 14px; }
+    .burgund .tl-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 600;
+      color: #1A1A1A; line-height: 1.45;
+    }
+    .burgund .tl-info {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      color: #9D5F75; font-style: italic; line-height: 1.3;
+    }
+
+    /* Burgund — freetext (italic paragraph) */
+    .burgund .tl-freetext {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #2E2E2E; line-height: 1.7;
+    }
+
+    /* Burgund — optional sections */
+    .burgund .opt-block {
+      border-top: 1px solid rgba(139,26,53,0.18);
+      padding-top: 10px; margin-top: 13px;
+    }
+    .burgund .opt-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px; font-weight: 500;
+      color: #8B1A35; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 5px;
+    }
+    .burgund .opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; color: #2E2E2E; line-height: 1.6;
+    }
+    .burgund .opt-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: italic;
+      color: #8B1A35; text-align: center; line-height: 1.65;
+      padding: 0 16px;
+    }
+    .burgund .opt-quote-mark {
+      font-style: normal; opacity: 0.5; font-size: 1.15em;
+    }
+
+    /* Burgund — QR block in preview */
+    .burgund .opt-qr { display: flex; align-items: flex-start; gap: 14px; }
+    .burgund .opt-qr-img {
+      width: 68px; height: 68px; object-fit: contain;
+      border: 1px solid rgba(139,26,53,0.2); border-radius: 2px; flex-shrink: 0;
+      filter: sepia(0.45) hue-rotate(325deg) saturate(1.3);
+    }
+    .burgund .opt-qr-caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #2E2E2E; line-height: 1.6; padding-top: 2px;
+    }
+
+    /* Burgund — footer */
+    .burgund .doc-footer {
+      position: absolute; bottom: 26px; left: 64px; right: 64px;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #C4A0A8;
+      border-top: 0.5px solid rgba(139,26,53,0.15); padding-top: 5px;
+    }
+
+    /* ════════════════════════════════════════
+       THEME: COGNAC  Accent: #7B4718
+    ════════════════════════════════════════ */
+    .cognac {
+      background: #FEF9F5;
+      padding: 48px 64px 44px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .cognac::before {
+      content: ''; position: absolute; inset: 11px;
+      border: 1.5px solid rgba(123,71,24,0.50);
+      pointer-events: none; z-index: 2;
+    }
+    .cognac::after {
+      content: ''; position: absolute; inset: 17px;
+      border: 0.5px solid rgba(123,71,24,0.25);
+      pointer-events: none; z-index: 2;
+    }
+
+    /* Cognac — banner */
+    .cognac .doc-banner {
+      margin: -48px -64px 32px;
+      height: 80px;
+      background: #7B4718;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .cognac .doc-banner-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: normal;
+      font-size: 13.5px; letter-spacing: 0.52em;
+      text-transform: uppercase;
+      color: #F8EBE0;
+      padding-left: 0.52em;
+    }
+
+    /* Cognac — document header */
+    .cognac .doc-header { text-align: center; margin-bottom: 22px; }
+    .cognac .doc-event-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300;
+      color: #7B4718; letter-spacing: 0.06em; line-height: 1.1;
+      margin-bottom: 7px;
+    }
+    .cognac .doc-event-subtitle {
+      font-size: 13px; color: #B08060;
+      font-style: italic; line-height: 1.5; margin-bottom: 10px;
+    }
+    .cognac .doc-rule {
+      border: none; border-top: 1.5px solid rgba(123,71,24,0.38);
+      width: 68px; margin: 0 auto;
+    }
+
+    /* Cognac — day blocks */
+    .cognac .doc-divider {
+      border: none; border-top: 1px solid rgba(123,71,24,0.16);
+      margin: 15px 0;
+    }
+    .cognac .day-block { margin-bottom: 0; }
+    .cognac .day-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px; font-weight: 500;
+      color: #7B4718; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .cognac .day-rule {
+      border: none; border-top: 1px solid rgba(123,71,24,0.2);
+      margin-bottom: 9px;
+    }
+
+    /* Cognac — timeline entry (two-column) */
+    .cognac .tl-row {
+      display: flex; align-items: stretch;
+      margin-bottom: 4px;
+    }
+    .cognac .tl-time {
+      flex: 0 0 58px;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-right: 14px;
+      border-right: 1px solid rgba(123,71,24,0.26);
+      font-family: 'Cormorant Garamond', serif; font-weight: 400;
+      color: #7B4718;
+    }
+    .cognac .tl-body { flex: 1; padding-left: 14px; }
+    .cognac .tl-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 600;
+      color: #20180E; line-height: 1.45;
+    }
+    .cognac .tl-info {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      color: #B08060; font-style: italic; line-height: 1.3;
+    }
+
+    /* Cognac — freetext */
+    .cognac .tl-freetext {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #2A200E; line-height: 1.7;
+    }
+
+    /* Cognac — optional sections */
+    .cognac .opt-block {
+      border-top: 1px solid rgba(123,71,24,0.18);
+      padding-top: 10px; margin-top: 13px;
+    }
+    .cognac .opt-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px; font-weight: 500;
+      color: #7B4718; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 5px;
+    }
+    .cognac .opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; color: #2A200E; line-height: 1.6;
+    }
+    .cognac .opt-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: italic;
+      color: #7B4718; text-align: center; line-height: 1.65;
+      padding: 0 16px;
+    }
+    .cognac .opt-quote-mark {
+      font-style: normal; opacity: 0.5; font-size: 1.15em;
+    }
+
+    /* Cognac — QR block in preview */
+    .cognac .opt-qr { display: flex; align-items: flex-start; gap: 14px; }
+    .cognac .opt-qr-img {
+      width: 68px; height: 68px; object-fit: contain;
+      border: 1px solid rgba(123,71,24,0.2); border-radius: 2px; flex-shrink: 0;
+      filter: sepia(0.5);
+    }
+    .cognac .opt-qr-caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #2A200E; line-height: 1.6; padding-top: 2px;
+    }
+
+    /* Cognac — footer */
+    .cognac .doc-footer {
+      position: absolute; bottom: 26px; left: 64px; right: 64px;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #C4A080;
+      border-top: 0.5px solid rgba(123,71,24,0.15); padding-top: 5px;
+    }
+
+    /* ════════════════════════════════════════
+       THEME: FOREST  Accent: #1F4A32
+    ════════════════════════════════════════ */
+    .forest {
+      background: #F7FAF7;
+      padding: 48px 64px 44px;
+      font-family: 'Cormorant Garamond', serif;
+    }
+    .forest::before {
+      content: ''; position: absolute; inset: 11px;
+      border: 1.5px solid rgba(31,74,50,0.52);
+      pointer-events: none; z-index: 2;
+    }
+    .forest::after {
+      content: ''; position: absolute; inset: 17px;
+      border: 0.5px solid rgba(31,74,50,0.26);
+      pointer-events: none; z-index: 2;
+    }
+
+    /* Forest — banner */
+    .forest .doc-banner {
+      margin: -48px -64px 32px;
+      height: 80px;
+      background: #1F4A32;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .forest .doc-banner-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: normal;
+      font-size: 13.5px; letter-spacing: 0.52em;
+      text-transform: uppercase;
+      color: #E4F0E8;
+      padding-left: 0.52em;
+    }
+
+    /* Forest — document header */
+    .forest .doc-header { text-align: center; margin-bottom: 22px; }
+    .forest .doc-event-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px; font-weight: 300;
+      color: #1F4A32; letter-spacing: 0.06em; line-height: 1.1;
+      margin-bottom: 7px;
+    }
+    .forest .doc-event-subtitle {
+      font-size: 13px; color: #60A080;
+      font-style: italic; line-height: 1.5; margin-bottom: 10px;
+    }
+    .forest .doc-rule {
+      border: none; border-top: 1.5px solid rgba(31,74,50,0.38);
+      width: 68px; margin: 0 auto;
+    }
+
+    /* Forest — day blocks */
+    .forest .doc-divider {
+      border: none; border-top: 1px solid rgba(31,74,50,0.16);
+      margin: 15px 0;
+    }
+    .forest .day-block { margin-bottom: 0; }
+    .forest .day-title {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px; font-weight: 500;
+      color: #1F4A32; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 6px;
+    }
+    .forest .day-rule {
+      border: none; border-top: 1px solid rgba(31,74,50,0.2);
+      margin-bottom: 9px;
+    }
+
+    /* Forest — timeline entry (two-column) */
+    .forest .tl-row {
+      display: flex; align-items: stretch;
+      margin-bottom: 4px;
+    }
+    .forest .tl-time {
+      flex: 0 0 58px;
+      display: flex; align-items: flex-start; justify-content: flex-end;
+      padding-right: 14px;
+      border-right: 1px solid rgba(31,74,50,0.26);
+      font-family: 'Cormorant Garamond', serif; font-weight: 400;
+      color: #1F4A32;
+    }
+    .forest .tl-body { flex: 1; padding-left: 14px; }
+    .forest .tl-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 600;
+      color: #182820; line-height: 1.45;
+    }
+    .forest .tl-info {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      color: #60A080; font-style: italic; line-height: 1.3;
+    }
+
+    /* Forest — freetext */
+    .forest .tl-freetext {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #1E2820; line-height: 1.7;
+    }
+
+    /* Forest — optional sections */
+    .forest .opt-block {
+      border-top: 1px solid rgba(31,74,50,0.18);
+      padding-top: 10px; margin-top: 13px;
+    }
+    .forest .opt-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8.5px; font-weight: 500;
+      color: #1F4A32; letter-spacing: 0.26em;
+      text-transform: uppercase; margin-bottom: 5px;
+    }
+    .forest .opt-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; color: #1E2820; line-height: 1.6;
+    }
+    .forest .opt-quote {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400; font-style: italic;
+      color: #1F4A32; text-align: center; line-height: 1.65;
+      padding: 0 16px;
+    }
+    .forest .opt-quote-mark {
+      font-style: normal; opacity: 0.5; font-size: 1.15em;
+    }
+
+    /* Forest — QR block in preview */
+    .forest .opt-qr { display: flex; align-items: flex-start; gap: 14px; }
+    .forest .opt-qr-img {
+      width: 68px; height: 68px; object-fit: contain;
+      border: 1px solid rgba(31,74,50,0.2); border-radius: 2px; flex-shrink: 0;
+      filter: sepia(0.4) hue-rotate(85deg) saturate(1.2);
+    }
+    .forest .opt-qr-caption {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300; font-style: italic;
+      color: #1E2820; line-height: 1.6; padding-top: 2px;
+    }
+
+    /* Forest — footer */
+    .forest .doc-footer {
+      position: absolute; bottom: 26px; left: 64px; right: 64px;
+      text-align: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #90C4A8;
+      border-top: 0.5px solid rgba(31,74,50,0.15); padding-top: 5px;
+    }
+
+    /* ── LOADING ── */
+    .loading {
+      display: none; position: fixed; inset: 0;
+      background: rgba(26,26,26,0.78); z-index: 100;
+      align-items: center; justify-content: center;
+      flex-direction: column; gap: 16px; color: white;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 18px; letter-spacing: 0.15em;
+    }
+    .loading.active { display: flex; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white; border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+<script>
+(function(){var _rc={_id:"TP-OldMoney",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+
+  <!-- ── FORM ── -->
+  <div class="panel-form">
+    <h2 id="panelTitle">Tagesprogramm</h2>
+    <p class="subtitle" id="panelSubtitle">Daten eingeben — das Programm aktualisiert sich live.</p>
+
+    <!-- DESIGN -->
+    <span class="section-label" id="lbl-design">Design wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('burgund', this)">
+        <span class="dot" style="background:#8B1A35"></span>Burgund
+      </button>
+      <button class="style-btn" onclick="setTheme('cognac', this)">
+        <span class="dot" style="background:#7B4718"></span>Cognac
+      </button>
+      <button class="style-btn" onclick="setTheme('forest', this)">
+        <span class="dot" style="background:#1F4A32"></span>Forest
+      </button>
+    </div>
+
+    <!-- SPRACHE -->
+    <span class="section-label">Sprache / Language</span>
+    <div class="lang-buttons">
+      <button class="lang-btn active" onclick="switchLang('de', this)">DE &mdash; Deutsch</button>
+      <button class="lang-btn"        onclick="switchLang('en', this)">EN &mdash; English</button>
+    </div>
+
+    <!-- ANZAHL TAGE -->
+    <span class="section-label" id="labelDays">Anzahl Tage</span>
+    <div class="days-buttons">
+      <button class="days-btn" onclick="setDays(1, this)" id="daysBtn1">1 Tag</button>
+      <button class="days-btn" onclick="setDays(2, this)" id="daysBtn2">2 Tage</button>
+      <button class="days-btn" onclick="setDays(3, this)" id="daysBtn3">3 Tage</button>
+    </div>
+
+    <!-- SCHRIFTGRÖSSE -->
+    <div class="form-section">
+      <div class="section-label" id="lbl-fontsize">Schriftgröße — Timeline-Einträge</div>
+      <div class="field">
+        <div class="slider-row">
+          <input type="range" id="fontSizeSlider" min="11" max="18" step="0.5" value="13"
+                 oninput="ge('fontSizeVal').textContent=this.value+' pt'; update()">
+          <span class="slider-val" id="fontSizeVal">13 pt</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- BANNER -->
+    <div class="form-section">
+      <div class="section-label" id="lbl-banner-section">Banner-Text</div>
+      <div class="field">
+        <label id="lbl-bannerText">Überschrift im farbigen Streifen <span class="opt">max. 6 Wörter</span></label>
+        <input type="text" id="bannerText" oninput="update()">
+      </div>
+    </div>
+
+    <!-- EVENT -->
+    <div class="form-section">
+      <div class="section-label" id="lbl-event">Event</div>
+      <div class="field">
+        <label id="lbl-eventTitle">Titel <span class="opt">z. B. Brautpaar-Name</span></label>
+        <input type="text" id="eventTitle" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-eventSub">Datum / Ort <span class="opt">optional</span></label>
+        <input type="text" id="eventSubtitle" oninput="update()">
+      </div>
+    </div>
+
+    <!-- TAG 1 -->
+    <div class="form-section day-form-section" id="form-day1">
+      <div class="section-label" id="sectionTitle1">Tag 1</div>
+      <div class="field">
+        <label id="lbl-day1Title">Tagstitel</label>
+        <input type="text" id="day1Title" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-day1TL">Timeline <span class="opt">14:00 – Event oder Fließtext</span></label>
+        <textarea id="day1Timeline" rows="5" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- TAG 2 -->
+    <div class="form-section day-form-section" id="form-day2">
+      <div class="section-label" id="sectionTitle2">Tag 2</div>
+      <div class="field">
+        <label id="lbl-day2Title">Tagstitel</label>
+        <input type="text" id="day2Title" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-day2TL">Timeline <span class="opt">14:00 – Event oder Fließtext</span></label>
+        <textarea id="day2Timeline" rows="5" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- TAG 3 -->
+    <div class="form-section day-form-section" id="form-day3">
+      <div class="section-label" id="sectionTitle3">Tag 3</div>
+      <div class="field">
+        <label id="lbl-day3Title">Tagstitel</label>
+        <input type="text" id="day3Title" oninput="update()">
+      </div>
+      <div class="field">
+        <label id="lbl-day3TL">Timeline <span class="opt">14:00 – Event oder Fließtext</span></label>
+        <textarea id="day3Timeline" rows="5" oninput="update()"></textarea>
+      </div>
+    </div>
+
+    <!-- OPTIONALE FELDER -->
+    <div class="form-section">
+      <div class="section-label" id="lbl-optional">Optionale Felder</div>
+      <div class="field">
+        <label id="lbl-quote">Zitat / Hochzeitsmotto <span class="opt">optional</span></label>
+        <textarea id="quoteText" rows="2" oninput="update()" placeholder="Nicht wohin wir reisen, sondern mit wem."></textarea>
+      </div>
+      <div class="field">
+        <label id="lbl-shuttle">Shuttle-Information <span class="opt">optional</span></label>
+        <textarea id="shuttleText" rows="2" oninput="update()" placeholder="Shuttle ab Bahnhof Mitte: 13:30 &amp; 17:00 Uhr"></textarea>
+      </div>
+      <div class="field">
+        <label id="lbl-dresscode">Dresscode <span class="opt">optional</span></label>
+        <input type="text" id="dresscodeText" oninput="update()" placeholder="Festlich · Gerne in Dunkelrot &amp; Creme">
+      </div>
+      <div class="field">
+        <label id="lbl-qrSection">QR-Code <span class="opt">optional</span></label>
+        <div class="qr-upload" id="qrUploadArea" onclick="ge('qrInput').click()">
+          <input type="file" id="qrInput" accept="image/*" onchange="loadQR(this)">
+          <div class="qr-ph-icon" id="qrPhIcon">&#9639;</div>
+          <img id="qrThumb" class="qr-thumb">
+          <div class="qr-ph-text" id="qrPhText">
+            <div class="qr-ph-label" id="qrPhLabel">QR-Code hochladen</div>
+            <div class="qr-ph-sub" id="qrPhSub">PNG, JPG &mdash; bleibt lokal auf Ihrem Gerät</div>
+          </div>
+          <button class="qr-remove" id="qrRemove" onclick="removeQR(event)">&#10005; Entfernen</button>
+        </div>
+        <div class="field" style="margin-top:6px;margin-bottom:0">
+          <label id="lbl-qrCaption">Bildunterschrift <span class="opt">optional</span></label>
+          <input type="text" id="qrCaption" oninput="update()" placeholder="Weitere Infos auf unserer Hochzeitswebsite">
+        </div>
+      </div>
+    </div>
+
+    <!-- FUSSZEILE -->
+    <div class="form-section">
+      <div class="section-label" id="lbl-footer">Fußzeile</div>
+      <div class="field">
+        <label id="lbl-footerText">Fußzeilen-Text <span class="opt">optional</span></label>
+        <input type="text" id="footerText" oninput="update()" placeholder="Fragen? Anna: +49 170 123 4567">
+      </div>
+    </div>
+
+    <div style="margin-bottom:8px">
+      <label id="lbl-paperFormat" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--mid);margin-bottom:4px">Paper Format</label>
+      <select id="sel-format" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:13px;color:#333;background:#fff">
+        <option value="a3">A3 — 297 × 420 mm</option>
+        <option value="a4">A4 — 210 × 297 mm</option>
+        <option value="tabloid">US Tabloid — 11 × 17"</option>
+        <option value="letter">US Letter — 8.5 × 11"</option>
+      </select>
+    </div>
+    <button class="btn-download" id="btn-download" onclick="startDownload()">&#11015; Als PDF herunterladen</button>
+    <p class="privacy-note" id="privacy-note">Kein Upload auf Server &nbsp;·&nbsp; Alles lokal &nbsp;·&nbsp; Chrome / Firefox empfohlen</p>
+    <label class="bleed-label"><input type="checkbox" id="chk-bleed"> <span id="lbl-bleed">Beschnittzugabe 3 mm</span></label>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+  <!-- ── PREVIEW ── -->
+  <div class="panel-preview">
+    <div id="tagesprogramm" class="burgund"></div>
+  </div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span id="loadingText">Tagesprogramm wird erstellt&hellip;</span>
+</div>
+
+<script>
+var currentTheme = 'burgund';
+var currentLang  = 'de';
+var activeDays   = 3;
+var qrDataUrl    = null;
+
+/* ── Bilingual default content ── */
+var defaults = {
+  de: {
+    bannerText:    'Der Tagesablauf',
+    eventSubtitle: '12.\u2013\u202f14. Juli 2025 \u00b7 Schloss Hermannsberg',
+    day1Title:     'Freitag \u2013 Anreise',
+    day1Timeline:
+      'Nach eurer Ankunft habt ihr Zeit, in Ruhe anzukommen und die Umgebung zu genie\u00dfen. ' +
+      'Nutzt den Nachmittag f\u00fcr einen ersten Spaziergang, entdeckt die Landschaft oder lasst ' +
+      'einfach die besondere Atmosph\u00e4re auf euch wirken.\n' +
+      'Am Abend freuen wir uns darauf, euch bei einem entspannten Get-together wiederzusehen und ' +
+      'gemeinsam in das Wochenende zu starten.',
+    day2Title:     'Samstag \u2013 Hochzeit',
+    day2Timeline:
+      '14:00 \u2013 Ankunft der G\u00e4ste\n' +
+      '15:00 \u2013 Trauung\n' +
+      '16:00 \u2013 Empfang \u0026 Gratulation\n' +
+      '18:00 \u2013 Dinner\n' +
+      '20:00 \u2013 Er\u00f6ffnungstanz\n' +
+      '21:00 \u2013 Party \u0026 Feier',
+    day3Title:     'Sonntag \u2013 Abreise',
+    day3Timeline:
+      'Nach einem unverge\u00dflichen Tag m\u00f6chten wir das Wochenende gemeinsam entspannt ' +
+      'ausklingen lassen.\n' +
+      'Genie\u00dft ein letztes Fr\u00fchst\u00fcck, tauscht Erinnerungen aus und nehmt euch Zeit ' +
+      'f\u00fcr einen ruhigen Abschied. Wir sind dankbar, diesen besonderen Moment mit euch geteilt zu haben.'
+  },
+  en: {
+    bannerText:    'Our Programme',
+    eventSubtitle: '12\u201314 July 2025 \u00b7 Schloss Hermannsberg',
+    day1Title:     'Friday \u2013 Arrival',
+    day1Timeline:
+      'Upon your arrival, take your time to settle in and soak up the surroundings. ' +
+      'Use the afternoon for a first walk, discover the landscape or simply let the ' +
+      'special atmosphere wash over you.\n' +
+      'In the evening we look forward to welcoming you at a relaxed get-together to ' +
+      'start the weekend together.',
+    day2Title:     'Saturday \u2013 Wedding',
+    day2Timeline:
+      '2:00 PM \u2013 Arrival of Guests\n' +
+      '3:00 PM \u2013 Ceremony\n' +
+      '4:00 PM \u2013 Reception \u0026 Congratulations\n' +
+      '6:00 PM \u2013 Dinner\n' +
+      '8:00 PM \u2013 First Dance\n' +
+      '9:00 PM \u2013 Party \u0026 Celebration',
+    day3Title:     'Sunday \u2013 Departure',
+    day3Timeline:
+      'After an unforgettable day, we would love to close the weekend together ' +
+      'in a relaxed and peaceful atmosphere.\n' +
+      'Enjoy a final breakfast, share memories and take your time for a gentle farewell. ' +
+      'We are truly grateful to have shared this special moment with you.'
+  }
+};
+
+/* Fields that switch with the language toggle */
+var langFields = [
+  'bannerText', 'eventSubtitle',
+  'day1Title', 'day1Timeline',
+  'day2Title', 'day2Timeline',
+  'day3Title', 'day3Timeline'
+];
+
+/* ── Language switcher ── */
+/* ── Panel UI translations ─────────────────────────────────────── */
+var panelI18n = {
+  panelTitle:         { de: 'Tagesprogramm',                              en: 'Wedding Programme' },
+  panelSubtitle:      { de: 'Daten eingeben \u2014 das Programm aktualisiert sich live.', en: 'Enter details \u2014 the programme updates live.' },
+  'lbl-design':       { de: 'Design w\u00e4hlen',                         en: 'Choose Design' },
+  'lbl-fontsize':     { de: 'Schriftgr\u00f6\u00dfe \u2014 Timeline-Eintr\u00e4ge', en: 'Font Size \u2014 Timeline Entries' },
+  'lbl-banner-section':{ de: 'Banner-Text',                               en: 'Banner Text' },
+  'lbl-bannerText':   { de: '\u00dcberschrift im farbigen Streifen <span class="opt">max. 6 W\u00f6rter</span>', en: 'Heading in Colour Band <span class="opt">max. 6 words</span>' },
+  'lbl-event':        { de: 'Event',                                      en: 'Event' },
+  'lbl-eventTitle':   { de: 'Titel <span class="opt">z.\u202fB. Brautpaar-Name</span>', en: 'Title <span class="opt">e.g. Couple\'s Name</span>' },
+  'lbl-eventSub':     { de: 'Datum / Ort <span class="opt">optional</span>', en: 'Date / Venue <span class="opt">optional</span>' },
+  'lbl-day1Title':    { de: 'Tagstitel',                                  en: 'Day Title' },
+  'lbl-day2Title':    { de: 'Tagstitel',                                  en: 'Day Title' },
+  'lbl-day3Title':    { de: 'Tagstitel',                                  en: 'Day Title' },
+  'lbl-day1TL':       { de: 'Timeline <span class="opt">14:00 \u2013 Event oder Flie\u00dftext</span>', en: 'Timeline <span class="opt">14:00 \u2013 Event or free text</span>' },
+  'lbl-day2TL':       { de: 'Timeline <span class="opt">14:00 \u2013 Event oder Flie\u00dftext</span>', en: 'Timeline <span class="opt">14:00 \u2013 Event or free text</span>' },
+  'lbl-day3TL':       { de: 'Timeline <span class="opt">14:00 \u2013 Event oder Flie\u00dftext</span>', en: 'Timeline <span class="opt">14:00 \u2013 Event or free text</span>' },
+  'lbl-optional':     { de: 'Optionale Felder',                           en: 'Optional Fields' },
+  'lbl-quote':        { de: 'Zitat / Hochzeitsmotto <span class="opt">optional</span>', en: 'Quote / Wedding Motto <span class="opt">optional</span>' },
+  'lbl-shuttle':      { de: 'Shuttle-Information <span class="opt">optional</span>', en: 'Shuttle Info <span class="opt">optional</span>' },
+  'lbl-dresscode':    { de: 'Dresscode <span class="opt">optional</span>', en: 'Dress Code <span class="opt">optional</span>' },
+  'lbl-qrSection':    { de: 'QR-Code <span class="opt">optional</span>',  en: 'QR Code <span class="opt">optional</span>' },
+  qrPhLabel:          { de: 'QR-Code hochladen',                          en: 'Upload QR Code' },
+  qrPhSub:            { de: 'PNG, JPG \u2014 bleibt lokal auf Ihrem Ger\u00e4t', en: 'PNG, JPG \u2014 stays local on your device' },
+  'lbl-qrCaption':    { de: 'Bildunterschrift <span class="opt">optional</span>', en: 'Caption <span class="opt">optional</span>' },
+  qrRemove:           { de: '\u2715 Entfernen',                           en: '\u2715 Remove' },
+  'lbl-footer':       { de: 'Fu\u00dfzeile',                              en: 'Footer' },
+  'lbl-footerText':   { de: 'Fu\u00dfzeilen-Text <span class="opt">optional</span>', en: 'Footer Text <span class="opt">optional</span>' },
+  'lbl-paperFormat':  { de: 'Paper Format',                               en: 'Paper Format' },
+  'btn-download':     { de: '\u2B07 Als PDF herunterladen',               en: '\u2B07 Download as PDF' },
+  'privacy-note':     { de: 'Kein Upload auf Server\u00a0\u00b7\u00a0Alles lokal\u00a0\u00b7\u00a0Chrome\u00a0/\u00a0Firefox empfohlen', en: 'No server upload\u00a0\u00b7\u00a0All local\u00a0\u00b7\u00a0Chrome\u00a0/\u00a0Firefox recommended' },
+  'lbl-bleed':        { de: 'Beschnittzugabe 3\u202fmm',                  en: 'Bleed 3\u202fmm' },
+  loadingText:        { de: 'Tagesprogramm wird erstellt\u2026',          en: 'Creating programme\u2026' }
+};
+
+var panelPlaceholders = {
+  de: { quoteText: 'Nicht wohin wir reisen, sondern mit wem.', shuttleText: 'Shuttle ab Bahnhof Mitte: 13:30 & 17:00 Uhr', dresscodeText: 'Festlich \u00b7 Gerne in Dunkelrot & Creme', qrCaption: 'Weitere Infos auf unserer Hochzeitswebsite', footerText: 'Fragen? Anna: +49\u202f170\u202f123\u202f4567' },
+  en: { quoteText: 'Not where we travel, but with whom.', shuttleText: 'Shuttle from City Centre: 1:30 PM & 5:00 PM', dresscodeText: 'Formal \u00b7 Dark Red & Cream welcome', qrCaption: 'More info on our wedding website', footerText: 'Questions? Anna: +1 (555) 123-4567' }
+};
+
+function updatePanelLabels(isDE) {
+  var lang = isDE ? 'de' : 'en';
+  Object.keys(panelI18n).forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    var val = panelI18n[id][lang];
+    if (val.indexOf('<') !== -1) { el.innerHTML = val; } else { el.textContent = val; }
+  });
+  var ph = panelPlaceholders[lang];
+  Object.keys(ph).forEach(function(id) { var el = ge(id); if (el) el.placeholder = ph[id]; });
+}
+
+function switchLang(lang, btn) {
+  var oldLang = currentLang;
+  currentLang = lang;
+
+  var lbtns = document.querySelectorAll('.lang-btn');
+  for (var i = 0; i < lbtns.length; i++) lbtns[i].classList.remove('active');
+  btn.classList.add('active');
+
+  /* Update days-toggle labels */
+  var isDE = (lang === 'de');
+  updatePanelLabels(isDE);
+  ge('daysBtn1').textContent = isDE ? '1 Tag'   : '1 Day';
+  ge('daysBtn2').textContent = isDE ? '2 Tage'  : '2 Days';
+  ge('daysBtn3').textContent = isDE ? '3 Tage'  : '3 Days';
+  ge('sectionTitle1').textContent = isDE ? 'Tag 1' : 'Day 1';
+  ge('sectionTitle2').textContent = isDE ? 'Tag 2' : 'Day 2';
+  ge('sectionTitle3').textContent = isDE ? 'Tag 3' : 'Day 3';
+  ge('labelDays').textContent = isDE ? 'Anzahl Tage' : 'Number of Days';
+
+  /* Switch content fields — warn if user has custom content */
+  for (var j = 0; j < langFields.length; j++) {
+    var id  = langFields[j];
+    var el  = ge(id);
+    if (!el) continue;
+
+    var current    = el.value;
+    var oldDefault = defaults[oldLang][id] || '';
+    var newDefault = defaults[lang][id]    || '';
+
+    var fieldDiv = el.closest ? el.closest('.field') : el.parentNode;
+    fieldDiv.classList.remove('field-warn');
+    var hint = fieldDiv.querySelector('.field-warn-hint');
+    if (hint) hint.remove();
+
+    if (current === '' || current === oldDefault) {
+      /* Untouched — safe to replace */
+      el.value = newDefault;
+    } else {
+      /* Custom content — highlight and warn */
+      fieldDiv.classList.add('field-warn');
+      var h = document.createElement('div');
+      h.className = 'field-warn-hint';
+      h.textContent = isDE ? '\u26a0 Bitte manuell pr\u00fcfen' : '\u26a0 Please review manually';
+      fieldDiv.appendChild(h);
+    }
+  }
+
+  update();
+}
+
+/* ── Helpers ── */
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+/* Banner text: trim to max 6 words */
+function limitWords(str, max) {
+  var words = str.trim().split(/\s+/);
+  return words.slice(0, max).join(' ');
+}
+
+/* ── QR upload / remove ── */
+function loadQR(input) {
+  if (!input.files || !input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    qrDataUrl = e.target.result;
+    var thumb = ge('qrThumb');
+    thumb.src = qrDataUrl;
+    thumb.style.display = 'block';
+    ge('qrPhIcon').style.display = 'none';
+    ge('qrPhText').style.display = 'none';
+    ge('qrRemove').style.display = 'block';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removeQR(e) {
+  e.stopPropagation();
+  qrDataUrl = null;
+  ge('qrThumb').style.display = 'none';
+  ge('qrThumb').src = '';
+  ge('qrPhIcon').style.display = '';
+  ge('qrPhText').style.display = '';
+  ge('qrRemove').style.display = 'none';
+  ge('qrInput').value = '';
+  update();
+}
+
+/* ── Theme & Days toggles ── */
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  var btns = document.querySelectorAll('.style-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  update();
+}
+
+function setDays(n, btn) {
+  activeDays = n;
+  var btns = document.querySelectorAll('.days-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  for (var d = 1; d <= 3; d++) {
+    var sec = ge('form-day' + d);
+    if (sec) {
+      if (d <= n) sec.classList.add('visible');
+      else        sec.classList.remove('visible');
+    }
+  }
+  update();
+}
+
+/* ── Hybrid timeline parser ──
+   Lines starting with HH:MM followed by –, -, or | → two-column entry
+   All other lines → italic freetext paragraph
+   Blank lines → small spacer
+*/
+var timeRe = /^\s*(\d{1,2}:\d{2})\s*(?:Uhr\b\s*)?(?:[-\u2013|]\s*|\s+)(.+)$/;
+
+function parseTimeline(raw, fs) {
+  if (!raw.trim()) return '';
+  var lines    = raw.split('\n');
+  var html     = '';
+  var fss      = 'font-size:' + fs + 'px';
+  var fsi      = 'font-size:' + (fs * 0.84).toFixed(1) + 'px';
+  /* Time column: scales with font size so the separator line stays aligned */
+  var timeW    = Math.round(fs * 5.2) + 'px';
+  var timeFlex = 'flex:0 0 ' + timeW + ';min-width:' + timeW;
+
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+
+    if (!line.trim()) {
+      html += '<div style="height:' + Math.round(fs * 0.45) + 'px"></div>';
+      continue;
+    }
+
+    var m = timeRe.exec(line);
+    if (m) {
+      /* Two-column timeline entry */
+      var time = m[1].trim();
+      var rest = m[2].trim();
+      /* Move AM / PM from start of text into time column */
+      var ampm = rest.match(/^([AaPp][Mm])\b\s*/);
+      if (ampm) { time = time + '\u00a0' + ampm[1].toUpperCase(); rest = rest.substring(ampm[0].length); }
+      time = esc(time);
+      /* Optional second separator (|) for Zusatzinfo */
+      var pipeIdx = rest.indexOf('|');
+      var title, info;
+      if (pipeIdx !== -1) {
+        title = esc(rest.substring(0, pipeIdx).trim());
+        info  = esc(rest.substring(pipeIdx + 1).trim());
+      } else {
+        title = esc(rest);
+        info  = '';
+      }
+      html +=
+        '<div class="tl-row">' +
+          '<div class="tl-time" style="' + fss + ';' + timeFlex + '">' + time + '</div>' +
+          '<div class="tl-body">' +
+            '<div class="tl-title" style="' + fss + '">' + title + '</div>' +
+            (info ? '<div class="tl-info" style="' + fsi + '">' + info + '</div>' : '') +
+          '</div>' +
+        '</div>';
+    } else {
+      /* Freetext paragraph line */
+      html += '<div class="tl-freetext" style="' + fss + '">' + esc(line.trim()) + '</div>';
+    }
+  }
+  return html;
+}
+
+/* ── Optional block renderer ── */
+function renderOptBlock(label, text, fs) {
+  if (!text.trim()) return '';
+  var fss = 'font-size:' + (fs * 0.9).toFixed(1) + 'px';
+  return '<div class="opt-block">' +
+    '<div class="opt-label">' + esc(label) + '</div>' +
+    '<div class="opt-text" style="' + fss + '">' + esc(text) + '</div>' +
+  '</div>';
+}
+
+function renderQuoteBlock(text, fs) {
+  if (!text.trim()) return '';
+  var fss    = 'font-size:' + (fs * 1.45).toFixed(1) + 'px';
+  var openQ  = currentLang === 'de' ? '\u00bb\u202f' : '\u201c\u202f';
+  var closeQ = currentLang === 'de' ? '\u202f\u00ab' : '\u202f\u201d';
+  return '<div class="opt-block">' +
+    '<div class="opt-quote" style="' + fss + '">' +
+      '<span class="opt-quote-mark">' + openQ  + '</span>' +
+      esc(text.trim()) +
+      '<span class="opt-quote-mark">' + closeQ + '</span>' +
+    '</div>' +
+  '</div>';
+}
+
+/* ── Main render ── */
+function update() {
+  var fs = parseFloat(gv('fontSizeSlider') || '13');
+
+  var bannerDefault = currentLang === 'de' ? 'Der Tagesablauf' : 'Our Programme';
+  var bannerText    = limitWords(gv('bannerText') || bannerDefault, 6);
+  var eventTitle    = gv('eventTitle')    || 'Sophie \u0026 Jonas';
+  var eventSubtitle = gv('eventSubtitle');
+  var quoteText     = gv('quoteText');
+  var shuttleText   = gv('shuttleText');
+  var dresscodeText = gv('dresscodeText');
+  var footerText    = gv('footerText');
+
+  var dayTitles = [
+    gv('day1Title') || 'Tag 1',
+    gv('day2Title') || 'Tag 2',
+    gv('day3Title') || 'Tag 3'
+  ];
+  var dayTimelines = [
+    gv('day1Timeline'),
+    gv('day2Timeline'),
+    gv('day3Timeline')
+  ];
+
+  var out = ge('tagesprogramm');
+  out.className = currentTheme;
+
+  var html = '';
+
+  /* ── Banner ── */
+  html +=
+    '<div class="doc-banner">' +
+      '<span class="doc-banner-text">' + esc(bannerText) + '</span>' +
+    '</div>';
+
+  /* ── Document header ── */
+  html +=
+    '<div class="doc-header">' +
+      '<div class="doc-event-title">' + esc(eventTitle) + '</div>' +
+      (eventSubtitle.trim() ? '<div class="doc-event-subtitle">' + esc(eventSubtitle) + '</div>' : '') +
+      '<hr class="doc-rule">' +
+    '</div>';
+
+  /* ── Day blocks ── */
+  for (var d = 0; d < activeDays; d++) {
+    if (d > 0) html += '<hr class="doc-divider">';
+    html +=
+      '<div class="day-block">' +
+        '<div class="day-title">' + esc(dayTitles[d]) + '</div>' +
+        '<hr class="day-rule">' +
+        parseTimeline(dayTimelines[d], fs) +
+      '</div>';
+  }
+
+  /* ── Optional fields (language-aware labels) ── */
+  var lbl = currentLang === 'de'
+    ? { shuttle: 'Shuttle', dresscode: 'Dresscode', qr: 'QR-Code' }
+    : { shuttle: 'Shuttle', dresscode: 'Dress Code', qr: 'QR Code' };
+
+  html += renderQuoteBlock(quoteText, fs);
+  html += renderOptBlock(lbl.shuttle,   shuttleText,   fs);
+  html += renderOptBlock(lbl.dresscode, dresscodeText, fs);
+
+  /* ── QR Code ── */
+  if (qrDataUrl) {
+    var qrCaption = gv('qrCaption');
+    var fss = 'font-size:' + (fs * 0.9).toFixed(1) + 'px';
+    html += '<div class="opt-block">' +
+      '<div class="opt-label">' + lbl.qr + '</div>' +
+      '<div class="opt-qr">' +
+        '<img class="opt-qr-img" src="' + qrDataUrl + '" alt="QR-Code">' +
+        (qrCaption.trim() ? '<div class="opt-qr-caption" style="' + fss + '">' + esc(qrCaption) + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }
+
+  /* ── Footer (absolute) ── */
+  if (footerText.trim()) {
+    html += '<div class="doc-footer">' + esc(footerText) + '</div>';
+  }
+
+  out.innerHTML = html;
+}
+
+/* ── PDF export ── */
+function startDownload() {
+  ge('loading').classList.add('active');
+  setTimeout(doDownload, 150);
+}
+
+function doDownload() {
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var el = ge('tagesprogramm');
+  var bleedRgb = null;
+  if (bleed) {
+    var _bg = getComputedStyle(el).backgroundColor.match(/\d+/g);
+    if (_bg && _bg.length >= 3) bleedRgb = [+_bg[0], +_bg[1], +_bg[2]];
+  }
+  html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null })
+    .then(function(canvas) {
+      var imgData = canvas.toDataURL('image/jpeg', 0.90);
+      var jsPDF   = window.jspdf.jsPDF;
+      var fmt     = (document.getElementById('sel-format') || {value:'a3'}).value;
+      var pdfW    = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+      var pdfH    = canvas.height * pdfW / canvas.width;
+      var namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pdfW,pdfH];
+      var pdf     = new jsPDF({ orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pdfW + bleed * 2, pdfH + bleed * 2] : namedFmt });
+      if (bleedRgb) {
+        pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+        pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+      }
+      pdf.addImage(imgData, 'JPEG', bleed, bleed, pdfW, pdfH);
+      var name = (gv('eventTitle') || 'Tagesprogramm')
+        .replace(/[^a-zA-Z0-9\u00e4\u00f6\u00fc\u00c4\u00d6\u00dc\u00df &]/g, '_');
+      var suffix = currentLang === 'de' ? '_Tagesprogramm_OldMoney.pdf' : '_WeddingProgramme_OldMoney.pdf';
+      pdf.save(name + suffix);
+      ge('loading').classList.remove('active');
+    })
+    .catch(function() {
+      alert(currentLang === 'de' ? 'PDF konnte nicht erstellt werden. Bitte erneut versuchen.' : 'PDF could not be created. Please try again.');
+      ge('loading').classList.remove('active');
+    });
+}
+
+/* ── Init: pre-fill with DE example data ── */
+document.addEventListener('DOMContentLoaded', function() {
+  /* Fill all language-controlled fields from defaults */
+  for (var i = 0; i < langFields.length; i++) {
+    var el = ge(langFields[i]);
+    if (el) el.value = defaults.de[langFields[i]] || '';
+  }
+  ge('eventTitle').value = 'Sophie \u0026 Jonas';
+
+  /* Activate 3-day toggle */
+  setDays(3, document.querySelectorAll('.days-btn')[2]);
+
+  /* Clear warn-state whenever user types in a warned field */
+  document.querySelector('.panel-form').addEventListener('input', function(e) {
+    var fieldDiv = e.target.closest ? e.target.closest('.field') : null;
+    if (!fieldDiv) return;
+    fieldDiv.classList.remove('field-warn');
+    var hint = fieldDiv.querySelector('.field-warn-hint');
+    if (hint) hint.remove();
+  });
+});
+</script>
+</body>
+</html>

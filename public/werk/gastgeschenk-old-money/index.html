@@ -1,0 +1,870 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Gastgeschenk-Karten — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    .opt-tag     { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
+    .guest-meta  { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; margin-bottom: 2px; min-height: 16px; }
+    .guest-count { font-size: 9px; color: #aaa; }
+    .guest-warn  { font-size: 8.5px; color: #c07040; font-style: italic; }
+
+    /* ══ RIGHT PANEL ════════════════════════════════════ */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+      align-items: stretch; padding: 0; justify-content: flex-start;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ══ A4 PORTRAIT GRID ═══════════════════════════════ */
+    .a4-portrait {
+      width: 210mm; height: 297mm;
+      background: #fff;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .a4-portrait.fmt-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8mm 6mm;
+      padding: 10mm;
+    }
+    .a4-portrait.fmt-6 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8mm 4mm;
+      padding: 8mm;
+    }
+    .letter-portrait {
+      width: 215.9mm; height: 279.4mm;
+      background: #fff;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .letter-portrait.fmt-4 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 8mm 6mm;
+      padding: 10mm;
+    }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+
+    /* ══ GIFT CARD ══════════════════════════════════════ */
+    .gift-card {
+      position: relative;
+      overflow: visible;
+      display: flex;
+      flex-direction: column;
+    }
+    .gift-card.empty { visibility: hidden; }
+
+    /* ── Old Money ── */
+    .gift-card.burgund {
+      background: #FEF8F7; color: #8B1A35;
+      border: 8px solid #8B1A35;
+      --accent: #C9A96E; --frame: rgba(139,26,53,0.30);
+      --rule: rgba(139,26,53,0.18); --label: rgba(139,26,53,0.65);
+    }
+    .gift-card.cognac {
+      background: #FEF9F5; color: #7B4718;
+      border: 8px solid #7B4718;
+      --accent: #C9A96E; --frame: rgba(123,71,24,0.30);
+      --rule: rgba(123,71,24,0.18); --label: rgba(123,71,24,0.65);
+    }
+    .gift-card.forest {
+      background: #F7FAF7; color: #1F4A32;
+      border: 8px solid #1F4A32;
+      --accent: #C9A96E; --frame: rgba(31,74,50,0.30);
+      --rule: rgba(31,74,50,0.18); --label: rgba(31,74,50,0.65);
+    }
+
+    /* ── Inner wrapper (clips content, overflow: visible kept on card for cut marks) ── */
+    .gcard-inner {
+      position: absolute; inset: 0;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── Inner frame ── */
+    .gcard-frame-inner {
+      display: block; pointer-events: none;
+      position: absolute; z-index: 1;
+      inset: 3mm; border: 0.5px solid var(--frame);
+    }
+    .gift-card.classic .gcard-frame-inner {
+      inset: 5px; border: 0.5px solid rgba(0,0,0,0.10);
+    }
+
+    /* ── Header ── */
+    .gcard-header {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+      gap: 2.5mm; flex-shrink: 0;
+    }
+    .fmt-4 .gcard-header { padding: 4.5mm 5mm 2mm; }
+    .fmt-6 .gcard-header { padding: 3.5mm 4mm 1.5mm; }
+
+    /* ── Header rule — stops at inner frame (3mm inset) ── */
+    .gcard-header-rule {
+      height: 0.5px; background: var(--rule);
+      flex-shrink: 0; margin: 0 3mm;
+    }
+
+    .gcard-orn {
+      color: #ABABAB; flex-shrink: 0; line-height: 1;
+    }
+    .fmt-4 .gcard-orn { font-size: 4mm; }
+    .fmt-6 .gcard-orn { font-size: 3mm; }
+
+    .gcard-initials {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      color: inherit; text-align: center;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .fmt-4 .gcard-initials { font-size: 6mm; }
+    .fmt-6 .gcard-initials { font-size: 4.5mm; }
+
+    /* ── Body (shrinks to content — no flex:1 stretch) ── */
+    .gcard-body {
+      position: relative; z-index: 2;
+      flex-shrink: 0; display: flex; flex-direction: column;
+    }
+    .fmt-4 .gcard-body { padding: 5mm 6mm 3mm; gap: 3mm; }
+    .fmt-6 .gcard-body { padding: 4mm 5mm 2.5mm; gap: 2.5mm; }
+
+    .gcard-greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400; color: inherit;
+    }
+    .fmt-4 .gcard-greeting { font-size: 5mm; }
+    .fmt-6 .gcard-greeting { font-size: 4.5mm; }
+
+    .gcard-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal; font-weight: 400;
+      color: inherit; line-height: 1.6;
+    }
+    .fmt-4 .gcard-message { font-size: 3.8mm; }
+    .fmt-6 .gcard-message { font-size: 3.5mm; }
+
+    .gcard-signoff {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      color: inherit; line-height: 1.5;
+    }
+    .fmt-4 .gcard-signoff { font-size: 3.8mm; }
+    .fmt-6 .gcard-signoff { font-size: 3.5mm; }
+
+    /* ── Spacer: pushes task to bottom ── */
+    .gcard-spacer { flex: 1; min-height: 5mm; }
+
+    /* ── Task zone ── */
+    .gcard-task-sep {
+      position: relative; z-index: 2;
+      height: 0.5px; background: var(--rule); flex-shrink: 0;
+    }
+    .fmt-4 .gcard-task-sep { margin: 0 6mm; }
+    .fmt-6 .gcard-task-sep { margin: 0 5mm; }
+
+    .gcard-task {
+      position: relative; z-index: 2; flex-shrink: 0;
+    }
+    .fmt-4 .gcard-task { padding: 3mm 6mm 7mm; }
+    .fmt-6 .gcard-task { padding: 2.5mm 5mm 6mm; }
+
+    .gcard-task-label {
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--label); margin-bottom: 1.5mm;
+    }
+    .fmt-4 .gcard-task-label { font-size: 2.2mm; }
+    .fmt-6 .gcard-task-label { font-size: 2mm; }
+
+    .gcard-task-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      color: inherit; line-height: 1.5;
+    }
+    .fmt-4 .gcard-task-text { font-size: 3.5mm; }
+    .fmt-6 .gcard-task-text { font-size: 3mm; }
+
+    /* ── Cut marks ── */
+    .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
+    .cut.h { height: 0.4px; width: 4mm; }
+    .cut.v { width: 0.4px; height: 4mm; }
+    .cut.tl.h { top: 0;    left: -5mm; } .cut.tl.v { top: -5mm;    left: 0; }
+    .cut.tr.h { top: 0;    right:-5mm; } .cut.tr.v { top: -5mm;    right:0; }
+    .cut.bl.h { bottom:0;  left: -5mm; } .cut.bl.v { bottom:-5mm;  left: 0; }
+    .cut.br.h { bottom:0;  right:-5mm; } .cut.br.v { bottom:-5mm;  right:0; }
+
+    /* ── Char counter ── */
+    .char-row {
+      display: flex; justify-content: space-between;
+      align-items: center; margin-top: 3px; min-height: 14px;
+    }
+    .char-count { font-size: 9px; color: #aaa; transition: color 0.2s; }
+    .char-count.over { color: #c07040; }
+    .char-hint { font-size: 8px; color: #bbb; font-style: italic; }
+
+    /* ── Task row ── */
+    .task-toggle-row {
+      display: flex; align-items: center;
+      justify-content: space-between; margin-top: 2px;
+    }
+    .task-toggle-label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9px; color: #666; cursor: pointer;
+    }
+    .shuffle-btn {
+      font-size: 8px; color: #888; background: none;
+      border: 1px solid #ddd; padding: 2px 8px; cursor: pointer;
+      letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.15s;
+    }
+    .shuffle-btn:hover { border-color: #999; color: #444; }
+
+    /* ── Style groups ── */
+    .style-group { display: none; }
+    .style-group.active { display: flex; }
+
+    /* ── Small label ── */
+    .sub-label {
+      font-size: 9px; color: #999; text-transform: uppercase;
+      letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 6px; display: block;
+    }
+    .sub-label:first-of-type { margin-top: 0; }
+  </style>
+  <script>
+  (function(){var _rc={_id:"GG-Karten",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+  </script>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo"    id="lbl-logo">Gastgeschenk-Karten</div>
+  <div class="panel-tagline" id="lbl-tagline">Wedding Story Atelier</div>
+
+  <!-- Sprache -->
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Stil -->
+  <span class="section-label" id="lbl-style">Stil</span>
+  <div class="btn-group" id="style-btns">
+    <button class="ui-btn active" onclick="setTheme('burgund',this)">Burgund</button>
+    <button class="ui-btn"        onclick="setTheme('cognac',this)">Cognac</button>
+    <button class="ui-btn"        onclick="setTheme('forest',this)">Forest</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Format -->
+  <span class="section-label" id="lbl-format">Format</span>
+  <div class="btn-group">
+    <button class="ui-btn active" id="btn-fmt4" onclick="setFormat('4',this)">A6 · 4/A4</button>
+    <button class="ui-btn"        id="btn-fmt6" onclick="setFormat('6',this)">70×140 · 6/A4</button>
+    <button class="ui-btn"        id="btn-fmtltr" onclick="setFormat('ltr',this)">4×6" · 4/Ltr</button>
+  </div>
+  <p class="hint" id="hint-format"></p>
+
+  <hr class="divider">
+
+  <!-- Karte gestalten -->
+  <span class="section-label" id="lbl-design">Karte gestalten</span>
+
+  <span class="sub-label" id="lbl-initials">Initialen</span>
+  <input type="text" id="inp-initials" maxlength="20" oninput="render()">
+
+  <span class="sub-label" id="lbl-names">Namen des Brautpaares</span>
+  <input type="text" id="inp-names" maxlength="40" oninput="render()">
+
+  <hr class="divider">
+
+  <!-- Persönliche Nachricht -->
+  <span class="section-label" id="lbl-message">Persönliche Nachricht</span>
+  <p class="hint" id="hint-message"></p>
+  <textarea id="inp-message" rows="4" oninput="updateCharCounter();render()"></textarea>
+  <div class="char-row">
+    <span class="char-count" id="char-count"></span>
+    <span class="char-hint"  id="char-hint"></span>
+  </div>
+
+  <!-- Abschluss -->
+  <span class="sub-label" id="lbl-signoff" style="margin-top:8px;">Abschluss</span>
+  <input type="text" id="inp-signoff" maxlength="50" oninput="render()">
+
+  <hr class="divider">
+
+  <!-- Aufgabe -->
+  <span class="section-label" id="lbl-task-head">Aufgabe <span class="opt-tag" id="lbl-opt">optional</span></span>
+  <div class="task-toggle-row">
+    <label class="task-toggle-label">
+      <input type="checkbox" id="chk-task" onchange="onTaskToggle()">
+      <span id="lbl-task-enable">Aufgabe aktivieren</span>
+    </label>
+    <button class="shuffle-btn" id="btn-shuffle" onclick="reshuffleTasks()" style="display:none;" id="btn-shuffle">&#8635; Neu</button>
+  </div>
+  <p class="hint" id="hint-task" style="margin-top:4px;"></p>
+
+  <hr class="divider">
+
+  <!-- Gästeliste -->
+  <span class="section-label" id="lbl-guests">Gästeliste</span>
+  <p class="hint" id="hint-guests"></p>
+  <textarea id="inp-guests" rows="11" oninput="render()"></textarea>
+  <div class="guest-meta">
+    <span class="guest-count" id="guest-count"></span>
+    <span class="guest-warn"  id="guest-warn"></span>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
+  </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>&#8592;</button>
+    <span id="page-info" style="min-width:80px;text-align:center;"></span>
+    <button class="nav-btn" id="btn-next" onclick="changePage(1)"  disabled>&#8594;</button>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-portrait fmt-4" id="preview-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-portrait fmt-4" id="print-grid"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+  // ── TASK POOL ──────────────────────────────────────
+  var TASKS = {
+    de: [
+      'Erzähle dem Menschen links von dir eine lustige Erinnerung an das Brautpaar.',
+      'Finde heraus, was du und dein Tischnachbar gemeinsam haben — außer dieser Hochzeit.',
+      'Erzähle deinem Tischnachbarn, was du dem Brautpaar für die Ehe wünschst.',
+      'Gib heute drei Menschen ein ehrliches Kompliment.',
+      'Erzähle dem Menschen rechts von dir deine Geschichte mit dem Brautpaar.',
+      'Finde jemanden, der aus derselben Stadt kommt wie du.',
+      'Finde heraus, wer an deinem Tisch am weitesten angereist ist.',
+      'Erzähle dem Menschen gegenüber, was du an diesem Tag am schönsten findest.',
+      'Finde heraus, wer das Brautpaar am längsten kennt — an deinem Tisch.',
+      'Erzähle dem Menschen links von dir etwas, das die meisten über dich nicht wissen.',
+      'Stell dich bei jemandem vor, mit dem du noch nicht gesprochen hast.',
+      'Erzähle deinem Tischnachbarn, welche Eigenschaft des Brautpaares dich am meisten inspiriert.',
+      'Finde heraus, was dein Tischnachbar beruflich macht — und erzähle ihm von dir.',
+      'Erzähle jemandem, was dich heute am Brautpaar bewegt hat.',
+      'Finde jemanden, der heute zum ersten Mal auf einer Hochzeit ist.',
+      'Mach mit jemandem ein Erinnerungsfoto für das Brautpaar.',
+      'Finde jemanden, der denselben Geburtsmonat hat wie du.',
+      'Stell deinem Tischnachbarn eine Frage, die du sonst nie stellen würdest.',
+      'Erzähle dem Menschen gegenüber, was „Liebe" für dich bedeutet — in einem Satz.',
+      'Finde jemanden, der aus einem anderen Land kommt als du.',
+      'Erzähle dem Menschen links von dir, was du von diesem Tag nie vergessen wirst.',
+      'Finde jemanden, der denselben Lieblingsfilm hat wie du.',
+      'Tausche deine Nummer mit jemandem, den du heute neu kennengelernt hast.',
+      'Erzähle deinem Tischnachbarn deine schönste Hochzeitserinnerung.',
+      'Finde jemanden, der denselben Lieblingsmusiker hat wie du.',
+      'Erzähle dem Menschen rechts von dir deinen besten Ehe-Tipp.',
+      'Lache heute laut mit jemandem, den du gerade erst kennengelernt hast.',
+      'Finde jemanden, der auf dieser Hochzeit niemanden kennt — und sei sein erster Gesprächspartner.',
+      'Erzähle dem Menschen links von dir, warum du heute hier sein wolltest.',
+      'Erzähle dem Menschen links von dir einen Wunsch, den du für das Brautpaar hegst.'
+    ],
+    en: [
+      'Tell the person to your left a funny memory about the couple.',
+      'Find out what you and your neighbor have in common — besides this wedding.',
+      'Tell your neighbor what you wish the couple for their marriage.',
+      'Give three people a genuine compliment today.',
+      'Tell the person to your right the story of how you met the couple.',
+      'Find someone who comes from the same city as you.',
+      'Find out who at your table has traveled the farthest to be here.',
+      'Tell the person across from you what you find most beautiful about today.',
+      'Find out who has known the couple the longest — at your table.',
+      'Tell the person to your left something most people don\'t know about you.',
+      'Introduce yourself to someone you haven\'t spoken to yet.',
+      'Tell your neighbor which quality of the couple inspires you the most.',
+      'Find out what your neighbor does for a living — and share about yourself.',
+      'Tell someone what moved you most about the couple today.',
+      'Find someone who is attending a wedding for the very first time.',
+      'Take a memory photo with someone as a gift for the couple.',
+      'Find someone who shares your birth month.',
+      'Ask your neighbor a question you\'d never normally ask.',
+      'Tell the person across from you what "love" means to you — in one sentence.',
+      'Find someone who comes from a different country than you.',
+      'Tell the person to your left what you will never forget about this day.',
+      'Find someone who shares your favorite movie.',
+      'Exchange numbers with someone you just met today.',
+      'Tell your neighbor your favorite wedding memory.',
+      'Find someone who shares your favorite musician.',
+      'Tell the person to your right your best marriage tip.',
+      'Laugh out loud today with someone you just met.',
+      'Find someone who doesn\'t know anyone here — and be their first conversation.',
+      'Tell the person to your left why being here today matters to you.',
+      'Tell the person to your left a wish you hold for the couple\'s future.'
+    ]
+  };
+
+  // ── STATE ─────────────────────────────────────────
+  var currentLang   = 'de';
+  var currentTheme  = 'burgund';
+  var currentFormat = '4';
+  var currentPage   = 0;
+  var MAX = 60;
+  var shuffledTasks = { de: [], en: [] };
+
+  // ── CHAR LIMITS (visual overflow is the real limit) ──
+  var CHAR_LIMITS = {
+    '4':   { task: 350, notask: 550 },
+    '6':   { task: 300, notask: 450 },
+    'ltr': { task: 350, notask: 550 }
+  };
+
+  // ── TRANSLATIONS ──────────────────────────────────
+  var T = {
+    de: {
+      logo:         'Gastgeschenk-Karten',
+      tagline:      'Old Money Line · Wedding Story Atelier',
+      lang:         'Sprache', style: 'Stil', format: 'Format',
+      design:       'Karte gestalten',
+      initials:     'Initialen',
+      names:        'Namen des Brautpaares',
+      message:      'Persönliche Nachricht',
+      hintMessage:  'Gilt für alle Gäste gleich. Text vorab in einem Dokument vorbereiten empfohlen — der Browser speichert nichts.',
+      signoff:      'Abschluss',
+      taskHead:     'Aufgabe',
+      opt:          'optional',
+      taskEnable:   'Aufgabe aktivieren',
+      hintTask:     'Jeder Gast erhält eine zufällige, gemeinschaftsfördernde Aufgabe.',
+      hintTaskOff:  '',
+      guests:       'Gästeliste',
+      hintGuests:   'Ein Eintrag pro Zeile — max. 60 Gäste. Für geschlechtsgerechte Anrede: Name,m oder Name,f',
+      hintFmt4:     'A6 (105×148 mm) — deckt viel Fläche auf dem Beutel, wirkt edel.',
+      hintFmt6:     '70×140 mm — 6 Karten pro A4, sparsamer bei vielen Gästen.',
+      hintFmtLtr:   '4×6" (102×152 mm) — US-Standard, 4 Karten pro US Letter, ideal für US-Druck.',
+      singular:     ' Gast', plural: ' Gäste',
+      limitWarn:    'Maximum erreicht (60)',
+      charOf:       function(n,m){ return n + ' / ' + m + ' Zeichen'; },
+      charOver:     'Zu lang — Text kürzen oder Format wechseln',
+      charHintTask: 'Mit Aufgabe steht weniger Platz zur Verfügung',
+      pageOf:       function(a,b){ return 'Seite ' + a + ' von ' + b; },
+      spinPage:     function(a,b){ return 'Seite ' + a + ' von ' + b + ' …'; },
+      spinDone:     'PDF wird erstellt …',
+      alertEmpty:   'Bitte zuerst Gäste eintragen.',
+      alertFail:    'Export fehlgeschlagen: ',
+      greetM:       function(n){ return 'Lieber ' + n + ','; },
+      greetF:       function(n){ return 'Liebe '  + n + ','; },
+      taskLabel:    'Deine Aufgabe:',
+      msgPH:        'Wir freuen uns so sehr, dass du diesen besonderen Tag mit uns teilst.',
+      signoffPH:    'Herzlich,',
+      initialsPH:   'A & P',
+      namesPH:      'Anna & Peter',
+      guestsPH:     'Maria Müller,f\nOliver Weber,m\nSophie Hoffmann,f\nAnna & Thomas Koch\nElisabeth Braun,f\nMaximilian Richter,m',
+      demoInitials: 'A & P',
+      demoNames:    'Anna & Peter',
+      demoMessage:  'Wir freuen uns so sehr, dass du diesen besonderen Tag mit uns teilst.',
+      demoSignoff:  'Herzlich,',
+      demoGuests:   'Maria Müller,f\nOliver Weber,m\nSophie Hoffmann,f\nThomas Koch,m\nElisabeth Braun,f\nMaximilian Richter,m\nKlara Becker,f\nFamilie Schmidt'
+    },
+    en: {
+      logo:         'Gift Cards',
+      tagline:      'Old Money Line · Wedding Story Atelier',
+      lang:         'Language', style: 'Style', format: 'Format',
+      design:       'Card Design',
+      initials:     'Initials',
+      names:        'Couple\'s Names',
+      message:      'Personal Message',
+      hintMessage:  'The same message appears on all cards. We recommend preparing your text in a document first — the browser does not save your input.',
+      signoff:      'Sign-off',
+      taskHead:     'Task',
+      opt:          'optional',
+      taskEnable:   'Enable task',
+      hintTask:     'Each guest receives a random community-building task.',
+      hintTaskOff:  '',
+      guests:       'Guest List',
+      hintGuests:   'One entry per line — max. 60 guests. For gendered greeting, append ,m or ,f to the name.',
+      hintFmt4:     'A6 (105×148 mm) — covers a large area of the bag, elegant.',
+      hintFmt6:     '70×140 mm — 6 cards per A4, more economical for large groups.',
+      hintFmtLtr:   '4×6" (102×152 mm) — US standard, 4 cards per US Letter sheet, ideal for US printing.',
+      singular:     ' guest', plural: ' guests',
+      limitWarn:    'Limit reached (60)',
+      charOf:       function(n,m){ return n + ' / ' + m + ' characters'; },
+      charOver:     'Too long — shorten text or switch format',
+      charHintTask: 'Less space available with task enabled',
+      pageOf:       function(a,b){ return 'Page ' + a + ' of ' + b; },
+      spinPage:     function(a,b){ return 'Page ' + a + ' of ' + b + ' …'; },
+      spinDone:     'Creating PDF …',
+      alertEmpty:   'Please add guests first.',
+      alertFail:    'Export failed: ',
+      greetM:       function(n){ return 'Dear ' + n + ','; },
+      greetF:       function(n){ return 'Dear ' + n + ','; },
+      taskLabel:    'Your task:',
+      msgPH:        'We are so glad you could share this special day with us.',
+      signoffPH:    'With love,',
+      initialsPH:   'A & P',
+      namesPH:      'Anna & Peter',
+      guestsPH:     'Emily Johnson,f\nJames Williams,m\nOlivia Brown,f\nWilliam Davis,m\nCharlotte Taylor,f\nHenry Wilson,m',
+      demoInitials: 'A & P',
+      demoNames:    'Anna & Peter',
+      demoMessage:  'We are so glad you could share this special day with us.',
+      demoSignoff:  'With love,',
+      demoGuests:   'Emily Johnson,f\nJames Williams,m\nOlivia Brown,f\nWilliam Davis,m\nCharlotte Taylor,f\nHenry Wilson,m\nAmelia Moore,f\nGeorge Anderson,m'
+    }
+  };
+
+  // ── HELPERS ───────────────────────────────────────
+  function ge(id) { return document.getElementById(id); }
+  function gv(id) { return ge(id).value; }
+  function t()    { return T[currentLang]; }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function parseGuests(raw) {
+    return raw.split('\n')
+      .map(function(l){ return l.trim(); })
+      .filter(Boolean).slice(0, MAX)
+      .map(function(line) {
+        var idx   = line.lastIndexOf(',');
+        var name  = idx > 0 ? line.slice(0, idx).trim() : line.trim();
+        var g     = idx > 0 ? line.slice(idx + 1).trim().toLowerCase() : 'f';
+        return { name: name, gender: g };
+      });
+  }
+  function perPage() { return currentFormat === '6' ? 6 : 4; }
+
+  // ── TASKS ─────────────────────────────────────────
+  function shuffleArr(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var x = a[i]; a[i] = a[j]; a[j] = x;
+    }
+    return a;
+  }
+  function initTasks() {
+    shuffledTasks.de = shuffleArr(TASKS.de);
+    shuffledTasks.en = shuffleArr(TASKS.en);
+  }
+  function reshuffleTasks() { initTasks(); render(); }
+  function getTask(idx) {
+    var pool = shuffledTasks[currentLang];
+    return pool[idx % pool.length];
+  }
+
+  // ── LANGUAGE ──────────────────────────────────────
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    applyLang(); render();
+  }
+  function applyLang() {
+    var l = t();
+    ge('lbl-logo').textContent       = l.logo;
+    ge('lbl-tagline').textContent    = l.tagline;
+    ge('lbl-lang').textContent       = l.lang;
+    ge('lbl-style').textContent      = l.style;
+    ge('lbl-format').textContent     = l.format;
+    ge('lbl-design').textContent     = l.design;
+    ge('lbl-initials').textContent   = l.initials;
+    ge('lbl-names').textContent      = l.names;
+    ge('lbl-message').textContent    = l.message;
+    ge('hint-message').textContent   = l.hintMessage;
+    ge('lbl-signoff').textContent    = l.signoff;
+    ge('lbl-task-head').innerHTML    = l.taskHead + ' <span class="opt-tag">' + l.opt + '</span>';
+    ge('lbl-task-enable').textContent = l.taskEnable;
+    ge('hint-task').textContent      = ge('chk-task').checked ? l.hintTask : l.hintTaskOff;
+    ge('lbl-guests').textContent     = l.guests;
+    ge('hint-guests').textContent    = l.hintGuests;
+    ge('hint-format').textContent    = currentFormat === '6' ? l.hintFmt6 : currentFormat === 'ltr' ? l.hintFmtLtr : l.hintFmt4;
+    ge('inp-message').placeholder    = l.msgPH;
+    ge('inp-signoff').placeholder    = l.signoffPH;
+    ge('inp-initials').placeholder   = l.initialsPH;
+    ge('inp-names').placeholder      = l.namesPH;
+    ge('inp-guests').placeholder     = l.guestsPH;
+    document.documentElement.lang   = currentLang;
+    updateCharCounter();
+  }
+
+  // ── THEME ─────────────────────────────────────────
+  function setTheme(th, btn) {
+    currentTheme = th;
+    document.querySelectorAll('#style-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  // ── FORMAT ────────────────────────────────────────
+  function setFormat(fmt, btn) {
+    currentFormat = fmt;
+    document.querySelectorAll('#btn-fmt4,#btn-fmt6,#btn-fmtltr').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    var l = t();
+    ge('hint-format').textContent = fmt === '6' ? l.hintFmt6 : fmt === 'ltr' ? l.hintFmtLtr : l.hintFmt4;
+    var base = fmt === 'ltr' ? 'letter-portrait' : 'a4-portrait';
+    var cls  = fmt === 'ltr' ? 'letter-portrait fmt-4' : 'a4-portrait fmt-' + fmt;
+    ge('preview-grid').className  = cls;
+    ge('print-grid').className    = cls;
+    updateCharCounter();
+    render();
+  }
+
+  // ── TASK TOGGLE ───────────────────────────────────
+  function onTaskToggle() {
+    var on = ge('chk-task').checked;
+    ge('btn-shuffle').style.display  = on ? 'inline-block' : 'none';
+    ge('hint-task').textContent      = on ? t().hintTask : t().hintTaskOff;
+    updateCharCounter();
+    render();
+  }
+
+  // ── CHAR COUNTER ──────────────────────────────────
+  function updateCharCounter() {
+    var hasTask = ge('chk-task').checked;
+    var limit   = CHAR_LIMITS[currentFormat][hasTask ? 'task' : 'notask'];
+    var n       = gv('inp-message').length;
+    var l       = t();
+    var el      = ge('char-count');
+    var over    = n > limit;
+    el.textContent = over ? l.charOver : l.charOf(n, limit);
+    el.className   = 'char-count' + (over ? ' over' : '');
+    ge('char-hint').textContent = hasTask ? l.charHintTask : '';
+  }
+
+  // ── PAGE NAV ──────────────────────────────────────
+  function changePage(dir) {
+    var guests = parseGuests(gv('inp-guests'));
+    var pages  = Math.max(1, Math.ceil(guests.length / perPage()));
+    currentPage = Math.max(0, Math.min(currentPage + dir, pages - 1));
+    render();
+  }
+
+  // ── CARD HTML ─────────────────────────────────────
+  function cardHTML(guest, taskIdx) {
+    var l        = t();
+    var initials = gv('inp-initials').trim() || l.initialsPH;
+    var names    = gv('inp-names').trim()    || l.namesPH;
+    var message  = gv('inp-message').trim();
+    var signoff  = gv('inp-signoff').trim()  || l.signoffPH;
+    var hasTask  = ge('chk-task').checked;
+    var greeting = guest.gender === 'm' ? l.greetM(guest.name) : l.greetF(guest.name);
+
+    var msgHTML = message
+      ? '<div class="gcard-message">'
+          + message.split('\n').map(function(ln){ return esc(ln) || '&nbsp;'; }).join('<br>')
+          + '</div>'
+      : '<div class="gcard-message"></div>';
+
+    var taskHTML = '';
+    if (hasTask) {
+      taskHTML = '<div class="gcard-task-sep"></div>'
+        + '<div class="gcard-task">'
+          + '<div class="gcard-task-label">' + esc(l.taskLabel) + '</div>'
+          + '<div class="gcard-task-text">'  + esc(getTask(taskIdx)) + '</div>'
+        + '</div>';
+    }
+
+    return '<div class="gift-card ' + currentTheme + '">'
+      + '<div class="gcard-inner">'
+        + '<div class="gcard-frame-inner"></div>'
+        + '<div class="gcard-header">'
+          + '<span class="gcard-orn">&#9670;</span>'
+          + '<span class="gcard-initials">' + esc(initials) + '</span>'
+          + '<span class="gcard-orn">&#9670;</span>'
+        + '</div>'
+        + '<div class="gcard-header-rule"></div>'
+        + '<div class="gcard-body">'
+          + '<div class="gcard-greeting">' + esc(greeting) + '</div>'
+          + msgHTML
+          + '<div class="gcard-signoff">' + esc(signoff) + '<br>' + esc(names) + '</div>'
+        + '</div>'
+        + '<div class="gcard-spacer"></div>'
+        + taskHTML
+      + '</div>'
+      + '<div class="cut tl h"></div><div class="cut tl v"></div>'
+      + '<div class="cut tr h"></div><div class="cut tr v"></div>'
+      + '<div class="cut bl h"></div><div class="cut bl v"></div>'
+      + '<div class="cut br h"></div><div class="cut br v"></div>'
+      + '</div>';
+  }
+
+  function pageHTML(pageGuests, startIdx) {
+    var pp = perPage(), html = '';
+    for (var i = 0; i < pp; i++) {
+      html += i < pageGuests.length
+        ? cardHTML(pageGuests[i], startIdx + i)
+        : '<div class="gift-card empty ' + currentTheme + '"></div>';
+    }
+    return html;
+  }
+
+  // ── RENDER ────────────────────────────────────────
+  function render() {
+    var l      = t();
+    var guests = parseGuests(gv('inp-guests'));
+    var pp     = perPage();
+
+    // If no guests entered: show one placeholder card so preview is never blank
+    var previewGuests = guests.length > 0 ? guests
+      : [{ name: currentLang === 'de' ? 'Maria Müller' : 'Emily Johnson', gender: 'f' }];
+
+    var pages  = Math.max(1, Math.ceil(previewGuests.length / pp));
+    currentPage = Math.min(currentPage, pages - 1);
+
+    var n = guests.length;
+    ge('guest-count').textContent = n > 0 ? n + (n === 1 ? l.singular : l.plural) : '';
+    ge('guest-warn').textContent  = n >= MAX ? l.limitWarn : '';
+
+    var showNav = pages > 1;
+    ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
+    ge('btn-prev').disabled = currentPage === 0;
+    ge('btn-next').disabled = currentPage === pages - 1;
+
+    var start = currentPage * pp;
+    ge('preview-grid').innerHTML = pageHTML(previewGuests.slice(start, start + pp), start);
+    scalePreview();
+  }
+
+  // ── SCALE PREVIEW ─────────────────────────────────
+  function scalePreview() {
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var pgW   = currentFormat === 'ltr' ? 215.9 : 210;
+    var pgH   = currentFormat === 'ltr' ? 279.4 : 297;
+    var a4W   = pgW * 3.7795;
+    var a4H   = pgH * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap  = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  // ── DEMO ──────────────────────────────────────────
+  function loadDemo() {
+    var l = t();
+    ge('inp-initials').value = l.demoInitials;
+    ge('inp-names').value    = l.demoNames;
+    ge('inp-message').value  = l.demoMessage;
+    ge('inp-signoff').value  = l.demoSignoff;
+    ge('inp-guests').value   = l.demoGuests;
+    currentPage = 0;
+    updateCharCounter();
+    render();
+  }
+
+  // ── PDF EXPORT ────────────────────────────────────
+  async function exportPDF() {
+    var l      = t();
+    var guests = parseGuests(gv('inp-guests'));
+    if (!guests.length) { alert(l.alertEmpty); return; }
+
+    var pp        = perPage();
+    var pages     = Math.ceil(guests.length / pp);
+    var spinner   = ge('pdf-spinner');
+    var msg       = ge('spin-msg');
+    spinner.style.display = 'flex';
+    msg.textContent = l.spinDone;
+
+    try {
+      var bleed = ge('chk-bleed').checked ? 3 : 0;
+      var isLetter = currentFormat === 'ltr';
+      var pw = isLetter ? 215.9 : 210;
+      var ph = isLetter ? 279.4 : 297;
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({
+        orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pw + bleed * 2, ph + bleed * 2] : (isLetter ? [pw, ph] : 'a4')
+      });
+      var printGrid = ge('print-grid');
+      if (window.getSelection) window.getSelection().removeAllRanges();
+
+      for (var p = 0; p < pages; p++) {
+        msg.textContent = l.spinPage(p + 1, pages);
+        var start = p * pp;
+        printGrid.innerHTML = pageHTML(guests.slice(start, start + pp), start);
+        await new Promise(function(r){ setTimeout(r, 150); });
+        var canvas = await html2canvas(printGrid, {
+          scale: 3, useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false
+        });
+        if (p > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', bleed, bleed, pw, ph);
+      }
+
+      var th = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+      pdf.save('Gift_Cards_' + th + '_' + new Date().toISOString().slice(0,10) + '.pdf');
+
+    } catch(e) {
+      alert(l.alertFail + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  // ── INIT ──────────────────────────────────────────
+  window.addEventListener('resize', scalePreview);
+  initTasks();
+  applyLang();
+  render();
+</script>
+</body>
+</html>

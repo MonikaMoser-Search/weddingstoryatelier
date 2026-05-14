@@ -1,0 +1,358 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Hochzeits-Bingo Generator — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+      --gold: #8B6F47;
+    }
+    body { background: #F2EFE9; }
+
+
+    /* ── FORM ── */
+    .panel-form h2 { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 700; margin-bottom: 4px; }
+    .panel-form .subtitle { font-size: 12px; color: var(--light); margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 24px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 12px; color: var(--mid); transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+    .form-section { margin-bottom: 20px; }
+
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    input { width: 100%; padding: 7px 10px; border: 1px solid var(--rule); background: #FAFAFA; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--charcoal); border-radius: 2px; transition: border-color 0.2s; outline: none; }
+    input:focus { border-color: var(--charcoal); background: white; }
+
+    .bingo-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .bingo-input-wrap { position: relative; }
+    .bingo-num { position: absolute; top: 50%; left: 8px; transform: translateY(-50%); font-size: 9px; color: var(--light); pointer-events: none; }
+    .bingo-input-wrap input { padding-left: 22px; font-size: 11px; }
+    .center-label { grid-column: 1 / -1; text-align: center; font-size: 10px; color: var(--gold); letter-spacing: 0.1em; margin: 4px 0; }
+
+    .btn-download {
+      width: 100%; padding: 13px; background: var(--charcoal); color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 8px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+
+    /* ── PREVIEW ── */
+    #bingo-output { width: 620px; box-shadow: 0 12px 48px rgba(0,0,0,0.18); transition: all 0.3s; }
+
+    /* ════ CLASSIC ════ */
+    .classic { background: #FAF7F2; padding: 48px 48px 40px; font-family: 'Cormorant Garamond', serif; }
+    .classic .rule-thick { border-top: 3px solid #1A1A1A; margin-bottom: 4px; }
+    .classic .rule-thin  { border-top: 1px solid #1A1A1A; margin-bottom: 0; }
+    .classic .masthead { text-align: center; padding: 16px 0 12px; }
+    .classic .title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #1A1A1A; line-height: 1; }
+    .classic .names { font-size: 14px; letter-spacing: 0.25em; text-transform: uppercase; color: #666; margin-top: 8px; }
+    .classic .intro { font-size: 14px; font-style: italic; color: #666; text-align: center; margin: 14px 0 16px; }
+    .classic .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+    .classic .cell {
+      aspect-ratio: 1; border: 2px solid #999; display: flex; align-items: center;
+      justify-content: center; text-align: center; font-size: 11px; line-height: 1.3;
+      padding: 6px; color: #333; background: white;
+    }
+    .classic .cell.center { background: #1A1A1A; color: #FAF7F2; font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; }
+    .classic .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #AAA; }
+    .classic .win-note { text-align: center; font-size: 12px; color: #888; margin: 10px 0 4px; font-style: italic; }
+
+    /* ════ DARK ════ */
+    .dark { background: #1C1410; padding: 48px 48px 40px; font-family: 'Cormorant Garamond', serif; }
+    .dark .rule-thick { border-top: 2px solid #C89A5A; margin-bottom: 4px; }
+    .dark .rule-thin  { border-top: 1px solid #3A2E22; margin-bottom: 0; }
+    .dark .masthead { text-align: center; padding: 16px 0 12px; }
+    .dark .title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #F0E8D8; line-height: 1; }
+    .dark .names { font-size: 14px; letter-spacing: 0.25em; text-transform: uppercase; color: #C89A5A; margin-top: 8px; }
+    .dark .intro { font-size: 14px; font-style: italic; color: #C8B090; text-align: center; margin: 14px 0 16px; }
+    .dark .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+    .dark .cell {
+      aspect-ratio: 1; border: 2px solid #6A5040; display: flex; align-items: center;
+      justify-content: center; text-align: center; font-size: 11px; line-height: 1.3;
+      padding: 6px; color: #E0CCA8; background: #251C14;
+    }
+    .dark .cell.center { background: #C89A5A; color: #1C1410; font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; }
+    .dark .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #6A5A42; }
+    .dark .win-note { text-align: center; font-size: 12px; color: #A89070; margin: 10px 0 4px; font-style: italic; }
+
+    /* ════ GARDEN ════ */
+    .garden { background: #F5EFE6; padding: 48px 48px 40px; font-family: 'Cormorant Garamond', serif; }
+    .garden .rule-thick { border-top: 2.5px solid #B07A4A; margin-bottom: 4px; }
+    .garden .rule-thin  { border-top: 1px solid #D4B896; margin-bottom: 0; }
+    .garden .masthead { text-align: center; padding: 16px 0 12px; }
+    .garden .title { font-family: 'Playfair Display', serif; font-size: 42px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: #3D2B1F; line-height: 1; }
+    .garden .names { font-size: 14px; letter-spacing: 0.25em; text-transform: uppercase; color: #B07A4A; margin-top: 8px; }
+    .garden .intro { font-size: 14px; font-style: italic; color: #7A5C42; text-align: center; margin: 14px 0 16px; }
+    .garden .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 3px; }
+    .garden .cell {
+      aspect-ratio: 1; border: 2px solid #B07A4A; display: flex; align-items: center;
+      justify-content: center; text-align: center; font-size: 11px; line-height: 1.3;
+      padding: 6px; color: #5A3E2B; background: white;
+    }
+    .garden .cell.center { background: #B07A4A; color: #FAF7F2; font-family: 'Playfair Display', serif; font-size: 13px; font-weight: 700; }
+    .garden .footer { text-align: center; margin-top: 16px; font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase; color: #C4A882; }
+    .garden .win-note { text-align: center; font-size: 12px; color: #9E8068; margin: 10px 0 4px; font-style: italic; }
+
+    /* Loading */
+    .loading { display: none; position: fixed; inset: 0; background: rgba(26,26,26,0.75); z-index: 100; align-items: center; justify-content: center; flex-direction: column; gap: 16px; color: white; font-family: 'Cormorant Garamond', serif; font-size: 18px; letter-spacing: 0.15em; }
+    .loading.active { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 2px solid rgba(255,255,255,0.2); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .bleed-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    #chk-bleed { opacity: 0; position: absolute; pointer-events: none; width: 0; height: 0; }
+    .bleed-row { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; margin-bottom: 7px; }
+    .bleed-check { width: 14px; height: 14px; border: 1.5px solid #ccc; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: all 0.15s; font-size: 9px; color: transparent; line-height: 1; }
+    #chk-bleed:checked ~ .bleed-row .bleed-check { background: #1A1A1A; border-color: #1A1A1A; color: #fff; }
+    .bleed-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; }
+    .bleed-off-desc, .bleed-on-desc { font-family: 'DM Sans', sans-serif; font-size: 8px; color: #666; line-height: 1.6; margin: 0; }
+    .bleed-off-desc strong, .bleed-on-desc strong { color: #333; }
+    .bleed-on-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-off-desc { display: none; }
+    #chk-bleed:checked ~ .bleed-on-desc { display: block; }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+  </style>
+<script>
+(function(){var _rc={_id:"WB-ClassicLine",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+
+  <!-- FORM -->
+  <div class="panel-form">
+    <div class="panel-logo">Hochzeits-Bingo</div>
+    <div class="panel-tagline">Wedding Story Atelier</div>
+
+    <span class="section-label">Stil wählen</span>
+    <div class="style-buttons">
+      <button class="style-btn active" onclick="setTheme('classic', this)"><span class="dot" style="background:#1A1A1A"></span>Classic</button>
+      <button class="style-btn" onclick="setTheme('dark', this)"><span class="dot" style="background:#8B6F47"></span>Dark Romance</button>
+      <button class="style-btn" onclick="setTheme('garden', this)"><span class="dot" style="background:#B07A4A"></span>Warm Garden</button>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Das Paar</div>
+      <div class="field">
+        <label>Name 1</label>
+        <input type="text" id="name1" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Name 2</label>
+        <input type="text" id="name2" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Datum</label>
+        <input type="text" id="wdate" oninput="update()">
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-label">Bingo-Felder (24 Felder + 1 Freifeld in der Mitte)</div>
+      <div class="bingo-inputs" id="bingo-fields"></div>
+    </div>
+
+    <button class="btn-download" onclick="startDownload()">&#11015; Als PDF herunterladen</button>
+    <p class="privacy-note">Keine Datenspeicherung · Alles in einem Durchgang · Chrome / Firefox empfohlen</p>
+    <div class="format-box">
+      <div class="format-title">Papierformat / Paper Format</div>
+      <div class="format-opts">
+        <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>210×297 mm</em></label>
+        <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>8½×11"</em></label>
+      </div>
+    </div>
+    <div class="bleed-box">
+      <input type="checkbox" id="chk-bleed">
+      <label class="bleed-row" for="chk-bleed">
+        <span class="bleed-check">&#10003;</span>
+        <span class="bleed-title">Beschnittzugabe 3 mm</span>
+      </label>
+      <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+      <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+    </div>
+    <div class="print-hint">
+      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="panel-preview">
+    <div id="bingo-output" class="classic"></div>
+  </div>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <span>Bingo-Karte wird erstellt…</span>
+</div>
+
+<script>
+var currentTheme = 'classic';
+
+var defaultFields = [
+  'Jemand weint', 'Blumenstrauß-Wurf', 'Ring-Panne', 'Verspätung', 'Fotobombe',
+  'Kinder tanzen', 'Rede zu lang', 'Sekt-Missgeschick', 'Süße Oma', 'Falscher Name',
+  'Erster Kuss', 'Überraschungssong', 'Trauzeugen-Panne', 'Hätte Dances', 'Hund erscheint',
+  'Zug-Missgeschick', 'Gelübde vergessen', 'Alle singen mit', 'Emotionaler Vater', 'Selfie mit Paar',
+  'DJ-Wunsch', 'Spontaner Flashmob', 'Jemand schläft', 'Tanzflächen-Duo'
+];
+
+function ge(id) { return document.getElementById(id); }
+function gv(id) { var el = ge(id); return el ? el.value : ''; }
+
+function esc(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildFields() {
+  var container = ge('bingo-fields');
+  container.innerHTML = '';
+  for (var i = 0; i < 24; i++) {
+    // Insert center label after field 11 (before middle cell position)
+    if (i === 12) {
+      var lbl = document.createElement('div');
+      lbl.className = 'center-label';
+      lbl.textContent = '✦ Feld 13 = Freifeld in der Mitte (fix) ✦';
+      container.appendChild(lbl);
+    }
+    var wrap = document.createElement('div');
+    wrap.className = 'bingo-input-wrap';
+    var num = i < 12 ? i + 1 : i + 2; // skip 13
+    wrap.innerHTML = '<span class="bingo-num">' + num + '</span>' +
+      '<input type="text" id="bf_' + i + '" oninput="update()" placeholder="Moment...">';
+    container.appendChild(wrap);
+  }
+}
+
+function setTheme(theme, btn) {
+  currentTheme = theme;
+  var btns = document.querySelectorAll('.style-btn');
+  for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+  btn.classList.add('active');
+  update();
+}
+
+function getCells() {
+  var cells = [];
+  for (var i = 0; i < 24; i++) {
+    cells.push(gv('bf_' + i) || defaultFields[i] || '');
+  }
+  // Insert FREE cell at position 12 (center of 5x5 grid)
+  cells.splice(12, 0, '★ FREE ★');
+  return cells;
+}
+
+function update() {
+  var name1 = gv('name1') || 'Anna';
+  var name2 = gv('name2') || 'Peter';
+  var wdate = gv('wdate') || '14. Juni 2026';
+  var cells = getCells();
+  var t = currentTheme;
+
+  var cellsHtml = '';
+  for (var i = 0; i < 25; i++) {
+    var isCenter = i === 12;
+    cellsHtml += '<div class="cell' + (isCenter ? ' center' : '') + '">' + esc(cells[i]) + '</div>';
+  }
+
+  var out = ge('bingo-output');
+  out.className = t;
+  out.innerHTML =
+    '<hr class="rule-thick">' +
+    '<hr class="rule-thin">' +
+    '<div class="masthead">' +
+      '<div class="title">Hochzeits-Bingo</div>' +
+      '<div class="names">' + esc(name1) + ' &amp; ' + esc(name2) + ' &nbsp;·&nbsp; ' + esc(wdate) + '</div>' +
+    '</div>' +
+    '<hr class="rule-thin">' +
+    '<hr class="rule-thick">' +
+    '<div class="intro">Kreuz an was du siehst — wer zuerst eine Reihe voll hat, ruft BINGO!</div>' +
+    '<div class="grid">' + cellsHtml + '</div>' +
+    '<div class="win-note">Reihe voll? Laut BINGO rufen — vielleicht gibt es sogar ein Getränk dafür 🥂</div>' +
+    '<hr class="rule-thin">' +
+    '<hr class="rule-thick">' +
+    '<div class="footer">Wedding Story Atelier &nbsp;·&nbsp; Tell your story beautifully</div>';
+}
+
+function startDownload() {
+  ge('loading').classList.add('active');
+  setTimeout(doDownload, 150);
+}
+
+function doDownload() {
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var fmt = (document.querySelector('input[name="paper-format"]:checked') || {}).value || 'a4';
+  var isLetter = fmt === 'letter';
+  var pdfW = isLetter ? 215.9 : 210;
+  var pdfH = isLetter ? 279.4 : 297;
+  var el = ge('bingo-output');
+  var bleedRgb = null;
+  if (bleed) {
+    var _bg = getComputedStyle(el).backgroundColor.match(/\d+/g);
+    if (_bg && _bg.length >= 3) bleedRgb = [+_bg[0], +_bg[1], +_bg[2]];
+  }
+  html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null })
+    .then(function(canvas) {
+      var imgData = canvas.toDataURL('image/png');
+      var jsPDF = window.jspdf.jsPDF;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: bleed ? [pdfW + bleed*2, pdfH + bleed*2] : [pdfW, pdfH] });
+      if (bleedRgb) {
+        pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+        pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+      }
+      var imgW = pdfW;
+      var imgH = canvas.height * pdfW / canvas.width;
+      if (imgH > pdfH) { var s = pdfH / imgH; imgH = pdfH; imgW = pdfW * s; }
+      var xOff = bleed + (pdfW - imgW) / 2;
+      var yOff = bleed + (pdfH - imgH) / 2;
+      pdf.addImage(imgData, 'PNG', xOff, yOff, imgW, imgH);
+      var n1 = gv('name1') || 'Hochzeits';
+      var n2 = gv('name2') || 'Bingo';
+      pdf.save(n1 + '_' + n2 + '_Bingo_WeddingStoryAtelier.pdf');
+      ge('loading').classList.remove('active');
+    })
+    .catch(function(e) {
+      alert('PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
+      ge('loading').classList.remove('active');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  buildFields();
+  ge('name1').value = 'Anna';
+  ge('name2').value = 'Peter';
+  ge('wdate').value = '14. Juni 2026';
+  for (var i = 0; i < 24; i++) {
+    ge('bf_' + i).value = defaultFields[i];
+  }
+  update();
+});
+</script>
+</body>
+</html>

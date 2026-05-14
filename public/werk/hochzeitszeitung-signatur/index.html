@@ -1,0 +1,888 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="google" content="notranslate">
+  <title>Classic Wedding Newspaper 2026 — Wedding Story Atelier</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── TOKENS ─────────────────────────────────────────────────── */
+    :root {
+      --rose:      #B07A7A;
+      --rose-dim:  #8A5A5A;
+      --rose-rule: #C49898;
+      --paper:     #FAFAF7;
+      --ink:       #2E2A27;
+      --ink-dim:   #6B6460;
+      --col-rule:  rgba(176,122,122,0.18);
+      --fine-rule: rgba(176,122,122,0.28);
+    }
+
+    body { background:#E8E4DF; color:var(--ink); }
+
+    /* ── FORM PANEL ──────────────────────────────────────────────── */
+    .panel-form textarea { resize:none; line-height:1.5; }
+    .field-row { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+    .field-row input { margin-bottom:0; }
+
+    .ui-group { display:flex; gap:5px; margin-bottom:10px; }
+    .ui-btn.active { background:var(--rose); color:#FFF8F5; border-color:var(--rose); }
+
+    .upload-zone {
+      border:1px dashed #eee; padding:10px; text-align:center;
+      background:#FAFAFA; cursor:pointer; margin-bottom:6px;
+      position:relative; font-size:11px; color:#aaa;
+    }
+    .upload-zone input { position:absolute; inset:0; opacity:0; cursor:pointer; margin:0; }
+
+    .export-btn {
+      width:100%; padding:14px; background:var(--rose); color:#FFF8F5;
+      border:none; cursor:pointer; margin-top:14px; font-weight:700;
+      font-family:'DM Sans',sans-serif; text-transform:uppercase; letter-spacing:2px; font-size:12px;
+    }
+    .export-btn:hover { background:var(--rose-dim); }
+    .divider-form { border:none; border-top:1px solid #f2f0ec; margin:14px 0 0; }
+
+    /* ── PREVIEW ─────────────────────────────────────────────────── */
+    .panel-preview { background:#DDD9D4; }
+
+    /* ══════════════════════════════════════════════════════════════
+       NEWSPAPER
+    ══════════════════════════════════════════════════════════════ */
+    #news-output {
+      width:297mm; height:420mm;
+      padding:12mm 16mm 10mm;
+      display:flex; flex-direction:column;
+      box-shadow:0 30px 80px rgba(0,0,0,0.18);
+      background-image:
+        radial-gradient(ellipse at 15% 8%,  rgba(176,122,122,0.04) 0%, transparent 55%),
+        radial-gradient(ellipse at 85% 92%, rgba(176,122,122,0.03) 0%, transparent 55%);
+      overflow:hidden;
+    }
+
+    /* ── MASTHEAD ───────────────────────────────────────────────── */
+    .masthead {
+      text-align:center;
+      padding-bottom:4mm;
+      margin-bottom:5mm;
+    }
+    .masthead-top-rules {
+      display:flex; flex-direction:column; gap:1.2mm;
+      margin-bottom:2.5mm;
+    }
+    .masthead-top-rules span {
+      display:block; height:0;
+      border-top:0.5pt solid var(--fine-rule);
+    }
+    .masthead-top-rules span:nth-child(2) { border-top-width:1.5pt; border-color:var(--rose-rule); }
+
+    .masthead h1 {
+      font-family:'Playfair Display',serif;
+      font-size:72pt;
+      font-weight:900;
+      text-transform:uppercase;
+      line-height:0.92;
+      color: var(--ink);
+      letter-spacing:-0.5pt;
+    }
+    .masthead-sub {
+      font-family:'DM Sans',sans-serif;
+      font-size:7.5pt;
+      letter-spacing:4px;
+      text-transform:uppercase;
+      padding-top:2mm;
+      margin-top:2.5mm;
+      color:var(--ink-dim);
+      border-top:0.5pt solid var(--fine-rule);
+    }
+    .masthead-bottom-rules {
+      display:flex; flex-direction:column; gap:1.2mm;
+      margin-top:3.5mm;
+    }
+    .masthead-bottom-rules span {
+      display:block; height:0;
+      border-top:0.5pt solid var(--fine-rule);
+    }
+    .masthead-bottom-rules span:first-child { border-top-width:1.5pt; border-color:var(--rose-rule); }
+
+    /* ── OBERES 3-SPALTEN-GRID ──────────────────────────────────── */
+    .news-grid-top {
+      display:grid;
+      grid-template-columns:1fr 1fr 1fr;
+      flex-shrink:0;
+      height:95mm;
+      overflow:hidden;
+    }
+    .col {
+      display:flex; flex-direction:column;
+      padding:0 7mm;
+    }
+    .col:first-child { padding-left:0; }
+    .col:last-child  { padding-right:0; }
+    .col + .col { border-left:0.5pt solid var(--col-rule); }
+
+    .col-label {
+      font-family:'DM Sans',sans-serif;
+      font-size:6.5pt;
+      text-transform:uppercase;
+      letter-spacing:2.5px;
+      color:var(--rose);
+      border-top:0.5pt solid var(--fine-rule);
+      border-bottom:0.5pt solid var(--fine-rule);
+      padding:1mm 0;
+      margin-bottom:3mm;
+    }
+    .col h2 {
+      font-family:'Playfair Display',serif;
+      font-size:18pt;
+      font-style:italic;
+      line-height:1.15;
+      margin-bottom:3mm;
+      color:var(--ink);
+    }
+    .art-text {
+      font-family:'Cormorant Garamond',serif;
+      font-size:10pt;
+      line-height:1.6;
+      text-align:justify;
+      white-space:pre-wrap;
+      color:var(--ink-dim);
+      hyphens:auto;
+    }
+    .quote-box {
+      border-top:0.5pt solid var(--fine-rule);
+      border-bottom:0.5pt solid var(--fine-rule);
+      padding:3mm 3mm;
+      text-align:center;
+      font-family:'Cormorant Garamond',serif;
+      font-style:italic;
+      font-size:11.5pt;
+      margin:4mm 0;
+      color:var(--ink);
+      position:relative;
+    }
+    .quote-box::before {
+      content:'\201C'; font-size:28pt; position:absolute;
+      top:-5px; left:5px; opacity:0.15; color:var(--rose);
+      font-family:'Playfair Display',serif;
+    }
+
+    /* Foto */
+    .photo-area {
+      width:100%; flex:1;
+      background:#E8E0D8;
+      margin-bottom:2mm;
+      overflow:hidden;
+      border:0.5pt solid rgba(176,122,122,0.2);
+      min-height:0;
+    }
+    .photo-area img {
+      width:100%; height:100%;
+      object-fit:cover;
+      filter:sepia(0.08) contrast(1.02) brightness(1.02) saturate(0.92);
+      display:block;
+    }
+    .caption {
+      font-family:'Cormorant Garamond',serif;
+      font-size:7.5pt; font-style:italic;
+      color:var(--ink-dim); text-align:center;
+      margin-bottom:2mm; opacity:0.75; flex-shrink:0;
+    }
+
+    /* Paar-Box */
+    .pair-box {
+      border:0.5pt solid var(--fine-rule);
+      padding:4mm;
+      text-align:center;
+      margin-bottom:4mm;
+      background:rgba(176,122,122,0.04);
+    }
+    .pair-names {
+      font-family:'Playfair Display',serif;
+      font-size:17pt;
+      color:var(--ink);
+      line-height:1.3;
+      font-style:italic;
+    }
+    .pair-names .amp {
+      font-size:11pt; color:var(--rose);
+      display:block; margin:1mm 0;
+    }
+    .pair-detail {
+      font-family:'DM Sans',sans-serif;
+      font-size:7pt; letter-spacing:2px;
+      text-transform:uppercase;
+      color:var(--ink-dim); margin-top:2.5mm; opacity:0.7;
+    }
+
+    /* QR oben-rechts */
+    .qr-frame {
+      width:26mm; height:26mm; margin:3mm auto 0;
+      background:rgba(255,255,255,0.9);
+      padding:1.5mm;
+      border:0.5pt solid rgba(176,122,122,0.25);
+    }
+    .qr-frame img { width:100%; height:100%; object-fit:contain; display:block; filter: sepia(0.3); }
+    .qr-web {
+      font-family:'DM Sans',sans-serif; font-size:7pt;
+      text-align:center; color:var(--ink-dim); margin-top:1.5mm;
+    }
+
+    /* ── PROGRAMM-TRENNZEILE ────────────────────────────────────── */
+    .prog-divider {
+      display:flex; align-items:center; gap:3mm;
+      margin:5mm 0 4mm;
+      flex-shrink:0;
+    }
+    .prog-divider-line { flex:1; border-top:0.5pt solid var(--fine-rule); }
+    .prog-divider-title {
+      font-family:'DM Sans',sans-serif;
+      font-size:7pt; letter-spacing:4px;
+      text-transform:uppercase; color:var(--rose);
+      white-space:nowrap; flex-shrink:0;
+    }
+    .prog-divider-title::before,
+    .prog-divider-title::after {
+      content:' ✦ '; opacity:0.5; font-size:6pt;
+    }
+
+    /* ── PROGRAMM + QR SEKTION ──────────────────────────────────── */
+    .prog-section {
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10mm;
+      flex-shrink:0;
+      padding-bottom:4mm;
+      border-bottom:0.5pt solid var(--fine-rule);
+    }
+    .prog-left {}
+    .prog-section-label {
+      font-family:'DM Sans',sans-serif;
+      font-size:6.5pt;
+      text-transform:uppercase;
+      letter-spacing:2.5px;
+      color:var(--rose);
+      border-top:0.5pt solid var(--fine-rule);
+      border-bottom:0.5pt solid var(--fine-rule);
+      padding:1mm 0;
+      margin-bottom:3mm;
+    }
+    .prog-table {
+      font-family:'Cormorant Garamond',serif;
+      font-size:10pt; color:var(--ink-dim);
+      line-height:1.85; width:100%;
+      border-collapse:collapse;
+    }
+    .prog-table td { padding:0.3mm 0; vertical-align:top; }
+    .prog-table td:first-child {
+      color:var(--rose); padding-right:5mm;
+      font-variant-numeric:tabular-nums;
+      white-space:nowrap; width:14mm;
+      border-bottom:0.3pt solid rgba(176,122,122,0.12);
+    }
+    .prog-table td:last-child {
+      border-bottom:0.3pt solid rgba(176,122,122,0.12);
+    }
+
+    /* QR rechts in Programm-Sektion */
+    .prog-qr-box {
+      border:0.5pt solid var(--fine-rule);
+      padding:4mm;
+      text-align:center;
+      width:52mm;
+      flex-shrink:0;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    .prog-qr-label {
+      font-family:'DM Sans',sans-serif;
+      font-size:6.5pt; letter-spacing:2.5px;
+      text-transform:uppercase; color:var(--rose);
+      border-top:0.5pt solid var(--fine-rule);
+      border-bottom:0.5pt solid var(--fine-rule);
+      padding:1mm 0; margin-bottom:3mm; width:100%;
+    }
+    .prog-qr-frame {
+      width:28mm; height:28mm;
+      background:rgba(255,255,255,0.9);
+      padding:1.5mm;
+      border:0.5pt solid rgba(176,122,122,0.25);
+      margin-bottom:2mm;
+    }
+    .prog-qr-frame img { width:100%; height:100%; object-fit:contain; display:block; filter: sepia(0.3); }
+    .prog-qr-url {
+      font-family:'Cormorant Garamond',serif; font-size:8.5pt; font-style:italic;
+      color:var(--ink-dim); margin-bottom:1mm;
+    }
+    .prog-qr-hashtag {
+      font-family:'DM Sans',sans-serif; font-size:7pt;
+      color:var(--rose); letter-spacing:0.5px;
+    }
+
+    /* ── UNTERE 2-SPALTEN-SEKTION ───────────────────────────────── */
+    .bottom-section {
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:0;
+      flex:1;
+      padding-top:4mm;
+      min-height:0;
+    }
+    .bottom-col {
+      display:flex; flex-direction:column;
+      padding:0 7mm;
+      overflow:hidden;
+    }
+    .bottom-col:nth-child(odd)  { padding-left:0; border-left:none; }
+    .bottom-col:nth-child(even) { padding-right:0; border-left:0.5pt solid var(--col-rule); }
+    .bottom-col:nth-child(3),
+    .bottom-col:nth-child(4) { border-top:0.5pt solid var(--col-rule); padding-top:4mm; margin-top:3mm; }
+
+    .bottom-col-label {
+      font-family:'DM Sans',sans-serif;
+      font-size:6.5pt; text-transform:uppercase;
+      letter-spacing:2.5px; color:var(--rose);
+      border-top:0.5pt solid var(--fine-rule);
+      border-bottom:0.5pt solid var(--fine-rule);
+      padding:1mm 0; margin-bottom:3mm;
+    }
+    .bottom-col h3 {
+      font-family:'Playfair Display',serif;
+      font-size:16pt; font-style:italic;
+      line-height:1.2; margin-bottom:3mm;
+      color:var(--ink);
+    }
+    .bottom-text {
+      font-family:'Cormorant Garamond',serif;
+      font-size:10pt; line-height:1.6;
+      text-align:justify; white-space:pre-wrap;
+      color:var(--ink-dim); hyphens:auto;
+    }
+
+    .bottom-section-4 { grid-template-columns: 1fr 1fr; }
+  </style>
+<script>
+(function(){var _rc={_id:"NW-ClassicWedding",_v:"2.4",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+</script>
+<!-- __WSA_FP__ -->
+</head>
+<body>
+
+<!-- ═══════════════════════════════ FORM ═══════════════════════════════ -->
+<div class="panel-form">
+  <div class="panel-logo">Classic Wedding Newspaper</div>
+  <div class="panel-tagline">Wedding Story Atelier</div>
+
+  <span class="section-label" id="lbl-sec1">1. Hintergrundfarbe</span>
+  <div class="ui-group">
+    <button class="ui-btn active" onclick="setBG('#FAFAF7',this)">Ivory White</button>
+    <button class="ui-btn" onclick="setBG('#F5EFE0',this)">Warm Cream</button>
+    <button class="ui-btn" onclick="setBG('#EDECEA',this)">Soft Grey</button>
+  </div>
+
+  <span class="section-label">Sprache / Language</span>
+  <div class="lang-buttons">
+    <button class="lang-btn active" onclick="switchLang('de', this)">DE &mdash; Deutsch</button>
+    <button class="lang-btn"        onclick="switchLang('en', this)">EN &mdash; English</button>
+  </div>
+
+  <span class="section-label" id="lbl-sec2">2. Zeitungsname &amp; Kopfzeile</span>
+  <input type="text" id="in-title"   value="The Wedding Gazette" oninput="update()" placeholder="Zeitungsname">
+  <div class="field-row">
+    <input type="text" id="in-edition" value="EDITION LUMIÈRE" oninput="update()">
+    <input type="text" id="in-date"    value="14. JUNI 2026" oninput="update()">
+  </div>
+
+  <span class="section-label" id="lbl-sec3">3. Kolumne Links — Story</span>
+  <input type="text" id="in-title-l" value="Wie alles begann" oninput="update()">
+  <textarea id="in-text-l" rows="4" oninput="update()">Hier beginnt eure Liebesgeschichte. Erzählt davon, wie ihr euch gefunden habt und welcher Moment euer Leben für immer veränderte.</textarea>
+  <input type="text" id="in-quote" value="" oninput="update()" placeholder="Zitat (optional)">
+
+  <span class="section-label" id="lbl-sec4">4. Foto — Mitte</span>
+  <div class="upload-zone"><span id="lbl-upload-photo">Foto hochladen</span><input type="file" accept="image/*" onchange="loadMedia(this,'img-main')"></div>
+  <input type="text" id="in-caption" value="Anna &amp; Peter · 14.06.2026" oninput="update()">
+
+  <span class="section-label" id="lbl-sec5">5. Das Paar — Rechts</span>
+  <div class="field-row">
+    <input type="text" id="in-name1"    value="Anna" oninput="update()">
+    <input type="text" id="in-name2"    value="Peter" oninput="update()">
+  </div>
+  <input type="text" id="in-location" value="Schloss Heidelberg" oninput="update()">
+
+  <hr class="divider-form">
+  <span class="section-label" id="lbl-sec6">6. Programm-Überschrift</span>
+  <input type="text" id="in-prog-title" value="Das Hochzeitsprogramm" oninput="update()">
+
+  <span class="section-label" id="lbl-sec7">7. Ablauf des Tages</span>
+  <textarea id="in-prog" rows="6" oninput="update()">14:00	Einlass & Sektempfang
+15:00	Trauung
+16:00	Cocktailstunde & Fotos
+18:00	Abendessen & Reden
+20:00	Erster Tanz
+21:00	Party & Tanz</textarea>
+
+  <span class="section-label" id="lbl-sec8">8. QR-Code &amp; Webseite</span>
+  <div class="upload-zone"><span id="lbl-upload-qr">QR-Code hochladen</span><input type="file" accept="image/*" onchange="loadMedia(this,'img-qr')"></div>
+  <input type="text" id="in-web"     value="www.anna-peter.de"  oninput="update()">
+  <input type="text" id="in-hashtag" value="#AnnaPeter2026"     oninput="update()">
+
+  <hr class="divider-form">
+  <span class="section-label" id="lbl-sec9">9. Spalte Links unten — Titel &amp; Text</span>
+  <input type="text" id="in-title-b1" value="Der Antrag" oninput="update()">
+  <textarea id="in-text-b1" rows="4" oninput="update()">Ein Moment, den wir nie vergessen werden:
+Mit klopfendem Herzen und leuchtenden Augen kam die Frage aller Fragen – und wurde mit einem glücklichen „Ja" beantwortet.
+Der Beginn unseres gemeinsamen Abenteuers.</textarea>
+
+  <span class="section-label" id="lbl-sec10">10. Spalte Rechts unten — Titel &amp; Text</span>
+  <input type="text" id="in-title-b2" value="Ein Wort vom Brautpaar" oninput="update()">
+  <textarea id="in-text-b2" rows="4" oninput="update()">Liebe Gäste,
+wir sind unendlich dankbar, dass ihr diesen besonderen Tag mit uns teilt.
+Eure Nähe, eure Worte und eure Freude machen unsere Hochzeit unvergesslich.
+Schön, dass ihr da seid!</textarea>
+
+  <span class="section-label" id="lbl-sec11">11. Optional: Spalte 3 unten (leer = ausgeblendet)</span>
+  <input type="text" id="in-title-b3" value="" oninput="update()" placeholder="Titel (optional)">
+  <textarea id="in-text-b3" rows="3" oninput="update()" placeholder="Text (optional) …"></textarea>
+
+  <span class="section-label" id="lbl-sec12">12. Optional: Spalte 4 unten (leer = ausgeblendet)</span>
+  <input type="text" id="in-title-b4" value="" oninput="update()" placeholder="Titel (optional)">
+  <textarea id="in-text-b4" rows="3" oninput="update()" placeholder="Text (optional) …"></textarea>
+
+  <div style="margin-bottom:8px">
+    <label id="lbl-paperFormat" style="display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:4px">Paper Format</label>
+    <select id="sel-format" style="width:100%;padding:8px 10px;border:1px solid #ddd;border-radius:3px;font-family:inherit;font-size:13px;color:#333;background:#fff">
+      <option value="a3">A3 — 297 × 420 mm</option>
+      <option value="a4">A4 — 210 × 297 mm</option>
+      <option value="tabloid">US Tabloid — 11 × 17"</option>
+      <option value="letter">US Letter — 8.5 × 11"</option>
+    </select>
+  </div>
+  <button class="export-btn" id="btn-export" onclick="downloadPDF()">&#11015; Export Classic PDF</button>
+  <label class="bleed-label"><input type="checkbox" id="chk-bleed"> <span id="lbl-bleed">Beschnittzugabe 3 mm</span></label>
+  <div class="print-hint">
+    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
+    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ PREVIEW ═══════════════════════════════ -->
+<div class="panel-preview">
+  <div id="preview-scaler">
+    <div id="news-output" style="background-color:#FAFAF7;">
+
+      <!-- MASTHEAD -->
+      <div class="masthead">
+        <div class="masthead-top-rules">
+          <span></span><span></span>
+        </div>
+        <h1 id="out-title">The Wedding Gazette</h1>
+        <div class="masthead-sub">
+          <span id="out-edition">EDITION LUMIÈRE</span>
+          &nbsp;·&nbsp;
+          <span id="out-date">14. JUNI 2026</span>
+        </div>
+        <div class="masthead-bottom-rules">
+          <span></span><span></span>
+        </div>
+      </div>
+
+      <!-- OBERES 3-SPALTEN-GRID -->
+      <div class="news-grid-top">
+
+        <!-- LINKS: Story -->
+        <div class="col">
+          <div class="col-label">The Story</div>
+          <h2 id="out-title-l">Wie alles begann</h2>
+          <div class="art-text" id="out-text-l"></div>
+          <div class="quote-box" id="out-quote" style="display:none;"></div>
+        </div>
+
+        <!-- MITTE: Foto -->
+        <div class="col">
+          <div class="col-label">L'Amour</div>
+          <div class="photo-area"><img id="img-main" src="" style="display:none;"></div>
+          <div class="caption" id="out-caption">Anna &amp; Peter · 14.06.2026</div>
+        </div>
+
+        <!-- RECHTS: Paar -->
+        <div class="col">
+          <div class="col-label">Das Paar</div>
+          <div class="pair-box">
+            <div class="pair-names" id="out-names">Anna<span class="amp">&amp;</span>Peter</div>
+            <div class="pair-detail" id="out-location">Schloss Heidelberg</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PROGRAMM-TRENNZEILE -->
+      <div class="prog-divider">
+        <div class="prog-divider-line"></div>
+        <div class="prog-divider-title" id="out-prog-title">Das Hochzeitsprogramm</div>
+        <div class="prog-divider-line"></div>
+      </div>
+
+      <!-- PROGRAMM + QR -->
+      <div class="prog-section" id="prog-section">
+        <div class="prog-left">
+          <div class="prog-section-label" id="out-prog-section-label">Ablauf des Tages</div>
+          <table class="prog-table" id="out-prog-table"></table>
+        </div>
+        <div class="prog-qr-box" id="prog-qr-box">
+          <div class="prog-qr-label" id="prog-qr-label">Scan &amp; Connect</div>
+          <div class="prog-qr-frame" id="prog-qr-frame"><img id="img-qr" src="" style="display:none;"></div>
+          <div class="prog-qr-url"  id="out-web">www.anna-peter.de</div>
+          <div class="prog-qr-hashtag" id="out-hashtag">#AnnaPeter2026</div>
+        </div>
+      </div>
+
+      <!-- UNTERE 2 SPALTEN -->
+      <div class="bottom-section">
+
+        <div class="bottom-col">
+          <div class="bottom-col-label" id="out-label-b1">Der Antrag</div>
+          <h3 id="out-title-b1">Der Antrag</h3>
+          <div class="bottom-text" id="out-text-b1"></div>
+        </div>
+
+        <div class="bottom-col">
+          <div class="bottom-col-label" id="out-label-b2">Ein Wort vom Brautpaar</div>
+          <h3 id="out-title-b2">Ein Wort vom Brautpaar</h3>
+          <div class="bottom-text" id="out-text-b2"></div>
+        </div>
+
+        <div class="bottom-col" id="out-col-b3" style="display:none;">
+          <div class="bottom-col-label" id="out-label-b3"></div>
+          <h3 id="out-title-b3"></h3>
+          <div class="bottom-text" id="out-text-b3"></div>
+        </div>
+
+        <div class="bottom-col" id="out-col-b4" style="display:none;">
+          <div class="bottom-col-label" id="out-label-b4"></div>
+          <h3 id="out-title-b4"></h3>
+          <div class="bottom-text" id="out-text-b4"></div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+var currentBG  = '#FAFAF7';
+var currentLang = 'de';
+
+var defaults = {
+  de: {
+    'in-title':    'The Wedding Gazette',
+    'in-edition':  'EDITION LUMI\u00c8RE',
+    'in-date':     '14. JUNI 2026',
+    'in-title-l':  'Wie alles begann',
+    'in-text-l':   'Hier beginnt eure Liebesgeschichte. Erz\u00e4hlt davon, wie ihr euch gefunden habt und welcher Moment euer Leben f\u00fcr immer ver\u00e4nderte.',
+    'in-caption':  'Anna & Peter \u00b7 14.06.2026',
+    'in-name1':    'Anna',
+    'in-name2':    'Peter',
+    'in-location': 'Schloss Heidelberg',
+    'in-prog-title':'Das Hochzeitsprogramm',
+    'in-prog':     '14:00\tEinlass & Sektempfang\n15:00\tTrauung\n16:00\tCocktailstunde & Fotos\n18:00\tAbendessen & Reden\n20:00\tErster Tanz\n21:00\tParty & Tanz',
+    'in-web':      'www.anna-peter.de',
+    'in-hashtag':  '#AnnaPeter2026',
+    'in-title-b1': 'Der Antrag',
+    'in-text-b1':  'Ein Moment, den wir nie vergessen werden:\nMit klopfendem Herzen und leuchtenden Augen kam die Frage aller Fragen \u2013 und wurde mit einem gl\u00fccklichen \u201eJa\u201c beantwortet.\nDer Beginn unseres gemeinsamen Abenteuers.',
+    'in-title-b2': 'Ein Wort vom Brautpaar',
+    'in-text-b2':  'Liebe G\u00e4ste,\nwir sind unendlich dankbar, dass ihr diesen besonderen Tag mit uns teilt.\nEure N\u00e4he, eure Worte und eure Freude machen unsere Hochzeit unvergesslich.\nSch\u00f6n, dass ihr da seid!'
+  },
+  en: {
+    'in-title':    'The Wedding Gazette',
+    'in-edition':  'EDITION LUMI\u00c8RE',
+    'in-date':     'JUNE 14, 2026',
+    'in-title-l':  'How It All Began',
+    'in-text-l':   'Here begins your love story. Share how you found each other and the moment that changed your lives forever.',
+    'in-caption':  'Emma & James \u00b7 06/14/2026',
+    'in-name1':    'Emma',
+    'in-name2':    'James',
+    'in-location': 'Heidelberg Castle',
+    'in-prog-title':'Wedding Day Programme',
+    'in-prog':     '2:00 PM\tArrival & Welcome Reception\n3:00 PM\tCeremony\n4:00 PM\tCocktail Hour & Photos\n6:00 PM\tDinner & Speeches\n8:00 PM\tFirst Dance\n9:00 PM\tParty & Dancing',
+    'in-web':      'www.emma-james.com',
+    'in-hashtag':  '#EmmaJames2026',
+    'in-title-b1': 'The Proposal',
+    'in-text-b1':  'A moment we will never forget:\nWith a racing heart and shining eyes, the question was asked \u2014 and answered with a joyful \u201cYes\u201d.\nThe start of our greatest adventure.',
+    'in-title-b2': 'A Word from the Couple',
+    'in-text-b2':  'Dear Guests,\nWe are truly grateful that you are sharing this special day with us.\nYour presence, your words and your joy make our wedding unforgettable.\nWe\'re so glad you\'re here!'
+  }
+};
+
+var panelI18n = {
+  'lbl-sec1':         { de: '1. Hintergrundfarbe',                         en: '1. Background Colour' },
+  'lbl-sec2':         { de: '2. Zeitungsname &amp; Kopfzeile',              en: '2. Newspaper Name &amp; Header' },
+  'lbl-sec3':         { de: '3. Kolumne Links \u2014 Story',                en: '3. Left Column \u2014 Story' },
+  'lbl-sec4':         { de: '4. Foto \u2014 Mitte',                         en: '4. Photo \u2014 Centre' },
+  'lbl-sec5':         { de: '5. Das Paar \u2014 Rechts',                    en: '5. The Couple \u2014 Right' },
+  'lbl-sec6':         { de: '6. Programm-\u00dcberschrift',                 en: '6. Programme Heading' },
+  'lbl-sec7':         { de: '7. Ablauf des Tages',                          en: '7. Day Schedule' },
+  'lbl-sec8':         { de: '8. QR-Code &amp; Webseite',                    en: '8. QR Code &amp; Website' },
+  'lbl-sec9':         { de: '9. Spalte Links unten \u2014 Titel &amp; Text', en: '9. Bottom Left \u2014 Title &amp; Text' },
+  'lbl-sec10':        { de: '10. Spalte Rechts unten \u2014 Titel &amp; Text', en: '10. Bottom Right \u2014 Title &amp; Text' },
+  'lbl-sec11':        { de: '11. Optional: Spalte 3 (leer = ausgeblendet)', en: '11. Optional: Column 3 (empty = hidden)' },
+  'lbl-sec12':        { de: '12. Optional: Spalte 4 (leer = ausgeblendet)', en: '12. Optional: Column 4 (empty = hidden)' },
+  'lbl-upload-photo': { de: 'Foto hochladen',                               en: 'Upload Photo' },
+  'lbl-upload-qr':    { de: 'QR-Code hochladen',                            en: 'Upload QR Code' },
+  'lbl-paperFormat':  { de: 'Paper Format',                                 en: 'Paper Format' },
+  'btn-export':       { de: '\u2B07 Export Classic PDF',                    en: '\u2B07 Export Classic PDF' },
+  'lbl-bleed':        { de: 'Beschnittzugabe 3\u202fmm',                    en: 'Bleed 3\u202fmm' }
+};
+
+var panelPlaceholders = {
+  de: { 'in-title': 'Zeitungsname', 'in-quote': 'Zitat (optional)', 'in-title-b3': 'Titel (optional)', 'in-title-b4': 'Titel (optional)' },
+  en: { 'in-title': 'Newspaper Name', 'in-quote': 'Quote (optional)', 'in-title-b3': 'Title (optional)', 'in-title-b4': 'Title (optional)' }
+};
+
+function ge(id) { return document.getElementById(id); }
+
+function updatePanelLabels(isDE) {
+  var lang = isDE ? 'de' : 'en';
+  Object.keys(panelI18n).forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    var val = panelI18n[id][lang];
+    if (val.indexOf('<') !== -1) { el.innerHTML = val; } else { el.textContent = val; }
+  });
+  var ph = panelPlaceholders[lang];
+  Object.keys(ph).forEach(function(id) { var el = ge(id); if (el) el.placeholder = ph[id]; });
+}
+
+function switchLang(lang, btn) {
+  var oldLang = currentLang;
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  var isDE = (lang === 'de');
+  updatePanelLabels(isDE);
+  var fieldIds = Object.keys(defaults.de);
+  fieldIds.forEach(function(id) {
+    var el = ge(id);
+    if (!el) return;
+    var cur = el.tagName === 'TEXTAREA' ? el.value : el.value;
+    var oldDef = defaults[oldLang][id] || '';
+    var newDef = defaults[lang][id]    || '';
+    if (cur === '' || cur === oldDef) {
+      el.value = newDef;
+    }
+  });
+  update();
+}
+
+function setBG(color, btn) {
+  currentBG = color;
+  document.querySelectorAll('.ui-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  document.getElementById('news-output').style.backgroundColor = color;
+}
+
+function cropPhotoToContainer(dataURL, callback) {
+  var area = document.querySelector('.photo-area');
+  var tW = (area && area.offsetWidth  > 20) ? area.offsetWidth  * 2 : 640;
+  var tH = (area && area.offsetHeight > 20) ? area.offsetHeight * 2 : 640;
+  var src = new Image();
+  src.onload = function() {
+    var srcR = src.width / src.height;
+    var tgtR = tW / tH;
+    var sx = 0, sy = 0, sw = src.width, sh = src.height;
+    if (srcR > tgtR) { sw = src.height * tgtR; sx = (src.width  - sw) / 2; }
+    else             { sh = src.width  / tgtR; sy = (src.height - sh) / 2; }
+    var c = document.createElement('canvas');
+    c.width = tW; c.height = tH;
+    c.getContext('2d').drawImage(src, sx, sy, sw, sh, 0, 0, tW, tH);
+    callback(c.toDataURL('image/jpeg', 0.85));
+  };
+  src.src = dataURL;
+}
+
+function loadMedia(input, targetId) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (targetId === 'img-main') {
+      cropPhotoToContainer(e.target.result, function(cropped) {
+        var img = document.getElementById(targetId);
+        img.src = cropped;
+        img.style.display = 'block';
+        update();
+      });
+    } else {
+      var img = document.getElementById(targetId);
+      img.src = e.target.result;
+      img.style.display = 'block';
+      update();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+
+function buildProgTable(text) {
+  var table = document.getElementById('out-prog-table');
+  table.innerHTML = '';
+  text.split('\n').forEach(function(line) {
+    line = line.trim();
+    if (!line) return;
+    var parts = line.split(/\t+/);
+    var tr = document.createElement('tr');
+    var td1 = document.createElement('td');
+    var td2 = document.createElement('td');
+    td1.textContent = parts[0] || '';
+    td2.textContent = (parts[1] || '').trim();
+    tr.appendChild(td1); tr.appendChild(td2);
+    table.appendChild(tr);
+  });
+}
+
+function update() {
+  document.getElementById('news-output').style.backgroundColor = currentBG;
+
+  // Masthead
+  document.getElementById('out-title').textContent   = document.getElementById('in-title').value;
+  document.getElementById('out-edition').textContent = document.getElementById('in-edition').value;
+  document.getElementById('out-date').textContent    = document.getElementById('in-date').value;
+
+  // Story
+  document.getElementById('out-title-l').textContent = document.getElementById('in-title-l').value;
+  document.getElementById('out-text-l').textContent  = document.getElementById('in-text-l').value;
+  document.getElementById('out-caption').textContent = document.getElementById('in-caption').value;
+
+  // Zitat
+  var quote = document.getElementById('in-quote').value;
+  var qBox  = document.getElementById('out-quote');
+  if (quote) { qBox.textContent = quote; qBox.style.display = 'block'; }
+  else        { qBox.style.display = 'none'; }
+
+  // Paar
+  var n1 = document.getElementById('in-name1').value;
+  var n2 = document.getElementById('in-name2').value;
+  document.getElementById('out-names').innerHTML = n1 + '<span class="amp">&amp;</span>' + n2;
+  document.getElementById('out-location').textContent = document.getElementById('in-location').value;
+
+  // Programm
+  document.getElementById('out-prog-title').textContent = document.getElementById('in-prog-title').value;
+  document.getElementById('out-prog-section-label').textContent = currentLang === 'en' ? 'Order of the Day' : 'Ablauf des Tages';
+  buildProgTable(document.getElementById('in-prog').value);
+
+  // QR
+  var web     = document.getElementById('in-web').value.trim();
+  var hashtag = document.getElementById('in-hashtag').value.trim();
+  document.getElementById('out-web').textContent     = web;
+  document.getElementById('out-hashtag').textContent = hashtag;
+
+  var qrImg   = document.getElementById('img-qr');
+  var hasQRImg = qrImg && qrImg.src && qrImg.style.display !== 'none';
+  var showQRBox = hasQRImg || !!web || !!hashtag;
+  document.getElementById('prog-qr-box').style.display   = showQRBox ? 'flex' : 'none';
+  document.getElementById('prog-section').style.gridTemplateColumns = showQRBox ? '1fr auto' : '1fr';
+  document.getElementById('prog-qr-label').style.display = hasQRImg  ? ''      : 'none';
+  document.getElementById('prog-qr-frame').style.display = hasQRImg  ? ''      : 'none';
+
+  // Untere Spalten
+  var t1 = document.getElementById('in-title-b1').value;
+  var t2 = document.getElementById('in-title-b2').value;
+  document.getElementById('out-label-b1').textContent = t1;
+  document.getElementById('out-title-b1').textContent = t1;
+  document.getElementById('out-text-b1').textContent  = document.getElementById('in-text-b1').value;
+  document.getElementById('out-label-b2').textContent = t2;
+  document.getElementById('out-title-b2').textContent = t2;
+  document.getElementById('out-text-b2').textContent  = document.getElementById('in-text-b2').value;
+
+  // Optionale Spalten 3 + 4
+  var t3    = document.getElementById('in-title-b3').value.trim();
+  var text3 = document.getElementById('in-text-b3').value.trim();
+  var t4    = document.getElementById('in-title-b4').value.trim();
+  var text4 = document.getElementById('in-text-b4').value.trim();
+
+  var show3 = !!(t3 || text3);
+  var show4 = !!(t4 || text4);
+
+  var col3 = document.getElementById('out-col-b3');
+  var col4 = document.getElementById('out-col-b4');
+  col3.style.display = show3 ? 'flex' : 'none';
+  col4.style.display = show4 ? 'flex' : 'none';
+
+  if (show3 || show4) {
+    document.getElementById('out-label-b3').textContent = t3;
+    document.getElementById('out-title-b3').textContent = t3;
+    document.getElementById('out-text-b3').textContent  = document.getElementById('in-text-b3').value;
+    document.getElementById('out-label-b4').textContent = t4;
+    document.getElementById('out-title-b4').textContent = t4;
+    document.getElementById('out-text-b4').textContent  = document.getElementById('in-text-b4').value;
+  }
+
+  // Grid: 4 Spalten wenn mindestens eine optionale befüllt, sonst 2
+  var bottomSection = document.querySelector('.bottom-section');
+  if (show3 || show4) {
+    bottomSection.classList.add('bottom-section-4');
+  } else {
+    bottomSection.classList.remove('bottom-section-4');
+  }
+
+  // Scale
+  var scale = Math.min((window.innerWidth - 420) / 1010, 0.57);
+  document.getElementById('preview-scaler').style.transform = 'scale(' + scale + ')';
+}
+
+function downloadPDF() {
+  var el     = document.getElementById('news-output');
+  var scaler = document.getElementById('preview-scaler');
+  var prev   = scaler.style.transform;
+  scaler.style.transform = 'scale(1)';
+
+  var wrap = document.createElement('div');
+  wrap.style.cssText = 'position:fixed;left:-9999px;top:0;z-index:-1;';
+  var clone = el.cloneNode(true);
+  clone.style.backgroundColor = currentBG;
+  ['img-main','img-qr'].forEach(function(id) {
+    var orig = document.getElementById(id);
+    var cl   = clone.querySelector('#'+id);
+    if (orig && cl) { cl.src = orig.src; cl.style.display = orig.style.display; }
+  });
+  wrap.appendChild(clone);
+  document.body.appendChild(wrap);
+
+  setTimeout(function() {
+    html2canvas(clone, {
+      scale:2, useCORS:false, allowTaint:true,
+      backgroundColor:currentBG, logging:false, imageTimeout:0
+    }).then(function(canvas) {
+      document.body.removeChild(wrap);
+      scaler.style.transform = prev;
+      var img = canvas.toDataURL('image/jpeg', 0.88);
+      var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+      var fmt = (document.getElementById('sel-format') || {value:'a3'}).value;
+      var pW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+      var pH = {a3:420,a4:297,tabloid:431.8,letter:279.4}[fmt] || 420;
+      var fmtSpec = bleed ? [pW+bleed*2,pH+bleed*2] : ((fmt==='a3'||fmt==='a4') ? fmt : [pW,pH]);
+      var pdf = new window.jspdf.jsPDF('p','mm', fmtSpec);
+      if (bleed) {
+        var m = currentBG.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+        if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pW+bleed*2, pH+bleed*2, 'F'); }
+      }
+      pdf.addImage(img,'JPEG',bleed,bleed,pW,pH);
+      var name = document.getElementById('in-name1').value || 'Wedding';
+      var suffix = currentLang === 'de' ? 'WSA_ClassicWedding_' : 'WSA_ClassicWeddingNewspaper_';
+      pdf.save(suffix+name+'.pdf');
+    }).catch(function(err) {
+      document.body.removeChild(wrap);
+      scaler.style.transform = prev;
+      console.error(err);
+      alert(currentLang === 'de' ? 'Export fehlgeschlagen. Bitte Chrome verwenden.' : 'Export failed. Please use Chrome.');
+    });
+  }, 350);
+}
+
+window.onload   = update;
+window.onresize = update;
+</script>
+</body>
+</html>
