@@ -1,0 +1,129 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout
+  title="Atelier-Zugang — Wedding Story Atelier"
+  description="Persönlicher Atelier-Zugang für deine gekaufte Vorlage."
+  noindex={true}
+>
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="min-h-screen flex items-center justify-center px-8 md:px-16 py-32">
+    <div class="max-w-md w-full">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6 text-center">
+        Atelier-Zugang
+      </p>
+
+      <h1 class="serif text-4xl md:text-5xl leading-tight mb-6 text-center">
+        Willkommen<br />
+        <em class="text-cognac">zurück.</em>
+      </h1>
+
+      <p id="zugang-intro" class="text-base text-ink-muted leading-relaxed text-center mb-10">
+        Bitte gib das Passwort deiner gekauften Vorlage ein. Du findest es in der Kunden-PDF von Etsy.
+      </p>
+
+      <div id="zugang-error" class="mb-6 p-4 border border-cognac/40 bg-cognac/5 text-sm text-center text-cognac" style="display:none">
+        Das Passwort passt leider nicht. Bitte prüfe es in deiner Kunden-PDF.
+      </div>
+
+      <form method="POST" action="/zugang/unlock" class="space-y-5">
+        <div id="werk-field">
+          <label for="werk-input" class="block text-xs tracking-[0.2em] uppercase text-ink-muted mb-2">
+            Werk
+          </label>
+          <input
+            type="text"
+            id="werk-input"
+            name="werk"
+            required
+            autocomplete="off"
+            placeholder="z.B. dankeskarte"
+            class="w-full px-4 py-3 bg-cream border border-sand focus:border-ink outline-none text-base tracking-wide"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block text-xs tracking-[0.2em] uppercase text-ink-muted mb-2">
+            Passwort
+          </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            required
+            autocomplete="current-password"
+            class="w-full px-4 py-3 bg-cream border border-sand focus:border-ink outline-none text-base tracking-wide"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full mt-8 py-3.5 bg-ink text-cream text-xs tracking-[0.25em] uppercase hover:bg-cognac transition-colors"
+        >
+          Atelier öffnen
+        </button>
+      </form>
+
+      <p class="mt-12 text-sm text-ink-muted text-center leading-relaxed">
+        Passwort verloren?
+        <a href="/kontakt" class="border-b border-ink-muted hover:text-cognac hover:border-cognac transition-colors">Schreib mir eine Mail</a>
+        — ich helfe dir gern.
+      </p>
+    </div>
+  </main>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-wide text-ink-muted">Editorial Hochzeitspapeterie & Tools</p>
+  </footer>
+
+  <script is:inline>
+    (function () {
+      const params = new URLSearchParams(location.search);
+      const werkRaw = params.get('werk') || '';
+      const werk = werkRaw.replace(/[^a-z0-9-]/g, '');
+      const hasError = params.get('error') === '1';
+
+      const labels = {
+        'dankeskarte': 'Dankeskarte · Old Money Linie'
+      };
+
+      const werkInput = document.getElementById('werk-input');
+      const werkField = document.getElementById('werk-field');
+      const intro = document.getElementById('zugang-intro');
+      const errorBox = document.getElementById('zugang-error');
+      const passwordInput = document.getElementById('password');
+
+      if (werk) {
+        // hide the werk field, lock it to the URL value
+        werkInput.value = werk;
+        werkInput.type = 'hidden';
+        werkInput.required = false;
+        werkField.style.display = 'none';
+
+        const label = labels[werk];
+        if (label) {
+          intro.textContent = 'Bitte gib das Passwort für deine ' + label + ' ein. Du findest es in deiner Kunden-PDF.';
+          document.title = 'Atelier-Zugang · ' + label + ' — Wedding Story Atelier';
+        }
+      }
+
+      if (hasError) {
+        errorBox.style.display = 'block';
+      }
+
+      if (passwordInput) passwordInput.focus();
+    })();
+  </script>
+</Layout>

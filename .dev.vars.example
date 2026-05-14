@@ -1,0 +1,13 @@
+# Wedding Story Atelier — Cloudflare Pages Environment Variables
+#
+# Copy this file to .dev.vars for local development with `wrangler pages dev`.
+# In production, set these in Cloudflare Pages Dashboard → Settings → Environment Variables.
+#
+# COOKIE_SECRET: random hex string used to sign auth cookies.
+# Generate with: openssl rand -hex 32
+COOKIE_SECRET=replace-with-random-hex-32-bytes
+#
+# One env var per protected Werk. Naming: PW_<SLUG_UPPER_UNDERSCORE>
+# Slug "dankeskarte" -> PW_DANKESKARTE
+# Slug "wedding-magazine" -> PW_WEDDING_MAGAZINE
+PW_DANKESKARTE=replace-with-the-customer-password
