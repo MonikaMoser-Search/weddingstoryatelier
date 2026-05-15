@@ -176,24 +176,43 @@
     .guest-count.warn { color: #c0392b; font-weight: 500; }
 
     /* ── Druckerei-Modus: Einzelkarte 111×154,5 mm (A6 + 3 mm Bleed).
-       Karte füllt Page komplett, Border-Breite = Border + 3mm Bleed im Border.
-       Ein einziges Element → html2canvas malt es als einen Block, keine Hairlines.
-       Schnitt erfolgt 3mm vom Rand → übrig bleibt der Original-Rand. ── */
+       Highland/Coastal: Padding + background-clip content-box (Theme-Farbe = Bleed-Rahmen,
+       innen die Karten-Innenfarbe). Ein Paint-Pass, keine Miter-Joins.
+       Classic: nur weißer Page-Bleed, Karte zentriert mit Original 1-px-Border. ── */
     .print-page {
       position: relative;
       margin-bottom: 20px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.18);
       background: #fff;
     }
-    .print-page > .tent-card {
+    .print-page > .tent-card.highland,
+    .print-page > .tent-card.coastal {
       width: 100%;
       height: 100%;
+      border: 0 !important;
+      padding: calc(10px + 3mm);
+      background-origin: content-box;
+      background-clip: content-box;
+      background-repeat: no-repeat;
     }
-    /* Border-Breite = Original + 3mm Bleed. Border-Color bleibt unverändert.
-       Nach Schnitt 3mm vom Rand bleibt exakt der Original-Border-Look übrig. */
-    .print-page > .tent-card.highland,
-    .print-page > .tent-card.coastal { border-width: calc(10px + 3mm); }
-    .print-page > .tent-card.classic { border-width: calc(1px + 3mm); }
+    .print-page > .tent-card.highland {
+      background-color: #2B4A1F;
+      background-image: linear-gradient(#FEFCF7, #FEFCF7);
+    }
+    .print-page > .tent-card.coastal {
+      background-color: #1A4A6B;
+      background-image: linear-gradient(#FAFCFE, #FAFCFE);
+    }
+    /* Classic: Karte 105×148,5 mm zentriert, Page-Bg = weiß (= Bleed). Original-Border bleibt. */
+    .print-page.classic-page {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .print-page.classic-page > .tent-card.classic {
+      width: 105mm;
+      height: 148.5mm;
+    }
 
   </style>
   <script>
@@ -555,7 +574,7 @@ function render() {
     var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
     list.forEach(function(name){
       var page  = document.createElement('div');
-      page.className = 'print-page';
+      page.className = 'print-page' + (currentTheme === 'classic' ? ' classic-page' : '');
       page.style.width  = pw + 'mm';
       page.style.height = ph + 'mm';
       page.innerHTML = renderCard(name);
