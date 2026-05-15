@@ -151,23 +151,20 @@
     .guest-count      { font-size: 9px; color: #bbb; text-align: right; margin-top: 3px; }
     .guest-count.warn { color: #c0392b; font-weight: 500; }
 
-    /* ── Druckerei-Modus: Einzelkarte A6 + 3 mm Bleed.
-       Page-Background = Theme-Farbe (Bleed). Karte sitzt zentriert mit 3 mm Margin.
-       Kartenrand 10px in Theme = nahtlos angrenzend an Page-Bleed (gleiche Farbe). ── */
+    /* ── Druckerei-Modus: Einzelkarte 111×154,5 mm (A6 + 3 mm Bleed).
+       Karte füllt Page komplett, Border-Breite = 10px + 3mm (Bleed im Border).
+       Ein einziges Element → html2canvas malt es als einen Block, keine Hairlines.
+       Schnitt erfolgt 3mm vom Rand → übrig bleibt der 10px-Rand wie im Heimdruck. ── */
     .print-page {
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       margin-bottom: 20px;
       box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      background: #fff;
     }
-    .print-page.burgund { background: #8B1A35; }
-    .print-page.cognac  { background: #7B4718; }
-    .print-page.forest  { background: #1F4A32; }
     .print-page > .tent-card {
-      width: 105mm;
-      height: 148.5mm;
+      width: 100%;
+      height: 100%;
+      border-width: calc(10px + 3mm);
     }
 
   </style>
@@ -545,7 +542,7 @@ function render() {
     var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
     list.forEach(function(name){
       var page  = document.createElement('div');
-      page.className = 'print-page ' + currentTheme;
+      page.className = 'print-page';
       page.style.width  = pw + 'mm';
       page.style.height = ph + 'mm';
       page.innerHTML = renderCard(name);
