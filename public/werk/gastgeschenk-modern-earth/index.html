@@ -837,7 +837,7 @@
       var list = guests.length ? guests : previewGuests;
       for (var i = 0; i < list.length; i++) {
         html +=
-          '<div class="print-page theme-' + currentTheme + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+          '<div class="print-page theme-' + currentTheme + ' fmt-' + (currentFormat === 'ltr' ? '4' : currentFormat) + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
             cardHTML(list[i], i) +
           '</div>';
       }
@@ -934,6 +934,7 @@
         var bg = THEME_HEX[currentTheme] || '#ffffff';
 
         var tmp = document.createElement('div');
+        tmp.className = 'fmt-' + (currentFormat === 'ltr' ? '4' : currentFormat);
         tmp.style.cssText =
           'position:fixed;left:-9999px;top:0;width:' + pw0 + 'mm;height:' + ph0 + 'mm;' +
           'display:flex;align-items:center;justify-content:center;background:' + bg + ';';
