@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <title>Tischschild — Old Money Line</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <script src="fonts_base64.js?v=20260429"></script>
   <link rel="stylesheet" href="/atelier/wsa_panel.css">
   <style>
     /* ── Theme Dots ── */
@@ -215,14 +215,18 @@
     <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
     <button type="button" class="btn-export" id="btn-export" onclick="exportPDF()">PDF exportieren</button>
   </div>
-  <label class="bleed-label">
-    <input type="checkbox" id="chk-bleed">
-    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
-  </label>
+
+  <label class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</label>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+  <input type="checkbox" id="chk-bleed" style="display:none">
+
   <div class="print-hint">
     <span id="lbl-print-hint">
       Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien.
-      Für randlose Drucke Beschnitt aktivieren.
+      Druckerei-Modus aktiviert 3 mm Beschnittzugabe.
     </span>
   </div>
 </form>
@@ -278,8 +282,10 @@ const T = {
     sliderTitle:  'Bildausschnitt vertikal',
     btnRm:        'Foto entfernen',
     btnExport:    'PDF exportieren',
-    bleed:        'Beschnittzugabe 3 mm',
-    printHint:    'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.',
+    outputLabel:  'Modus',
+    outBtnHome:   'Heimdruck',
+    outBtnPrint:  'Druckerei',
+    printHint:    'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Druckerei-Modus aktiviert 3 mm Beschnittzugabe.',
     demo:         ['Italien','Frankreich','Portugal','Griechenland','Spanien','Kroatien','Österreich','Schweiz','Irland','Island'],
   },
   en: {
@@ -294,8 +300,10 @@ const T = {
     sliderTitle:  'Vertical crop',
     btnRm:        'Remove photo',
     btnExport:    'Export PDF',
-    bleed:        'Bleed 3 mm',
-    printHint:    'File in sRGB color space, print-ready for all major online printers. Enable bleed for borderless prints.',
+    outputLabel:  'Mode',
+    outBtnHome:   'Home',
+    outBtnPrint:  'Print shop',
+    printHint:    'File in sRGB color space, print-ready for all major online printers. Print shop mode adds 3 mm bleed.',
     demo:         ['Italy','France','Portugal','Greece','Spain','Croatia','Austria','Switzerland','Ireland','Iceland'],
   },
 };
@@ -441,9 +449,23 @@ function setLang(lang, btn) {
   document.getElementById('lbl-sec5').textContent       = t.sec5;
   document.getElementById('inp-prefix').placeholder     = t.prefixPH;
   document.getElementById('btn-export').textContent     = t.btnExport;
-  document.getElementById('lbl-bleed').textContent      = t.bleed;
+  document.getElementById('lbl-output').textContent     = t.outputLabel;
+  document.getElementById('btn-out-home').textContent   = t.outBtnHome;
+  document.getElementById('btn-out-print').textContent  = t.outBtnPrint;
   document.getElementById('lbl-print-hint').textContent = t.printHint;
   buildTableRows();
+}
+
+// ════════════════════════════════════════════════════════
+// OUTPUT MODE (Heimdruck / Druckerei)
+// Bindet an chk-bleed: Druckerei = Bleed AN, Heimdruck = Bleed AUS.
+// Tischschild ist 1 Karte / Seite, vollständig vektoriell — der einzige
+// funktionale Unterschied ist die 3-mm-Bleed-Page-Erweiterung im Export.
+// ════════════════════════════════════════════════════════
+function setOutput(mode, btn) {
+  document.querySelectorAll('#output-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('chk-bleed').checked = (mode === 'print');
 }
 
 // ════════════════════════════════════════════════════════
