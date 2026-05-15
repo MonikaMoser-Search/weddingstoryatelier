@@ -904,12 +904,35 @@ function loadQR(input) {
   if (!file) return;
   var reader = new FileReader();
   reader.onload = function(e) {
-    ge('img-qr').src = e.target.result;
-    ge('img-qr').style.display = 'block';
-    ge('out-qr-frame').style.display = 'block';
-    update();
+    recolorQRThemed(e.target.result, [176,122,122], function(recolored) {
+      ge('img-qr').src = recolored;
+      ge('img-qr').style.display = 'block';
+      ge('out-qr-frame').style.display = 'block';
+      update();
+    });
   };
   reader.readAsDataURL(file);
+}
+
+function recolorQRThemed(srcDataUrl, col, done) {
+  var img = new Image();
+  img.onload = function() {
+    var c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    var ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    var d = ctx.getImageData(0, 0, c.width, c.height);
+    var p = d.data;
+    for (var i = 0; i < p.length; i += 4) {
+      var lum = 0.299*p[i] + 0.587*p[i+1] + 0.114*p[i+2];
+      if (lum < 128) { p[i]=col[0]; p[i+1]=col[1]; p[i+2]=col[2]; p[i+3]=255; }
+      else           { p[i]=255;    p[i+1]=255;    p[i+2]=255;    p[i+3]=255; }
+    }
+    ctx.putImageData(d, 0, 0);
+    done(c.toDataURL('image/png'));
+  };
+  img.onerror = function(){ done(srcDataUrl); };
+  img.src = srcDataUrl;
 }
 
 /* ── UPDATE ────────────────────────────────────────────────────── */

@@ -961,6 +961,33 @@ function limitWords(str, max) {
 }
 
 /* ── QR upload / remove ── */
+var qrDataUrlThemed = null;
+var QR_THEME_COLOR = { burgund: [139,26,53], cognac: [123,71,24], forest: [31,74,50] };
+
+function updateThemedQR(done) {
+  if (!qrDataUrl) { qrDataUrlThemed = null; if (done) done(); return; }
+  var col = QR_THEME_COLOR[currentTheme] || QR_THEME_COLOR.burgund;
+  var img = new Image();
+  img.onload = function() {
+    var c = document.createElement('canvas');
+    c.width = img.naturalWidth; c.height = img.naturalHeight;
+    var ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    var d = ctx.getImageData(0, 0, c.width, c.height);
+    var p = d.data;
+    for (var i = 0; i < p.length; i += 4) {
+      var lum = 0.299*p[i] + 0.587*p[i+1] + 0.114*p[i+2];
+      if (lum < 128) { p[i]=col[0]; p[i+1]=col[1]; p[i+2]=col[2]; p[i+3]=255; }
+      else           { p[i]=255;    p[i+1]=255;    p[i+2]=255;    p[i+3]=255; }
+    }
+    ctx.putImageData(d, 0, 0);
+    qrDataUrlThemed = c.toDataURL('image/png');
+    if (done) done();
+  };
+  img.onerror = function(){ qrDataUrlThemed = null; if (done) done(); };
+  img.src = qrDataUrl;
+}
+
 function loadQR(input) {
   if (!input.files || !input.files[0]) return;
   var reader = new FileReader();
@@ -972,7 +999,7 @@ function loadQR(input) {
     ge('qrPhIcon').style.display = 'none';
     ge('qrPhText').style.display = 'none';
     ge('qrRemove').style.display = 'block';
-    update();
+    updateThemedQR(function(){ update(); });
   };
   reader.readAsDataURL(input.files[0]);
 }
@@ -980,6 +1007,7 @@ function loadQR(input) {
 function removeQR(e) {
   e.stopPropagation();
   qrDataUrl = null;
+  qrDataUrlThemed = null;
   ge('qrThumb').style.display = 'none';
   ge('qrThumb').src = '';
   ge('qrPhIcon').style.display = '';
@@ -995,7 +1023,7 @@ function setTheme(theme, btn) {
   var btns = document.querySelectorAll('.style-btn');
   for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
   btn.classList.add('active');
-  update();
+  updateThemedQR(function(){ update(); });
 }
 
 function setDays(n, btn) {
@@ -1167,7 +1195,7 @@ function update() {
     html += '<div class="opt-block">' +
       '<div class="opt-label">' + lbl.qr + '</div>' +
       '<div class="opt-qr">' +
-        '<img class="opt-qr-img" src="' + qrDataUrl + '" alt="QR-Code">' +
+        '<img class="opt-qr-img" src="' + (qrDataUrlThemed || qrDataUrl) + '" alt="QR-Code">' +
         (qrCaption.trim() ? '<div class="opt-qr-caption" style="' + fss + '">' + esc(qrCaption) + '</div>' : '') +
       '</div>' +
     '</div>';
