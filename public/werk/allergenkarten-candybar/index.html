@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
 <meta charset="UTF-8">
@@ -317,13 +317,6 @@
             <span class="print-opt-sub"  id="subCutLines"></span>
           </div>
         </div>
-        <div class="print-opt-row" id="optBleed" onclick="toggleOpt('bleed')">
-          <div class="print-opt-check"><span class="print-opt-check-mark">✓</span></div>
-          <div class="print-opt-text">
-            <span class="print-opt-label" id="labelBleed"></span>
-            <span class="print-opt-sub"  id="subBleed"></span>
-          </div>
-        </div>
       </div>
       <p class="srgb-hint" id="srgbHint" style="margin-top:8px;"></p>
     </div>
@@ -422,8 +415,6 @@ const UI = {
     labelPrintOpts:  'Druckoptionen',
     labelCutLines:   'Schnittlinien',
     subCutLines:     'Dünne Hilfslinien zum Ausschneiden — ideal für Heimdruck',
-    labelBleed:      'Beschnittzugabe 3 mm',
-    subBleed:        'Empfohlen für Online-Druckereien',
     srgbHint:        'Datei ist im sRGB-Farbraum — wird von allen gängigen Online-Druckereien problemlos verarbeitet.',
   },
   en: {
@@ -460,8 +451,6 @@ const UI = {
     labelPrintOpts:  'Print options',
     labelCutLines:   'Cut guides',
     subCutLines:     'Thin guide lines for cutting — ideal for home printing',
-    labelBleed:      'Bleed 3 mm',
-    subBleed:        'Recommended for online print services',
     srgbHint:        'File is in sRGB colour space — accepted by all major online print services.',
   },
 };
@@ -471,7 +460,6 @@ let lifestyle  = 'neutral';
 let isHalal    = false;
 let cards      = [];
 let showCutLines = false;
-let addBleed     = false;
 let paperFormat  = 'a4';
 
 const nameInput   = document.getElementById('nameInput');
@@ -515,8 +503,6 @@ function applyUI() {
   document.getElementById('labelPrintOpts').textContent  = u.labelPrintOpts;
   document.getElementById('labelCutLines').textContent   = u.labelCutLines;
   document.getElementById('subCutLines').textContent     = u.subCutLines;
-  document.getElementById('labelBleed').textContent      = u.labelBleed;
-  document.getElementById('subBleed').textContent        = u.subBleed;
   document.getElementById('srgbHint').textContent        = u.srgbHint;
 }
 
@@ -540,9 +526,6 @@ function toggleOpt(key) {
   if (key === 'cutLines') {
     showCutLines = !showCutLines;
     document.getElementById('optCutLines').classList.toggle('active', showCutLines);
-  } else {
-    addBleed = !addBleed;
-    document.getElementById('optBleed').classList.toggle('active', addBleed);
   }
 }
 
@@ -752,21 +735,20 @@ async function exportPDF() {
 
     const imgData = canvas.toDataURL('image/jpeg', 0.95);
     const { jsPDF } = window.jspdf;
-    const b = addBleed ? 3 : 0;
     const isLetter = paperFormat === 'letter';
     const pdfW = isLetter ? 279.4 : 297;
     const pdfH = isLetter ? 215.9 : 210;
 
     const pdf = new jsPDF({
       orientation: 'landscape', unit: 'mm',
-      format: b ? [pdfW + b * 2, pdfH + b * 2] : [pdfW, pdfH]
+      format: [pdfW, pdfH]
     });
 
     // Smart-fit: canvas aspect ratio maintained, image fills page width, centered vertically
     const imgW = pdfW;
     const imgH = 794 * pdfW / 1123;
-    const imgX = b;
-    const imgY = b + (pdfH - imgH) / 2;
+    const imgX = 0;
+    const imgY = (pdfH - imgH) / 2;
 
     pdf.addImage(imgData, 'JPEG', imgX, imgY, imgW, imgH);
 
