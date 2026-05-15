@@ -644,9 +644,9 @@ function exportPDF() {
     };
     var rgb = THEME_RGB[currentTheme] || [255, 255, 255];
 
-    /* Off-screen-Wrapper für die Karte in Heimdruck-Optik (kein Bleed-Padding) */
+    /* Off-screen-Wrapper, TRANSPARENT damit der jsPDF-Bleed-Rect unter der Karte durchscheint */
     var tmp = document.createElement('div');
-    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;background:#fff;';
+    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;';
     document.body.appendChild(tmp);
 
     var i = 0;
@@ -659,19 +659,26 @@ function exportPDF() {
       }
       if (i > 0) pdf.addPage([pw, ph]);
       tmp.innerHTML = renderCard(names[i]);
-      /* Karte explizit auf 105×148.5 setzen (kein Print-Mode-Padding) */
       var card = tmp.querySelector('.tent-card');
-      if (card) { card.style.width = '105mm'; card.style.height = '148.5mm'; card.style.padding = '0'; }
+      if (card) {
+        card.style.width = '105mm';
+        card.style.height = '148.5mm';
+        card.style.padding = '0';
+        /* Border-Farbe transparent → 10-px-Border ist im PNG transparent,
+           der jsPDF-Bleed-Rect scheint durch (= Theme-Rahmen aus einer Quelle, keine Naht).
+           Miter-Joins werden unsichtbar, weil 4 transparente Trapeze kein Kontrast haben. */
+        card.style.borderColor = 'transparent';
+      }
       setTimeout(function(){
         html2canvas(tmp, {
-          scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false,
+          scale: 3, useCORS: true, backgroundColor: null, logging: false,
           width: tmp.offsetWidth, height: tmp.offsetHeight
         }).then(function(canvas){
-          /* 1) Bleed-Rechteck in Theme-Farbe als Vektor unter die Karte */
+          /* 1) Bleed + Border-Bereich als ein Vektor-Rechteck in Theme-Farbe */
           pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
           pdf.rect(0, 0, pw, ph, 'F');
-          /* 2) Karte mittig auf den Bleed (3mm Versatz allseitig) */
-          pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG',
+          /* 2) Karte mit transparentem Border auf den Bleed → Border-Area zeigt Theme-Rect */
+          pdf.addImage(canvas.toDataURL('image/png'), 'PNG',
                        PRINT_CARD.bleed, PRINT_CARD.bleed, PRINT_CARD.w, PRINT_CARD.h);
           i++; nextP();
         }).catch(function(e){

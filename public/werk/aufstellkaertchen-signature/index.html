@@ -655,7 +655,7 @@ function exportPDF() {
     var rgb = THEME_RGB[currentTheme] || [255, 255, 255];
 
     var tmp = document.createElement('div');
-    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;background:#fff;';
+    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;';
     document.body.appendChild(tmp);
 
     var pi = 0;
@@ -669,15 +669,24 @@ function exportPDF() {
       if (pi > 0) pdfP.addPage([pw, ph]);
       tmp.innerHTML = renderCard(names[pi]);
       var card = tmp.querySelector('.tent-card');
-      if (card) { card.style.width = '105mm'; card.style.height = '148.5mm'; card.style.padding = '0'; }
+      if (card) {
+        card.style.width = '105mm';
+        card.style.height = '148.5mm';
+        card.style.padding = '0';
+        /* Transparenter Border → Bleed-Rect scheint durch, eine Quelle für den Theme-Rahmen.
+           Classic hat semi-transparenten 1-px-Border → ebenfalls transparent setzen
+           (Border weiß zu rendern macht keinen Sinn, da Bleed weiß ist = unsichtbar).
+           Bei Classic bleibt nach Cut der INNERE 1-px-Linie übrig durch die Karten-Doppelrahmen. */
+        card.style.borderColor = 'transparent';
+      }
       setTimeout(function(){
         html2canvas(tmp, {
-          scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false,
+          scale: 3, useCORS: true, backgroundColor: null, logging: false,
           width: tmp.offsetWidth, height: tmp.offsetHeight
         }).then(function(canvas){
           pdfP.setFillColor(rgb[0], rgb[1], rgb[2]);
           pdfP.rect(0, 0, pw, ph, 'F');
-          pdfP.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG',
+          pdfP.addImage(canvas.toDataURL('image/png'), 'PNG',
                         PRINT_CARD.bleed, PRINT_CARD.bleed, PRINT_CARD.w, PRINT_CARD.h);
           pi++; nextPrint();
         }).catch(function(e){
