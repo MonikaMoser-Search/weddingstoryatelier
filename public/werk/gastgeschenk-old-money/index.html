@@ -504,12 +504,13 @@
   var MAX = 60;
   var shuffledTasks = { de: [], en: [] };
 
-  /* Druckerei-Modus: Karte als 1/Seite + 3 mm Bleed allseitig.
-     Größe je nach gewähltem Format (Karten-Format wird im Druckerei-Modus übernommen). */
+  /* Druckerei-Modus: 1 Karte / Seite + 3 mm Bleed.
+     Größen = Grid-Dimensionen aus Home-Mode → identisches Content-Layout.
+     (Berechnet aus A4/Letter-Grid mit CSS-Padding und Gap.) */
   var PRINT_CARD_SIZES = {
-    '4':   { w: 105,   h: 148   },  /* A6 */
-    '6':   { w:  70,   h: 140   },
-    'ltr': { w: 101.6, h: 152.4 }   /* 4×6" */
+    '4':   { w: 92,    h: 134.5 },   /* A4 fmt-4 (2×2): (210-20-6)/2 × (297-20-8)/2 */
+    '6':   { w: 62,    h: 136.5 },   /* A4 fmt-6 (3×2): (210-16-8)/3 × (297-16-8)/2 */
+    'ltr': { w: 94.95, h: 125.7 }    /* Letter fmt-4 (2×2): (215.9-20-6)/2 × (279.4-20-8)/2 */
   };
   var PRINT_BLEED    = 3;
   var PRINT_BORDER_PX = 8;

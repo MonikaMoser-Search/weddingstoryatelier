@@ -505,11 +505,12 @@
   var currentPage   = 0;
   var MAX = 60;
 
-  /* Druckerei-Modus: 1 Karte / Seite im gewählten Format + 3 mm Bleed */
+  /* Druckerei-Modus: 1 Karte / Seite + 3 mm Bleed.
+     Größen = Grid-Dimensionen aus Home-Mode → identisches Content-Layout. */
   var PRINT_CARD_SIZES = {
-    '4':   { w: 105,   h: 148   },
-    '6':   { w:  70,   h: 140   },
-    'ltr': { w: 101.6, h: 152.4 }
+    '4':   { w: 92,    h: 134.5 },
+    '6':   { w: 62,    h: 136.5 },
+    'ltr': { w: 94.95, h: 125.7 }
   };
   var PRINT_BLEED     = 3;
   var PRINT_BORDER_PX = 8;
