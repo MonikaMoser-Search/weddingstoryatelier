@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -151,6 +151,27 @@
     .guest-count      { font-size: 9px; color: #bbb; text-align: right; margin-top: 3px; }
     .guest-count.warn { color: #c0392b; font-weight: 500; }
 
+    /* ── Druckerei-Modus: Einzelkarte A6 + 3 mm Bleed ── */
+    .print-page {
+      background: #fff;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.18);
+      margin-bottom: 20px;
+    }
+    .bleed-fill {
+      position: absolute; inset: 0;
+    }
+    .bleed-fill.burgund { background: #8B1A35; }
+    .bleed-fill.cognac  { background: #7B4718; }
+    .bleed-fill.forest  { background: #1F4A32; }
+    .print-card-wrap {
+      position: absolute;
+      inset: 3mm;
+      display: flex;
+    }
+    .print-card-wrap > .tent-card { flex: 1; }
+
   </style>
   <script>
   (function(){var _rc={_id:"AK-OldMoney",_v:"1.2",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
@@ -219,15 +240,24 @@
 
   <!-- Druckoptionen -->
   <label class="section-label" id="lbl-print">5 · Druckoptionen</label>
-  <label class="section-label" id="lbl-format" style="font-size:10px;margin-bottom:4px">Format</label>
-  <div class="btn-group" id="format-btns" style="margin-bottom:8px">
-    <button class="ui-btn active" onclick="setFormat('a4',this)">DIN A4</button>
-    <button class="ui-btn"        onclick="setFormat('letter',this)">US Letter</button>
+
+  <label class="section-label" id="lbl-output" style="font-size:10px;margin-bottom:4px">Modus</label>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
   </div>
-  <label class="bleed-label">
-    <input type="checkbox" id="chk-bleed">
-    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
-  </label>
+
+  <div id="row-format">
+    <label class="section-label" id="lbl-format" style="font-size:10px;margin-bottom:4px">Format</label>
+    <div class="btn-group" id="format-btns" style="margin-bottom:8px">
+      <button class="ui-btn active" onclick="setFormat('a4',this)">DIN A4</button>
+      <button class="ui-btn"        onclick="setFormat('letter',this)">US Letter</button>
+    </div>
+    <label class="bleed-label">
+      <input type="checkbox" id="chk-bleed">
+      <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+    </label>
+  </div>
 
   <div class="action-row">
     <button class="btn-demo"   onclick="loadDemo()">Demo</button>
@@ -235,8 +265,8 @@
   </div>
 
   <div class="print-hint">
-    <span class="print-hint-de" id="hint-print-de">Druckdatei im sRGB-Farbraum — von allen gängigen Online-Druckereien verarbeitet. Für randlose Drucke Beschnittzugabe (3 mm) aktivieren. Drucken auf 200–300 g/m² Karton · In der Mitte falzen · Aufstellen.</span>
-    <span class="print-hint-en" id="hint-print-en">File is print-ready in sRGB — accepted by all major online print services. Enable 3 mm bleed for edge-to-edge results. Print on 200–300 gsm cardstock · Score and fold at centre · Display.</span>
+    <span class="print-hint-de" id="hint-print-de">Heimdruck: 4 Karten pro A4 · Schneidmarken · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.</span>
+    <span class="print-hint-en" id="hint-print-en">Home print: 4 cards per A4 · cut marks · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.</span>
   </div>
 
 </div>
@@ -261,6 +291,7 @@
 var currentTheme  = 'burgund';
 var currentLang   = 'de';
 var currentFormat = 'a4';
+var currentOutput = 'home';
 var MAX_GUESTS    = 60;
 var PER_PAGE      = 4;
 
@@ -268,6 +299,9 @@ var FORMATS = {
   a4:     { w: 210,   h: 297,   name: 'A4' },
   letter: { w: 215.9, h: 279.4, name: 'USLetter' }
 };
+
+/* Druckerei-Modus: A6 flach, gefaltet zur Tent-Card */
+var PRINT_CARD = { w: 105, h: 148.5, bleed: 3 };
 
 /* ══ Übersetzungen ═══════════════════════════════════════════════════════ */
 var T = {
@@ -288,7 +322,12 @@ var T = {
     backPlaceholder: 'Text, Datum, Motto …',
     hintBackText: 'Optional — erscheint klein auf der Rückseite',
     print:        '5 · Druckoptionen',
+    outputLabel:  'Modus',
+    outBtnHome:   'Heimdruck',
+    outBtnPrint:  'Druckerei',
     bleed:        'Beschnittzugabe 3 mm',
+    hintHome:     'Heimdruck: 4 Karten pro A4 · Schneidmarken · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.',
+    hintPrint:    'Druckerei: 1 Karte pro Seite · A6 (105 × 148,5 mm) + 3 mm Beschnitt randlos · sRGB. Datei direkt an Online-Druckerei.',
     spinner:      'PDF wird erstellt …',
     guestCount:   function(n){ return n + ' / 60 Gäste'; },
     guestWarn:    'Maximum erreicht (60)',
@@ -315,7 +354,12 @@ var T = {
     backPlaceholder: 'Text, date, tagline …',
     hintBackText: 'Optional — appears in small print on the back',
     print:        '5 · Print Options',
+    outputLabel:  'Mode',
+    outBtnHome:   'Home',
+    outBtnPrint:  'Print shop',
     bleed:        '3 mm Bleed',
+    hintHome:     'Home: 4 cards per A4 · cut marks · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.',
+    hintPrint:    'Print shop: 1 card per page · A6 (105 × 148.5 mm) + 3 mm bleed · sRGB. Send directly to your online printer.',
     spinner:      'Creating PDF …',
     guestCount:   function(n){ return n + ' / 60 guests'; },
     guestWarn:    'Limit reached (60)',
@@ -358,8 +402,16 @@ function applyLang() {
   set('hint-backname', l.hintBackName);
   set('hint-backtext', l.hintBackText);
   set('lbl-print',     l.print);
+  set('lbl-output',    l.outputLabel);
+  set('btn-out-home',  l.outBtnHome);
+  set('btn-out-print', l.outBtnPrint);
   set('lbl-bleed',     l.bleed);
   set('spinner-text',  l.spinner);
+
+  var hd = document.getElementById('hint-print-de');
+  var he = document.getElementById('hint-print-en');
+  if (hd) hd.textContent = currentOutput === 'print' ? T.de.hintPrint : T.de.hintHome;
+  if (he) he.textContent = currentOutput === 'print' ? T.en.hintPrint : T.en.hintHome;
 
   ph('inp-motto',    l.mottoPlaceholder);
   ph('inp-backtext', l.backPlaceholder);
@@ -381,6 +433,19 @@ function setFormat(fmt, btn) {
   document.querySelectorAll('#format-btns .ui-btn')
     .forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
+  render();
+}
+
+/* ══ Output-Modus (Heimdruck / Druckerei) ════════════════════════════════ */
+function setOutput(mode, btn) {
+  currentOutput = mode;
+  document.querySelectorAll('#output-btns .ui-btn')
+    .forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  /* Format-Block nur im Heimdruck-Modus zeigen */
+  var rowFmt = document.getElementById('row-format');
+  if (rowFmt) rowFmt.style.display = mode === 'home' ? '' : 'none';
+  applyLang();
   render();
 }
 
@@ -476,21 +541,37 @@ function render() {
     ? names
     : ['Vorname Nachname','Vorname Nachname','Vorname Nachname','Vorname Nachname'];
 
-  var fmt = FORMATS[currentFormat];
-  for (var p = 0; p < list.length; p += PER_PAGE) {
-    var batch = list.slice(p, p + PER_PAGE);
-    var page  = document.createElement('div');
-    page.className = 'a4-page';
-    page.style.width  = fmt.w + 'mm';
-    page.style.height = fmt.h + 'mm';
-    page.innerHTML = pageMarks();
+  if (currentOutput === 'print') {
+    /* 1 Karte pro Seite · A6 + 3 mm Bleed, Farbe randlos */
+    var pw = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+    var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
+    list.forEach(function(name){
+      var page  = document.createElement('div');
+      page.className = 'print-page';
+      page.style.width  = pw + 'mm';
+      page.style.height = ph + 'mm';
+      page.innerHTML =
+        '<div class="bleed-fill ' + currentTheme + '"></div>' +
+        '<div class="print-card-wrap">' + renderCard(name) + '</div>';
+      container.appendChild(page);
+    });
+  } else {
+    var fmt = FORMATS[currentFormat];
+    for (var p = 0; p < list.length; p += PER_PAGE) {
+      var batch = list.slice(p, p + PER_PAGE);
+      var page  = document.createElement('div');
+      page.className = 'a4-page';
+      page.style.width  = fmt.w + 'mm';
+      page.style.height = fmt.h + 'mm';
+      page.innerHTML = pageMarks();
 
-    var grid = document.createElement('div');
-    grid.className = 'card-grid';
-    batch.forEach(function(name){ grid.innerHTML += renderCard(name); });
+      var grid = document.createElement('div');
+      grid.className = 'card-grid';
+      batch.forEach(function(name){ grid.innerHTML += renderCard(name); });
 
-    page.appendChild(grid);
-    container.appendChild(page);
+      page.appendChild(grid);
+      container.appendChild(page);
+    }
   }
 
   scalePreview();
@@ -502,18 +583,28 @@ function scalePreview() {
   var wrapper = document.getElementById('preview-wrapper');
   var preview = document.querySelector('.panel-preview');
 
-  var fmt     = FORMATS[currentFormat];
+  var pageWmm, pageHmm, pageEls;
+  if (currentOutput === 'print') {
+    pageWmm = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+    pageHmm = PRINT_CARD.h + PRINT_CARD.bleed * 2;
+    pageEls = document.querySelectorAll('.print-page');
+  } else {
+    var fmt = FORMATS[currentFormat];
+    pageWmm = fmt.w;
+    pageHmm = fmt.h;
+    pageEls = document.querySelectorAll('.a4-page');
+  }
+
   var availW  = preview.clientWidth - 72;
-  var pageWpx = fmt.w * (96 / 25.4);
+  var pageWpx = pageWmm * (96 / 25.4);
   var scale   = Math.min(availW / pageWpx, 1.0);
 
   scaler.style.transform      = 'scale(' + scale + ')';
   scaler.style.transformOrigin = 'top left';
 
-  var pages   = document.querySelectorAll('.a4-page').length;
-  var pageHpx = fmt.h * (96 / 25.4) + 20;
+  var pageHpx = pageHmm * (96 / 25.4) + 20;
   wrapper.style.width  = (pageWpx * scale) + 'px';
-  wrapper.style.height = (pages * pageHpx * scale) + 'px';
+  wrapper.style.height = (pageEls.length * pageHpx * scale) + 'px';
 }
 
 /* ══ Demo ════════════════════════════════════════════════════════════════ */
@@ -527,20 +618,51 @@ function loadDemo() {
 
 /* ══ PDF-Export ══════════════════════════════════════════════════════════ */
 function exportPDF() {
-  var pages = document.querySelectorAll('.a4-page');
-  if (!pages.length) return;
-
-  var bleed   = document.getElementById('chk-bleed').checked ? 3 : 0;
   var spinner = document.getElementById('pdf-spinner');
   spinner.style.display = 'flex';
 
-  var fmt  = FORMATS[currentFormat];
-  var fmtW = fmt.w + bleed * 2;
-  var fmtH = fmt.h + bleed * 2;
-  var pdf  = new window.jspdf.jsPDF({
-    orientation: 'portrait', unit: 'mm',
-    format: [fmtW, fmtH]
-  });
+  if (currentOutput === 'print') {
+    /* ── Druckerei: 1 Karte pro Seite, A6 + 3 mm Bleed, randlos ── */
+    var pages = document.querySelectorAll('.print-page');
+    if (!pages.length) { spinner.style.display = 'none'; return; }
+
+    var pw = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+    var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
+    var pdf = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm', format:[pw, ph] });
+
+    var i = 0;
+    function nextP() {
+      if (i >= pages.length) {
+        pdf.save('TentCards_OldMoney_Druckerei_A6_Bleed3mm.pdf');
+        spinner.style.display = 'none';
+        return;
+      }
+      if (i > 0) pdf.addPage([pw, ph]);
+      html2canvas(pages[i], {
+        scale: 3, useCORS: true, backgroundColor: '#ffffff',
+        width: pages[i].offsetWidth, height: pages[i].offsetHeight
+      }).then(function(canvas){
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG', 0, 0, pw, ph);
+        i++; nextP();
+      }).catch(function(e){
+        console.error(e);
+        alert('Export error — please try again.');
+        spinner.style.display = 'none';
+      });
+    }
+    nextP();
+    return;
+  }
+
+  /* ── Heimdruck: 4 Karten / A4 ── */
+  var pages = document.querySelectorAll('.a4-page');
+  if (!pages.length) { spinner.style.display = 'none'; return; }
+
+  var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+  var fmt   = FORMATS[currentFormat];
+  var fmtW  = fmt.w + bleed * 2;
+  var fmtH  = fmt.h + bleed * 2;
+  var pdf   = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm', format:[fmtW, fmtH] });
 
   var i = 0;
   function nextPage() {
