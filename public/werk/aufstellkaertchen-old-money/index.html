@@ -627,33 +627,60 @@ function exportPDF() {
   spinner.style.display = 'flex';
 
   if (currentOutput === 'print') {
-    /* ── Druckerei: 1 Karte pro Seite, A6 + 3 mm Bleed, randlos ── */
-    var pages = document.querySelectorAll('.print-page');
-    if (!pages.length) { spinner.style.display = 'none'; return; }
-
+    /* ── Druckerei: 1 Karte pro Seite, A6 + 3 mm Bleed, randlos.
+       Bleed wird als jsPDF-Vektor-Rect gezeichnet (deterministisch, keine Rastergrafiken-
+       Artefakte). Karte wird in Heimdruck-Optik (mit ihrem 10-px-Theme-Border) gerendert
+       und auf den Bleed-Rect platziert. ── */
+    var names = getNames();
+    if (!names.length) names = ['Vorname Nachname'];
     var pw = PRINT_CARD.w + PRINT_CARD.bleed * 2;
     var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
     var pdf = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm', format:[pw, ph] });
 
+    var THEME_RGB = {
+      burgund: [139, 26, 53],
+      cognac:  [123, 71, 24],
+      forest:  [31, 74, 50]
+    };
+    var rgb = THEME_RGB[currentTheme] || [255, 255, 255];
+
+    /* Off-screen-Wrapper für die Karte in Heimdruck-Optik (kein Bleed-Padding) */
+    var tmp = document.createElement('div');
+    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;background:#fff;';
+    document.body.appendChild(tmp);
+
     var i = 0;
     function nextP() {
-      if (i >= pages.length) {
+      if (i >= names.length) {
+        document.body.removeChild(tmp);
         pdf.save('TentCards_OldMoney_Druckerei_A6_Bleed3mm.pdf');
         spinner.style.display = 'none';
         return;
       }
       if (i > 0) pdf.addPage([pw, ph]);
-      html2canvas(pages[i], {
-        scale: 3, useCORS: true, backgroundColor: '#ffffff',
-        width: pages[i].offsetWidth, height: pages[i].offsetHeight
-      }).then(function(canvas){
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG', 0, 0, pw, ph);
-        i++; nextP();
-      }).catch(function(e){
-        console.error(e);
-        alert('Export error — please try again.');
-        spinner.style.display = 'none';
-      });
+      tmp.innerHTML = renderCard(names[i]);
+      /* Karte explizit auf 105×148.5 setzen (kein Print-Mode-Padding) */
+      var card = tmp.querySelector('.tent-card');
+      if (card) { card.style.width = '105mm'; card.style.height = '148.5mm'; card.style.padding = '0'; }
+      setTimeout(function(){
+        html2canvas(tmp, {
+          scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false,
+          width: tmp.offsetWidth, height: tmp.offsetHeight
+        }).then(function(canvas){
+          /* 1) Bleed-Rechteck in Theme-Farbe als Vektor unter die Karte */
+          pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
+          pdf.rect(0, 0, pw, ph, 'F');
+          /* 2) Karte mittig auf den Bleed (3mm Versatz allseitig) */
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.96), 'JPEG',
+                       PRINT_CARD.bleed, PRINT_CARD.bleed, PRINT_CARD.w, PRINT_CARD.h);
+          i++; nextP();
+        }).catch(function(e){
+          console.error(e);
+          document.body.removeChild(tmp);
+          alert('Export error — please try again.');
+          spinner.style.display = 'none';
+        });
+      }, 100);
     }
     nextP();
     return;
