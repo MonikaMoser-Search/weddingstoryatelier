@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <title>Menükarte — Signature Line</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <script src="fonts_base64.js?v=20260429"></script>
   <link rel="stylesheet" href="/atelier/wsa_panel.css">
   <style>
     /* ══ Generator-spezifische Ergänzungen ══ */
@@ -955,17 +955,17 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
     pdf.setFont(r[0], r[1]);
   }
 
-  // Background
-  sf(bg); pdf.rect(bx, by, baseW, baseH, 'F');
+  // Background (inkl. Bleed)
+  sf(bg); pdf.rect(0, 0, docW, docH, 'F');
 
-  // Outer border (highland / coastal only)
+  // Outer border (highland / coastal only) — läuft in den Beschnitt hinein
   const BW = hasBorder ? 3.703 * fS : 0;
   if (hasBorder) {
     sf(tc);
-    pdf.rect(bx,           by,           baseW, BW,    'F');
-    pdf.rect(bx,           by+baseH-BW,  baseW, BW,    'F');
-    pdf.rect(bx,           by,           BW,    baseH, 'F');
-    pdf.rect(bx+baseW-BW,  by,           BW,    baseH, 'F');
+    pdf.rect(0,            0,            docW,  by+BW, 'F');
+    pdf.rect(0,            by+baseH-BW,  docW,  BW+by, 'F');
+    pdf.rect(0,            0,            bx+BW, docH,  'F');
+    pdf.rect(bx+baseW-BW,  0,            BW+bx, docH,  'F');
   }
 
   // Inner frame

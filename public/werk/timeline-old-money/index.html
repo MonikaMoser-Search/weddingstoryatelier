@@ -44,14 +44,6 @@
       display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;
       gap: 8mm 4mm; padding: 8mm;
     }
-
-    /* Single-card container for Druckerei mode (1 card per PDF page, includes 3mm bleed) */
-    .print-card-single { box-sizing: border-box; position: relative; padding: 3mm; }
-    .print-card-single.fmt-4  { width: 111mm;   height: 154mm; }
-    .print-card-single.fmt-6  { width:  76mm;   height: 146mm; }
-    .print-card-single.fmt-ltr { width: 107.6mm; height: 158.4mm; }
-    .print-card-single > .day-card,
-    .print-card-single > .back-card { width: 100%; height: 100%; }
     .letter-portrait {
       width: 215.9mm; height: 279.4mm;
       background: #fff; box-sizing: border-box; position: relative;
@@ -64,7 +56,7 @@
     /* ══ DAY CARD ════════════════════════════════════════ */
     .day-card {
       position: relative; overflow: visible;
-      box-sizing: border-box;
+      display: flex; flex-direction: column; box-sizing: border-box;
     }
     .day-card.empty { visibility: hidden; }
 
@@ -163,12 +155,12 @@
     .fmt-ltr .dcard-timeline { padding: 0.5mm 5mm 0; }
 
     .dcard-spacer { flex: 1; min-height: 0; }
-    .dcard-spacer-top { max-height: 5mm; }
+    .dcard-spacer-top { max-height: 10mm; }
 
     /* Letter-Portrait overrides (Letter card is ~126mm tall vs A6 ~135mm) */
     .letter-portrait .dcard-mono  { height: 24mm !important; }
     .letter-portrait .tl-entry    { min-height: 9mm !important; padding-bottom: 0.5mm !important; }
-    .letter-portrait .dcard-closing { bottom: 9mm !important; }
+    .letter-portrait .dcard-closing { padding-bottom: 8mm !important; }
 
     /* Vertical gold center line — height = content only */
     .tl-line {
@@ -243,18 +235,17 @@
     .fmt-6  .tl-icon svg { width: 3.8mm; height: 3.8mm; }
     .fmt-ltr .tl-icon svg { width: 4mm; height: 4mm; }
 
-    /* Closing — absolute sibling of dcard-inner for html2canvas determinism */
+    /* Closing */
     .dcard-closing {
-      position: absolute; z-index: 3;
-      bottom: 9mm; left: 5mm; right: 5mm;
+      position: relative; z-index: 2;
       font-family: 'Cormorant Garamond', serif;
       font-style: italic; font-weight: 300; color: var(--text-dim);
-      text-align: center;
+      text-align: center; flex-shrink: 0;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .fmt-4  .dcard-closing { font-size: 2.7mm; }
-    .fmt-6  .dcard-closing { font-size: 2.6mm; left: 3.5mm; right: 3.5mm; }
-    .fmt-ltr .dcard-closing { font-size: 2.7mm; }
+    .fmt-4  .dcard-closing { font-size: 2.7mm; padding: 1.5mm 5mm 8mm; }
+    .fmt-6  .dcard-closing { font-size: 2.6mm; padding: 1mm 3.5mm 8mm; }
+    .fmt-ltr .dcard-closing { font-size: 2.7mm; padding: 1.5mm 5mm 8mm; }
     .dcard-closing.hidden { display: none; }
 
     /* ══ BACK CARD ═══════════════════════════════════════ */
@@ -518,7 +509,7 @@
     <button class="tl-add-btn" id="btn-add" onclick="addEntry()">+ Eintrag</button>
     <span class="tl-count" id="tl-count"></span>
   </div>
-  <p class="tl-hint" id="hint-greeting-cap" style="display:none;color:#c07040;">A6 + Begrüßung: max. 5 Einträge sichtbar.</p>
+  <p class="tl-hint" id="hint-greeting-cap" style="display:none;color:#c07040;">A6 + Begrüßung: max. 6 Einträge sichtbar.</p>
 
   <hr class="divider">
 
@@ -547,19 +538,17 @@
     <span class="copies-label" id="hint-copies"></span>
   </div>
 
-  <span class="section-label" id="lbl-output">Ausgabe</span>
-  <div class="btn-group">
-    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
-    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
-  </div>
-
-  <div class="action-row" style="margin-top:8px">
+  <div class="action-row">
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
   </div>
+  <label class="bleed-label">
+    <input type="checkbox" id="chk-bleed">
+    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+  </label>
   <div class="print-hint">
-    <span class="print-hint-de" id="phint-de">Mehrere Karten pro Bogen · sRGB · scale:3 (~288 DPI). Selbst schneiden.</span>
-    <span class="print-hint-en" id="phint-en">Multiple cards per sheet · sRGB · scale:3 (~288 DPI). Cut to size yourself.</span>
+    <span class="print-hint-de">Druckdatei im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke Beschnittzugabe empfohlen.</span>
+    <span class="print-hint-en">Print-ready in sRGB colour space — accepted by all major online print services. Enable 3 mm bleed for edge-to-edge results.</span>
   </div>
 
 </div>
@@ -581,7 +570,6 @@
 <!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
 <div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
   <div class="a4-portrait fmt-4" id="print-grid"></div>
-  <div class="print-card-single fmt-4" id="print-card-single"></div>
 </div>
 
 <!-- ════ SPINNER ══════════════════════════════════════ -->
@@ -649,9 +637,8 @@
   var currentTheme  = 'burgund';
   var currentFormat = '4';
   var currentMono   = 'diamond';
-  var currentOutput = 'home';
   var currentPage   = 0;
-  var MAX_ENTRIES   = 6;
+  var MAX_ENTRIES   = 7;
 
   var entries = [];
 
@@ -794,7 +781,7 @@
     var rows = ge('tl-rows');
     rows.innerHTML = '';
     var greetingCap = currentFormat === '4' && ge('chk-greeting').checked;
-    var maxVisible = greetingCap ? 5 : MAX_ENTRIES;
+    var maxVisible = greetingCap ? 6 : MAX_ENTRIES;
     entries.forEach(function(e, i) {
       var row = document.createElement('div');
       row.className = 'tl-row';
@@ -871,7 +858,6 @@
     document.documentElement.lang = currentLang;
     updateCopiesHint();
     updateGreetingCount();
-    updatePrintHint();
     renderEntryRows();
   }
 
@@ -894,8 +880,6 @@
     var cls  = fmt === 'ltr' ? 'letter-portrait fmt-4' : 'a4-portrait fmt-' + fmt;
     ge('preview-grid').className = cls;
     ge('print-grid').className   = cls;
-    ge('print-card-single').className = 'print-card-single fmt-' + fmt;
-    updatePrintHint();
     ge('inp-greeting').maxLength = fmt === '6' ? 40 : 100;
     updateGreetingVisibility();
     updateCopiesHint();
@@ -909,34 +893,6 @@
     document.querySelectorAll('#mono-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
     render();
-  }
-
-  // ── OUTPUT MODE (Heimdruck / Druckerei) ───────────
-  function setOutput(mode, btn) {
-    currentOutput = mode;
-    document.querySelectorAll('#btn-out-home,#btn-out-print').forEach(function(b){ b.classList.remove('active'); });
-    btn.classList.add('active');
-    updatePrintHint();
-  }
-
-  function cardDims() {
-    // Returns {w, h, label} for current format
-    if (currentFormat === '6')   return { w: 70,    h: 140,   label: '70x140' };
-    if (currentFormat === 'ltr') return { w: 101.6, h: 152.4, label: '4x6in'  };
-    return { w: 105, h: 148, label: 'A6' };
-  }
-
-  function updatePrintHint() {
-    var isPrint = currentOutput === 'print';
-    var d = cardDims();
-    var dimLabel = currentFormat === 'ltr' ? '4 × 6 Zoll' : (d.w + ' × ' + d.h + ' mm');
-    ge('phint-de').textContent = isPrint
-      ? '1 Karte pro Seite · ' + dimLabel + ' + 3 mm Beschnitt · für Online-Druckereien.'
-      : (currentFormat === '6' ? '6 Karten pro Bogen · sRGB · scale:3 (~288 DPI). Selbst schneiden.' : '4 Karten pro Bogen · sRGB · scale:3 (~288 DPI). Selbst schneiden.');
-    var dimLabelEn = currentFormat === 'ltr' ? '4 × 6 inch' : (d.w + ' × ' + d.h + ' mm');
-    ge('phint-en').textContent = isPrint
-      ? '1 card per page · ' + dimLabelEn + ' + 3 mm bleed · for online print services.'
-      : (currentFormat === '6' ? '6 cards per sheet · sRGB · scale:3 (~288 DPI). Cut to size yourself.' : '4 cards per sheet · sRGB · scale:3 (~288 DPI). Cut to size yourself.');
   }
 
   // ── GREETING TOGGLE ───────────────────────────────
@@ -1019,7 +975,7 @@
     var greeting  = ge('chk-greeting').checked ? gv('inp-greeting').trim() : '';
 
     var greetingOn = ge('chk-greeting').checked && greeting.length > 0;
-    var maxEntries = (currentFormat === '4' && greetingOn) ? 5 : MAX_ENTRIES;
+    var maxEntries = (currentFormat === '4' && greetingOn) ? 6 : MAX_ENTRIES;
     var visibleEntries = entries.slice(0, maxEntries);
 
     // Greeting zone
@@ -1068,8 +1024,9 @@
           + tlRows
         + '</div>'
         + '<div class="dcard-orn"><div class="dcard-orn-line"></div><span class="dcard-orn-gem">&#9670;</span><div class="dcard-orn-line"></div></div>'
+        + '<div class="dcard-spacer"></div>'
+        + closingHTML
       + '</div>'
-      + closingHTML
       + '<div class="cut tl h"></div><div class="cut tl v"></div>'
       + '<div class="cut tr h"></div><div class="cut tr v"></div>'
       + '<div class="cut bl h"></div><div class="cut bl v"></div>'
@@ -1184,6 +1141,8 @@
   async function exportPDF() {
     var l      = t();
     var n      = Math.max(1, parseInt(gv('inp-copies')) || 1);
+    var pp     = perPage();
+    var pages  = Math.ceil(n / pp);
     var backOn = ge('chk-back').checked;
 
     var spinner = ge('pdf-spinner');
@@ -1191,88 +1150,47 @@
     spinner.style.display = 'flex';
     msg.textContent = l.spinDone;
 
-    var th   = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
-    var fmt  = currentFormat === '6' ? '70x140' : currentFormat === 'ltr' ? 'Letter' : 'A6';
+    var bleed    = ge('chk-bleed').checked ? 3 : 0;
+    var isLetter = currentFormat === 'ltr';
+    var pw = isLetter ? 215.9 : 210;
+    var ph = isLetter ? 279.4 : 297;
+    var th  = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+    var fmt = currentFormat === '6' ? '70x140' : currentFormat === 'ltr' ? 'Letter' : 'A6';
     var date = new Date().toISOString().slice(0,10);
+    var printGrid = ge('print-grid');
+
+    async function buildPDF(useBack, sideLabel) {
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({
+        orientation: 'portrait', unit: 'mm',
+        format: bleed ? [pw + bleed*2, ph + bleed*2] : (isLetter ? [pw, ph] : 'a4')
+      });
+      if (window.getSelection) window.getSelection().removeAllRanges();
+      for (var p = 0; p < pages; p++) {
+        msg.textContent = sideLabel + l.spinPage(p + 1, pages);
+        var cardsOnPage = Math.min(pp, n - p * pp);
+        printGrid.innerHTML = useBack ? backPageHTML(cardsOnPage) : pageHTML(cardsOnPage);
+        await new Promise(function(r){ setTimeout(r, 150); });
+        var canvas = await html2canvas(printGrid, {
+          scale: 3, useCORS: true, allowTaint: true,
+          backgroundColor: '#ffffff', logging: false
+        });
+        if (p > 0) pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', bleed, bleed, pw, ph);
+      }
+      return pdf;
+    }
 
     try {
-      var { jsPDF } = window.jspdf;
-      if (window.getSelection) window.getSelection().removeAllRanges();
-
-      if (currentOutput === 'print') {
-        /* ── Druckerei: 1 Karte pro Seite + 3 mm Beschnitt ── */
-        var d = cardDims();
-        var bleed = 3;
-        var pgW = d.w + bleed*2, pgH = d.h + bleed*2;
-        var pcs = ge('print-card-single');
-        /* Theme-Hintergrund auf den Container — wird mit ins Bild aufgenommen, kein Übergangs-Artefakt */
-        var THEME_HEX = { burgund: '#8B1A35', cognac: '#7B4718', forest: '#1F4A32' };
-        pcs.style.background = THEME_HEX[currentTheme] || '#ffffff';
-
-        async function buildPrintPDF(useBack, sideLabel) {
-          /* Druckerei: nur 1 Seite — Online-Drucker multipliziert selbst */
-          var pdf = new jsPDF({ orientation:'portrait', unit:'mm', format:[pgW, pgH] });
-          msg.textContent = sideLabel + l.spinPage(1, 1);
-          pcs.innerHTML = useBack ? backCardHTML() : cardHTML();
-          await new Promise(function(r){ setTimeout(r, 150); });
-          var canvas = await html2canvas(pcs, {
-            scale: 3, useCORS: true, allowTaint: true,
-            backgroundColor: null, logging: false
-          });
-          pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 0, 0, pgW, pgH);
-          return pdf;
-        }
-
-        if (backOn) {
-          var pdfVS = await buildPrintPDF(false, 'VS · ');
-          pdfVS.save('Tagesprogramm_' + th + '_' + fmt + '_Druckerei_VS_' + date + '.pdf');
-          await new Promise(function(r){ setTimeout(r, 600); });
-          var pdfRS = await buildPrintPDF(true, 'RS · ');
-          pdfRS.save('Tagesprogramm_' + th + '_' + fmt + '_Druckerei_RS_' + date + '.pdf');
-        } else {
-          var pdfP = await buildPrintPDF(false, '');
-          pdfP.save('Tagesprogramm_' + th + '_' + fmt + '_Druckerei_' + date + '.pdf');
-        }
-
+      if (backOn) {
+        var pdfVS = await buildPDF(false, 'VS · ');
+        pdfVS.save('Tagesprogramm_' + th + '_' + fmt + '_VS_' + date + '.pdf');
+        await new Promise(function(r){ setTimeout(r, 600); });
+        var pdfRS = await buildPDF(true, 'RS · ');
+        pdfRS.save('Tagesprogramm_' + th + '_' + fmt + '_RS_' + date + '.pdf');
       } else {
-        /* ── Heimdruck: mehrere Karten pro A4/Letter-Bogen ── */
-        var pp       = perPage();
-        var pages    = Math.ceil(n / pp);
-        var isLetter = currentFormat === 'ltr';
-        var pw = isLetter ? 215.9 : 210;
-        var ph = isLetter ? 279.4 : 297;
-        var printGrid = ge('print-grid');
-
-        async function buildHomePDF(useBack, sideLabel) {
-          var pdf = new jsPDF({
-            orientation: 'portrait', unit: 'mm',
-            format: isLetter ? [pw, ph] : 'a4'
-          });
-          for (var p = 0; p < pages; p++) {
-            msg.textContent = sideLabel + l.spinPage(p + 1, pages);
-            var cardsOnPage = Math.min(pp, n - p * pp);
-            printGrid.innerHTML = useBack ? backPageHTML(cardsOnPage) : pageHTML(cardsOnPage);
-            await new Promise(function(r){ setTimeout(r, 150); });
-            var canvas = await html2canvas(printGrid, {
-              scale: 3, useCORS: true, allowTaint: true,
-              backgroundColor: '#ffffff', logging: false
-            });
-            if (p > 0) pdf.addPage();
-            pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, pw, ph);
-          }
-          return pdf;
-        }
-
-        if (backOn) {
-          var pdfVSh = await buildHomePDF(false, 'VS · ');
-          pdfVSh.save('Tagesprogramm_' + th + '_' + fmt + '_VS_' + date + '.pdf');
-          await new Promise(function(r){ setTimeout(r, 600); });
-          var pdfRSh = await buildHomePDF(true, 'RS · ');
-          pdfRSh.save('Tagesprogramm_' + th + '_' + fmt + '_RS_' + date + '.pdf');
-        } else {
-          var pdfH = await buildHomePDF(false, '');
-          pdfH.save('Tagesprogramm_' + th + '_' + fmt + '_' + date + '.pdf');
-        }
+        var pdf = await buildPDF(false, '');
+        pdf.save('Tagesprogramm_' + th + '_' + fmt + '_' + date + '.pdf');
       }
     } catch(e) {
       alert(l.alertFail + e.message);

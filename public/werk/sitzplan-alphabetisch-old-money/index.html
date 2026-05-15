@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <title>Sitzplan alphabetisch — Old Money Line</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="/atelier/fonts_base64.js?v=20260429"></script>
+  <script src="fonts_base64.js?v=20260429"></script>
   <link rel="stylesheet" href="/atelier/wsa_panel.css">
   <style>
     /* ── Generator-spezifische Ergänzungen ── */
@@ -503,16 +503,17 @@ function exportPDF_vector() {
   // pt → mm
   const PTmm = 0.3528;
 
-  // ── Hintergrund ──────────────────────────────────────
-  sf(bg); pdf.rect(bx, by, baseW, baseH, 'F');
+  // ── Hintergrund (inkl. Bleed) ────────────────────────
+  sf(bg); pdf.rect(0, 0, docW, docH, 'F');
 
   // ── Außenrahmen (14 CSS-px = 3.703 mm, skaliert) ─────
+  // Rahmen läuft in den Beschnitt hinein, damit beim Schneiden keine weißen Blitzer entstehen.
   const BW = 3.703 * fS;
   sf(tc);
-  pdf.rect(bx,          by,           baseW, BW,    'F'); // oben
-  pdf.rect(bx,          by+baseH-BW,  baseW, BW,    'F'); // unten
-  pdf.rect(bx,          by,           BW,    baseH, 'F'); // links
-  pdf.rect(bx+baseW-BW, by,           BW,    baseH, 'F'); // rechts
+  pdf.rect(0,           0,            docW,        by+BW,       'F'); // oben
+  pdf.rect(0,           by+baseH-BW,  docW,        BW+by,       'F'); // unten
+  pdf.rect(0,           0,            bx+BW,       docH,        'F'); // links
+  pdf.rect(bx+baseW-BW, 0,            BW+bx,       docH,        'F'); // rechts
 
   // ── Innenrahmen (1 px bei 7 mm Einzug) ───────────────
   const fi = 7 * fS;
