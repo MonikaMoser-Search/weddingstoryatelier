@@ -926,6 +926,7 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
   const PTmm = 0.3528;
   const fS   = baseW / 210;
   const bx   = bleedMM, by = bleedMM;
+  const docW = baseW + bleedMM*2, docH = baseH + bleedMM*2;
 
   const th = THEMES_PDF[currentTheme] || THEMES_PDF.highland;
   const tc = th.tc, bg = th.bg, hasBorder = th.hasBorder;
