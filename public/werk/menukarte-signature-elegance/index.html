@@ -1006,10 +1006,10 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
     const fs = 6.5 * fS;
     st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(fs);
     pdf.setCharSpace(tracking(0.45, fs));
-    y += fs*PTmm*0.5;
+    y += fs*PTmm*0.5 + 1.5*fS;
     pdf.text(names.toUpperCase(), cx, y, {align:'center', baseline:'middle'});
     pdf.setCharSpace(0);
-    y += fs*PTmm*0.5 + 2*fS;
+    y += fs*PTmm*0.5 + 4*fS;
   }
 
   const date = gv('inp-date');
@@ -1022,7 +1022,7 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
     y += fs*PTmm*0.5;
     pdf.text(sub, cx, y, {align:'center', baseline:'middle'});
     pdf.setCharSpace(0);
-    y += fs*PTmm*0.5 + 3*fS;
+    y += fs*PTmm*0.5 + 6*fS;
   }
 
   // Card title
