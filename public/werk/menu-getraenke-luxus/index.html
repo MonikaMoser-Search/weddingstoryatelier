@@ -291,15 +291,19 @@
     <button class="btn-export-all" onclick="exportAll()">Alle PDF</button>
   </div>
 
-  <div class="bleed-box">
-    <input type="checkbox" id="chk-bleed">
-    <label class="bleed-row" for="chk-bleed">
-      <span class="bleed-check">&#10003;</span>
-      <span class="bleed-title">Beschnittzugabe 3 mm</span>
-    </label>
-    <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
-    <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+  <span class="section-label" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
   </div>
+  <input type="checkbox" id="chk-bleed" style="display:none">
+  <script>
+    function setOutput(mode, btn) {
+      document.querySelectorAll('#output-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('chk-bleed').checked = (mode === 'print');
+    }
+  </script>
   <div class="print-hint">
     <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
     <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, enable the 3 mm bleed above.</span>

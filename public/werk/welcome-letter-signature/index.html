@@ -453,10 +453,22 @@
         <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>8½×11"</em></label>
       </div>
     </div>
-    <label class="bleed-label"><input type="checkbox" id="chk-bleed"> Beschnittzugabe 3 mm</label>
+    <span class="section-label" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+    <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+      <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+      <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+    </div>
+    <input type="checkbox" id="chk-bleed" style="display:none">
+    <script>
+      function setOutput(mode, btn) {
+        document.querySelectorAll('#output-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+        btn.classList.add('active');
+        document.getElementById('chk-bleed').checked = (mode === 'print');
+      }
+    </script>
     <div class="print-hint">
-      <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
-      <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+      <span class="print-hint-de">Heimdruck = ohne Beschnitt, Druckerei-Modus aktiviert 3 mm Beschnittzugabe. Datei in sRGB.</span>
+      <span class="print-hint-en">Home = no bleed, Print shop mode adds 3 mm bleed. File in sRGB.</span>
     </div>
   </div>
 
