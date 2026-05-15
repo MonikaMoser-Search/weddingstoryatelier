@@ -673,11 +673,11 @@ function exportPDF() {
         card.style.width = '105mm';
         card.style.height = '148.5mm';
         card.style.padding = '0';
-        /* Transparenter Border → Bleed-Rect scheint durch, eine Quelle für den Theme-Rahmen.
-           Classic hat semi-transparenten 1-px-Border → ebenfalls transparent setzen
-           (Border weiß zu rendern macht keinen Sinn, da Bleed weiß ist = unsichtbar).
-           Bei Classic bleibt nach Cut der INNERE 1-px-Linie übrig durch die Karten-Doppelrahmen. */
+        /* Border + Background-Clip: Border-Bereich komplett transparent, jsPDF-Bleed-Rect
+           scheint durch. background-clip:padding-box verhindert, dass der Card-Cream-Hintergrund
+           den Border-Bereich übermalt. */
         card.style.borderColor = 'transparent';
+        card.style.backgroundClip = 'padding-box';
       }
       setTimeout(function(){
         html2canvas(tmp, {

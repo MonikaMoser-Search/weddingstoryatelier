@@ -664,10 +664,11 @@ function exportPDF() {
         card.style.width = '105mm';
         card.style.height = '148.5mm';
         card.style.padding = '0';
-        /* Border-Farbe transparent → 10-px-Border ist im PNG transparent,
-           der jsPDF-Bleed-Rect scheint durch (= Theme-Rahmen aus einer Quelle, keine Naht).
-           Miter-Joins werden unsichtbar, weil 4 transparente Trapeze kein Kontrast haben. */
+        /* Border + Background-Clip: Border-Bereich komplett transparent, damit der
+           jsPDF-Bleed-Rect dort durchscheint. Ohne padding-box clippt der Cream-Hintergrund
+           den Border-Bereich aus = Bleed-Rect nicht sichtbar. */
         card.style.borderColor = 'transparent';
+        card.style.backgroundClip = 'padding-box';
       }
       setTimeout(function(){
         html2canvas(tmp, {
