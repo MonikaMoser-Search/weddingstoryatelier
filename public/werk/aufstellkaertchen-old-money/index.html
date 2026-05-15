@@ -637,16 +637,21 @@ function exportPDF() {
     var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
     var pdf = new window.jspdf.jsPDF({ orientation:'portrait', unit:'mm', format:[pw, ph] });
 
-    var THEME_RGB = {
-      burgund: [139, 26, 53],
-      cognac:  [123, 71, 24],
-      forest:  [31, 74, 50]
+    var THEME_HEX = {
+      burgund: '#8B1A35',
+      cognac:  '#7B4718',
+      forest:  '#1F4A32'
     };
-    var rgb = THEME_RGB[currentTheme] || [255, 255, 255];
+    var bg = THEME_HEX[currentTheme] || '#ffffff';
 
-    /* Off-screen-Wrapper, TRANSPARENT damit der jsPDF-Bleed-Rect unter der Karte durchscheint */
+    /* Off-screen-Wrapper 111×154,5 mm in Theme-Farbe (= Bleed-Bereich).
+       Karte mit normalem Theme-Border sitzt mittig drin. Wrapper-Bg und Card-Border
+       haben IDENTISCHE Farbe → Anti-Alias an der Grenze produziert dieselbe Farbe
+       → keine sichtbare Naht. Komplette Page in EINEM JPEG → klein + sauber. */
     var tmp = document.createElement('div');
-    tmp.style.cssText = 'position:fixed;left:-9999px;top:0;width:105mm;height:148.5mm;';
+    tmp.style.cssText =
+      'position:fixed;left:-9999px;top:0;width:' + pw + 'mm;height:' + ph + 'mm;' +
+      'display:flex;align-items:center;justify-content:center;background:' + bg + ';';
     document.body.appendChild(tmp);
 
     var i = 0;
@@ -664,23 +669,13 @@ function exportPDF() {
         card.style.width = '105mm';
         card.style.height = '148.5mm';
         card.style.padding = '0';
-        /* Border + Background-Clip: Border-Bereich komplett transparent, damit der
-           jsPDF-Bleed-Rect dort durchscheint. Ohne padding-box clippt der Cream-Hintergrund
-           den Border-Bereich aus = Bleed-Rect nicht sichtbar. */
-        card.style.borderColor = 'transparent';
-        card.style.backgroundClip = 'padding-box';
       }
       setTimeout(function(){
         html2canvas(tmp, {
-          scale: 3, useCORS: true, backgroundColor: null, logging: false,
+          scale: 2, useCORS: true, backgroundColor: bg, logging: false,
           width: tmp.offsetWidth, height: tmp.offsetHeight
         }).then(function(canvas){
-          /* 1) Bleed + Border-Bereich als ein Vektor-Rechteck in Theme-Farbe */
-          pdf.setFillColor(rgb[0], rgb[1], rgb[2]);
-          pdf.rect(0, 0, pw, ph, 'F');
-          /* 2) Karte mit transparentem Border auf den Bleed → Border-Area zeigt Theme-Rect */
-          pdf.addImage(canvas.toDataURL('image/png'), 'PNG',
-                       PRINT_CARD.bleed, PRINT_CARD.bleed, PRINT_CARD.w, PRINT_CARD.h);
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, pw, ph);
           i++; nextP();
         }).catch(function(e){
           console.error(e);
