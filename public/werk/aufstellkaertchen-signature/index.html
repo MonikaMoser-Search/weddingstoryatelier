@@ -191,17 +191,14 @@
       height: 100%;
       border: 0 !important;
       padding: calc(10px + 3mm);
-      background-origin: content-box;
-      background-clip: content-box;
-      background-repeat: no-repeat;
     }
+    /* Multi-Layer-Background: Layer 1 (Innenfarbe) clipped auf content-box,
+       background-color (Theme) füllt border-box. Pro Layer eigener Clip → ein Paint-Pass. */
     .print-page > .tent-card.highland {
-      background-color: #2B4A1F;
-      background-image: linear-gradient(#FEFCF7, #FEFCF7);
+      background: linear-gradient(#FEFCF7, #FEFCF7) no-repeat content-box, #2B4A1F;
     }
     .print-page > .tent-card.coastal {
-      background-color: #1A4A6B;
-      background-image: linear-gradient(#FAFCFE, #FAFCFE);
+      background: linear-gradient(#FAFCFE, #FAFCFE) no-repeat content-box, #1A4A6B;
     }
     /* Classic: Karte 105×148,5 mm zentriert, Page-Bg = weiß (= Bleed). Original-Border bleibt. */
     .print-page.classic-page {

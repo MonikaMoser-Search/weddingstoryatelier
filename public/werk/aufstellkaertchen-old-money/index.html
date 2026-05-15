@@ -166,21 +166,17 @@
       height: 100%;
       border: 0 !important;
       padding: calc(10px + 3mm);
-      background-origin: content-box;
-      background-clip: content-box;
-      background-repeat: no-repeat;
     }
+    /* Multi-Layer-Background: Layer 1 (Innenfarbe) clipped auf content-box,
+       background-color (Theme) füllt border-box. Pro Layer eigener Clip → ein Paint-Pass. */
     .print-page > .tent-card.burgund {
-      background-color: #8B1A35;
-      background-image: linear-gradient(#FEF8F7, #FEF8F7);
+      background: linear-gradient(#FEF8F7, #FEF8F7) no-repeat content-box, #8B1A35;
     }
     .print-page > .tent-card.cognac {
-      background-color: #7B4718;
-      background-image: linear-gradient(#FEF9F5, #FEF9F5);
+      background: linear-gradient(#FEF9F5, #FEF9F5) no-repeat content-box, #7B4718;
     }
     .print-page > .tent-card.forest {
-      background-color: #1F4A32;
-      background-image: linear-gradient(#F7FAF7, #F7FAF7);
+      background: linear-gradient(#F7FAF7, #F7FAF7) no-repeat content-box, #1F4A32;
     }
 
   </style>
