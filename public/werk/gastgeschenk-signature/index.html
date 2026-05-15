@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -220,6 +220,33 @@
     .fmt-6 .gcard-task-text { font-size: 3mm; }
 
     /* ── Cut marks ── */
+    /* ══ DRUCKEREI-MODUS ═══════════════════════════════ */
+    .print-page {
+      position: relative;
+      margin: 0 auto 18px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    }
+    .print-page > .gift-card.highland,
+    .print-page > .gift-card.coastal {
+      width: 100%;
+      height: 100%;
+      border: 0 !important;
+      padding: calc(8px + 3mm);
+    }
+    .print-page > .gift-card.highland {
+      background: linear-gradient(#FEFCF7, #FEFCF7) no-repeat content-box, #2B4A1F;
+    }
+    .print-page > .gift-card.coastal {
+      background: linear-gradient(#FAFCFE, #FAFCFE) no-repeat content-box, #1A4A6B;
+    }
+    .print-page.classic-page { display: flex; align-items: center; justify-content: center; }
+    .print-page.classic-page > .gift-card.classic {
+      width: calc(100% - 6mm); height: calc(100% - 6mm);
+    }
+    .print-page > .gift-card.highland .gcard-frame-inner,
+    .print-page > .gift-card.coastal  .gcard-frame-inner { display: none !important; }
+
     .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
     .cut.v { width: 0.4px; height: 4mm; }
@@ -356,13 +383,23 @@
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
   </div>
-  <label class="bleed-label">
-    <input type="checkbox" id="chk-bleed">
-    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
-  </label>
+
+  <span class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+
+  <div id="row-home-bleed">
+    <label class="bleed-label">
+      <input type="checkbox" id="chk-bleed">
+      <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
+    </label>
+  </div>
+
   <div class="print-hint">
-    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
-    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    <span class="print-hint-de" id="hint-print-de">Heimdruck: Karten im Grid pro A4/Letter · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.</span>
+    <span class="print-hint-en" id="hint-print-en">Home print: cards in grid per A4/Letter · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.</span>
   </div>
 
 </div>
@@ -465,8 +502,18 @@
   var currentLang   = 'de';
   var currentTheme  = 'highland';
   var currentFormat = '4';
+  var currentOutput = 'home';
   var currentPage   = 0;
   var MAX = 60;
+
+  /* Druckerei-Modus: 1 Karte / Seite im gewählten Format + 3 mm Bleed */
+  var PRINT_CARD_SIZES = {
+    '4':   { w: 105,   h: 148   },
+    '6':   { w:  70,   h: 140   },
+    'ltr': { w: 101.6, h: 152.4 }
+  };
+  var PRINT_BLEED     = 3;
+  var PRINT_BORDER_PX = 8;
   var shuffledTasks = { de: [], en: [] };
 
   // ── CHAR LIMITS (visual overflow is the real limit) ──
@@ -498,6 +545,11 @@
       hintFmt4:     'A6 (105×148 mm) — deckt viel Fläche auf dem Beutel, wirkt edel.',
       hintFmt6:     '70×140 mm — 6 Karten pro A4, sparsamer bei vielen Gästen.',
       hintFmtLtr:   '4×6" (102×152 mm) — US-Standard, 4 Karten pro US Letter, ideal für US-Druck.',
+      outputLabel:  'Modus',
+      outBtnHome:   'Heimdruck',
+      outBtnPrint:  'Druckerei',
+      hintHome:     'Heimdruck: Karten im Grid pro A4/Letter · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.',
+      hintPrint:    'Druckerei: 1 Karte pro Seite im gewählten Format + 3 mm Beschnitt randlos · sRGB. Datei direkt an Online-Druckerei.',
       singular:     ' Gast', plural: ' Gäste',
       limitWarn:    'Maximum erreicht (60)',
       charOf:       function(n,m){ return n + ' / ' + m + ' Zeichen'; },
@@ -542,6 +594,11 @@
       hintFmt4:     'A6 (105×148 mm) — covers a large area of the bag, elegant.',
       hintFmt6:     '70×140 mm — 6 cards per A4, more economical for large groups.',
       hintFmtLtr:   '4×6" (102×152 mm) — US standard, 4 cards per US Letter sheet, ideal for US printing.',
+      outputLabel:  'Mode',
+      outBtnHome:   'Home',
+      outBtnPrint:  'Print shop',
+      hintHome:     'Home: cards in grid per A4/Letter · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.',
+      hintPrint:    'Print shop: 1 card per page at chosen format + 3 mm bleed · sRGB. Send directly to your online printer.',
       singular:     ' guest', plural: ' guests',
       limitWarn:    'Limit reached (60)',
       charOf:       function(n,m){ return n + ' / ' + m + ' characters'; },
@@ -640,8 +697,24 @@
     ge('inp-initials').placeholder   = l.initialsPH;
     ge('inp-names').placeholder      = l.namesPH;
     ge('inp-guests').placeholder     = l.guestsPH;
+    ge('lbl-output').textContent     = l.outputLabel;
+    ge('btn-out-home').textContent   = l.outBtnHome;
+    ge('btn-out-print').textContent  = l.outBtnPrint;
+    ge('hint-print-de').textContent  = currentOutput === 'print' ? T.de.hintPrint : T.de.hintHome;
+    ge('hint-print-en').textContent  = currentOutput === 'print' ? T.en.hintPrint : T.en.hintHome;
     document.documentElement.lang   = currentLang;
     updateCharCounter();
+  }
+
+  // ── OUTPUT MODE ───────────────────────────────────
+  function setOutput(mode, btn) {
+    currentOutput = mode;
+    document.querySelectorAll('#output-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ge('row-home-bleed').style.display = mode === 'home' ? '' : 'none';
+    currentPage = 0;
+    applyLang();
+    render();
   }
 
   // ── THEME ─────────────────────────────────────────
@@ -771,13 +844,41 @@
     ge('guest-count').textContent = n > 0 ? n + (n === 1 ? l.singular : l.plural) : '';
     ge('guest-warn').textContent  = n >= MAX ? l.limitWarn : '';
 
+    var grid = ge('preview-grid');
+
+    if (currentOutput === 'print') {
+      grid.className = '';
+      grid.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:0;background:transparent;width:auto;height:auto;padding:0;';
+      var size = PRINT_CARD_SIZES[currentFormat] || PRINT_CARD_SIZES['4'];
+      var pw = size.w + PRINT_BLEED * 2;
+      var ph = size.h + PRINT_BLEED * 2;
+      var html = '';
+      var list = guests.length ? guests : previewGuests;
+      var pageCls = currentTheme === 'classic' ? 'print-page classic-page' : 'print-page';
+      for (var i = 0; i < list.length; i++) {
+        html +=
+          '<div class="' + pageCls + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+            cardHTML(list[i], i) +
+          '</div>';
+      }
+      grid.innerHTML = html;
+      ge('page-info').textContent = '';
+      ge('btn-prev').disabled = true;
+      ge('btn-next').disabled = true;
+      scalePreview();
+      return;
+    }
+
     var showNav = pages > 1;
     ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
     ge('btn-prev').disabled = currentPage === 0;
     ge('btn-next').disabled = currentPage === pages - 1;
 
+    grid.style.cssText = '';
+    grid.className = currentFormat === 'ltr' ? 'letter-portrait fmt-4' : 'a4-portrait fmt-' + currentFormat;
+
     var start = currentPage * pp;
-    ge('preview-grid').innerHTML = pageHTML(previewGuests.slice(start, start + pp), start);
+    grid.innerHTML = pageHTML(previewGuests.slice(start, start + pp), start);
     scalePreview();
   }
 
@@ -786,16 +887,26 @@
     var area  = document.querySelector('.preview-area');
     var avW   = area.clientWidth  - 40;
     var avH   = area.clientHeight - 40;
-    var pgW   = currentFormat === 'ltr' ? 215.9 : 210;
-    var pgH   = currentFormat === 'ltr' ? 279.4 : 297;
-    var a4W   = pgW * 3.7795;
-    var a4H   = pgH * 3.7795;
-    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var pgWmm, pgHmm;
+
+    if (currentOutput === 'print') {
+      var size = PRINT_CARD_SIZES[currentFormat] || PRINT_CARD_SIZES['4'];
+      var cards = ge('preview-grid').children.length || 1;
+      pgWmm = size.w + PRINT_BLEED * 2;
+      pgHmm = cards * (size.h + PRINT_BLEED * 2 + 6);
+    } else {
+      pgWmm = currentFormat === 'ltr' ? 215.9 : 210;
+      pgHmm = currentFormat === 'ltr' ? 279.4 : 297;
+    }
+
+    var pxW = pgWmm * 3.7795;
+    var pxH = pgHmm * 3.7795;
+    var scale = Math.min(avW / pxW, avH / pxH, 1);
     var wrap  = ge('preview-wrap');
     wrap.style.transform       = 'scale(' + scale + ')';
     wrap.style.transformOrigin = 'top left';
-    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
-    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+    wrap.style.left = Math.round((area.clientWidth  - pxW * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - pxH * scale) / 2) + 'px';
   }
 
   // ── DEMO ──────────────────────────────────────────
@@ -825,11 +936,59 @@
     msg.textContent = l.spinDone;
 
     try {
+      var { jsPDF } = window.jspdf;
+
+      if (currentOutput === 'print') {
+        var size = PRINT_CARD_SIZES[currentFormat] || PRINT_CARD_SIZES['4'];
+        var pw0 = size.w + PRINT_BLEED * 2;
+        var ph0 = size.h + PRINT_BLEED * 2;
+        var pdfP = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pw0, ph0] });
+
+        var THEME_HEX = { highland: '#2B4A1F', coastal: '#1A4A6B', classic: '#FFFFFF' };
+        var bg = THEME_HEX[currentTheme] || '#ffffff';
+        var isClassic = currentTheme === 'classic';
+
+        var tmp = document.createElement('div');
+        tmp.style.cssText =
+          'position:fixed;left:-9999px;top:0;width:' + pw0 + 'mm;height:' + ph0 + 'mm;' +
+          'display:flex;align-items:center;justify-content:center;background:' + bg + ';';
+        document.body.appendChild(tmp);
+
+        for (var i = 0; i < guests.length; i++) {
+          msg.textContent = l.spinPage(i + 1, guests.length);
+          tmp.innerHTML = cardHTML(guests[i], i);
+          var card = tmp.querySelector('.gift-card');
+          if (card) {
+            if (isClassic) {
+              card.style.width  = size.w + 'mm';
+              card.style.height = size.h + 'mm';
+            } else {
+              card.style.width  = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+              card.style.height = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+              card.style.border = '0';
+            }
+          }
+          tmp.querySelectorAll('.cut').forEach(function(c){ c.style.display = 'none'; });
+
+          await new Promise(function(r){ setTimeout(r, 100); });
+          var canvasP = await html2canvas(tmp, {
+            scale: 2, useCORS: true, allowTaint: true,
+            backgroundColor: bg, logging: false,
+            width: tmp.offsetWidth, height: tmp.offsetHeight
+          });
+          if (i > 0) pdfP.addPage([pw0, ph0], 'portrait');
+          pdfP.addImage(canvasP.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, pw0, ph0);
+        }
+        document.body.removeChild(tmp);
+        var thP = currentTheme.charAt(0).toUpperCase() + currentTheme.slice(1);
+        pdfP.save('Gift_Cards_Signature_' + thP + '_Druckerei_' + new Date().toISOString().slice(0,10) + '.pdf');
+        return;
+      }
+
       var bleed = ge('chk-bleed').checked ? 3 : 0;
       var isLetter = currentFormat === 'ltr';
       var pw = isLetter ? 215.9 : 210;
       var ph = isLetter ? 279.4 : 297;
-      var { jsPDF } = window.jspdf;
       var pdf = new jsPDF({
         orientation: 'portrait', unit: 'mm',
         format: bleed ? [pw + bleed * 2, ph + bleed * 2] : (isLetter ? [pw, ph] : 'a4')
