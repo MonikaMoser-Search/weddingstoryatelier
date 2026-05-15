@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -282,10 +282,15 @@
     <button class="btn-demo" id="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
   </div>
-  <label class="bleed-label" id="lbl-bleed"><input type="checkbox" id="chk-bleed"> Beschnittzugabe 3 mm</label>
+  <span class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+  <input type="checkbox" id="chk-bleed" style="display:none">
   <div class="print-hint">
-    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
-    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    <span class="print-hint-de">Heimdruck = ohne Beschnitt, Druckerei-Modus aktiviert 3 mm Beschnittzugabe. Datei in sRGB.</span>
+    <span class="print-hint-en">Home = no bleed, Print shop mode adds 3 mm bleed. File in sRGB.</span>
   </div>
 </div>
 
@@ -359,7 +364,9 @@ const T = {
     guestWarn:   ' — max. 65 empfohlen',
     btnDemo:     '\u25B7 Demo',
     btnExport:   'Export PDF',
-    bleed:       'Beschnittzugabe 3 mm',
+    outputLabel: 'Modus',
+    outBtnHome:  'Heimdruck',
+    outBtnPrint: 'Druckerei',
     eyebrow:     'Seating Chart',
     spinnerTxt:  'PDF wird erstellt …',
     demoTitle:   'SITZPLAN',
@@ -430,7 +437,9 @@ Yvonne Ziegler, Tisch 9`,
     guestWarn:   ' — max. 65 recommended',
     btnDemo:     '\u25B7 Demo',
     btnExport:   'Export PDF',
-    bleed:       '3 mm bleed',
+    outputLabel: 'Mode',
+    outBtnHome:  'Home',
+    outBtnPrint: 'Print shop',
     eyebrow:     'Seating Chart',
     spinnerTxt:  'Creating PDF …',
     demoTitle:   'SEATING CHART',
@@ -566,6 +575,11 @@ function setTheme(t, btn) {
   btn.classList.add('active');
   renderPoster();
 }
+function setOutput(mode, btn) {
+  document.querySelectorAll('#output-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('chk-bleed').checked = (mode === 'print');
+}
 function setLang(lang, btn) {
   currentLang = lang;
   document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
@@ -596,14 +610,9 @@ function applyLang() {
   p('inp-subtitle', l.subtitlePh);
   document.getElementById('inp-guests').placeholder = l.guestsPh;
 
-  // Bleed-Label: Checkbox erhalten, Text aktualisieren
-  const bleedLabel = document.getElementById('lbl-bleed');
-  if (bleedLabel) {
-    const cb = bleedLabel.querySelector('input');
-    bleedLabel.textContent = '';
-    bleedLabel.appendChild(cb);
-    bleedLabel.append(' ' + l.bleed);
-  }
+  s('lbl-output',    l.outputLabel || 'Modus');
+  s('btn-out-home',  l.outBtnHome  || 'Heimdruck');
+  s('btn-out-print', l.outBtnPrint || 'Druckerei');
 
   // Spinner
   const spinTxt = document.querySelector('#pdf-spinner span');
