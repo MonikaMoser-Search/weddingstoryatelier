@@ -666,9 +666,14 @@ function exportPDF() {
       tmp.innerHTML = renderCard(names[i]);
       var card = tmp.querySelector('.tent-card');
       if (card) {
-        card.style.width = '105mm';
-        card.style.height = '148.5mm';
+        /* Border raus → der gesamte Theme-Rahmen kommt aus dem Wrapper-Bg.
+           Karte = nur Cream-Rechteck mit Inhalt. Cream-auf-Theme-Übergang an geraden Kanten
+           hat saubere Anti-Alias-Fades (keine Miter-Diagonalen).
+           Größe = 105×148,5 minus 2×10px Original-Border = ~99,7×143,2 mm. */
+        card.style.width = 'calc(105mm - 20px)';
+        card.style.height = 'calc(148.5mm - 20px)';
         card.style.padding = '0';
+        card.style.border = '0';
       }
       setTimeout(function(){
         html2canvas(tmp, {

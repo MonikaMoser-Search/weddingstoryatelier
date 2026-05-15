@@ -675,9 +675,19 @@ function exportPDF() {
       tmp.innerHTML = renderCard(names[pi]);
       var card = tmp.querySelector('.tent-card');
       if (card) {
-        card.style.width = '105mm';
-        card.style.height = '148.5mm';
-        card.style.padding = '0';
+        if (currentTheme === 'classic') {
+          /* Classic: 1-px-Border ist zu dünn für Miter-Probleme, behält das Original-Look */
+          card.style.width = '105mm';
+          card.style.height = '148.5mm';
+          card.style.padding = '0';
+        } else {
+          /* Highland/Coastal: 10-px-Border raus → kompletter Theme-Rahmen aus Wrapper-Bg.
+             Karte = nur Cream-Rechteck (105×148,5 − 2×10px = ~99,7×143,2 mm). */
+          card.style.width = 'calc(105mm - 20px)';
+          card.style.height = 'calc(148.5mm - 20px)';
+          card.style.padding = '0';
+          card.style.border = '0';
+        }
       }
       setTimeout(function(){
         html2canvas(tmp, {
