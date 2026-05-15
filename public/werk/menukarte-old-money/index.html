@@ -963,22 +963,31 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
   let y        = by + BW + 11 * fS;
 
   // ── Header ──────────────────────────────────────────
+  // Helper: CSS letter-spacing → jsPDF setCharSpace (mm)
+  function tracking(letterEm, fontSizePt) { return letterEm * fontSizePt * PTmm; }
+
   const names = gv('inp-names');
   if (names) {
-    st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6.5 * fS);
-    y += 6.5*fS*PTmm*0.5;
+    const fs = 6.5 * fS;
+    st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(fs);
+    pdf.setCharSpace(tracking(0.45, fs));
+    y += fs*PTmm*0.5;
     pdf.text(names.toUpperCase(), cx, y, {align:'center', baseline:'middle'});
-    y += 6.5*fS*PTmm*0.5 + 2*fS;
+    pdf.setCharSpace(0);
+    y += fs*PTmm*0.5 + 2*fS;
   }
 
   const date = gv('inp-date');
   const ort  = gv('inp-ort');
   const sub  = [date, ort].filter(Boolean).join(' · ');
   if (sub) {
-    st(bl(tc, 0.68)); setFont('CormorantGaramond','italic'); pdf.setFontSize(8.2 * fS);
-    y += 8.2*fS*PTmm*0.5;
+    const fs = 8.2 * fS;
+    st(bl(tc, 0.68)); setFont('CormorantGaramond','italic'); pdf.setFontSize(fs);
+    pdf.setCharSpace(tracking(0.08, fs));
+    y += fs*PTmm*0.5;
     pdf.text(sub, cx, y, {align:'center', baseline:'middle'});
-    y += 8.2*fS*PTmm*0.5 + 3*fS;
+    pdf.setCharSpace(0);
+    y += fs*PTmm*0.5 + 3*fS;
   }
 
   // Card title
@@ -986,8 +995,10 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
   const titleText  = (cardTitles[cardType] || cardType).toUpperCase();
   const titleFS    = 24 * fS;
   st(tc); setFont(TITLE_FONT, TITLE_FONT_STYLE); pdf.setFontSize(titleFS);
+  pdf.setCharSpace(tracking(0.22, titleFS));
   y += titleFS*PTmm*0.5;
   pdf.text(titleText, cx, y, {align:'center', baseline:'middle'});
+  pdf.setCharSpace(0);
   y += titleFS*PTmm*0.5 + 3*fS;
 
   // Accent rule
@@ -1133,17 +1144,23 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
       drawOrnSep(cy + block.height/2);
 
     } else if (block.type === 'algtitle') {
-      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(7*fS);
-      pdf.text(I18N[currentLang].algTitle.toUpperCase(), cx, cy + 7*fS*PTmm*0.5, {align:'center', baseline:'middle'});
+      var atFS = 7*fS;
+      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(atFS);
+      pdf.setCharSpace(tracking(0.3, atFS));
+      pdf.text(I18N[currentLang].algTitle.toUpperCase(), cx, cy + atFS*PTmm*0.5, {align:'center', baseline:'middle'});
+      pdf.setCharSpace(0);
 
     } else if (block.type === 'menu') {
       var g  = block.data;
       var ry = cy;
       if (g.kat) {
-        st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6*fS);
-        ry += 6*fS*PTmm*0.5;
+        var katFS = 6*fS;
+        st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(katFS);
+        pdf.setCharSpace(tracking(0.28, katFS));
+        ry += katFS*PTmm*0.5;
         pdf.text(g.kat.toUpperCase(), cx, ry, {align:'center', baseline:'middle'});
-        ry += 6*fS*PTmm*0.5 + 1.5*fS;
+        pdf.setCharSpace(0);
+        ry += katFS*PTmm*0.5 + 1.5*fS;
       }
       if (g.name) {
         setFont('CormorantGaramond','normal'); pdf.setFontSize(12.8*fS);
@@ -1181,10 +1198,13 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
     } else if (block.type === 'drink') {
       var d  = block.data;
       var ry = cy;
-      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(6*fS);
-      ry += 6*fS*PTmm*0.5;
+      var dLabFS = 6*fS;
+      st(bl(tc, 0.68)); setFont('DMSans','normal'); pdf.setFontSize(dLabFS);
+      pdf.setCharSpace(tracking(0.28, dLabFS));
+      ry += dLabFS*PTmm*0.5;
       pdf.text(d.label.toUpperCase(), cx, ry, {align:'center', baseline:'middle'});
-      ry += 6*fS*PTmm*0.5 + 1.5*fS;
+      pdf.setCharSpace(0);
+      ry += dLabFS*PTmm*0.5 + 1.5*fS;
       setFont('CormorantGaramond','italic'); pdf.setFontSize(12.2*fS);
       var lineH = 12.2*fS*PTmm*1.4;
       d.items.forEach(function(item) {
