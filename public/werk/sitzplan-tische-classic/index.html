@@ -623,18 +623,26 @@ function exportPDF_vector() {
 
   // Header
   let y = contY;
+  // CSS letter-spacing (px) → jsPDF setCharSpace (mm), skaliert mit fS
+  const PXmm = 0.2645;
+  function trackingPx(px) { return px * PXmm * fS; }
+
   const eyeFS = 7 * fS;
   st(bl(tc, 0.42)); setFont('DMSans', 'normal'); pdf.setFontSize(eyeFS);
+  pdf.setCharSpace(trackingPx(5));
   y += eyeFS * PTmm * 0.5;
   pdf.text(T[currentLang].seating, cxPage, y, { align: 'center', baseline: 'middle' });
+  pdf.setCharSpace(0);
   y += eyeFS * PTmm * 0.5 + 2.5 * fS;
 
   // Titel — PlayfairDisplay bold
   const titleFS  = 26 * fS;
   const titleTxt = document.getElementById('inp-title').value.trim() || 'TISCHPLAN';
   st(ac); setFont('PlayfairDisplay', 'bold'); pdf.setFontSize(titleFS * fs);
+  pdf.setCharSpace(trackingPx(7));
   y += titleFS * fs * PTmm * 0.5;
   pdf.text(titleTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+  pdf.setCharSpace(0);
   y += titleFS * fs * PTmm * 0.5 + 2 * fS;
 
   // Untertitel
@@ -642,8 +650,10 @@ function exportPDF_vector() {
   if (subTxt) {
     const subFS = 10.5 * fS * fs;
     st(bl(tc, 0.62)); setFont('CormorantGaramond', 'italic'); pdf.setFontSize(subFS);
+    pdf.setCharSpace(trackingPx(1.5));
     y += 2 * fS + subFS * PTmm * 0.5;
     pdf.text(subTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+    pdf.setCharSpace(0);
     y += subFS * PTmm * 0.5 + 2 * fS;
   }
 
@@ -766,8 +776,10 @@ function exportPDF_vector() {
 
     // Tischnummer
     st(bl(ac, 0.55)); setFont('DMSans', 'normal'); pdf.setFontSize(FS_NUM * cS);
+    pdf.setCharSpace(trackingPx(1) * cS);
     cy += FS_NUM * cS * PTmm * 0.5;
     pdf.text(T[currentLang].tisch + ' ' + (i + 1), cardCx, cy, { align: 'center', baseline: 'middle' });
+    pdf.setCharSpace(0);
     cy += FS_NUM * cS * PTmm * 0.5 + 1.5 * fS * cS;
 
     // Tischname — PlayfairDisplay bold

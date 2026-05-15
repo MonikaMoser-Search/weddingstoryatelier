@@ -532,19 +532,27 @@ function exportPDF_vector() {
   // ── Header ───────────────────────────────────────────
   let y = contY;
 
+  // CSS letter-spacing (px) → jsPDF setCharSpace (mm), skaliert mit fS
+  const PXmm = 0.2645;
+  function trackingPx(px) { return px * PXmm * fS; }
+
   // Eyebrow
   const eyeFS = 7 * fS;
   st(bl(tc, 0.42)); setFont('DMSans','normal'); pdf.setFontSize(eyeFS);
+  pdf.setCharSpace(trackingPx(5));
   y += eyeFS * PTmm * 0.5;
   pdf.text('SEATING CHART', cxPage, y, { align:'center', baseline:'middle' });
+  pdf.setCharSpace(0);
   y += eyeFS * PTmm * 0.5 + 2.5*fS;
 
   // Titel
   const titleFS  = 24 * fS;
   const titleTxt = document.getElementById('inp-title').value.trim() || 'SITZPLAN';
   st(tc); setFont('CormorantGaramond','light'); pdf.setFontSize(titleFS);
+  pdf.setCharSpace(trackingPx(6));
   y += titleFS * PTmm * 0.5;
   pdf.text(titleTxt, cxPage, y, { align:'center', baseline:'middle' });
+  pdf.setCharSpace(0);
   y += titleFS * PTmm * 0.5 + 2*fS;
 
   // Untertitel
@@ -552,8 +560,10 @@ function exportPDF_vector() {
   if (subTxt) {
     const subFS = 10 * fS;
     st(bl(tc, 0.62)); setFont('CormorantGaramond','italic'); pdf.setFontSize(subFS);
+    pdf.setCharSpace(trackingPx(1.5));
     y += 2*fS + subFS * PTmm * 0.5;
     pdf.text(subTxt, cxPage, y, { align:'center', baseline:'middle' });
+    pdf.setCharSpace(0);
     y += subFS * PTmm * 0.5 + 2*fS;
   }
 

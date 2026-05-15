@@ -863,27 +863,36 @@ async function exportPDF_vector() {
   const contH   = baseH - BH - PT - PB;
 
   // ── Header ──────────────────────────────────────────────
+  // CSS letter-spacing (px) → jsPDF setCharSpace (mm), skaliert mit fS
+  const PXmm = 0.2645;
+  function trackingPx(px) { return px * PXmm * fS; }
   let y = contY;
 
   const eyeFS = 7 * fS;
   st(bl(tc, 0.40)); setFont('DMSans','normal'); pdf.setFontSize(eyeFS);
+  pdf.setCharSpace(trackingPx(5));
   y += eyeFS * PTmm * 0.5;
   pdf.text(tt().eyebrow.toUpperCase(), cxPage, y, { align:'center', baseline:'middle' });
+  pdf.setCharSpace(0);
   y += eyeFS * PTmm * 0.5 + 2.5*fS;
 
   const titleFS  = 24 * fS;
   const titleTxt = document.getElementById('inp-title').value.trim() || tt().titlePh;
   st(tc); setFont('CormorantGaramond','italic'); pdf.setFontSize(titleFS);
+  pdf.setCharSpace(trackingPx(5));
   y += titleFS * PTmm * 0.5;
   pdf.text(titleTxt, cxPage, y, { align:'center', baseline:'middle' });
+  pdf.setCharSpace(0);
   y += titleFS * PTmm * 0.5 + 2*fS;
 
   const subTxt = document.getElementById('inp-subtitle').value.trim();
   if (subTxt) {
     const subFS = 10 * fS;
     st(bl(tc, 0.60)); setFont('CormorantGaramond','italic'); pdf.setFontSize(subFS);
+    pdf.setCharSpace(trackingPx(1.5));
     y += 2*fS + subFS * PTmm * 0.5;
     pdf.text(subTxt, cxPage, y, { align:'center', baseline:'middle' });
+    pdf.setCharSpace(0);
     y += subFS * PTmm * 0.5 + 2*fS;
   }
 

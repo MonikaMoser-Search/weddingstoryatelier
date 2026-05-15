@@ -625,14 +625,19 @@ function exportPDF_vector() {
   const contW  = baseW - PL * 2, contH = baseH - PT - PB;
 
   // Header
+  // CSS letter-spacing (px) → jsPDF setCharSpace (mm), skaliert mit fS
+  const PXmm = 0.2645;
+  function trackingPx(px) { return px * PXmm * fS; }
   let y = contY;
 
   // Titel — CormorantGaramond light (Old Money)
   const titleFS  = 26 * fS;
   const titleTxt = document.getElementById('inp-title').value.trim() || I18N[currentLang].pdfTitleFb;
   st(tc); setFont('CormorantGaramond', 'light'); pdf.setFontSize(titleFS * fs);
+  pdf.setCharSpace(trackingPx(7));
   y += titleFS * fs * PTmm * 0.5;
   pdf.text(titleTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+  pdf.setCharSpace(0);
   y += titleFS * fs * PTmm * 0.5 + 2 * fS;
 
   // Untertitel
@@ -640,8 +645,10 @@ function exportPDF_vector() {
   if (subTxt) {
     const subFS = 10.5 * fS * fs;
     st(bl(tc, 0.62)); setFont('CormorantGaramond', 'italic'); pdf.setFontSize(subFS);
+    pdf.setCharSpace(trackingPx(1.5));
     y += 2 * fS + subFS * PTmm * 0.5;
     pdf.text(subTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+    pdf.setCharSpace(0);
     y += subFS * PTmm * 0.5 + 2 * fS;
   }
 
@@ -768,8 +775,10 @@ function exportPDF_vector() {
 
     // Tischnummer
     st(bl(tc, 0.55)); setFont('DMSans', 'normal'); pdf.setFontSize(FS_NUM * cS);
+    pdf.setCharSpace(trackingPx(1) * cS);
     cy += FS_NUM * cS * PTmm * 0.5;
     pdf.text(I18N[currentLang].pdfTableLabel(i), cardCx, cy, { align: 'center', baseline: 'middle' });
+    pdf.setCharSpace(0);
     cy += FS_NUM * cS * PTmm * 0.5 + 1.5 * fS * cS;
 
     // Tischname
