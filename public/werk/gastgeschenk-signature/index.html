@@ -244,8 +244,7 @@
     .print-page.classic-page > .gift-card.classic {
       width: calc(100% - 6mm); height: calc(100% - 6mm);
     }
-    .print-page > .gift-card.highland .gcard-frame-inner,
-    .print-page > .gift-card.coastal  .gcard-frame-inner { display: none !important; }
+    /* Inner-Frame bleibt sichtbar (Design-Element) */
 
     .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -959,6 +958,9 @@
           tmp.innerHTML = cardHTML(guests[i], i);
           var card = tmp.querySelector('.gift-card');
           if (card) {
+            card.style.padding    = '0';
+            card.style.flexShrink = '0';
+            card.style.boxSizing  = 'border-box';
             if (isClassic) {
               card.style.width  = size.w + 'mm';
               card.style.height = size.h + 'mm';

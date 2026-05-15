@@ -239,7 +239,7 @@
     .print-page > .gift-card.stone {
       background: linear-gradient(#FAF9F6, #FAF9F6) no-repeat content-box, #96897F;
     }
-    .print-page > .gift-card .gcard-frame-inner { display: none !important; }
+    /* Inner-Frame bleibt sichtbar (Design-Element) */
 
     .cut { position: absolute; background: rgba(110,100,90,0.35); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -946,9 +946,12 @@
           tmp.innerHTML = cardHTML(guests[i], i);
           var card = tmp.querySelector('.gift-card');
           if (card) {
-            card.style.width  = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
-            card.style.height = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
-            card.style.border = '0';
+            card.style.width      = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+            card.style.height     = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+            card.style.border     = '0';
+            card.style.padding    = '0';
+            card.style.flexShrink = '0';
+            card.style.boxSizing  = 'border-box';
           }
           tmp.querySelectorAll('.cut').forEach(function(c){ c.style.display = 'none'; });
 
