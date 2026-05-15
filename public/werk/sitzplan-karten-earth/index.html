@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -351,12 +351,16 @@
     <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
     <button type="button" class="btn-export" id="btn-export" onclick="exportPDF()">PDF exportieren</button>
   </div>
-  <label class="bleed-label">
-    <input type="checkbox" id="chk-bleed">
-    <span id="lbl-bleed">Beschnittzugabe 3 mm</span>
-  </label>
+
+  <label class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</label>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
+  </div>
+  <input type="checkbox" id="chk-bleed" style="display:none">
+
   <div class="print-hint">
-    <span id="lbl-print-hint">Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.</span>
+    <span id="lbl-print-hint">Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Druckerei-Modus aktiviert 3 mm Beschnittzugabe.</span>
   </div>
 
 </form>
@@ -420,8 +424,10 @@ var T = {
     btnAdd:     '+ Tisch hinzufügen',
     photoPH:    'Foto hochladen',
     btnExport:  'PDF exportieren',
-    bleed:      'Beschnittzugabe 3 mm',
-    printHint:  'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Für randlose Drucke Beschnitt aktivieren.',
+    outputLabel:'Modus',
+    outBtnHome: 'Heimdruck',
+    outBtnPrint:'Druckerei',
+    printHint:  'Datei im sRGB-Farbraum, druckfertig für alle gängigen Online-Druckereien. Druckerei-Modus aktiviert 3 mm Beschnittzugabe.',
     alertEmpty: 'Bitte mindestens einen Tisch mit Name und Foto anlegen.',
     alertNoPhoto: 'Kein Foto hochgeladen für: ',
     alertFail:  'Export fehlgeschlagen: ',
@@ -448,8 +454,10 @@ var T = {
     btnAdd:     '+ Add table',
     photoPH:    'Upload photo',
     btnExport:  'Export PDF',
-    bleed:      'Bleed 3 mm',
-    printHint:  'File in sRGB color space, print-ready for all major online printers. Enable bleed for borderless prints.',
+    outputLabel:'Mode',
+    outBtnHome: 'Home',
+    outBtnPrint:'Print shop',
+    printHint:  'File in sRGB color space, print-ready for all major online printers. Print shop mode adds 3 mm bleed.',
     alertEmpty: 'Please add at least one table with a name and photo.',
     alertNoPhoto: 'No photo uploaded for: ',
     alertFail:  'Export failed: ',
@@ -704,11 +712,24 @@ function setLang(lang, btn) {
   ge('lbl-tagline').textContent    = l.tagline;
   ge('lbl-sec4').textContent       = l.sec4;
   ge('btn-export').textContent     = l.btnExport;
-  ge('lbl-bleed').textContent      = l.bleed;
+  ge('lbl-output').textContent     = l.outputLabel;
+  ge('btn-out-home').textContent   = l.outBtnHome;
+  ge('btn-out-print').textContent  = l.outBtnPrint;
   ge('lbl-print-hint').textContent = l.printHint;
   ge('lbl-photo-ph').textContent   = l.photoPH;
   document.documentElement.lang   = lang;
   buildTableBlocks();
+}
+
+// ════════════════════════════════════════════════════════════
+// OUTPUT MODE (Heimdruck / Druckerei) — bindet an chk-bleed
+// Sitzplan-Karten sind 1 Karte / Seite, vollständig vektoriell (jsPDF).
+// Druckerei = chk-bleed AN, Heimdruck = chk-bleed AUS.
+// ════════════════════════════════════════════════════════════
+function setOutput(mode, btn) {
+  document.querySelectorAll('#output-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  ge('chk-bleed').checked = (mode === 'print');
 }
 
 // ════════════════════════════════════════════════════════════
