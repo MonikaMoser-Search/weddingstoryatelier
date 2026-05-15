@@ -147,6 +147,36 @@
     .orn-line { flex: 1; height: 0.5px; background: var(--rule); }
     .orn-dot  { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
 
+    /* ══ DRUCKEREI-MODUS ═══════════════════════════════
+       Editor-Preview: Karte mit Multi-Layer-Background (Theme-Padding + Cream-Content)
+       zeigt 1:1 das spätere Druckergebnis. PDF-Export rendert per Wrapper-JPEG-Pattern
+       (siehe exportPDF), umgeht html2canvas-Border-Miter-Bug. */
+    .print-page {
+      position: relative;
+      margin: 0 auto 18px;
+      background: #fff;
+      box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+    }
+    .print-page > .place-card {
+      width: 100%;
+      height: 100%;
+      border: 0 !important;
+      padding: calc(8px + 3mm);
+    }
+    .print-page > .place-card.burgund {
+      background: linear-gradient(#FEF8F7, #FEF8F7) no-repeat content-box, #8B1A35;
+    }
+    .print-page > .place-card.cognac {
+      background: linear-gradient(#FEF9F5, #FEF9F5) no-repeat content-box, #7B4718;
+    }
+    .print-page > .place-card.forest {
+      background: linear-gradient(#F7FAF7, #F7FAF7) no-repeat content-box, #1F4A32;
+    }
+    /* Inner frame und Content im Print-Mode neu positionieren (Padding statt Border) */
+    .print-page > .place-card .pcard-frame-inner {
+      inset: calc(8px + 3mm + 4mm) !important;
+    }
+
     /* ── Cut marks ── */
     .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -213,20 +243,30 @@
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
   </div>
-  <div class="format-box">
-    <div class="format-title">Papierformat / Paper Format</div>
-    <div class="format-opts">
-      <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>297×210 mm</em></label>
-      <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>11×8½"</em></label>
-    </div>
+
+  <span class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+  <div class="btn-group" id="output-btns" style="margin-bottom:8px">
+    <button class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
+    <button class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
   </div>
-  <label class="bleed-label">
-    <input type="checkbox" id="chk-bleed">
-    Beschnittzugabe 3 mm
-  </label>
+
+  <div id="row-home-options">
+    <div class="format-box">
+      <div class="format-title">Papierformat / Paper Format</div>
+      <div class="format-opts">
+        <label class="format-opt"><input type="radio" name="paper-format" value="a4" checked> A4 <em>297×210 mm</em></label>
+        <label class="format-opt"><input type="radio" name="paper-format" value="letter"> US Letter <em>11×8½"</em></label>
+      </div>
+    </div>
+    <label class="bleed-label">
+      <input type="checkbox" id="chk-bleed">
+      Beschnittzugabe 3 mm
+    </label>
+  </div>
+
   <div class="print-hint">
-    <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
-    <span class="print-hint-en">Your file is print-ready in sRGB colour space — accepted by all major online print services without any extra steps. For edge-to-edge results, we recommend enabling the 3 mm bleed above.</span>
+    <span class="print-hint-de" id="hint-print-de">Heimdruck: 6 Karten pro A4 quer · Schneidmarken · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.</span>
+    <span class="print-hint-en" id="hint-print-en">Home print: 6 cards per A4 landscape · cut marks · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.</span>
   </div>
 
 </div>
@@ -261,11 +301,15 @@
 
 <script>
   // ── STATE ──────────────────────────────────────────
-  var currentTheme = 'burgund';
-  var currentLang  = 'de';
-  var currentPage  = 0;
+  var currentTheme  = 'burgund';
+  var currentLang   = 'de';
+  var currentOutput = 'home';
+  var currentPage   = 0;
   var MAX      = 60;
   var PER_PAGE = 6;
+
+  /* Druckerei-Modus: Karte in A4-Grid-Größe (136×59,33 mm) + 3 mm Bleed allseitig */
+  var PRINT_CARD = { w: 136, h: 59.33, bleed: 3, border_px: 8 };
 
   // ── TRANSLATIONS ───────────────────────────────────
   var T = {
@@ -280,6 +324,11 @@
       hintGuests:    'Ein Name pro Zeile — max. 60 Gäste.',
       mottoPlaceholder: 'z. B. 15. August 2026',
       guestsPlaceholder:'Maria Müller\nJonas Weber\nAnna & Peter Schmidt\n...',
+      outputLabel:   'Modus',
+      outBtnHome:    'Heimdruck',
+      outBtnPrint:   'Druckerei',
+      hintHome:      'Heimdruck: 6 Karten pro A4 quer · Schneidmarken · sRGB · scale:3 (~288 DPI). Bleed nur sinnvoll mit Schneidemaschine.',
+      hintPrint:     'Druckerei: 1 Karte pro Seite · 136 × 59 mm + 3 mm Beschnitt randlos · sRGB. Datei direkt an Online-Druckerei.',
       singular:      ' Gast',
       plural:        ' Gäste',
       limitWarn:     'Maximum erreicht (60)',
@@ -307,6 +356,11 @@
       hintGuests:    'One name per line — max. 60 guests.',
       mottoPlaceholder: 'e.g. August 15, 2026',
       guestsPlaceholder:'Emily Johnson\nJames & Sarah Williams\nOlivia Brown\n...',
+      outputLabel:   'Mode',
+      outBtnHome:    'Home',
+      outBtnPrint:   'Print shop',
+      hintHome:      'Home: 6 cards per A4 landscape · cut marks · sRGB · scale:3 (~288 DPI). Bleed only useful with a guillotine.',
+      hintPrint:     'Print shop: 1 card per page · 136 × 59 mm + 3 mm bleed · sRGB. Send directly to your online printer.',
       singular:      ' guest',
       plural:        ' guests',
       limitWarn:     'Limit reached (60)',
@@ -359,7 +413,23 @@
     ge('hint-guests').textContent     = l.hintGuests;
     ge('inp-motto').placeholder       = l.mottoPlaceholder;
     ge('inp-guests').placeholder      = l.guestsPlaceholder;
+    ge('lbl-output').textContent      = l.outputLabel;
+    ge('btn-out-home').textContent    = l.outBtnHome;
+    ge('btn-out-print').textContent   = l.outBtnPrint;
+    ge('hint-print-de').textContent   = currentOutput === 'print' ? T.de.hintPrint : T.de.hintHome;
+    ge('hint-print-en').textContent   = currentOutput === 'print' ? T.en.hintPrint : T.en.hintHome;
     document.documentElement.lang    = currentLang;
+  }
+
+  // ── OUTPUT MODE ────────────────────────────────────
+  function setOutput(mode, btn) {
+    currentOutput = mode;
+    document.querySelectorAll('#output-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ge('row-home-options').style.display = mode === 'home' ? '' : 'none';
+    currentPage = 0;
+    applyLang();
+    render();
   }
 
   // ── THEME ──────────────────────────────────────────
@@ -414,20 +484,43 @@
     var l      = t();
     var guests = parseGuests(gv('inp-guests'));
     var motto  = gv('inp-motto').trim();
-    var pages  = Math.max(1, Math.ceil(guests.length / PER_PAGE));
-    currentPage = Math.min(currentPage, pages - 1);
 
     var n = guests.length;
     ge('guest-count').textContent = n > 0 ? n + (n === 1 ? l.singular : l.plural) : '';
     ge('guest-warn').textContent  = n >= MAX ? l.limitWarn : '';
 
-    var showNav = pages > 1;
-    ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
-    ge('btn-prev').disabled = currentPage === 0;
-    ge('btn-next').disabled = currentPage === pages - 1;
+    var grid = ge('preview-grid');
 
-    var pageGuests = guests.slice(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE);
-    ge('preview-grid').innerHTML = pageHTML(pageGuests, motto);
+    if (currentOutput === 'print') {
+      /* Druckerei-Modus: 1 Karte / Seite (136×59 + 3 mm Bleed), als Stapel angezeigt */
+      grid.className = '';
+      grid.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:0;background:transparent;';
+      var pw = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+      var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
+      var list = guests.length ? guests : ['Vorname Nachname'];
+      var html = '';
+      for (var i = 0; i < list.length; i++) {
+        html +=
+          '<div class="print-page" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+            cardHTML(list[i], motto) +
+          '</div>';
+      }
+      grid.innerHTML = html;
+      ge('page-info').textContent = '';
+      ge('btn-prev').disabled = true;
+      ge('btn-next').disabled = true;
+    } else {
+      /* Heimdruck: bestehendes 6/A4-Grid */
+      var pages = Math.max(1, Math.ceil(guests.length / PER_PAGE));
+      currentPage = Math.min(currentPage, pages - 1);
+      var showNav = pages > 1;
+      ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
+      ge('btn-prev').disabled = currentPage === 0;
+      ge('btn-next').disabled = currentPage === pages - 1;
+      grid.style.cssText = '';
+      var pageGuests = guests.slice(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE);
+      grid.innerHTML = pageHTML(pageGuests, motto);
+    }
 
     scalePreview();
   }
@@ -437,19 +530,29 @@
     var area  = document.querySelector('.preview-area');
     var avW   = area.clientWidth  - 40;
     var avH   = area.clientHeight - 40;
-    var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
-    var pgW = isLetter ? 279.4 : 297;
-    var pgH = isLetter ? 215.9 : 210;
-    ge('preview-grid').className = isLetter ? 'letter-landscape' : 'a4-landscape';
-    var a4W   = pgW * 3.7795;
-    var a4H   = pgH * 3.7795;
-    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var pgWmm, pgHmm;
+
+    if (currentOutput === 'print') {
+      /* Stapel-Höhe = Anzahl Karten × (Kartenhöhe + Abstand) */
+      var cards = ge('preview-grid').children.length || 1;
+      pgWmm = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+      pgHmm = cards * (PRINT_CARD.h + PRINT_CARD.bleed * 2 + 6);  /* +6 für margin-bottom 18px ≈ 6mm */
+    } else {
+      var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
+      pgWmm = isLetter ? 279.4 : 297;
+      pgHmm = isLetter ? 215.9 : 210;
+      ge('preview-grid').className = isLetter ? 'letter-landscape' : 'a4-landscape';
+    }
+
+    var pxW = pgWmm * 3.7795;
+    var pxH = pgHmm * 3.7795;
+    var scale = Math.min(avW / pxW, avH / pxH, 1);
 
     var wrap = ge('preview-wrap');
     wrap.style.transform       = 'scale(' + scale + ')';
     wrap.style.transformOrigin = 'top left';
-    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
-    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+    wrap.style.left = Math.round((area.clientWidth  - pxW * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - pxH * scale) / 2) + 'px';
   }
 
   // ── DEMO ───────────────────────────────────────────
@@ -467,43 +570,89 @@
     var guests = parseGuests(gv('inp-guests'));
     if (guests.length === 0) { alert(l.alertEmpty); return; }
 
-    var motto     = gv('inp-motto').trim();
-    var pages     = Math.ceil(guests.length / PER_PAGE);
-    var spinner   = ge('pdf-spinner');
-    var msg       = ge('spin-msg');
+    var motto   = gv('inp-motto').trim();
+    var spinner = ge('pdf-spinner');
+    var msg     = ge('spin-msg');
     spinner.style.display = 'flex';
     msg.textContent = l.spinDone;
 
     try {
-      var bleed = ge('chk-bleed').checked ? 3 : 0;
-      var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
-      var pw = isLetter ? 279.4 : 297;
-      var ph = isLetter ? 215.9 : 210;
       var { jsPDF } = window.jspdf;
-      var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm',
-        format: bleed ? [pw + bleed * 2, ph + bleed * 2] : (isLetter ? [pw, ph] : 'a4') });
-      var printGrid = ge('print-grid');
-      printGrid.className = isLetter ? 'letter-landscape' : 'a4-landscape';
 
-      if (window.getSelection) window.getSelection().removeAllRanges();
+      if (currentOutput === 'print') {
+        /* ══ DRUCKEREI: 1 Karte pro Seite, 136×59 + 3 mm Bleed, randlos ══
+           Wrapper-JPEG-Pattern: Wrapper-Bg = Theme-Farbe (Bleed + Border in einem),
+           Karte ohne Border (verkleinert um 2×8px) als Cream-Rechteck zentriert drin.
+           Gerade Kanten → keine Miter-Joins. */
+        var pw = PRINT_CARD.w + PRINT_CARD.bleed * 2;
+        var ph = PRINT_CARD.h + PRINT_CARD.bleed * 2;
+        var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: [pw, ph] });
 
-      for (var p = 0; p < pages; p++) {
-        msg.textContent = l.spinPage(p + 1, pages);
-        var pageGuests = guests.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
-        printGrid.innerHTML = pageHTML(pageGuests, motto);
+        var THEME_HEX = { burgund: '#8B1A35', cognac: '#7B4718', forest: '#1F4A32' };
+        var bg = THEME_HEX[currentTheme] || '#ffffff';
 
-        await new Promise(function(r){ setTimeout(r, 150); });
+        var tmp = document.createElement('div');
+        tmp.style.cssText =
+          'position:fixed;left:-9999px;top:0;width:' + pw + 'mm;height:' + ph + 'mm;' +
+          'display:flex;align-items:center;justify-content:center;background:' + bg + ';';
+        document.body.appendChild(tmp);
 
-        var canvas = await html2canvas(printGrid, {
-          scale: 3, useCORS: true, allowTaint: true,
-          backgroundColor: '#ffffff', logging: false
-        });
+        for (var i = 0; i < guests.length; i++) {
+          msg.textContent = l.spinPage(i + 1, guests.length);
+          tmp.innerHTML = cardHTML(guests[i], motto);
+          var card = tmp.querySelector('.place-card');
+          if (card) {
+            /* Border raus, Größe um 2×Border reduziert → Theme-Rahmen kommt nur aus Wrapper-Bg */
+            card.style.width  = 'calc(' + PRINT_CARD.w + 'mm - ' + (2 * PRINT_CARD.border_px) + 'px)';
+            card.style.height = 'calc(' + PRINT_CARD.h + 'mm - ' + (2 * PRINT_CARD.border_px) + 'px)';
+            card.style.border = '0';
+          }
+          /* Schneidmarken im Druckerei-Modus ausblenden */
+          tmp.querySelectorAll('.cut').forEach(function(c){ c.style.display = 'none'; });
 
-        if (p > 0) pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.88), 'JPEG', bleed, bleed, pw, ph);
+          await new Promise(function(r){ setTimeout(r, 100); });
+          var canvas = await html2canvas(tmp, {
+            scale: 2, useCORS: true, backgroundColor: bg, logging: false,
+            width: tmp.offsetWidth, height: tmp.offsetHeight
+          });
+          if (i > 0) pdf.addPage([pw, ph], 'landscape');
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', 0, 0, pw, ph);
+        }
+        document.body.removeChild(tmp);
+        pdf.save('Place_Cards_OldMoney_Druckerei_' + new Date().toISOString().slice(0,10) + '.pdf');
+
+      } else {
+        /* ══ HEIMDRUCK: 6 Karten / A4 quer (bestehende Logik) ══ */
+        var pages    = Math.ceil(guests.length / PER_PAGE);
+        var bleed    = ge('chk-bleed').checked ? 3 : 0;
+        var isLetter = (document.querySelector('input[name="paper-format"]:checked') || {}).value === 'letter';
+        var pw2 = isLetter ? 279.4 : 297;
+        var ph2 = isLetter ? 215.9 : 210;
+        var pdf2 = new jsPDF({ orientation: 'landscape', unit: 'mm',
+          format: bleed ? [pw2 + bleed * 2, ph2 + bleed * 2] : (isLetter ? [pw2, ph2] : 'a4') });
+        var printGrid = ge('print-grid');
+        printGrid.className = isLetter ? 'letter-landscape' : 'a4-landscape';
+
+        if (window.getSelection) window.getSelection().removeAllRanges();
+
+        for (var p = 0; p < pages; p++) {
+          msg.textContent = l.spinPage(p + 1, pages);
+          var pageGuests = guests.slice(p * PER_PAGE, (p + 1) * PER_PAGE);
+          printGrid.innerHTML = pageHTML(pageGuests, motto);
+
+          await new Promise(function(r){ setTimeout(r, 150); });
+
+          var canvas2 = await html2canvas(printGrid, {
+            scale: 3, useCORS: true, allowTaint: true,
+            backgroundColor: '#ffffff', logging: false
+          });
+
+          if (p > 0) pdf2.addPage();
+          pdf2.addImage(canvas2.toDataURL('image/jpeg', 0.88), 'JPEG', bleed, bleed, pw2, ph2);
+        }
+
+        pdf2.save('Place_Cards_OldMoney_' + new Date().toISOString().slice(0,10) + '.pdf');
       }
-
-      pdf.save('Place_Cards_OldMoney_' + new Date().toISOString().slice(0,10) + '.pdf');
 
     } catch(e) {
       alert(l.alertFail + e.message);
