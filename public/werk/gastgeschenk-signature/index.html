@@ -220,31 +220,20 @@
     .fmt-6 .gcard-task-text { font-size: 3mm; }
 
     /* ── Cut marks ── */
-    /* ══ DRUCKEREI-MODUS ═══════════════════════════════ */
+    /* ══ DRUCKEREI-MODUS ═══════════════════════════════
+       Print-Page = Theme-farbiger Flex-Container. Karte zentriert, Border weg.
+       Classic: weißer Page-Bg, Karte behält 1-px-Border. */
     .print-page {
       position: relative;
       margin: 0 auto 18px;
-      background: #fff;
       box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .print-page > .gift-card.highland,
-    .print-page > .gift-card.coastal {
-      width: 100%;
-      height: 100%;
-      border: 0 !important;
-      padding: calc(8px + 3mm);
-    }
-    .print-page > .gift-card.highland {
-      background: linear-gradient(#FEFCF7, #FEFCF7) no-repeat content-box, #2B4A1F;
-    }
-    .print-page > .gift-card.coastal {
-      background: linear-gradient(#FAFCFE, #FAFCFE) no-repeat content-box, #1A4A6B;
-    }
-    .print-page.classic-page { display: flex; align-items: center; justify-content: center; }
-    .print-page.classic-page > .gift-card.classic {
-      width: calc(100% - 6mm); height: calc(100% - 6mm);
-    }
-    /* Inner-Frame bleibt sichtbar (Design-Element) */
+    .print-page.theme-highland { background: #2B4A1F; }
+    .print-page.theme-coastal  { background: #1A4A6B; }
+    .print-page.theme-classic  { background: #FFFFFF; }
 
     .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -854,14 +843,25 @@
       var ph = size.h + PRINT_BLEED * 2;
       var html = '';
       var list = guests.length ? guests : previewGuests;
-      var pageCls = currentTheme === 'classic' ? 'print-page classic-page' : 'print-page';
+      var isClassic = currentTheme === 'classic';
       for (var i = 0; i < list.length; i++) {
         html +=
-          '<div class="' + pageCls + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+          '<div class="print-page theme-' + currentTheme + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
             cardHTML(list[i], i) +
           '</div>';
       }
       grid.innerHTML = html;
+      grid.querySelectorAll('.print-page > .gift-card').forEach(function(c){
+        c.style.flexShrink = '0';
+        if (isClassic) {
+          c.style.width  = size.w + 'mm';
+          c.style.height = size.h + 'mm';
+        } else {
+          c.style.width  = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+          c.style.height = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+          c.style.border = '0';
+        }
+      });
       ge('page-info').textContent = '';
       ge('btn-prev').disabled = true;
       ge('btn-next').disabled = true;

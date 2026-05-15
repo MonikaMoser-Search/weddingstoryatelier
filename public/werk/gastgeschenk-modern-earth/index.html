@@ -217,29 +217,20 @@
     .fmt-6 .gcard-task-text { font-size: 3mm; }
 
     /* ── Cut marks ── */
-    /* ══ DRUCKEREI-MODUS ═══════════════════════════════ */
+    /* ══ DRUCKEREI-MODUS ═══════════════════════════════
+       Print-Page = Theme-farbiger Flex-Container.
+       Karte mit Border, verkleinert um 2×Border → Border + Wrapper-Bleed = Theme. */
     .print-page {
       position: relative;
       margin: 0 auto 18px;
-      background: #fff;
       box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .print-page > .gift-card {
-      width: 100%;
-      height: 100%;
-      border: 0 !important;
-      padding: calc(5px + 3mm);
-    }
-    .print-page > .gift-card.terracotta {
-      background: linear-gradient(#FAF9F6, #FAF9F6) no-repeat content-box, #A0522D;
-    }
-    .print-page > .gift-card.eukalyptus {
-      background: linear-gradient(#FAF9F6, #FAF9F6) no-repeat content-box, #8F9779;
-    }
-    .print-page > .gift-card.stone {
-      background: linear-gradient(#FAF9F6, #FAF9F6) no-repeat content-box, #96897F;
-    }
-    /* Inner-Frame bleibt sichtbar (Design-Element) */
+    .print-page.theme-terracotta { background: #A0522D; }
+    .print-page.theme-eukalyptus { background: #8F9779; }
+    .print-page.theme-stone      { background: #96897F; }
 
     .cut { position: absolute; background: rgba(110,100,90,0.35); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -846,11 +837,17 @@
       var list = guests.length ? guests : previewGuests;
       for (var i = 0; i < list.length; i++) {
         html +=
-          '<div class="print-page" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+          '<div class="print-page theme-' + currentTheme + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
             cardHTML(list[i], i) +
           '</div>';
       }
       grid.innerHTML = html;
+      grid.querySelectorAll('.print-page > .gift-card').forEach(function(c){
+        c.style.width      = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+        c.style.height     = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+        c.style.border     = '0';
+        c.style.flexShrink = '0';
+      });
       ge('page-info').textContent = '';
       ge('btn-prev').disabled = true;
       ge('btn-next').disabled = true;

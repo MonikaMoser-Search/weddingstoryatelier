@@ -219,30 +219,21 @@
 
     /* ── Cut marks ── */
     /* ══ DRUCKEREI-MODUS ═══════════════════════════════
-       Editor-Preview: Multi-Layer-Background pro Karte (Theme + Cream-Content).
-       Export-Pattern: Wrapper-JPEG mit Theme-Bg, Karte ohne Border, verkleinert. */
+       Print-Page = Theme-farbiger Flex-Container.
+       Karte mit ihrem normalen Theme-Border, verkleinert um 2×Border so dass
+       Border + Wrapper-Bleed nahtlos in Theme-Farbe übergehen.
+       Identisch zur Export-Logik — gleiches Bild in Preview und PDF. */
     .print-page {
       position: relative;
       margin: 0 auto 18px;
-      background: #fff;
       box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .print-page > .gift-card {
-      width: 100%;
-      height: 100%;
-      border: 0 !important;
-      padding: calc(8px + 3mm);
-    }
-    .print-page > .gift-card.burgund {
-      background: linear-gradient(#FEF8F7, #FEF8F7) no-repeat content-box, #8B1A35;
-    }
-    .print-page > .gift-card.cognac {
-      background: linear-gradient(#FEF9F5, #FEF9F5) no-repeat content-box, #7B4718;
-    }
-    .print-page > .gift-card.forest {
-      background: linear-gradient(#F7FAF7, #F7FAF7) no-repeat content-box, #1F4A32;
-    }
-    /* Inner-Frame bleibt sichtbar (Design-Element) */
+    .print-page.theme-burgund { background: #8B1A35; }
+    .print-page.theme-cognac  { background: #7B4718; }
+    .print-page.theme-forest  { background: #1F4A32; }
 
     .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
     .cut.h { height: 0.4px; width: 4mm; }
@@ -848,8 +839,9 @@
     var grid = ge('preview-grid');
 
     if (currentOutput === 'print') {
-      /* Druckerei-Preview: 1 Karte / Seite im gewählten Format + 3 mm Bleed.
-         Karten werden gestapelt angezeigt. */
+      /* Druckerei-Preview: 1 Karte / Seite + 3 mm Bleed, gestapelt angezeigt.
+         Print-Page hat Theme-Farbe als Hintergrund, Karte ist verkleinert (–2×Border)
+         und zentriert — identisch zur Export-Logik. */
       grid.className = '';
       grid.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;gap:0;background:transparent;width:auto;height:auto;padding:0;';
       var size = PRINT_CARD_SIZES[currentFormat] || PRINT_CARD_SIZES['4'];
@@ -857,14 +849,20 @@
       var ph = size.h + PRINT_BLEED * 2;
       var html = '';
       var list = guests.length ? guests : previewGuests;
-      var start0 = currentPage * pp;
       for (var i = 0; i < list.length; i++) {
         html +=
-          '<div class="print-page" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
+          '<div class="print-page theme-' + currentTheme + '" style="width:' + pw + 'mm;height:' + ph + 'mm;">' +
             cardHTML(list[i], i) +
           '</div>';
       }
       grid.innerHTML = html;
+      /* Karte verkleinern, Border weg → Wrapper-Theme-Bg liefert Border + Bleed */
+      grid.querySelectorAll('.print-page > .gift-card').forEach(function(c){
+        c.style.width      = 'calc(' + size.w + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+        c.style.height     = 'calc(' + size.h + 'mm - ' + (2 * PRINT_BORDER_PX) + 'px)';
+        c.style.border     = '0';
+        c.style.flexShrink = '0';
+      });
       ge('page-info').textContent = '';
       ge('btn-prev').disabled = true;
       ge('btn-next').disabled = true;
