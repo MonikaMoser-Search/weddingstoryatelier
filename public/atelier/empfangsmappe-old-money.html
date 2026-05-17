@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Empfangsmappe Hochzeit — Live-Demo · Wedding Story Atelier</title>
+  <meta name="description" content="Live-Demo: Editorial-Empfangsmappe für Hochzeitsgäste — Cover, Welcome Letter, Tagesablauf, „Auf einen Blick". Drei Farbwelten, A3 + Tabloid. Direkt im Browser ausprobieren.">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="https://weddingstoryatelier.de/atelier/empfangsmappe-old-money">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    :root {
+      --cream: #FAF7F2;
+      --charcoal: #1A1A1A;
+      --mid: #555555;
+      --light: #999999;
+      --rule: #DDDDDD;
+    }
+    body { background: #ECEAE4; }
+
+    /* ── FORM PANEL ── */
+    .panel-form { position: sticky; top: 0; height: calc(100vh - 44px); }
+    .panel-form h2 { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 400; margin-bottom: 4px; }
+    .panel-form .subtitle { font-size: 12px; color: var(--light); margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--rule); }
+    .style-buttons { display: flex; gap: 6px; margin-bottom: 16px; }
+    .style-btn {
+      flex: 1; padding: 8px 4px; border: 1.5px solid var(--rule);
+      background: white; cursor: pointer; font-family: 'Cormorant Garamond', serif;
+      font-size: 11px; letter-spacing: 0.06em; color: var(--mid);
+      transition: all 0.2s; border-radius: 2px;
+    }
+    .style-btn.active { border-color: var(--charcoal); background: var(--charcoal); color: white; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+    .form-section { margin-bottom: 18px; padding-bottom: 14px; border-bottom: 1px dashed var(--rule); }
+    .form-section:last-of-type { border-bottom: none; }
+    .section-label { font-family: 'DM Sans', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 10px; display: block; }
+    .field { margin-bottom: 10px; }
+    label { display: block; font-size: 11px; color: var(--mid); margin-bottom: 3px; }
+    .opt { font-size: 9px; color: var(--light); margin-left: 4px; font-style: italic; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .field-row .field { margin-bottom: 0; }
+    textarea { min-height: 70px; resize: vertical; font-family: 'Cormorant Garamond', serif; }
+    .photo-upload {
+      border: 2px dashed var(--rule); border-radius: 2px;
+      padding: 14px; text-align: center; cursor: pointer;
+      transition: all 0.2s; background: #FAFAFA;
+    }
+    .photo-upload:hover { border-color: var(--charcoal); background: white; }
+    .photo-upload input { display: none; }
+    .photo-upload .pu-icon { font-size: 22px; margin-bottom: 4px; }
+    .photo-upload .pu-label { font-size: 11px; color: var(--mid); }
+    .photo-upload .pu-sub { font-size: 9px; color: var(--light); margin-top: 2px; }
+    .photo-preview { width: 100%; height: 90px; object-fit: cover; border-radius: 2px; display: none; }
+    .btn-download {
+      width: 100%; padding: 13px; background: #8B1A35; color: white;
+      border: none; font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; letter-spacing: 0.15em; text-transform: uppercase;
+      cursor: pointer; margin-top: 6px; transition: opacity 0.2s; border-radius: 2px;
+    }
+    .btn-download:hover { opacity: 0.82; }
+    .privacy-note { font-size: 10px; color: var(--light); text-align: center; margin-top: 8px; font-style: italic; }
+    .format-box { border: 1px solid #e8e4df; border-radius: 4px; padding: 10px 12px; margin-top: 8px; background: #faf8f5; }
+    .format-title { font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase; letter-spacing: 1.2px; color: #333; margin-bottom: 7px; }
+    .format-opts { display: flex; gap: 16px; }
+    .format-opt { display: flex; align-items: center; gap: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 9px; color: #333; }
+    .format-opt input[type="radio"] { accent-color: #1A1A1A; width: 12px; height: 12px; margin: 0; cursor: pointer; }
+    .format-opt em { font-style: normal; color: #888; font-size: 8px; }
+    .day-block { border: 1px solid var(--rule); border-radius: 2px; padding: 10px; margin-bottom: 10px; background: #fcfbf9; }
+    .day-head { font-family:'Cormorant Garamond', serif; font-size: 13px; color: var(--charcoal); margin-bottom: 6px; font-style: italic; }
+    .tl-row { display: grid; grid-template-columns: 50px 1fr 22px; gap: 4px; margin-bottom: 4px; align-items: center; }
+    .tl-row input { font-size: 11px; }
+    .btn-tl-add { width: 100%; padding: 5px; font-size: 10px; background: white; border: 1px dashed var(--rule); cursor: pointer; color: var(--mid); border-radius: 2px; }
+    .btn-tl-remove { background: white; border: 1px solid var(--rule); cursor: pointer; font-size: 12px; color: var(--light); border-radius: 2px; }
+    .btn-tl-remove:hover { border-color: #8B1A35; color: #8B1A35; }
+    .y-slider { display: none; margin-top: 8px; align-items: center; gap: 8px; }
+    .y-slider.visible { display: flex; }
+    .y-slider label { flex-shrink: 0; font-size: 10px; color: var(--mid); margin: 0; }
+    .y-slider input[type="range"] { flex: 1; accent-color: #8B1A35; }
+    .y-slider .y-val { flex-shrink: 0; min-width: 30px; font-size: 10px; color: var(--charcoal); text-align: right; }
+
+    /* ── PREVIEW AREA ── */
+    .panel-preview {
+      flex: 1; padding: 24px; display: flex; flex-direction: column;
+      align-items: center; gap: 16px; overflow: auto;
+    }
+    .view-toggle {
+      display: flex; gap: 4px; background: white; padding: 4px;
+      border-radius: 999px; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 4px;
+    }
+    .view-toggle button {
+      padding: 8px 18px; border: none; background: transparent; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 0.16em;
+      text-transform: uppercase; color: var(--mid); border-radius: 999px;
+      transition: all 0.2s;
+    }
+    .view-toggle button.active { background: var(--charcoal); color: white; }
+    .spread-view { display: none; flex-direction: column; align-items: center; gap: 12px; }
+    .spread-view.visible { display: flex; }
+    .spread-label {
+      font-family:'DM Sans', sans-serif; font-size: 10px; letter-spacing: 0.18em;
+      text-transform: uppercase; color: var(--mid);
+    }
+    .spread {
+      background: white; box-shadow: 0 10px 36px rgba(0,0,0,0.15);
+      display: flex; position: relative;
+    }
+    .spread::before {
+      content: ''; position: absolute; top: 0; bottom: 0; left: 50%;
+      width: 1px; background: rgba(0,0,0,0.06); pointer-events: none; z-index: 5;
+    }
+    .panel-card {
+      width: 210mm; height: 297mm; box-sizing: border-box;
+      font-family: 'Cormorant Garamond', serif;
+      position: relative; overflow: hidden;
+      background: var(--bg);
+      /* Solider Bordeaux-Außenband — Old-Money-Familien-Signatur */
+      border: 4mm solid var(--accent);
+    }
+    /* Feine innere Trennlinie (Cream-Bereich) */
+    .panel-card::before {
+      content: ''; position: absolute; inset: 5mm;
+      border: 0.8px solid var(--accent-fade);
+      pointer-events: none; z-index: 1;
+    }
+
+    /* Foto-Schmuckecken — TR + BL, doppelt versetztes L (Brautjungfer-Pattern) */
+    .photo-corners { position: relative; }
+    .photo-corners > .pc {
+      position: absolute; pointer-events: none;
+      width: 10mm; height: 10mm;
+      border-style: solid; border-color: var(--accent);
+    }
+    .photo-corners > .pc.tr-i { top: 0;       right: 0;       border-width: 1.3px 1.3px 0 0; }
+    .photo-corners > .pc.tr-o { top: -3.5mm;  right: -3.5mm;  border-width: 0.7px 0.7px 0 0; opacity: 0.7; }
+    .photo-corners > .pc.bl-i { bottom: 0;    left: 0;        border-width: 0 0 1.3px 1.3px; }
+    .photo-corners > .pc.bl-o { bottom: -3.5mm; left: -3.5mm; border-width: 0 0 0.7px 0.7px; opacity: 0.7; }
+    /* preview scale via wrapper transform */
+    .spread-scale {
+      transform-origin: top center;
+    }
+    /* Format-Scale: schrumpft das A3-Master-Spread auf das gewählte Papierformat */
+    .format-scale {
+      transform: scale(var(--format-scale, 1));
+      transform-origin: top left;
+      width: max-content;
+    }
+
+    /* ── PANEL: COVER ── */
+    .p-cover {
+      display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+      padding: 34mm 24mm;
+    }
+    .cover-top { text-align: center; z-index: 2; }
+    .cover-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-size: 11px;
+      letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--accent-soft); margin-bottom: 0;
+    }
+    .cover-photo-frame {
+      width: 132mm; height: 165mm; overflow: hidden;
+      background: var(--photo-placeholder);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto; position: relative; z-index: 2;
+    }
+    .cover-photo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .cover-photo-placeholder { color: var(--accent-soft); font-style: italic; font-size: 14px; }
+    .cover-bottom { text-align: center; z-index: 2; width: 100%; }
+    .cover-names {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      font-size: 44px; color: var(--accent); letter-spacing: 0.08em;
+      line-height: 1.05; margin-bottom: 6mm;
+    }
+    .cover-rule {
+      width: 14mm; height: 1px; background: var(--accent);
+      margin: 0 auto 6mm; opacity: 0.5;
+    }
+    .cover-date {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 18px; color: var(--text); opacity: 0.95;
+      margin-bottom: 3mm;
+    }
+    .cover-venue {
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--accent-soft);
+    }
+
+    /* ── PANEL: WELCOME LETTER (Editorial Refresh) ── */
+    .p-welcome {
+      padding: 22mm 20mm 18mm;
+      display: flex; flex-direction: column;
+      text-align: center;
+    }
+    .wl-vignette {
+      width: 24mm; margin: 0 auto 6mm;
+      color: var(--accent);
+      position: relative; z-index: 2;
+    }
+    .wl-vignette svg { width: 100%; height: auto; display: block; opacity: 0.85; }
+    .wl-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      font-size: 42px; color: var(--accent); line-height: 1.1;
+      letter-spacing: 0.02em;
+      margin-bottom: 6mm;
+      position: relative; z-index: 2;
+    }
+    .wl-body {
+      font-family: 'Cormorant Garamond', serif; font-size: 14.5px;
+      line-height: 1.7; color: var(--text);
+      margin: 0 auto 6mm;
+      max-width: 140mm;
+      position: relative; z-index: 2;
+      white-space: pre-line;
+    }
+    .wl-closer {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 17px; color: var(--accent);
+      margin: 0 0 3mm;
+      letter-spacing: 0.01em;
+      position: relative; z-index: 2;
+    }
+    .wl-signature {
+      margin-bottom: 8mm;
+      position: relative; z-index: 2;
+    }
+    .wl-signature-eure { display: none; }
+    .wl-signature-names {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 20px; color: var(--accent); letter-spacing: 0.02em;
+    }
+    .wl-photo-frame {
+      flex: 1; min-height: 138mm;
+      position: relative; z-index: 5;
+      margin: auto -22mm -20mm;
+      width: calc(100% + 44mm);
+      overflow: hidden;
+    }
+    .wl-photo {
+      position: absolute; inset: 0;
+      background: var(--photo-placeholder);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .wl-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .wl-photo .ph {
+      color: var(--accent-soft); font-style: italic; font-size: 12px;
+    }
+    /* Weicher Übergang Weißraum → Foto (kein hartes Rechteck) */
+    .wl-photo::after {
+      content: '';
+      position: absolute; left: 0; right: 0; top: 0; height: 26%;
+      background: linear-gradient(to bottom, var(--bg) 0%, rgba(254,248,247,0) 100%);
+      pointer-events: none;
+    }
+    .cognac .wl-photo::after { background: linear-gradient(to bottom, var(--bg) 0%, rgba(254,249,245,0) 100%); }
+    .forest .wl-photo::after { background: linear-gradient(to bottom, var(--bg) 0%, rgba(247,250,247,0) 100%); }
+    .wl-concierge {
+      position: absolute;
+      left: 14mm; right: auto; bottom: 14mm;
+      width: 74mm;
+      background: var(--bg);
+      padding: 10mm 9mm 9mm;
+      border: 0.5px solid rgba(0,0,0,0.10);
+      text-align: left;
+      box-shadow: 0 1mm 3mm rgba(0,0,0,0.06);
+      border-radius: 6mm 6mm 2mm 2mm;
+    }
+    .wl-concierge.pos-right { left: auto; right: 14mm; }
+    .wl-concierge-mark {
+      position: absolute;
+      top: -2mm; left: 50%;
+      transform: translateX(-50%);
+      width: 7.5mm; height: 3.6mm;
+      background: var(--bg);
+      border: 0.4px solid var(--accent);
+      border-radius: 50%;
+      opacity: 0.9;
+    }
+    .wl-concierge-mark::before,
+    .wl-concierge-mark::after {
+      content: '';
+      position: absolute;
+      top: 50%; transform: translateY(-50%) rotate(45deg);
+      width: 0.7mm; height: 0.7mm;
+      background: var(--accent);
+    }
+    .wl-concierge-mark::before { left: 1.4mm; }
+    .wl-concierge-mark::after  { right: 1.4mm; }
+    .wl-highlights-label {
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      letter-spacing: 0.22em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 5mm;
+      text-align: center; line-height: 1.4;
+    }
+    .wl-highlights {
+      list-style: none; padding: 0; margin: 0;
+    }
+    .wl-highlights li {
+      font-family: 'Cormorant Garamond', serif; font-size: 13px;
+      line-height: 1.5; color: var(--text); margin-bottom: 4mm;
+      padding-left: 6mm; position: relative;
+    }
+    .wl-highlights li:last-child { margin-bottom: 0; }
+    .wl-highlights li::before {
+      content: '';
+      position: absolute; left: 0; top: 2mm;
+      width: 1.6mm; height: 1.6mm;
+      background: var(--accent); opacity: 0.7;
+      transform: rotate(45deg);
+    }
+
+    /* ── PANEL: PROGRAMM ── */
+    .p-program {
+      padding: 22mm 22mm 18mm;
+      display: flex; flex-direction: column;
+    }
+    .prg-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-size: 11px;
+      letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--accent-soft); text-align: center;
+      margin-bottom: 6mm; position: relative; z-index: 2;
+    }
+    .prg-body { flex: 1; display: flex; flex-direction: column; position: relative; z-index: 2; }
+    #out-prg-days { flex: 1; display: flex; flex-direction: column; }
+    #out-prg-days[data-days="2"] { justify-content: space-around; }
+    /* 3-Tage-Modus = dichteste Variante, Spacing zurück */
+    .prg-body[data-days="3"] .prg-head { margin-bottom: 5mm; }
+    .prg-body[data-days="3"] .prg-day { margin-bottom: 4mm; }
+    .prg-body[data-days="3"] .prg-day + .prg-day { padding-top: 5mm; }
+    .prg-body[data-days="3"] .prg-day-intro,
+    .prg-body[data-days="3"] .prg-day-outro { margin-bottom: 2mm; line-height: 1.55; }
+    .prg-body[data-days="3"] .prg-timeline li { padding: 0.4mm 0; line-height: 1.3; }
+    .prg-body[data-days="3"] .prg-day-hero-time { font-size: 58px; margin-bottom: 2mm; }
+    .prg-body[data-days="3"] .prg-day-hero-mark { margin: 2mm auto 0; }
+    /* 2-Tage-Modus: Diamant-Trenner ausblenden, space-around macht die Trennung */
+    .prg-body[data-days="2"] .prg-day + .prg-day { padding-top: 0; }
+    .prg-body[data-days="2"] .prg-day + .prg-day::before,
+    .prg-body[data-days="2"] .prg-day + .prg-day::after { display: none; }
+    .prg-head { text-align: center; margin-bottom: 9mm; }
+    .prg-couple {
+      font-family: 'Cormorant Garamond', serif; font-weight: 600;
+      font-size: 38px; color: var(--accent); margin-bottom: 2mm;
+    }
+    .prg-sub {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 13px; color: var(--text); opacity: 0.88;
+    }
+    .prg-head-rule { width: 18mm; height: 1px; background: var(--accent); opacity: 0.55; margin: 4mm auto 0; }
+    .prg-day { margin-bottom: 7mm; position: relative; }
+    /* Diamant-Trenner zwischen Tagen */
+    .prg-day + .prg-day { padding-top: 8mm; }
+    .prg-day + .prg-day::before {
+      content: '';
+      position: absolute; top: 0; left: 50%;
+      transform: translate(-50%, -50%) rotate(45deg);
+      width: 2mm; height: 2mm;
+      background: var(--accent); opacity: 0.7;
+    }
+    .prg-day + .prg-day::after {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%;
+      height: 0.6px; background: var(--accent-fade);
+    }
+    /* Hero-Pull-out Layout */
+    .prg-day.has-hero .prg-day-flow {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8mm;
+      align-items: start;
+      margin-top: 3mm;
+    }
+    .prg-day-hero {
+      text-align: center;
+      padding-top: 2mm;
+    }
+    .prg-day-hero-time {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      font-size: 76px; line-height: 1; color: var(--accent);
+      letter-spacing: 0.02em;
+      margin-bottom: 4mm;
+    }
+    .prg-day-hero-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 400;
+      font-size: 21px; line-height: 1.25; color: var(--text);
+      margin-bottom: 1.5mm;
+    }
+    .prg-day-hero-sub {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 15px; line-height: 1.35; color: var(--text); opacity: 0.95;
+    }
+    .prg-day-hero-mark {
+      display: block; margin: 5mm auto 0;
+      width: 1.8mm; height: 1.8mm;
+      background: var(--accent); opacity: 0.55;
+      transform: rotate(45deg);
+    }
+    .prg-day.has-hero .prg-timeline {
+      border-left: 0.6px solid var(--accent-fade);
+      padding-left: 6mm;
+    }
+    .prg-day.has-hero .prg-timeline li {
+      grid-template-columns: 16mm 1fr;
+      gap: 4mm;
+      font-size: 12.5px;
+      padding: 0.8mm 0;
+    }
+    .prg-day.has-hero .prg-timeline li .tl-time {
+      border-right: none;
+      padding-right: 0;
+    }
+    .prg-day-label {
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      letter-spacing: 0.3em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 3mm;
+      padding-bottom: 2mm; border-bottom: 1px solid var(--rule-soft);
+    }
+    .prg-day-intro,
+    .prg-day-outro {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 13.5px; line-height: 1.55; color: var(--text);
+      opacity: 1; margin-bottom: 3mm;
+    }
+    .prg-timeline { list-style: none; padding: 0; margin: 0 0 3mm; }
+    .prg-timeline li {
+      display: grid; grid-template-columns: 22mm 1fr; gap: 5mm;
+      padding: 1.2mm 0;
+      font-family: 'Cormorant Garamond', serif; font-size: 13.5px;
+      color: var(--text); line-height: 1.4;
+    }
+    .prg-timeline li .tl-time {
+      font-weight: 600; color: var(--accent); text-align: right;
+      border-right: 1px solid var(--rule-soft); padding-right: 5mm;
+    }
+
+    /* ── PANEL: AUF EINEN BLICK (Rückseite, neu) ── */
+    .p-ab {
+      padding: 0; display: flex; flex-direction: row; gap: 0;
+      align-items: stretch;
+    }
+    .ab-photo {
+      width: 78mm; flex-shrink: 0;
+      background: var(--photo-placeholder);
+      overflow: hidden; position: relative; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ab-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ab-photo .ph {
+      color: var(--accent-soft); font-family:'Cormorant Garamond',serif;
+      font-style: italic; font-size: 13px; padding: 0 6mm; text-align: center;
+    }
+    .ab-content {
+      flex: 1; padding: 24mm 18mm 18mm 18mm;
+      display: flex; flex-direction: column; position: relative; z-index: 2;
+    }
+    .ab-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      letter-spacing: 0.42em; text-transform: uppercase;
+      color: var(--accent-soft); text-align: center; margin-bottom: 3mm;
+    }
+    .ab-title {
+      font-family: 'Cormorant Garamond', serif; font-weight: 300;
+      font-style: italic;
+      font-size: 42px; color: var(--accent); letter-spacing: 0.02em;
+      text-align: center; margin-bottom: 3mm;
+    }
+    .ab-title-rule {
+      width: 14mm; height: 1px; background: var(--accent); opacity: 0.55;
+      margin: 0 auto 12mm;
+    }
+    .ab-blocks {
+      flex: 1;
+      display: flex; flex-direction: column;
+      position: relative;
+      padding-left: 14mm;
+    }
+    /* Vertikale Achsen-Linie */
+    .ab-blocks::before {
+      content: ''; position: absolute;
+      left: 3mm; top: 4mm; bottom: 4mm;
+      width: 0.6px; background: var(--accent-fade);
+    }
+    .ab-block {
+      position: relative;
+      padding: 4mm 0 4mm 0;
+    }
+    .ab-block + .ab-block { margin-top: 2mm; }
+    /* Diamant-Marker auf der Achse */
+    .ab-block::before {
+      content: '';
+      position: absolute;
+      left: -11.4mm; top: 7mm;
+      width: 2.4mm; height: 2.4mm;
+      background: var(--accent);
+      transform: rotate(45deg);
+    }
+    .ab-block-label {
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 2.5mm;
+    }
+    .ab-block-name {
+      font-family: 'Cormorant Garamond', serif; font-weight: 500;
+      font-size: 22px; color: var(--text); line-height: 1.15;
+      margin-bottom: 2.5mm;
+    }
+    .ab-block-addr {
+      font-family: 'Cormorant Garamond', serif; font-size: 13px;
+      line-height: 1.5; color: var(--text); opacity: 0.95;
+      white-space: pre-line; margin-bottom: 2.5mm;
+    }
+    .ab-block-info {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 13.5px; line-height: 1.5; color: var(--text); opacity: 0.95;
+      white-space: pre-line;
+    }
+    .ab-contact {
+      margin-top: 7mm;
+      padding: 5mm 0;
+      border-top: 0.4px solid var(--accent-fade);
+      border-bottom: 0.4px solid var(--accent-fade);
+      text-align: center;
+    }
+    .ab-contact-lab {
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 2.5mm;
+    }
+    .ab-contact-number {
+      font-family: 'Cormorant Garamond', serif; font-weight: 500;
+      font-size: 22px; color: var(--text);
+      letter-spacing: 0.04em;
+      margin-bottom: 1.5mm;
+    }
+    .ab-contact-note {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 13px; color: var(--text); opacity: 0.95;
+    }
+    .ab-master {
+      margin-top: 7mm;
+      display: grid; grid-template-columns: 22mm 1fr;
+      gap: 5mm; align-items: center;
+      padding-left: 14mm;
+    }
+    .ab-master-qr {
+      width: 22mm; height: 22mm; background: white;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ab-master-qr img { width: 100%; height: 100%; display: block; }
+    .ab-master-qr.empty {
+      border: 0.8px dashed var(--accent-fade);
+      color: var(--accent-soft);
+      font-family:'Cormorant Garamond',serif; font-style: italic;
+      font-size: 9px; text-align: center; line-height: 1.2;
+    }
+    .ab-master-text-lab {
+      font-family: 'DM Sans', sans-serif; font-size: 9px;
+      letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 1.5mm;
+    }
+    .ab-master-text-body {
+      font-family: 'Cormorant Garamond', serif; font-size: 11.5px;
+      line-height: 1.5; color: var(--text); opacity: 0.95;
+    }
+    .ab-footer {
+      margin-top: 8mm;
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 13px; color: var(--accent); opacity: 0.92;
+    }
+    .ab-footer-rule { width: 8mm; height: 1px; background: var(--accent); opacity: 0.4; margin: 0 auto 4mm; }
+
+    /* ── THEMES ── */
+    .burgund { --accent: #8B1A35; --accent-soft: rgba(139,26,53,0.62); --accent-fade: rgba(139,26,53,0.50); --accent-fade2: rgba(139,26,53,0.26); --bg: #FEF8F7; --text: #2A1017; --rule-soft: rgba(139,26,53,0.18); --photo-placeholder: rgba(139,26,53,0.07); }
+    .cognac  { --accent: #7B4718; --accent-soft: rgba(123,71,24,0.62); --accent-fade: rgba(123,71,24,0.50); --accent-fade2: rgba(123,71,24,0.26); --bg: #FEF9F5; --text: #2A1810; --rule-soft: rgba(123,71,24,0.18); --photo-placeholder: rgba(123,71,24,0.07); }
+    .forest  { --accent: #1F4A32; --accent-soft: rgba(31,74,50,0.62); --accent-fade: rgba(31,74,50,0.50); --accent-fade2: rgba(31,74,50,0.26); --bg: #F7FAF7; --text: #0F2820; --rule-soft: rgba(31,74,50,0.18); --photo-placeholder: rgba(31,74,50,0.07); }
+
+    /* ── DEMO CTA ─────────────────────────────────────────────────────────── */
+    .demo-cta {
+      margin-top: 14px; padding: 18px 16px 16px;
+      background: linear-gradient(180deg, #FAF7F2 0%, #F3EDE3 100%);
+      border: 1px solid #E5DCC9; border-radius: 3px;
+      text-align: center;
+    }
+    .demo-cta-eyebrow {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: #8B7355; margin-bottom: 10px;
+    }
+    .demo-cta-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; line-height: 1.55; color: #4A4A4A;
+      margin: 0 0 14px 0;
+    }
+    .demo-cta-btn {
+      display: inline-block; width: 100%; box-sizing: border-box;
+      padding: 12px 14px; background: #1A1A1A; color: #FAF7F2;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 13px; letter-spacing: 0.18em; text-transform: uppercase;
+      text-decoration: none; border-radius: 2px;
+      transition: opacity 0.2s;
+    }
+    .demo-cta-btn:hover { opacity: 0.85; }
+    .demo-cta-fine {
+      font-size: 10px; color: #999; font-style: italic;
+      margin: 10px 0 0 0; line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── FORM PANEL ── -->
+  <aside class="panel-form wsa-panel">
+    <h2 data-i18n="app.title">Empfangsmappe Generator</h2>
+    <div class="subtitle" data-i18n="app.subtitle">Old Money Line · A3 Halbfalz · Für Hotelgäste</div>
+
+    <!-- Design -->
+    <div class="form-section">
+      <span class="section-label" data-i18n="sec.design">Design</span>
+      <div class="style-buttons" style="margin-bottom:10px;">
+        <button class="style-btn active" data-lang="de" onclick="setLang('de',this)">Deutsch</button>
+        <button class="style-btn" data-lang="en" onclick="setLang('en',this)">English</button>
+      </div>
+      <div class="style-buttons">
+        <button class="style-btn active" data-theme="burgund" onclick="setTheme('burgund',this)"><span class="dot" style="background:#8B1A35"></span>Burgund</button>
+        <button class="style-btn" data-theme="cognac" onclick="setTheme('cognac',this)"><span class="dot" style="background:#7B4718"></span>Cognac</button>
+        <button class="style-btn" data-theme="forest" onclick="setTheme('forest',this)"><span class="dot" style="background:#1F4A32"></span>Forest</button>
+      </div>
+      <div class="format-box">
+        <div class="format-title" data-i18n="design.format">Format</div>
+        <div class="style-buttons" style="margin-top:6px;">
+          <button class="style-btn active" data-format="a3" onclick="setFormat('a3',this)">A3</button>
+          <button class="style-btn" data-format="a4" onclick="setFormat('a4',this)">A4</button>
+          <button class="style-btn" data-format="tabloid" onclick="setFormat('tabloid',this)">Tabloid</button>
+          <button class="style-btn" data-format="letter" onclick="setFormat('letter',this)">Letter</button>
+        </div>
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;color:#888;margin-top:6px;line-height:1.4;" data-i18n="design.format.hint">A3 gefaltet → A4 · A4 → A5 · Tabloid → Letter · Letter → Half-Letter</div>
+      </div>
+      <div class="format-box">
+        <div class="format-title" data-i18n="design.print">Druckmodus</div>
+        <div class="format-opts">
+          <label class="format-opt"><input type="radio" name="bleed" value="off" checked onchange="update()"> <span data-i18n="print.home">Heimdruck</span> <em data-i18n="print.home.note">(ohne Beschnitt)</em></label>
+          <label class="format-opt"><input type="radio" name="bleed" value="on" onchange="update()"> <span data-i18n="print.pro">Druckerei</span> <em data-i18n="print.pro.note">(+3 mm Beschnitt)</em></label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cover -->
+    <div class="form-section">
+      <span class="section-label" data-i18n="sec.cover">Außenseite · Cover (rechts)</span>
+      <div class="field"><label data-i18n="label.names">Namen</label><input id="inp-names" type="text" value="Sophie & Jonas" oninput="update()"></div>
+      <div class="field-row">
+        <div class="field"><label data-i18n="label.date">Datum</label><input id="inp-date" type="text" value="12.–14. Juli 2026" oninput="update()"></div>
+        <div class="field"><label data-i18n="label.venue">Location</label><input id="inp-venue" type="text" value="Château de Valmont" oninput="update()"></div>
+      </div>
+      <div class="field"><label><span data-i18n="label.eyebrow">Eyebrow</span> <span class="opt" data-i18n="label.eyebrow.opt">Willkommen / Welcome</span></label><input id="inp-eyebrow" type="text" value="WILLKOMMEN" oninput="update()"></div>
+      <div class="field">
+        <div class="photo-upload" onclick="document.getElementById('photo-cover').click()">
+          <input type="file" id="photo-cover" accept="image/*" onchange="loadPhoto(this,'cover')">
+          <div class="pu-icon">⌘</div>
+          <div class="pu-label" data-i18n="photo.cover.label">Hero-Foto auswählen</div>
+          <div class="pu-sub" data-i18n="photo.cover.sub">Hochformat empfohlen · 4:5</div>
+          <img id="prev-cover" class="photo-preview">
+        </div>
+        <div class="y-slider" id="y-slider-cover">
+          <label data-i18n="pos.y">Y-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onYChange('cover', this.value)">
+          <span class="y-val" id="y-val-cover">50</span>
+        </div>
+        <div class="y-slider" id="x-slider-cover">
+          <label data-i18n="pos.x">X-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onXChange('cover', this.value)">
+          <span class="y-val" id="x-val-cover">50</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Auf einen Blick (Rückseite) -->
+    <div class="form-section">
+      <span class="section-label" data-i18n="sec.back">Außenseite · Auf einen Blick (links)</span>
+      <div class="field"><label data-i18n="ab.eyebrow">Eyebrow</label><input id="inp-ab-eyebrow" type="text" value="WICHTIGE INFORMATIONEN" oninput="update()"></div>
+      <div class="field"><label data-i18n="ab.title.label">Titel</label><input id="inp-ab-title" type="text" value="Auf einen Blick" oninput="update()"></div>
+
+      <div class="field">
+        <div class="photo-upload" onclick="document.getElementById('photo-back').click()">
+          <input type="file" id="photo-back" accept="image/*" onchange="loadPhoto(this,'back')">
+          <div class="pu-icon">⌘</div>
+          <div class="pu-label" data-i18n="photo.back.label">Foto Rückseite auswählen</div>
+          <div class="pu-sub" data-i18n="photo.back.sub">Hochformat empfohlen · 2:3</div>
+          <img id="prev-back" class="photo-preview">
+        </div>
+        <div class="y-slider" id="y-slider-back">
+          <label data-i18n="pos.y">Y-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onYChange('back', this.value)">
+          <span class="y-val" id="y-val-back">50</span>
+        </div>
+        <div class="y-slider" id="x-slider-back">
+          <label data-i18n="pos.x">X-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onXChange('back', this.value)">
+          <span class="y-val" id="x-val-back">50</span>
+        </div>
+      </div>
+
+      <div class="field"><label><span data-i18n="ab.hotel">Hotel</span> · <span data-i18n="ab.label.short">Label</span></label><input id="inp-ab-h-lab" type="text" value="HOTEL" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.hotel">Hotel</span> · <span data-i18n="ab.name">Name</span></label><input id="inp-ab-h-name" type="text" value="Hotel Valmont" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.hotel">Hotel</span> · <span data-i18n="ab.addr">Adresse</span></label><textarea id="inp-ab-h-addr" oninput="update()">Rue du Château 12&#10;1234 Valmont · CH</textarea></div>
+      <div class="field"><label><span data-i18n="ab.hotel">Hotel</span> · <span data-i18n="ab.info">Info-Zeile</span> <span class="opt" data-i18n="ab.info.opt">kursiv</span></label><textarea id="inp-ab-h-info" oninput="update()">Check-In ab 15 Uhr&#10;Valet Parking vorhanden</textarea></div>
+
+      <div class="field"><label><span data-i18n="ab.ceremony">Zeremonie</span> · <span data-i18n="ab.label.short">Label</span></label><input id="inp-ab-c-lab" type="text" value="ZEREMONIE" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.ceremony">Zeremonie</span> · <span data-i18n="ab.name">Name</span></label><input id="inp-ab-c-name" type="text" value="Chapelle Saint-Pierre" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.ceremony">Zeremonie</span> · <span data-i18n="ab.addr">Adresse</span></label><textarea id="inp-ab-c-addr" oninput="update()">Place de l'Église 1&#10;1234 Valmont · CH</textarea></div>
+      <div class="field"><label><span data-i18n="ab.ceremony">Zeremonie</span> · <span data-i18n="ab.info">Info-Zeile</span> <span class="opt" data-i18n="ab.info.opt">kursiv</span></label><textarea id="inp-ab-c-info" oninput="update()">Ein Shuttle fährt ab 13:15 Uhr&#10;vom Hotel zur Kapelle.</textarea></div>
+
+      <div class="field"><label><span data-i18n="ab.reception">Empfang</span> · <span data-i18n="ab.label.short">Label</span></label><input id="inp-ab-r-lab" type="text" value="EMPFANG & FEIER" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.reception">Empfang</span> · <span data-i18n="ab.name">Name</span></label><input id="inp-ab-r-name" type="text" value="Château de Valmont" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.reception">Empfang</span> · <span data-i18n="ab.addr">Adresse</span></label><textarea id="inp-ab-r-addr" oninput="update()">Domaine de Valmont&#10;1234 Valmont · CH</textarea></div>
+      <div class="field"><label><span data-i18n="ab.reception">Empfang</span> · <span data-i18n="ab.info">Info-Zeile</span> <span class="opt" data-i18n="ab.info.opt">kursiv</span></label><textarea id="inp-ab-r-info" oninput="update()">Dinner & Feier&#10;bis in die Nachtstunden.</textarea></div>
+
+      <div class="field"><label data-i18n="ab.q.lab">Bei Fragen · Label</label><input id="inp-ab-q-lab" type="text" value="BEI FRAGEN" oninput="update()"></div>
+      <div class="field"><label data-i18n="ab.q.num">Telefonnummer</label><input id="inp-ab-q-num" type="text" value="+41 79 123 45 67" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="ab.q.note">Name / Hinweis</span> <span class="opt" data-i18n="opt">optional</span></label><input id="inp-ab-q-note" type="text" value="Anna · jederzeit für euch da" oninput="update()"></div>
+
+      <div class="field"><label data-i18n="ab.qr.lab">Master-QR · Headline</label><input id="inp-ab-qr-lab" type="text" value="ALLE ORTE & ZEITEN AUF EUREM SMARTPHONE" oninput="update()"></div>
+      <div class="field"><label data-i18n="ab.qr.body">Master-QR · Beschreibung</label><textarea id="inp-ab-qr-body" oninput="update()">Scanne den QR-Code, um alle Infos, Adressen und Zeiten direkt zu speichern.</textarea></div>
+      <div class="field">
+        <div class="photo-upload" onclick="document.getElementById('qr-master').click()">
+          <input type="file" id="qr-master" accept="image/*" onchange="loadQR(this,'master')">
+          <div class="pu-icon">⌗</div>
+          <div class="pu-label"><span data-i18n="ab.qr.upload">Master-QR</span> <span class="opt" data-i18n="opt">optional</span></div>
+          <img id="prev-qr-master" class="photo-preview" style="height:50px;width:50px;object-fit:contain;">
+          <button type="button" id="rm-qr-master" style="display:none;margin-top:6px;padding:3px 8px;font-size:9px;border:1px solid var(--rule);background:white;cursor:pointer;border-radius:2px;color:var(--mid);" onclick="event.stopPropagation();removeQR('master')" data-i18n="ab.qr.remove">QR entfernen</button>
+        </div>
+      </div>
+
+      <div class="field"><label data-i18n="ab.foot.label">Schlusszeile</label><input id="inp-ab-foot" type="text" value="Wir danken euch von Herzen — Sophie & Jonas" oninput="update()"></div>
+    </div>
+
+    <!-- Welcome -->
+    <div class="form-section">
+      <span class="section-label" data-i18n="sec.welcome">Innenseite · Welcome (links)</span>
+      <div class="field"><label data-i18n="wl.title.label">Titel</label><input id="inp-wl-title" type="text" value="Herzlich willkommen" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="wl.body.label">Begrüßungstext</span> <span class="opt" data-i18n="wl.body.opt">2–3 kurze Sätze</span></label><textarea id="inp-wl-body" oninput="update()" style="min-height:90px;">Wir freuen uns so sehr, dass ihr da seid und dieses besondere Wochenende mit uns feiert.
+
+Alle Momente, gute Gespräche, gutes Essen, Musik und ganz viel Zeit miteinander — nichts brauchen wir mehr, um unvergessliche Erinnerungen zu schaffen.</textarea></div>
+      <div class="field"><label><span data-i18n="wl.closer.label">Closer-Zeile</span> <span class="opt" data-i18n="wl.closer.opt">italic, optional</span></label><input id="inp-wl-closer" type="text" value="Schön, dass ihr da seid!" oninput="update()"></div>
+      <div class="field"><label data-i18n="wl.sig.label">Unterschrift</label><input id="inp-wl-sig" type="text" value="Sophie & Jonas" oninput="update()"></div>
+
+      <div class="field">
+        <div class="photo-upload" onclick="document.getElementById('photo-wl').click()">
+          <input type="file" id="photo-wl" accept="image/*" onchange="loadPhoto(this,'wl')">
+          <div class="pu-icon">⌘</div>
+          <div class="pu-label" data-i18n="photo.wl.label">Foto Schloss / Umgebung</div>
+          <div class="pu-sub" data-i18n="photo.wl.sub">Querformat empfohlen · breit</div>
+          <img id="prev-wl" class="photo-preview">
+        </div>
+        <div class="y-slider" id="y-slider-wl">
+          <label data-i18n="pos.y">Y-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onYChange('wl', this.value)">
+          <span class="y-val" id="y-val-wl">50</span>
+        </div>
+        <div class="y-slider" id="x-slider-wl">
+          <label data-i18n="pos.x">X-Position</label>
+          <input type="range" min="0" max="100" value="50" oninput="onXChange('wl', this.value)">
+          <span class="y-val" id="x-val-wl">50</span>
+        </div>
+      </div>
+
+      <div class="field"><label data-i18n="wl.card.pos">Concierge-Karte · Position</label>
+        <div class="style-buttons">
+          <button class="style-btn active" data-side="left" onclick="setCardSide('left',this)" data-i18n="wl.card.left">Karte links</button>
+          <button class="style-btn" data-side="right" onclick="setCardSide('right',this)" data-i18n="wl.card.right">Karte rechts</button>
+        </div>
+      </div>
+      <div class="field"><label data-i18n="wl.hilab">Concierge-Label</label><input id="inp-wl-hilab" type="text" value="DAS MÜSST IHR ERLEBT HABEN" oninput="update()"></div>
+      <div class="field"><label>Highlight 1 <span class="opt" data-i18n="wl.h.opt">eine Zeile</span></label><input id="inp-wl-h1" type="text" value="Sommersonnenuntergang über den Weinbergen — kleiner Spaziergang zur alten Mauer aus." oninput="update()"></div>
+      <div class="field"><label>Highlight 2</label><input id="inp-wl-h2" type="text" value="Massage im Schloss-Spa — gönnt euch eine Pause und lasst euch verwöhnen." oninput="update()"></div>
+      <div class="field"><label>Highlight 3</label><input id="inp-wl-h3" type="text" value="Apéritif auf der Terrasse — bringt eure Lieblingsleute mit, gute Gespräche und lange Abende." oninput="update()"></div>
+    </div>
+
+    <!-- Programm -->
+    <div class="form-section">
+      <span class="section-label" data-i18n="sec.program">Innenseite · Tagesprogramm (rechts)</span>
+      <div class="field"><label data-i18n="prg.banner">Banner-Text</label><input id="inp-prg-banner" type="text" value="DER TAGESABLAUF" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="prg.sub">Untertitel</span> <span class="opt" data-i18n="prg.sub.opt">Datum · Ort</span></label><input id="inp-prg-sub" type="text" value="12.–14. Juli 2026 · Château de Valmont" oninput="update()"></div>
+      <div class="field"><label><span data-i18n="prg.days">Anzahl Tage</span> <span class="opt" data-i18n="prg.days.opt">für Eintageshochzeiten lieber das Wedding-Program-Werk</span></label>
+        <div class="style-buttons">
+          <button class="style-btn active" data-days="2" onclick="setDays(2,this)" data-i18n="prg.days.2">2 Tage</button>
+          <button class="style-btn" data-days="3" onclick="setDays(3,this)" data-i18n="prg.days.3">3 Tage</button>
+        </div>
+      </div>
+      <div id="days-container"></div>
+    </div>
+
+    <!-- ══ DEMO CTA ══════════════════════════════════════════════════════════ -->
+    <div class="demo-cta">
+      <div class="demo-cta-eyebrow">LIVE-DEMO</div>
+      <p class="demo-cta-text">Du siehst die Live-Vorschau. Die fertige Empfangsmappe mit druckfertigem PDF (A3 Halbfalz, 3 mm Beschnitt, drei Farbwelten, bilingual) gibt es im Atelier.</p>
+      <a class="demo-cta-btn" href="https://weddingstoryatelier.etsy.com/de/listing/4506458037/willkommensmappe-hochzeit-zum-ausdrucken" target="_blank" rel="noopener">Im Atelier kaufen &rarr;</a>
+      <p class="demo-cta-fine">Probiere alle Felder, Fotos und Farben frei aus — nichts wird hochgeladen.</p>
+    </div>
+  </aside>
+
+  <!-- ── PREVIEW PANEL ── -->
+  <main class="panel-preview">
+    <div class="view-toggle">
+      <button id="vt-outside" class="active" onclick="setView('outside')" data-i18n="view.outside">Außenseite</button>
+      <button id="vt-inside" onclick="setView('inside')" data-i18n="view.inside">Innenseite</button>
+    </div>
+    <div class="spread-view visible" id="view-outside">
+    <div class="spread-label" data-i18n="spread.outside">Außenseite — geschlossen</div>
+    <div class="spread-scale" id="scale-outside">
+      <div class="format-scale">
+      <div class="spread burgund" id="spread-outside">
+        <!-- LEFT = BACK (Auf einen Blick) -->
+        <div class="panel-card p-ab" id="panel-reise">
+          <div class="ab-photo photo-corners">
+            <img id="out-ab-photo" style="display:none;">
+            <span class="ph" id="out-ab-photo-ph" data-i18n="ph.back">[ Foto Schloss / Umgebung ]</span>
+            <span class="pc tr-o"></span><span class="pc tr-i"></span>
+            <span class="pc bl-o"></span><span class="pc bl-i"></span>
+          </div>
+          <div class="ab-content">
+            <div class="ab-eyebrow" id="out-ab-eyebrow">WICHTIGE INFORMATIONEN</div>
+            <div class="ab-title" id="out-ab-title">Auf einen Blick</div>
+            <div class="ab-title-rule"></div>
+            <div class="ab-blocks" id="out-ab-blocks"></div>
+            <div class="ab-contact" id="out-ab-contact">
+              <div class="ab-contact-lab" id="out-ab-q-lab">BEI FRAGEN</div>
+              <div class="ab-contact-number" id="out-ab-q-num">+41 79 123 45 67</div>
+              <div class="ab-contact-note" id="out-ab-q-note">Anna · jederzeit für euch da</div>
+            </div>
+            <div class="ab-master">
+              <div class="ab-master-qr empty" id="out-ab-qr"><span>QR optional</span></div>
+              <div>
+                <div class="ab-master-text-lab" id="out-ab-qr-lab">ALLE ORTE & ZEITEN AUF EUREM SMARTPHONE</div>
+                <div class="ab-master-text-body" id="out-ab-qr-body"></div>
+              </div>
+            </div>
+            <div class="ab-footer">
+              <div class="ab-footer-rule"></div>
+              <span id="out-ab-foot">Wir danken euch von Herzen — Sophie & Jonas</span>
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT = COVER -->
+        <div class="panel-card p-cover" id="panel-cover">
+          <div class="cover-top">
+            <div class="cover-eyebrow" id="out-eyebrow">WILLKOMMEN</div>
+          </div>
+          <div class="cover-photo-frame photo-corners">
+            <img id="out-cover-photo" style="display:none;">
+            <span class="cover-photo-placeholder" id="out-cover-photo-ph" data-i18n="ph.cover">Foto wird hier eingesetzt</span>
+            <span class="pc tr-o"></span><span class="pc tr-i"></span>
+            <span class="pc bl-o"></span><span class="pc bl-i"></span>
+          </div>
+          <div class="cover-bottom">
+            <div class="cover-names" id="out-names">Sophie & Jonas</div>
+            <div class="cover-rule"></div>
+            <div class="cover-date" id="out-date">12.–14. Juli 2026</div>
+            <div class="cover-venue" id="out-venue">CHÂTEAU DE VALMONT</div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    </div>
+    </div>
+    <div class="spread-view" id="view-inside">
+    <div class="spread-label" data-i18n="spread.inside">Innenseite — aufgeklappt</div>
+    <div class="spread-scale" id="scale-inside">
+      <div class="format-scale">
+      <div class="spread burgund" id="spread-inside">
+        <!-- LEFT = WELCOME -->
+        <div class="panel-card p-welcome" id="panel-welcome">
+          <div class="wl-vignette" aria-hidden="true">
+            <svg viewBox="0 0 200 56" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+              <g fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="20" y1="50" x2="180" y2="50"/>
+                <rect x="70" y="28" width="60" height="22"/>
+                <rect x="92" y="20" width="16" height="30"/>
+                <polygon points="92,20 100,10 108,20"/>
+                <line x1="100" y1="10" x2="100" y2="6"/>
+                <circle cx="100" cy="6" r="0.8" fill="currentColor"/>
+                <rect x="60" y="24" width="10" height="26"/>
+                <polygon points="60,24 65,16 70,24"/>
+                <rect x="130" y="24" width="10" height="26"/>
+                <polygon points="130,24 135,16 140,24"/>
+                <rect x="48" y="34" width="12" height="16"/>
+                <rect x="140" y="34" width="12" height="16"/>
+              </g>
+            </svg>
+          </div>
+          <div class="wl-title" id="out-wl-title">Herzlich willkommen</div>
+          <div class="wl-body" id="out-wl-body"></div>
+          <div class="wl-closer" id="out-wl-closer">Schön, dass ihr da seid!</div>
+          <div class="wl-signature">
+            <div class="wl-signature-eure" id="out-wl-eure">Eure</div>
+            <div class="wl-signature-names" id="out-wl-sig">Sophie & Jonas</div>
+          </div>
+          <div class="wl-photo-frame">
+            <div class="wl-photo">
+              <img id="out-wl-photo" style="display:none;">
+              <span class="ph" id="out-wl-photo-ph" data-i18n="ph.wl">[ Foto Schloss / Umgebung ]</span>
+            </div>
+            <div class="wl-concierge">
+              <span class="wl-concierge-mark" aria-hidden="true"></span>
+              <div class="wl-highlights-label" id="out-wl-hilab">DAS MÜSST IHR ERLEBT HABEN</div>
+              <ul class="wl-highlights" id="out-wl-hilist"></ul>
+            </div>
+          </div>
+        </div>
+        <!-- RIGHT = PROGRAM -->
+        <div class="panel-card p-program" id="panel-program">
+          <div class="prg-eyebrow" id="out-prg-banner">DER TAGESABLAUF</div>
+          <div class="prg-body">
+            <div class="prg-head">
+              <div class="prg-couple" id="out-prg-couple">Sophie & Jonas</div>
+              <div class="prg-sub" id="out-prg-sub">12.–14. Juli 2026 · Château de Valmont</div>
+              <div class="prg-head-rule"></div>
+            </div>
+            <div id="out-prg-days"></div>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+    </div>
+  </main>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════
+let currentTheme = 'burgund';
+let activeDays = 2;
+let cardSide = 'left';
+let currentLang = 'de';
+let currentFormat = 'a3';
+
+// Format-Dimensionen (Spread offen, in mm).
+// scale = min(paperW/420, paperH/297), damit A3-Master in jedes Papier passt.
+// Bei US-Formaten mit anderem Aspekt entstehen Cream-Margins links/rechts oder oben/unten.
+const FORMATS = {
+  a3:      { paperW: 420, paperH: 297, scale: 1.0,    open: 'A3',      closed: 'A4' },
+  a4:      { paperW: 297, paperH: 210, scale: 0.7071, open: 'A4',      closed: 'A5' },
+  tabloid: { paperW: 432, paperH: 279, scale: 0.9394, open: 'Tabloid', closed: 'Letter' },
+  letter:  { paperW: 279, paperH: 216, scale: 0.6643, open: 'Letter',  closed: 'Half-Letter' }
+};
+
+// ════════════════════════════════════════════════════════════════
+// I18N — UI-Labels + Demo-Defaults (smart swap: nur unveränderte Felder)
+// ════════════════════════════════════════════════════════════════
+const I18N = {
+  de: {
+    'app.title': 'Empfangsmappe Generator',
+    'app.subtitle': 'Old Money Line · A3 Halbfalz · Für Hotelgäste',
+    'sec.design': 'Design',
+    'sec.cover': 'Außenseite · Cover (rechts)',
+    'sec.back': 'Außenseite · Auf einen Blick (links)',
+    'sec.welcome': 'Innenseite · Welcome (links)',
+    'sec.program': 'Innenseite · Tagesprogramm (rechts)',
+    'view.outside': 'Außenseite',
+    'view.inside': 'Innenseite',
+    'spread.outside': 'Außenseite — geschlossen',
+    'spread.inside': 'Innenseite — aufgeklappt',
+    'design.lang': 'Sprache',
+    'design.format': 'Format',
+    'design.format.hint': 'A3 gefaltet → A4 · A4 → A5 · Tabloid → Letter · Letter → Half-Letter',
+    'design.print': 'Druckmodus',
+    'print.home': 'Heimdruck',
+    'print.home.note': '(ohne Beschnitt)',
+    'print.pro': 'Druckerei',
+    'print.pro.note': '(+3 mm Beschnitt)',
+    'label.names': 'Namen',
+    'label.date': 'Datum',
+    'label.venue': 'Location',
+    'label.eyebrow': 'Eyebrow',
+    'label.eyebrow.opt': 'Willkommen / Welcome',
+    'photo.cover.label': 'Hero-Foto auswählen',
+    'photo.cover.sub': 'Hochformat empfohlen · 4:5',
+    'photo.back.label': 'Foto Rückseite auswählen',
+    'photo.back.sub': 'Hochformat empfohlen · 2:3',
+    'photo.wl.label': 'Foto Schloss / Umgebung',
+    'photo.wl.sub': 'Querformat empfohlen · breit',
+    'pos.y': 'Y-Position',
+    'pos.x': 'X-Position',
+    'wl.title.label': 'Titel',
+    'wl.body.label': 'Begrüßungstext',
+    'wl.body.opt': '2–3 kurze Sätze',
+    'wl.closer.label': 'Closer-Zeile',
+    'wl.closer.opt': 'italic, optional',
+    'wl.sig.label': 'Unterschrift',
+    'wl.card.pos': 'Concierge-Karte · Position',
+    'wl.card.left': 'Karte links',
+    'wl.card.right': 'Karte rechts',
+    'wl.hilab': 'Concierge-Label',
+    'wl.h.opt': 'eine Zeile',
+    'prg.banner': 'Banner-Text',
+    'prg.sub': 'Untertitel',
+    'prg.sub.opt': 'Datum · Ort',
+    'prg.days': 'Anzahl Tage',
+    'prg.days.opt': 'für Eintageshochzeiten lieber das Wedding-Program-Werk',
+    'prg.days.2': '2 Tage',
+    'prg.days.3': '3 Tage',
+    'day.head': 'Tag',
+    'day.label.label': 'Label',
+    'day.label.opt': 'z. B. Freitag · Anreise',
+    'day.intro': 'Einleitung',
+    'opt': 'optional',
+    'day.timeline': 'Timeline',
+    'day.tl.add': '+ Eintrag',
+    'day.hero': 'Hero-Moment',
+    'day.hero.opt': 'optional — leer = ruhiger Tag',
+    'day.hero.time': 'Hero-Zeit',
+    'day.hero.title': 'Hero-Titel',
+    'day.hero.sub': 'Hero-Untertitel',
+    'day.hero.sub.opt': 'eine Zeile',
+    'day.outro': 'Abschluss',
+    'ab.eyebrow': 'Eyebrow',
+    'ab.title.label': 'Titel',
+    'ab.label.short': 'Label',
+    'ab.name': 'Name',
+    'ab.addr': 'Adresse',
+    'ab.info': 'Info-Zeile',
+    'ab.info.opt': 'kursiv',
+    'ab.hotel': 'Hotel',
+    'ab.ceremony': 'Zeremonie',
+    'ab.reception': 'Empfang',
+    'ab.q.lab': 'Bei Fragen · Label',
+    'ab.q.num': 'Telefonnummer',
+    'ab.q.note': 'Name / Hinweis',
+    'ab.qr.lab': 'Master-QR · Headline',
+    'ab.qr.body': 'Master-QR · Beschreibung',
+    'ab.qr.upload': 'Master-QR',
+    'ab.qr.remove': 'QR entfernen',
+    'ab.foot.label': 'Schlusszeile',
+    'btn.download': '⌘ Mappe als PDF',
+    'btn.creating': 'PDFs werden erstellt …',
+    'privacy': 'A3 quer · 2 Dateien (Außen + Innen)<br>Keine Datenspeicherung · Chrome empfohlen',
+    'ph.cover': 'Foto wird hier eingesetzt',
+    'ph.wl': '[ Foto Schloss / Umgebung ]',
+    'ph.back': '[ Foto Schloss / Umgebung ]',
+    'qr.optional.short': 'QR<br>optional',
+  },
+  en: {
+    'app.title': 'Welcome Folder Generator',
+    'app.subtitle': 'Old Money Line · A3 Half-Fold · For Hotel Guests',
+    'sec.design': 'Design',
+    'sec.cover': 'Outside · Cover (right)',
+    'sec.back': 'Outside · At a Glance (left)',
+    'sec.welcome': 'Inside · Welcome (left)',
+    'sec.program': 'Inside · Day-by-Day (right)',
+    'view.outside': 'Outside',
+    'view.inside': 'Inside',
+    'spread.outside': 'Outside — closed',
+    'spread.inside': 'Inside — open spread',
+    'design.lang': 'Language',
+    'design.format': 'Format',
+    'design.format.hint': 'A3 folds → A4 · A4 → A5 · Tabloid → Letter · Letter → Half-Letter',
+    'design.print': 'Print Mode',
+    'print.home': 'Home Print',
+    'print.home.note': '(no bleed)',
+    'print.pro': 'Print Shop',
+    'print.pro.note': '(+3 mm bleed)',
+    'label.names': 'Names',
+    'label.date': 'Date',
+    'label.venue': 'Venue',
+    'label.eyebrow': 'Eyebrow',
+    'label.eyebrow.opt': 'Welcome / Willkommen',
+    'photo.cover.label': 'Choose hero photo',
+    'photo.cover.sub': 'Portrait recommended · 4:5',
+    'photo.back.label': 'Choose back-cover photo',
+    'photo.back.sub': 'Portrait recommended · 2:3',
+    'photo.wl.label': 'Photo Castle / Surroundings',
+    'photo.wl.sub': 'Landscape recommended · wide',
+    'pos.y': 'Y-Position',
+    'pos.x': 'X-Position',
+    'wl.title.label': 'Title',
+    'wl.body.label': 'Welcome text',
+    'wl.body.opt': '2–3 short sentences',
+    'wl.closer.label': 'Closer line',
+    'wl.closer.opt': 'italic, optional',
+    'wl.sig.label': 'Signature',
+    'wl.card.pos': 'Concierge card · Position',
+    'wl.card.left': 'Card left',
+    'wl.card.right': 'Card right',
+    'wl.hilab': 'Concierge label',
+    'wl.h.opt': 'one line',
+    'prg.banner': 'Banner text',
+    'prg.sub': 'Subtitle',
+    'prg.sub.opt': 'Date · Place',
+    'prg.days': 'Number of days',
+    'prg.days.opt': 'for one-day weddings, use the Wedding Program piece instead',
+    'prg.days.2': '2 days',
+    'prg.days.3': '3 days',
+    'day.head': 'Day',
+    'day.label.label': 'Label',
+    'day.label.opt': 'e.g. Friday · Arrival',
+    'day.intro': 'Intro',
+    'opt': 'optional',
+    'day.timeline': 'Timeline',
+    'day.tl.add': '+ Entry',
+    'day.hero': 'Hero moment',
+    'day.hero.opt': 'optional — empty = quiet day',
+    'day.hero.time': 'Hero time',
+    'day.hero.title': 'Hero title',
+    'day.hero.sub': 'Hero subtitle',
+    'day.hero.sub.opt': 'one line',
+    'day.outro': 'Closing',
+    'ab.eyebrow': 'Eyebrow',
+    'ab.title.label': 'Title',
+    'ab.label.short': 'Label',
+    'ab.name': 'Name',
+    'ab.addr': 'Address',
+    'ab.info': 'Info line',
+    'ab.info.opt': 'italic',
+    'ab.hotel': 'Hotel',
+    'ab.ceremony': 'Ceremony',
+    'ab.reception': 'Reception',
+    'ab.q.lab': 'Questions · Label',
+    'ab.q.num': 'Phone number',
+    'ab.q.note': 'Name / note',
+    'ab.qr.lab': 'Master QR · Headline',
+    'ab.qr.body': 'Master QR · Description',
+    'ab.qr.upload': 'Master QR',
+    'ab.qr.remove': 'Remove QR',
+    'ab.foot.label': 'Closing line',
+    'btn.download': '⌘ Folder as PDF',
+    'btn.creating': 'Creating PDFs …',
+    'privacy': 'A3 landscape · 2 files (Outside + Inside)<br>No data stored · Chrome recommended',
+    'ph.cover': 'Photo appears here',
+    'ph.wl': '[ Photo Castle / Surroundings ]',
+    'ph.back': '[ Photo Castle / Surroundings ]',
+    'qr.optional.short': 'QR<br>optional',
+  }
+};
+
+const I18N_DEFAULTS = {
+  de: {
+    'inp-names': 'Sophie & Jonas',
+    'inp-date': '12.–14. Juli 2026',
+    'inp-venue': 'Château de Valmont',
+    'inp-eyebrow': 'WILLKOMMEN',
+    'inp-wl-title': 'Herzlich willkommen',
+    'inp-wl-body': 'Wir freuen uns so sehr, dass ihr da seid und dieses besondere Wochenende mit uns feiert.\n\nAlle Momente, gute Gespräche, gutes Essen, Musik und ganz viel Zeit miteinander — nichts brauchen wir mehr, um unvergessliche Erinnerungen zu schaffen.',
+    'inp-wl-closer': 'Schön, dass ihr da seid!',
+    'inp-wl-sig': 'Sophie & Jonas',
+    'inp-wl-hilab': 'DAS MÜSST IHR ERLEBT HABEN',
+    'inp-wl-h1': 'Sommersonnenuntergang über den Weinbergen — kleiner Spaziergang zur alten Mauer aus.',
+    'inp-wl-h2': 'Massage im Schloss-Spa — gönnt euch eine Pause und lasst euch verwöhnen.',
+    'inp-wl-h3': 'Apéritif auf der Terrasse — bringt eure Lieblingsleute mit, gute Gespräche und lange Abende.',
+    'inp-prg-banner': 'DER TAGESABLAUF',
+    'inp-prg-sub': '12.–14. Juli 2026 · Château de Valmont',
+    'inp-ab-eyebrow': 'WICHTIGE INFORMATIONEN',
+    'inp-ab-title': 'Auf einen Blick',
+    'inp-ab-h-lab': 'HOTEL',
+    'inp-ab-h-name': 'Hotel Valmont',
+    'inp-ab-h-addr': 'Rue du Château 12\n1234 Valmont · CH',
+    'inp-ab-h-info': 'Check-In ab 15 Uhr\nValet Parking vorhanden',
+    'inp-ab-c-lab': 'ZEREMONIE',
+    'inp-ab-c-name': 'Chapelle Saint-Pierre',
+    'inp-ab-c-addr': 'Place de l\'Église 1\n1234 Valmont · CH',
+    'inp-ab-c-info': 'Ein Shuttle fährt ab 13:15 Uhr\nvom Hotel zur Kapelle.',
+    'inp-ab-r-lab': 'EMPFANG & FEIER',
+    'inp-ab-r-name': 'Château de Valmont',
+    'inp-ab-r-addr': 'Domaine de Valmont\n1234 Valmont · CH',
+    'inp-ab-r-info': 'Dinner & Feier\nbis in die Nachtstunden.',
+    'inp-ab-qr-lab': 'ALLE ORTE & ZEITEN AUF EUREM SMARTPHONE',
+    'inp-ab-qr-body': 'Scanne den QR-Code, um alle Infos, Adressen und Zeiten direkt zu speichern.',
+    'inp-ab-q-lab': 'BEI FRAGEN',
+    'inp-ab-q-num': '+41 79 123 45 67',
+    'inp-ab-q-note': 'Anna · jederzeit für euch da',
+    'inp-ab-foot': 'Wir danken euch von Herzen — Sophie & Jonas',
+  },
+  en: {
+    'inp-names': 'Sophie & Jonas',
+    'inp-date': 'July 12–14, 2026',
+    'inp-venue': 'Château de Valmont',
+    'inp-eyebrow': 'WELCOME',
+    'inp-wl-title': 'A warm welcome',
+    'inp-wl-body': 'We are so happy you are here to celebrate this special weekend with us.\n\nAll the moments, good conversations, fine food, music, and time together — nothing more is needed to create unforgettable memories.',
+    'inp-wl-closer': 'So glad you\'re here!',
+    'inp-wl-sig': 'Sophie & Jonas',
+    'inp-wl-hilab': 'DON\'T MISS THESE',
+    'inp-wl-h1': 'Sunset over the vineyards — a short walk to the old wall is worth every minute.',
+    'inp-wl-h2': 'A massage at the château spa — give yourselves a moment to be pampered.',
+    'inp-wl-h3': 'Apéritif on the terrace — bring the people you love, slow conversations, long evenings.',
+    'inp-prg-banner': 'THE WEEKEND',
+    'inp-prg-sub': 'July 12–14, 2026 · Château de Valmont',
+    'inp-ab-eyebrow': 'IMPORTANT INFORMATION',
+    'inp-ab-title': 'At a Glance',
+    'inp-ab-h-lab': 'HOTEL',
+    'inp-ab-h-name': 'Hotel Valmont',
+    'inp-ab-h-addr': 'Rue du Château 12\n1234 Valmont · Switzerland',
+    'inp-ab-h-info': 'Check-in from 3 pm\nValet parking available',
+    'inp-ab-c-lab': 'CEREMONY',
+    'inp-ab-c-name': 'Chapelle Saint-Pierre',
+    'inp-ab-c-addr': 'Place de l\'Église 1\n1234 Valmont · Switzerland',
+    'inp-ab-c-info': 'A shuttle leaves at 1:15 pm\nfrom the hotel to the chapel.',
+    'inp-ab-r-lab': 'RECEPTION & CELEBRATION',
+    'inp-ab-r-name': 'Château de Valmont',
+    'inp-ab-r-addr': 'Domaine de Valmont\n1234 Valmont · Switzerland',
+    'inp-ab-r-info': 'Dinner & celebration\nwell into the night.',
+    'inp-ab-qr-lab': 'ALL PLACES & TIMES ON YOUR PHONE',
+    'inp-ab-qr-body': 'Scan the QR code to save all info, addresses, and times directly.',
+    'inp-ab-q-lab': 'IF YOU NEED US',
+    'inp-ab-q-num': '+41 79 123 45 67',
+    'inp-ab-q-note': 'Anna · always here for you',
+    'inp-ab-foot': 'With all our gratitude — Sophie & Jonas',
+  }
+};
+
+const DAY_DEFAULTS = {
+  de: [
+    { label:'Freitag · Anreise',
+      intro:'Nach eurer Ankunft habt ihr Zeit, in Ruhe anzukommen und die Umgebung zu genießen. Wer mag, lässt den Tag mit uns ausklingen — wir freuen uns auf jedes Wiedersehen.',
+      hero:{ time:'', title:'', sub:'' },
+      timeline:[
+        {time:'ab 15:00', event:'Check-In im Hotel Valmont'},
+        {time:'17:00',    event:'Welcome-Spaziergang durchs Schlossgut (optional)'},
+        {time:'19:30',    event:'Get-together im Schloss-Salon'},
+        {time:'21:30',    event:'Digestif & Kaminfeuer'},
+      ],
+      outro:'Kleidung: locker und entspannt. Nehmt euch die Zeit, die ihr braucht — niemand muss überall dabei sein.' },
+    { label:'Samstag · Hochzeit',
+      intro:'Der große Tag. Wir freuen uns von ganzem Herzen, ihn mit euch zu teilen.',
+      hero:{ time:'15:00', title:'Freie Trauung', sub:'in der Schlosskapelle' },
+      timeline:[
+        {time:'14:00', event:'Ankunft der Gäste · Apéritif im Garten'},
+        {time:'16:00', event:'Empfang & Gratulation'},
+        {time:'17:30', event:'Gruppenfoto auf der Schlosstreppe'},
+        {time:'18:00', event:'Festliches Dinner'},
+        {time:'20:00', event:'Eröffnungstanz'},
+        {time:'21:00', event:'Party & Feier — bis in die Morgenstunden'},
+      ],
+      outro:'Dresscode: Cocktail bis festlich. Der Park ist gut beleuchtet, aber bequeme Schuhe für die Wege sind eine gute Idee.' },
+    { label:'Sonntag · Abreise',
+      intro:'Wir möchten den Abschied nicht überstürzen — bleibt, solange es euch guttut. Frühstück steht für alle bereit.',
+      hero:{ time:'', title:'', sub:'' },
+      timeline:[
+        {time:'09:30', event:'Brunch im Schlossgarten'},
+        {time:'11:30', event:'Gemeinsames Gruppenfoto'},
+        {time:'12:00', event:'Letzte Umarmungen & Abschied'},
+        {time:'bis 14:00', event:'Check-Out im Hotel'},
+      ],
+      outro:'Genießt ein letztes Frühstück, tauscht Erinnerungen aus und nehmt euch Zeit für einen ruhigen Abschied. Wir sind dankbar, diesen Moment mit euch geteilt zu haben.' },
+  ],
+  en: [
+    { label:'Friday · Arrival',
+      intro:'After you arrive, take your time to settle in and enjoy the surroundings. If you like, let the day end with us — we cannot wait to see every one of you again.',
+      hero:{ time:'', title:'', sub:'' },
+      timeline:[
+        {time:'from 3 pm', event:'Check-in at Hotel Valmont'},
+        {time:'5:00 pm',   event:'Welcome stroll through the château grounds (optional)'},
+        {time:'7:30 pm',   event:'Get-together in the château salon'},
+        {time:'9:30 pm',   event:'Digestif & fireside'},
+      ],
+      outro:'Dress: relaxed. Take all the time you need — no one has to be everywhere.' },
+    { label:'Saturday · Wedding Day',
+      intro:'The big day. We could not be happier to share it with you.',
+      hero:{ time:'3:00 pm', title:'Wedding ceremony', sub:'at the château chapel' },
+      timeline:[
+        {time:'2:00 pm', event:'Arrival of guests · Apéritif in the garden'},
+        {time:'4:00 pm', event:'Reception & congratulations'},
+        {time:'5:30 pm', event:'Group photo on the château steps'},
+        {time:'6:00 pm', event:'Festive dinner'},
+        {time:'8:00 pm', event:'First dance'},
+        {time:'9:00 pm', event:'Party & celebration — into the early hours'},
+      ],
+      outro:'Dress code: cocktail to formal. The park is well lit, but comfortable shoes are a good idea for the paths.' },
+    { label:'Sunday · Departure',
+      intro:'We would rather not rush the farewell — stay as long as feels right. Breakfast will be ready for everyone.',
+      hero:{ time:'', title:'', sub:'' },
+      timeline:[
+        {time:'9:30 am',     event:'Brunch in the château garden'},
+        {time:'11:30 am',    event:'Group photo together'},
+        {time:'12:00 pm',    event:'Last hugs & goodbyes'},
+        {time:'until 2 pm',  event:'Hotel check-out'},
+      ],
+      outro:'Enjoy one last breakfast, share memories, and take your time for a quiet farewell. We are deeply grateful for this moment shared with you.' },
+  ]
+};
+
+const t = key => (I18N[currentLang] && I18N[currentLang][key]) || I18N.de[key] || key;
+
+function setLang(newLang, btn) {
+  if (newLang === currentLang) return;
+  const oldLang = currentLang;
+  const oldD = I18N_DEFAULTS[oldLang];
+  const newD = I18N_DEFAULTS[newLang];
+
+  // 1) Form-Felder: nur unveränderte Defaults wechseln
+  Object.keys(oldD).forEach(id => {
+    const el = ge(id);
+    if (!el) return;
+    if (el.value === oldD[id]) el.value = newD[id];
+  });
+
+  // 2) dayData: nur unveränderte Felder wechseln
+  const oldDays = DAY_DEFAULTS[oldLang];
+  const newDays = DAY_DEFAULTS[newLang];
+  for (let d = 0; d < dayData.length; d++) {
+    const cur = dayData[d];
+    const o = oldDays[d];
+    const n = newDays[d];
+    if (!o || !n) continue;
+    if (cur.label === o.label) cur.label = n.label;
+    if (cur.intro === o.intro) cur.intro = n.intro;
+    if (cur.outro === o.outro) cur.outro = n.outro;
+    if (cur.hero && o.hero && n.hero) {
+      if (cur.hero.time === o.hero.time) cur.hero.time = n.hero.time;
+      if (cur.hero.title === o.hero.title) cur.hero.title = n.hero.title;
+      if (cur.hero.sub === o.hero.sub) cur.hero.sub = n.hero.sub;
+    }
+    // Timeline-Rows einzeln
+    if (Array.isArray(cur.timeline) && Array.isArray(o.timeline) && Array.isArray(n.timeline)) {
+      for (let i = 0; i < cur.timeline.length; i++) {
+        const cr = cur.timeline[i], or = o.timeline[i], nr = n.timeline[i];
+        if (!or || !nr) continue;
+        if (cr.time === or.time) cr.time = nr.time;
+        if (cr.event === or.event) cr.event = nr.event;
+      }
+    }
+  }
+
+  currentLang = newLang;
+  document.documentElement.lang = newLang;
+  document.querySelectorAll('.style-btn[data-lang]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+
+  applyI18nLabels();
+  renderDayInputs();
+  update();
+}
+
+function applyI18nLabels() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    el.textContent = t(key);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    el.innerHTML = t(el.dataset.i18nHtml);
+  });
+}
+let photoCoverOrig = null, photoCover = null, photoCoverY = 50, photoCoverX = 50;
+let photoWLOrig = null, photoWL = null, photoWLY = 50, photoWLX = 50;
+let photoBackOrig = null, photoBack = null, photoBackY = 50, photoBackX = 50;
+// QR uploads: original + themed-recolor pair per slot
+let qrPhotos = { master:{orig:null,themed:null} };
+// Target aspect ratios (width/height) for crop:
+const PHOTO_TARGET = {
+  cover: 132/165,   // cover frame exact (Hochformat 0.8)
+  wl:    1.35,      // welcome photo frame — entspricht tatsächlich gerendertem Container ~210:155mm
+  back:  78/297,    // back panel left photo column (full panel height)
+};
+
+// dayData wird aus DAY_DEFAULTS initialisiert (Deep-Clone, damit Edits den Default nicht überschreiben)
+const dayData = JSON.parse(JSON.stringify(DAY_DEFAULTS.de));
+
+// ════════════════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════════════════
+const ge = id => document.getElementById(id);
+const gv = id => (ge(id)||{}).value || '';
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+// ════════════════════════════════════════════════════════════════
+// THEME / DAYS
+// ════════════════════════════════════════════════════════════════
+async function setTheme(t, btn) {
+  currentTheme = t;
+  document.querySelectorAll('.style-btn[data-theme]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  ge('spread-outside').className = 'spread ' + t;
+  ge('spread-inside').className  = 'spread ' + t;
+  await refreshAllQRs();
+  // Vorschau-Thumbnails der QRs auf themed-Farbe aktualisieren
+  Object.keys(qrPhotos).forEach(s => {
+    if (qrPhotos[s].themed) ge('prev-qr-' + s).src = qrPhotos[s].themed;
+  });
+  update();
+}
+
+function setCardSide(s, btn) {
+  cardSide = s;
+  document.querySelectorAll('.style-btn[data-side]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.wl-concierge').forEach(el => el.classList.toggle('pos-right', s === 'right'));
+}
+
+function setFormat(name, btn) {
+  if (!FORMATS[name]) return;
+  currentFormat = name;
+  document.querySelectorAll('.style-btn[data-format]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const fmt = FORMATS[name];
+  document.documentElement.style.setProperty('--format-scale', fmt.scale);
+  scalePreview();
+}
+
+function setDays(n, btn) {
+  activeDays = n;
+  document.querySelectorAll('.style-btn[data-days]').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDayInputs();
+  update();
+}
+
+// ════════════════════════════════════════════════════════════════
+// DAY INPUT BUILDER
+// ════════════════════════════════════════════════════════════════
+function renderDayInputs() {
+  const wrap = ge('days-container');
+  wrap.innerHTML = '';
+  for (let d = 0; d < activeDays; d++) {
+    const day = dayData[d];
+    const block = document.createElement('div');
+    block.className = 'day-block';
+    const hero = day.hero || { time:'', title:'', sub:'' };
+    block.innerHTML = `
+      <div class="day-head">${t('day.head')} ${d+1}</div>
+      <div class="field"><label>${t('day.label.label')} <span class="opt">${t('day.label.opt')}</span></label><input type="text" value="${esc(day.label)}" oninput="dayData[${d}].label=this.value; update()"></div>
+      <div class="field"><label>${t('day.intro')} <span class="opt">${t('opt')}</span></label><textarea oninput="dayData[${d}].intro=this.value; update()">${esc(day.intro)}</textarea></div>
+      <div class="field"><label>${t('day.timeline')}</label><div id="tl-list-${d}"></div><button class="btn-tl-add" onclick="addTL(${d})">${t('day.tl.add')}</button></div>
+      <div class="hero-fields" style="background:#fbf6f3;border:1px dashed var(--rule);border-radius:2px;padding:8px;margin-top:8px;">
+        <div style="font-family:'DM Sans',sans-serif;font-size:9px;letter-spacing:0.18em;text-transform:uppercase;color:#666;margin-bottom:6px;">${t('day.hero')} <span class="opt" style="text-transform:none;letter-spacing:0;font-style:italic;">${t('day.hero.opt')}</span></div>
+        <div class="field-row">
+          <div class="field"><label>${t('day.hero.time')}</label><input type="text" placeholder="15:00" value="${esc(hero.time)}" oninput="if(!dayData[${d}].hero)dayData[${d}].hero={};dayData[${d}].hero.time=this.value; update()"></div>
+          <div class="field"><label>${t('day.hero.title')}</label><input type="text" placeholder="${currentLang === 'en' ? 'Wedding ceremony' : 'Freie Trauung'}" value="${esc(hero.title)}" oninput="if(!dayData[${d}].hero)dayData[${d}].hero={};dayData[${d}].hero.title=this.value; update()"></div>
+        </div>
+        <div class="field"><label>${t('day.hero.sub')} <span class="opt">${t('day.hero.sub.opt')}</span></label><input type="text" placeholder="${currentLang === 'en' ? 'at the château chapel' : 'in der Schlosskapelle'}" value="${esc(hero.sub)}" oninput="if(!dayData[${d}].hero)dayData[${d}].hero={};dayData[${d}].hero.sub=this.value; update()"></div>
+      </div>
+      <div class="field" style="margin-top:8px;"><label>${t('day.outro')} <span class="opt">${t('opt')}</span></label><textarea oninput="dayData[${d}].outro=this.value; update()">${esc(day.outro)}</textarea></div>
+    `;
+    wrap.appendChild(block);
+    renderTL(d);
+  }
+}
+
+function renderTL(d) {
+  const list = ge('tl-list-' + d);
+  if (!list) return;
+  list.innerHTML = '';
+  dayData[d].timeline.forEach((row, i) => {
+    const div = document.createElement('div');
+    div.className = 'tl-row';
+    div.innerHTML = `
+      <input type="text" placeholder="14:00" value="${esc(row.time)}" oninput="dayData[${d}].timeline[${i}].time=this.value; update()">
+      <input type="text" placeholder="Trauung" value="${esc(row.event)}" oninput="dayData[${d}].timeline[${i}].event=this.value; update()">
+      <button class="btn-tl-remove" onclick="removeTL(${d},${i})">×</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function addTL(d) {
+  dayData[d].timeline.push({ time:'', event:'' });
+  renderTL(d);
+  update();
+}
+
+function removeTL(d, i) {
+  dayData[d].timeline.splice(i, 1);
+  renderTL(d);
+  update();
+}
+
+// ════════════════════════════════════════════════════════════════
+// PHOTO LOAD + CROP-WITH-Y
+// ════════════════════════════════════════════════════════════════
+// Welche Achse hat Crop-Slack bei diesem Bild + Ziel-Aspect?
+// Returns 'x' (Bild breiter → horizontal crop), 'y' (Bild höher → vertikal crop), 'none' (passt exakt)
+function activeCropAxis(srcWidth, srcHeight, targetRatio) {
+  const srcR = srcWidth / srcHeight;
+  if (Math.abs(srcR - targetRatio) < 0.01) return 'none';
+  return srcR > targetRatio ? 'x' : 'y';
+}
+
+function cropWithY(base64, targetRatio, yPercent, xPercent) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const srcR = img.width / img.height;
+      let sx, sy, sw, sh;
+      if (srcR > targetRatio) {
+        // Bild breiter als Zielfenster → links/rechts beschneiden nach xPercent
+        sh = img.height; sw = sh * targetRatio;
+        sx = (img.width - sw) * ((xPercent ?? 50) / 100);
+        sy = 0;
+      } else {
+        // Bild höher als Zielfenster → vertikal nach yPercent schneiden
+        sw = img.width; sh = sw / targetRatio;
+        sx = 0;
+        sy = (img.height - sh) * ((yPercent ?? 50) / 100);
+      }
+      const c = document.createElement('canvas');
+      // Vergrößerter Output für scharfen Druck (~2000px breit)
+      const outW = Math.max(1200, Math.min(2400, Math.round(sw)));
+      const outH = Math.round(outW / targetRatio);
+      c.width = outW; c.height = outH;
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH);
+      resolve(c.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = base64;
+  });
+}
+
+async function applyPhotoCrop(target) {
+  if (target === 'cover' && photoCoverOrig) {
+    photoCover = await cropWithY(photoCoverOrig, PHOTO_TARGET.cover, photoCoverY, photoCoverX);
+    const img = ge('out-cover-photo');
+    img.src = photoCover; img.style.display = 'block';
+    ge('out-cover-photo-ph').style.display = 'none';
+    const pv = ge('prev-cover'); pv.src = photoCover; pv.style.display = 'block';
+  } else if (target === 'wl' && photoWLOrig) {
+    photoWL = await cropWithY(photoWLOrig, PHOTO_TARGET.wl, photoWLY, photoWLX);
+    const img = ge('out-wl-photo');
+    img.src = photoWL; img.style.display = 'block';
+    ge('out-wl-photo-ph').style.display = 'none';
+    const pv = ge('prev-wl'); pv.src = photoWL; pv.style.display = 'block';
+  } else if (target === 'back' && photoBackOrig) {
+    photoBack = await cropWithY(photoBackOrig, PHOTO_TARGET.back, photoBackY, photoBackX);
+    const img = ge('out-ab-photo');
+    img.src = photoBack; img.style.display = 'block';
+    ge('out-ab-photo-ph').style.display = 'none';
+    const pv = ge('prev-back'); pv.src = photoBack; pv.style.display = 'block';
+  }
+  updateSliderVisibility(target);
+}
+
+// Blendet den Slider aus, der bei diesem Foto-Aspect mathematisch keinen Effekt hat.
+// Foto breiter als Ziel → X aktiv, Y wirkungslos (raus).
+// Foto höher als Ziel → Y aktiv, X wirkungslos (raus).
+function updateSliderVisibility(target) {
+  const map = {
+    cover: { orig: photoCoverOrig, ratio: PHOTO_TARGET.cover, y: 'y-slider-cover', x: 'x-slider-cover' },
+    wl:    { orig: photoWLOrig,    ratio: PHOTO_TARGET.wl,    y: 'y-slider-wl',    x: 'x-slider-wl' },
+    back:  { orig: photoBackOrig,  ratio: PHOTO_TARGET.back,  y: 'y-slider-back',  x: 'x-slider-back' },
+  };
+  const cfg = map[target];
+  if (!cfg || !cfg.orig) return;
+  const im = new Image();
+  im.onload = () => {
+    const axis = activeCropAxis(im.width, im.height, cfg.ratio);
+    const showY = (axis === 'y' || axis === 'none');
+    const showX = (axis === 'x' || axis === 'none');
+    if (cfg.y) ge(cfg.y).classList.toggle('visible', showY);
+    if (cfg.x) ge(cfg.x).classList.toggle('visible', showX);
+  };
+  im.src = cfg.orig;
+}
+
+function loadPhoto(input, target) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    if (target === 'cover') {
+      photoCoverOrig = e.target.result;
+      photoCoverY = 50; photoCoverX = 50;
+      ge('y-slider-cover').classList.add('visible');
+      ge('y-val-cover').textContent = '50';
+      ge('y-slider-cover').querySelector('input').value = 50;
+      ge('x-slider-cover').classList.add('visible');
+      ge('x-val-cover').textContent = '50';
+      ge('x-slider-cover').querySelector('input').value = 50;
+    } else if (target === 'wl') {
+      photoWLOrig = e.target.result;
+      photoWLY = 50; photoWLX = 50;
+      ge('y-slider-wl').classList.add('visible');
+      ge('y-val-wl').textContent = '50';
+      ge('y-slider-wl').querySelector('input').value = 50;
+      ge('x-slider-wl').classList.add('visible');
+      ge('x-val-wl').textContent = '50';
+      ge('x-slider-wl').querySelector('input').value = 50;
+    } else if (target === 'back') {
+      photoBackOrig = e.target.result;
+      photoBackY = 50; photoBackX = 50;
+      ge('y-slider-back').classList.add('visible');
+      ge('y-val-back').textContent = '50';
+      ge('y-slider-back').querySelector('input').value = 50;
+      ge('x-slider-back').classList.add('visible');
+      ge('x-val-back').textContent = '50';
+      ge('x-slider-back').querySelector('input').value = 50;
+    }
+    await applyPhotoCrop(target);
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+async function onYChange(target, val) {
+  if (target === 'cover') { photoCoverY = +val; ge('y-val-cover').textContent = val; }
+  else if (target === 'wl') { photoWLY = +val; ge('y-val-wl').textContent = val; }
+  // wl X-Slider handled below
+  else if (target === 'back') { photoBackY = +val; ge('y-val-back').textContent = val; }
+  await applyPhotoCrop(target);
+}
+
+async function onXChange(target, val) {
+  if (target === 'cover') { photoCoverX = +val; ge('x-val-cover').textContent = val; }
+  else if (target === 'wl') { photoWLX = +val; ge('x-val-wl').textContent = val; }
+  else if (target === 'back') { photoBackX = +val; ge('x-val-back').textContent = val; }
+  await applyPhotoCrop(target);
+}
+
+// ════════════════════════════════════════════════════════════════
+// QR CODE — Upload + Recolor in Theme-Akzentfarbe
+// ════════════════════════════════════════════════════════════════
+const THEME_ACCENT = { burgund:'#8B1A35', cognac:'#7B4718', forest:'#1F4A32' };
+const THEME_ACCENT_RGB = { burgund:[139,26,53], cognac:[123,71,24], forest:[31,74,50] };
+
+function recolorQR(srcDataUrl, colorRgb) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement('canvas');
+      c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const ctx = c.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+      const d = ctx.getImageData(0, 0, c.width, c.height);
+      const p = d.data;
+      for (let i = 0; i < p.length; i += 4) {
+        const lum = 0.299*p[i] + 0.587*p[i+1] + 0.114*p[i+2];
+        if (lum < 128) { p[i]=colorRgb[0]; p[i+1]=colorRgb[1]; p[i+2]=colorRgb[2]; p[i+3]=255; }
+        else           { p[i]=255; p[i+1]=255; p[i+2]=255; p[i+3]=255; }
+      }
+      ctx.putImageData(d, 0, 0);
+      resolve(c.toDataURL('image/png'));
+    };
+    img.onerror = () => resolve(srcDataUrl);
+    img.src = srcDataUrl;
+  });
+}
+
+async function refreshAllQRs() {
+  const col = THEME_ACCENT_RGB[currentTheme];
+  for (const slot of Object.keys(qrPhotos)) {
+    if (qrPhotos[slot].orig) {
+      qrPhotos[slot].themed = await recolorQR(qrPhotos[slot].orig, col);
+    }
+  }
+}
+
+function loadQR(input, slot) {
+  if (!input.files || !input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = async e => {
+    qrPhotos[slot].orig = e.target.result;
+    qrPhotos[slot].themed = await recolorQR(e.target.result, THEME_ACCENT_RGB[currentTheme]);
+    const pv = ge('prev-qr-' + slot);
+    pv.src = qrPhotos[slot].themed;
+    pv.style.display = 'block';
+    ge('rm-qr-' + slot).style.display = 'inline-block';
+    update();
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function removeQR(slot) {
+  qrPhotos[slot] = { orig:null, themed:null };
+  ge('prev-qr-' + slot).style.display = 'none';
+  ge('prev-qr-' + slot).src = '';
+  ge('rm-qr-' + slot).style.display = 'none';
+  ge('qr-' + slot).value = '';
+  update();
+}
+
+// ════════════════════════════════════════════════════════════════
+// MAIN UPDATE — rendert die Preview neu aus den Inputs
+// ════════════════════════════════════════════════════════════════
+function update() {
+  // Cover
+  ge('out-eyebrow').textContent = gv('inp-eyebrow').toUpperCase();
+  ge('out-names').textContent = gv('inp-names');
+  ge('out-date').textContent = gv('inp-date');
+  ge('out-venue').textContent = gv('inp-venue').toUpperCase();
+
+  // Welcome Letter
+  ge('out-wl-title').textContent = gv('inp-wl-title');
+  ge('out-wl-body').textContent = gv('inp-wl-body');
+  ge('out-wl-hilab').textContent = gv('inp-wl-hilab').toUpperCase();
+  const closerVal = gv('inp-wl-closer');
+  ge('out-wl-closer').textContent = closerVal;
+  ge('out-wl-closer').style.display = closerVal.trim() ? '' : 'none';
+  ge('out-wl-sig').textContent = gv('inp-wl-sig');
+
+  const highlights = [gv('inp-wl-h1'), gv('inp-wl-h2'), gv('inp-wl-h3')].filter(h => h.trim());
+  const ul = ge('out-wl-hilist');
+  ul.innerHTML = highlights.map(h => `<li>${esc(h)}</li>`).join('');
+
+  // Programm
+  ge('out-prg-banner').textContent = gv('inp-prg-banner').toUpperCase();
+  ge('out-prg-couple').textContent = gv('inp-names');
+  ge('out-prg-sub').textContent = gv('inp-prg-sub');
+
+  const daysWrap = ge('out-prg-days');
+  daysWrap.setAttribute('data-days', activeDays);
+  const prgBody = document.querySelector('#panel-program .prg-body');
+  if (prgBody) prgBody.setAttribute('data-days', activeDays);
+  daysWrap.innerHTML = '';
+  for (let d = 0; d < activeDays; d++) {
+    const day = dayData[d];
+    const hero = day.hero || { time:'', title:'', sub:'' };
+    const hasHero = !!(hero.time.trim() || hero.title.trim());
+    const div = document.createElement('div');
+    div.className = 'prg-day' + (hasHero ? ' has-hero' : '');
+
+    let html = `<div class="prg-day-label">${esc(day.label).toUpperCase()}</div>`;
+    if (day.intro) html += `<div class="prg-day-intro">${esc(day.intro)}</div>`;
+
+    // Timeline HTML (Standard und Hero teilen sich das gleiche Markup, CSS macht den Unterschied)
+    let timelineHtml = '';
+    if (day.timeline.length) {
+      timelineHtml = '<ul class="prg-timeline">';
+      day.timeline.forEach(row => {
+        if (row.time || row.event) {
+          timelineHtml += `<li><span class="tl-time">${esc(row.time)}</span><span>${esc(row.event)}</span></li>`;
+        }
+      });
+      timelineHtml += '</ul>';
+    }
+
+    if (hasHero) {
+      const heroHtml = `
+        <div class="prg-day-hero">
+          ${hero.time ? `<div class="prg-day-hero-time">${esc(hero.time)}</div>` : ''}
+          ${hero.title ? `<div class="prg-day-hero-title">${esc(hero.title)}</div>` : ''}
+          ${hero.sub ? `<div class="prg-day-hero-sub">${esc(hero.sub)}</div>` : ''}
+          <span class="prg-day-hero-mark"></span>
+        </div>`;
+      html += `<div class="prg-day-flow">${heroHtml}<div>${timelineHtml}</div></div>`;
+    } else {
+      html += timelineHtml;
+    }
+
+    if (day.outro) html += `<div class="prg-day-outro">${esc(day.outro)}</div>`;
+    div.innerHTML = html;
+    daysWrap.appendChild(div);
+  }
+
+  // Auf einen Blick (Rückseite)
+  ge('out-ab-eyebrow').textContent = gv('inp-ab-eyebrow').toUpperCase();
+  ge('out-ab-title').textContent = gv('inp-ab-title');
+  ge('out-ab-foot').textContent = gv('inp-ab-foot');
+  ge('out-ab-qr-lab').textContent = gv('inp-ab-qr-lab').toUpperCase();
+  ge('out-ab-qr-body').textContent = gv('inp-ab-qr-body');
+  // Bei Fragen / Telefonnummer
+  ge('out-ab-q-lab').textContent = gv('inp-ab-q-lab').toUpperCase();
+  ge('out-ab-q-num').textContent = gv('inp-ab-q-num');
+  const qNote = gv('inp-ab-q-note');
+  ge('out-ab-q-note').textContent = qNote;
+  ge('out-ab-q-note').style.display = qNote.trim() ? '' : 'none';
+  ge('out-ab-contact').style.display = (gv('inp-ab-q-num').trim() || gv('inp-ab-q-lab').trim()) ? '' : 'none';
+
+  const items = [
+    { lab:gv('inp-ab-h-lab'), name:gv('inp-ab-h-name'), addr:gv('inp-ab-h-addr'), info:gv('inp-ab-h-info') },
+    { lab:gv('inp-ab-c-lab'), name:gv('inp-ab-c-name'), addr:gv('inp-ab-c-addr'), info:gv('inp-ab-c-info') },
+    { lab:gv('inp-ab-r-lab'), name:gv('inp-ab-r-name'), addr:gv('inp-ab-r-addr'), info:gv('inp-ab-r-info') },
+  ];
+  ge('out-ab-blocks').innerHTML = items.map(it => `
+    <div class="ab-block">
+      <div class="ab-block-label">${esc(it.lab).toUpperCase()}</div>
+      <div class="ab-block-name">${esc(it.name)}</div>
+      ${it.addr ? `<div class="ab-block-addr">${esc(it.addr)}</div>` : ''}
+      ${it.info ? `<div class="ab-block-info">${esc(it.info)}</div>` : ''}
+    </div>
+  `).join('');
+
+  // Master-QR-Slot
+  const qrBox = ge('out-ab-qr');
+  if (qrPhotos.master && qrPhotos.master.themed) {
+    qrBox.classList.remove('empty');
+    qrBox.innerHTML = `<img src="${qrPhotos.master.themed}" alt="">`;
+  } else {
+    qrBox.classList.add('empty');
+    qrBox.innerHTML = `<span>${t('qr.optional.short')}</span>`;
+  }
+
+  scalePreview();
+}
+
+// ════════════════════════════════════════════════════════════════
+// PREVIEW SCALE — fit A3 quer (420mm × 297mm) into available width
+// ════════════════════════════════════════════════════════════════
+function scalePreview() {
+  const wrap = document.querySelector('.panel-preview');
+  if (!wrap) return;
+  const fmt = FORMATS[currentFormat];
+  // Spread wird intern in A3-Master gerendert; format-scale-Wrapper schrumpft es
+  // auf die visuelle Format-Größe. spread-scale schrumpft das Ganze zur Bildschirm-Anpassung.
+  const visualW = 420 * fmt.scale * 3.7795;
+  const visualH = 297 * fmt.scale * 3.7795;
+  const avail = Math.max(400, wrap.clientWidth - 48);
+  const availH = Math.max(400, wrap.clientHeight - 120);
+  const fit = Math.min(1, avail / visualW, availH / visualH);
+  document.querySelectorAll('.spread-scale').forEach(el => {
+    el.style.width = visualW + 'px';
+    el.style.height = visualH + 'px';
+    el.style.transform = 'scale(' + fit + ')';
+    el.style.marginBottom = (visualH * (fit - 1)) + 'px';
+  });
+}
+
+function setView(which) {
+  ['outside','inside'].forEach(v => {
+    ge('view-' + v).classList.toggle('visible', v === which);
+    ge('vt-' + v).classList.toggle('active', v === which);
+  });
+  setTimeout(scalePreview, 10);
+}
+
+window.addEventListener('resize', scalePreview);
+
+// ════════════════════════════════════════════════════════════════
+// PDF EXPORT — 2-page A3 quer (420 × 297 mm), beidseitig
+// ════════════════════════════════════════════════════════════════
+async function exportPDF() {
+  const btn = document.querySelector('.btn-download');
+  const old = btn.textContent;
+  btn.textContent = t('btn.creating');
+  btn.disabled = true;
+  try {
+    const { jsPDF } = window.jspdf;
+    const fmt = FORMATS[currentFormat];
+    const bleed = document.querySelector('input[name="bleed"]:checked').value === 'on' ? 3 : 0;
+    const pgW = fmt.paperW + bleed * 2;
+    const pgH = fmt.paperH + bleed * 2;
+
+    // A3-Master-Design wird im Papier zentriert; Cream-Margins außerhalb füllen ggf. die Differenz.
+    const designW = 420 * fmt.scale;
+    const designH = 297 * fmt.scale;
+    const offX = bleed + (fmt.paperW - designW) / 2;
+    const offY = bleed + (fmt.paperH - designH) / 2;
+
+    const bg = (currentTheme === 'forest') ? '#F7FAF7' : (currentTheme === 'cognac' ? '#FEF9F5' : '#FEF8F7');
+    const bgRgb = hexToRgb(bg);
+
+    async function capture(el) {
+      // Target-View kurz sichtbar machen (sonst display:none → 0×0 Canvas)
+      const view = el.closest('.spread-view');
+      const prevDisplay = view ? view.style.display : '';
+      if (view) view.style.display = 'flex';
+      // Format-scale UND Fit-Scale temporär entfernen, damit html2canvas A3-Master 1:1 capturet
+      const fitWrap = el.closest('.spread-scale');
+      const fmtWrap = el.closest('.format-scale');
+      const prevFit = fitWrap.style.transform;
+      const prevFmt = fmtWrap ? fmtWrap.style.transform : '';
+      fitWrap.style.transform = 'none';
+      if (fmtWrap) fmtWrap.style.transform = 'none';
+      const canvas = await html2canvas(el, { scale: 2.2, useCORS: true, allowTaint: true, backgroundColor: bg, logging: false });
+      fitWrap.style.transform = prevFit;
+      if (fmtWrap) fmtWrap.style.transform = prevFmt;
+      if (view) view.style.display = prevDisplay;
+      return canvas.toDataURL('image/jpeg', 0.92);
+    }
+
+    function buildPdf(imgData) {
+      const p = new jsPDF({ orientation:'landscape', unit:'mm', format:[pgW, pgH] });
+      // Cream-Background füllt die gesamte Seite (inkl. Cream-Margins bei Tabloid/Letter)
+      p.setFillColor(bgRgb[0], bgRgb[1], bgRgb[2]);
+      p.rect(0, 0, pgW, pgH, 'F');
+      // A3-Master-Bild wird auf Format-Maße skaliert und zentriert eingebettet
+      p.addImage(imgData, 'JPEG', offX, offY, designW, designH);
+      return p;
+    }
+
+    const names = gv('inp-names').replace(/\s+/g,'_').replace(/[^A-Za-z0-9_&äöüÄÖÜß]/g,'') || (currentLang === 'en' ? 'WelcomeFolder' : 'Empfangsmappe');
+    const folder = currentLang === 'en' ? 'WelcomeFolder' : 'Empfangsmappe';
+    const outsideLbl = currentLang === 'en' ? 'Outside' : 'Aussenseite';
+    const insideLbl = currentLang === 'en' ? 'Inside' : 'Innenseite';
+    const base = names + '_' + folder + '_OldMoney_' + currentTheme + '_' + fmt.open;
+
+    // 2 separate PDFs — eine pro Druckseite (Heimdruck-tauglich, Druckerei akzeptiert beides)
+    const outsideImg = await capture(ge('spread-outside'));
+    buildPdf(outsideImg).save(base + '_1_' + outsideLbl + '.pdf');
+
+    const insideImg = await capture(ge('spread-inside'));
+    buildPdf(insideImg).save(base + '_2_' + insideLbl + '.pdf');
+  } catch(err) {
+    alert((currentLang === 'en' ? 'PDFs could not be created: ' : 'PDFs konnten nicht erstellt werden: ') + err.message);
+    console.error(err);
+  } finally {
+    btn.textContent = old;
+    btn.disabled = false;
+  }
+}
+
+function hexToRgb(hex) {
+  const h = hex.replace('#','');
+  return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)];
+}
+
+// ════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  applyI18nLabels();
+  document.documentElement.style.setProperty('--format-scale', FORMATS[currentFormat].scale);
+  renderDayInputs();
+  update();
+  setTimeout(scalePreview, 50);
+});
+</script>
+</body>
+</html>
