@@ -137,13 +137,21 @@ const description = 'Wenn das Wetter umkippt: ein nüchterner Notfall-Guide für
 
       <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Zum Atelier</h2>
       <p class="leading-relaxed mb-6">
-        Wenn ihr die Schilder für euren Plan B in der Nacht vor der Hochzeit braucht, gibt es im <a href="/" class="cognac-link">Wedding Story Atelier</a> eine Vorlage für Hinweis- und Wegweiserschilder, die genau dafür gemacht ist: Headline und Detailzeile, offline-funktionierender QR optional, drei dezente Farben, in vier Druckformaten. Eingeben, drucken, fertig — keine Software-Installation, keine Account-Pflicht.
+        Wenn ihr die Schilder für euren Plan B in der Nacht vor der Hochzeit braucht, gibt es im Wedding Story Atelier eine Vorlage für Hinweis- und Wegweiserschilder, die genau dafür gemacht ist: Headline und Detailzeile, offline-funktionierender QR optional, drei dezente Farben, in vier Druckformaten. Eingeben, drucken, fertig — keine Software-Installation, keine Account-Pflicht.
       </p>
 
       <figure class="my-10">
-        <img src="/images/9.jpg" alt="Wedding Story Atelier QR-Hinweisschild Werk auf zwei Smartphones — Sprach- und Farbauswahl, Headline „Sektempfang in Raum 3"" width="1086" height="1086" class="w-full h-auto" loading="lazy" />
+        <a href="/demos/plan-b-hinweisschild" class="block group">
+          <img src="/images/9.jpg" alt="Wedding Story Atelier Plan-B-Hinweisschild Werk auf zwei Smartphones — Sprach- und Farbauswahl, Headline „Sektempfang in Raum 3"" width="1086" height="1086" class="w-full h-auto transition-transform duration-500 group-hover:scale-[1.02]" loading="lazy" />
+        </a>
         <figcaption class="text-xs text-center text-ink-muted mt-4 italic">Eingeben, drucken, an die Wand — keine Software-Installation, keine Account-Pflicht.</figcaption>
       </figure>
+
+      <div class="demo-cta-block">
+        <p class="demo-cta-eyebrow">Live-Demo</p>
+        <p class="demo-cta-text">Probiere die Vorlage direkt im Browser aus — alle Felder, Symbole und Farben, ohne Account.</p>
+        <a href="/demos/plan-b-hinweisschild" class="demo-cta-btn">Demo öffnen →</a>
+      </div>
 
       <p class="serif text-xl italic text-ink-muted text-center mt-10">
         Auch der ruhigste Hochzeitstag hat ein Wetter. Der Unterschied ist, wer ihn vorbereitet hat.
@@ -270,6 +278,42 @@ const description = 'Wenn das Wetter umkippt: ein nüchterner Notfall-Guide für
     text-decoration: none;
   }
   .cognac-link:hover { color: var(--color-ink); }
+
+  .demo-cta-block {
+    background: linear-gradient(180deg, #FAF7F2 0%, #F3EDE3 100%);
+    border: 1px solid #E5DCC9;
+    padding: 2rem 2rem 1.75rem;
+    margin: 2.5rem 0 0;
+    text-align: center;
+  }
+  .demo-cta-eyebrow {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 0.75rem;
+  }
+  .demo-cta-text {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    margin-bottom: 1.25rem;
+  }
+  .demo-cta-btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .demo-cta-btn:hover { opacity: 0.85; }
 
   .atelier-signature {
     margin-top: 4rem;
