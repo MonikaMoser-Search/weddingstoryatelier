@@ -1,0 +1,2098 @@
+﻿<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <title>Bridal Shower Invitation — Romantic Line</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Pinyon+Script&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script src="fonts_base64.js?v=20260429"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <style>
+    /* ── Preview Panel ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #ECEAE4; align-items: stretch; padding: 0;
+    }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── Card Face ── */
+    .card-face {
+      width: 127mm; height: 178mm;
+      position: relative; overflow: hidden; flex-shrink: 0;
+    }
+    .card-face.us46 { width: 102mm; height: 152mm; }
+
+    .card-bg {
+      position: absolute; inset: 0;
+      background: var(--bg, #FBF5F2);
+    }
+    .card-border-line {
+      position: absolute; inset: 3.5mm;
+      border: 0.4px solid var(--acc, #C4907A);
+      pointer-events: none; z-index: 2;
+    }
+
+    /* Photo: smaller height (60mm) so event details fit below */
+    .card-photo-wrap {
+      position: absolute; left: 7mm; top: 10mm;
+      width: 113mm; height: 108mm;
+      overflow: hidden; z-index: 1;
+    }
+    .card-face.us46 .card-photo-wrap {
+      left: 5.6mm; top: 8mm;
+      width: 90.8mm; height: 85mm;
+    }
+    .card-photo-wrap.no-photo { display: none; }
+    .card-photo-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: center 50%; display: block;
+    }
+    .card-photo-placeholder {
+      width: 100%; height: 100%; background: #e8e3dd;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase;
+    }
+
+    /* ── Corner Marks: TR + BL only, doppeltes versetztes L ── */
+    .corner-mark {
+      position: absolute; pointer-events: none; z-index: 4;
+      --cl: 12mm; --off: 3.5mm;
+      width: calc(var(--cl) + var(--off));
+      height: calc(var(--cl) + var(--off));
+    }
+    .card-face.us46 .corner-mark { --off: 2.1mm; }
+    .corner-mark::before, .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cl); height: var(--cl);
+      border-color: var(--acc, #C4907A); border-style: solid;
+    }
+    .corner-mark.tr::before { top: 0; right: var(--off); border-width: 0.4px 0.4px 0 0; }
+    .corner-mark.tr::after  { top: var(--off); right: 0; border-width: 0.5px 0.5px 0 0; }
+    .corner-mark.bl::before { bottom: 0; left: var(--off); border-width: 0 0 0.4px 0.4px; }
+    .corner-mark.bl::after  { bottom: var(--off); left: 0; border-width: 0 0 0.5px 0.5px; }
+    .card-photo-wrap.no-photo ~ .corner-mark { display: none; }
+
+    /* ── Event Text Block ── */
+    .card-text {
+      position: absolute; left: 9mm; right: 9mm;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      z-index: 3;
+    }
+    /* With photo: text starts below photo */
+    .card-text.with-photo {
+      top: 125mm; bottom: 10mm;
+      justify-content: center;
+    }
+    .card-face.us46 .card-text.with-photo {
+      top: 96mm; bottom: 8mm;
+    }
+    /* Without photo: text fills card, centered */
+    .card-text.no-photo {
+      top: 10mm; bottom: 10mm;
+      justify-content: center;
+    }
+    .card-face.us46 .card-text.no-photo {
+      top: 8mm; bottom: 8mm;
+    }
+
+    .evt-header {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt; font-weight: 500;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      color: var(--txt2-deep, #73574A);
+      margin-top: 5mm;
+    }
+    .card-face.us46 .evt-header { font-size: 7.5pt; margin-top: 3.5mm; letter-spacing: 0.36em; }
+
+    .evt-name {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 64pt; line-height: 1;
+      color: var(--txt-strong, #1A0D06);
+    }
+    .card-face.us46 .evt-name { font-size: 52pt; }
+
+    .evt-ornament {
+      display: flex; align-items: center; gap: 2.5mm; width: 60%;
+      margin-top: 4mm;
+    }
+    .evt-ornament::before, .evt-ornament::after {
+      content: ''; flex: 1; height: 0.4px;
+      background: var(--acc, #C4907A); opacity: 0.65;
+    }
+    .evt-orn-dot {
+      width: 2mm; height: 2mm;
+      background: var(--acc, #C4907A); opacity: 0.8;
+      border-radius: 50%;
+    }
+    .card-face.us46 .evt-ornament { width: 55%; margin-top: 3.5mm; }
+    .card-face.us46 .evt-orn-dot { width: 1.8mm; height: 1.8mm; }
+
+    .evt-datetime {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9pt; font-weight: 500;
+      letter-spacing: 0.25em; text-transform: uppercase;
+      color: var(--txt-strong, #1A0D06);
+      margin-top: 2.5mm; line-height: 1.5;
+    }
+    .card-face.us46 .evt-datetime { font-size: 7.5pt; margin-top: 2mm; letter-spacing: 0.22em; }
+
+    .evt-venue {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11pt;
+      color: var(--txt-strong, #1A0D06);
+      margin-top: 4mm; line-height: 1.4;
+    }
+    .card-face.us46 .evt-venue { font-size: 10pt; margin-top: 3.5mm; }
+
+    .evt-hosts {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 11pt;
+      color: var(--txt, #3D2B1F);
+      margin-top: 5mm; line-height: 1.3;
+    }
+    .card-face.us46 .evt-hosts { font-size: 10pt; margin-top: 4mm; }
+
+    .evt-rsvp {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 8.5pt; font-weight: 500;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--txt-strong, #1A0D06);
+      margin-top: 5mm; line-height: 1.55;
+    }
+    .card-face.us46 .evt-rsvp { font-size: 8pt; margin-top: 4mm; }
+
+    .evt-extra {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10pt;
+      color: var(--txt, #3D2B1F);
+      margin-top: 4mm; line-height: 1.35;
+    }
+    .card-face.us46 .evt-extra { font-size: 9pt; margin-top: 3.5mm; }
+
+    .evt-tagline {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10.5pt;
+      color: var(--txt2-deep, #73574A);
+      margin-top: 4mm; line-height: 1.3;
+      max-width: 80%;
+    }
+    .card-face.us46 .evt-tagline { font-size: 9.5pt; margin-top: 3mm; }
+
+    /* ── Back as Concierge Brief — Editorial Layout ── */
+    .card-back.utility {
+      justify-content: flex-start; padding: 16mm 16mm 14mm;
+    }
+    .card-back.us46.utility { padding: 12mm 12mm 11mm; }
+
+    /* Header block (centered): small caps label + Pinyon Script title */
+    .util-header {
+      text-align: center; width: 100%;
+      margin-bottom: 14mm; z-index: 1;
+    }
+    .card-back.us46 .util-header { margin-bottom: 10mm; }
+    .util-header-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 6pt; font-weight: 500;
+      letter-spacing: 0.4em; text-transform: uppercase;
+      margin-bottom: 2.5mm;
+    }
+    .card-back.us46 .util-header-label { font-size: 5pt; margin-bottom: 1.8mm; }
+    .card-back.style-clean .util-header-label { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-header-label { color: rgba(255,255,255,0.85); }
+    .util-header-title {
+      font-family: 'Pinyon Script', cursive;
+      font-size: 28pt; line-height: 1;
+    }
+    .card-back.us46 .util-header-title { font-size: 22pt; }
+    .card-back.style-clean .util-header-title { color: var(--acc, #C4907A); }
+    .card-back.style-color .util-header-title { color: rgba(255,255,255,0.95); }
+
+    /* Heart ornament — Bridal Shower Edition signature, replaces diamond of Old Money Line */
+    .util-heart {
+      display: block; margin: 2.5mm auto 0;
+      width: 4mm; height: 3.6mm;
+    }
+    .card-back.us46 .util-heart { width: 3.2mm; height: 2.8mm; margin-top: 1.8mm; }
+    .card-back.style-clean .util-heart { color: var(--acc, #C4907A); }
+    .card-back.style-color .util-heart { color: rgba(255,255,255,0.85); }
+    .util-header-mono {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 8pt;
+      letter-spacing: 0.3em; margin-top: 2.5mm;
+    }
+    .card-back.us46 .util-header-mono { font-size: 7pt; }
+    .card-back.style-clean .util-header-mono { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-header-mono { color: rgba(255,255,255,0.8); }
+
+    /* Two-column main section — WHEN-hero left, stacked items right (asymmetric: left narrower, more breath right) */
+    .util-main {
+      display: grid;
+      grid-template-columns: 0.425fr 0 0.575fr;
+      column-gap: 6.5mm;
+      align-items: stretch;
+      width: 100%;
+      padding: 0;
+      z-index: 1;
+    }
+    .card-back.us46 .util-main { column-gap: 4.5mm; padding: 0; grid-template-columns: 0.425fr 0 0.575fr; }
+    .util-main-divider {
+      background: currentColor; opacity: 0.5;
+      width: 0.4px; justify-self: center;
+    }
+    .card-back.style-clean .util-main-divider { color: var(--acc, #C4907A); }
+    .card-back.style-color .util-main-divider { color: rgba(255,255,255,0.55); }
+
+    /* Left column: WHEN as hero */
+    .util-hero {
+      display: flex; flex-direction: column;
+      align-items: flex-start; justify-content: flex-start;
+      text-align: left;
+    }
+    .util-hero > .util-label { margin-bottom: 7mm; }
+    .card-back.us46 .util-hero > .util-label { margin-bottom: 5mm; }
+    .util-hero-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      font-size: 36pt; line-height: 0.95;
+      letter-spacing: -0.01em;
+      max-width: 100%;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .card-back.us46 .util-hero-time { font-size: 26pt; }
+    .card-back.style-clean .util-hero-time { color: var(--txt-strong, #1A0D06); }
+    .card-back.style-color .util-hero-time { color: #fff; }
+    .util-hero-rule {
+      width: 14mm; height: 0.4px;
+      margin: 6mm 0 4mm;
+    }
+    .card-back.us46 .util-hero-rule { margin: 4mm 0 3mm; width: 11mm; }
+    .card-back.style-clean .util-hero-rule { background: var(--acc, #C4907A); opacity: 0.55; }
+    .card-back.style-color .util-hero-rule { background: rgba(255,255,255,0.55); }
+    .util-hero-note {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 9pt; line-height: 1.3;
+    }
+    .card-back.us46 .util-hero-note { font-size: 8pt; }
+    .card-back.style-clean .util-hero-note { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-hero-note { color: rgba(255,255,255,0.85); }
+
+    /* Right column: stacked items */
+    .util-stack-wrap {
+      display: flex; align-items: stretch;
+      z-index: 1;
+    }
+    .util-stack {
+      display: flex; flex-direction: column;
+      align-items: stretch;
+      gap: 5mm;
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .card-back.us46 .util-stack { gap: 4mm; }
+
+    /* Corner brackets — editorial print marks at card corners */
+    .util-corner {
+      position: absolute;
+      width: 6mm; height: 6mm;
+      pointer-events: none; z-index: 1;
+    }
+    .card-back.us46 .util-corner { width: 5mm; height: 5mm; }
+    .card-back.style-clean .util-corner {
+      border-color: var(--acc, #C4907A); opacity: 0.7;
+    }
+    .card-back.style-color .util-corner {
+      border-color: rgba(255,255,255,0.7);
+    }
+    .util-corner-tl { top: 10mm; left: 10mm; border-top: 0.4px solid; border-left: 0.4px solid; }
+    .util-corner-tr { top: 10mm; right: 10mm; border-top: 0.4px solid; border-right: 0.4px solid; }
+    .util-corner-bl { bottom: 10mm; left: 10mm; border-bottom: 0.4px solid; border-left: 0.4px solid; }
+    .util-corner-br { bottom: 10mm; right: 10mm; border-bottom: 0.4px solid; border-right: 0.4px solid; }
+    .card-back.us46 .util-corner-tl,
+    .card-back.us46 .util-corner-tr { top: 8mm; }
+    .card-back.us46 .util-corner-bl,
+    .card-back.us46 .util-corner-br { bottom: 8mm; }
+    .card-back.us46 .util-corner-tl,
+    .card-back.us46 .util-corner-bl { left: 8mm; }
+    .card-back.us46 .util-corner-tr,
+    .card-back.us46 .util-corner-br { right: 8mm; }
+
+    /* Each item: bullet (small dot) tight to label + body (label/value/note) */
+    .util-item {
+      display: grid;
+      grid-template-columns: 3mm 1fr;
+      column-gap: 4mm;
+      align-items: start;
+      text-align: left;
+    }
+    .card-back.us46 .util-item { grid-template-columns: 2mm 1fr; column-gap: 3mm; }
+    .util-bullet {
+      width: 1.4mm; height: 1.4mm;
+      border-radius: 50%;
+      margin-top: 1.8mm;
+    }
+    .card-back.us46 .util-bullet { width: 1.1mm; height: 1.1mm; margin-top: 1.3mm; }
+    .card-back.style-clean .util-bullet { background: var(--acc, #C4907A); }
+    .card-back.style-color .util-bullet { background: rgba(255,255,255,0.85); }
+    .util-body {
+      display: flex; flex-direction: column;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .util-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 6pt; font-weight: 500;
+      letter-spacing: 0.36em; text-transform: uppercase;
+      margin-bottom: 1.5mm;
+    }
+    .card-back.us46 .util-label { font-size: 5pt; letter-spacing: 0.32em; margin-bottom: 1mm; }
+    .card-back.style-clean .util-label { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-label { color: rgba(255,255,255,0.85); }
+    .util-value {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 10.5pt; line-height: 1.35;
+    }
+    .card-back.us46 .util-value { font-size: 9pt; }
+    .card-back.style-clean .util-value { color: var(--txt-strong, #1A0D06); }
+    .card-back.style-color .util-value { color: #fff; }
+    .util-value.italic { font-style: italic; }
+    .util-note {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 8.5pt;
+      line-height: 1.3;
+      margin-top: 2mm;
+    }
+    .card-back.us46 .util-note { font-size: 7.5pt; margin-top: 1.5mm; }
+    .card-back.style-clean .util-note { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-note { color: rgba(255,255,255,0.82); }
+    .util-hashtag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7.5pt; font-weight: 400;
+      letter-spacing: 0.22em; text-transform: uppercase;
+    }
+    .card-back.us46 .util-hashtag { font-size: 6.5pt; letter-spacing: 0.18em; }
+    .card-back.style-clean .util-hashtag { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-hashtag { color: rgba(255,255,255,0.85); }
+
+    /* Hairline with heart ornament — Bridal Shower Edition signature
+       (mirrors Old Money Line's diamond-in-divider pattern) */
+    .util-hairline {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3mm;
+      width: 72%;
+      margin: 12mm auto 9mm;
+      z-index: 1;
+    }
+    .card-back.us46 .util-hairline { margin: 8mm auto 6mm; gap: 2.5mm; width: 75%; }
+    .util-hairline::before, .util-hairline::after {
+      content: ''; flex: 1; height: 0.4px;
+    }
+    .card-back.style-clean .util-hairline::before,
+    .card-back.style-clean .util-hairline::after { background: var(--acc, #C4907A); opacity: 0.5; }
+    .card-back.style-color .util-hairline::before,
+    .card-back.style-color .util-hairline::after { background: rgba(255,255,255,0.55); }
+    .util-hairline-heart {
+      width: 3mm; height: 2.7mm; flex-shrink: 0;
+    }
+    .card-back.us46 .util-hairline-heart { width: 2.5mm; height: 2.3mm; }
+    .card-back.style-clean .util-hairline-heart { color: var(--acc, #C4907A); }
+    .card-back.style-color .util-hairline-heart { color: rgba(255,255,255,0.85); }
+    .util-footer {
+      display: flex; align-items: center;
+      width: 100%; padding: 0 8mm;
+      z-index: 1;
+    }
+    .card-back.us46 .util-footer { padding: 0 5mm; }
+    .util-footer-col {
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center;
+      padding: 0 5mm; gap: 1.5mm;
+    }
+    .card-back.us46 .util-footer-col { padding: 0 3mm; }
+    .util-footer-divider {
+      width: 0.4px; align-self: stretch;
+      margin: 1mm 0;
+    }
+    .card-back.style-clean .util-footer-divider { background: var(--acc, #C4907A); opacity: 0.4; }
+    .card-back.style-color .util-footer-divider { background: rgba(255,255,255,0.45); }
+    .util-footer-col .util-label { margin-bottom: 1.5mm; letter-spacing: 0.18em; font-size: 5pt; }
+    .card-back.us46 .util-footer-col .util-label { font-size: 4.5pt; }
+    .util-footer-col .util-value { font-size: 9pt; }
+    .card-back.us46 .util-footer-col .util-value { font-size: 8pt; }
+    .util-footer-col .util-note { font-size: 7.5pt; margin-top: 1mm; }
+    .card-back.us46 .util-footer-col .util-note { font-size: 6.5pt; }
+    .util-qr-wrap { display: flex; justify-content: center; }
+    .util-qr-img {
+      width: 14mm; height: 14mm; display: block;
+    }
+    .card-back.us46 .util-qr-img { width: 12mm; height: 12mm; }
+
+    /* Closer (italic, anchored at bottom inside card) */
+    .util-closer {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 9.5pt;
+      letter-spacing: 0.08em;
+      margin-top: auto; padding-top: 6mm;
+      text-align: center; width: 100%; z-index: 1;
+    }
+    .card-back.us46 .util-closer { font-size: 8pt; }
+    .card-back.style-clean .util-closer { color: var(--txt2-deep, #73574A); }
+    .card-back.style-color .util-closer { color: rgba(255,255,255,0.92); }
+
+    /* ── Back Side ── */
+    .card-back {
+      width: 127mm; height: 178mm;
+      position: relative; flex-shrink: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; text-align: center;
+      box-sizing: border-box;
+    }
+    .card-back.us46 { width: 102mm; height: 152mm; }
+
+    .card-back.style-clean { background: var(--bg, #FBF5F2); }
+    .card-back.style-color { background: var(--acc, #C4907A); }
+    .card-back-border {
+      position: absolute; inset: 7mm; pointer-events: none;
+    }
+    .card-back.style-clean .card-back-border { border: 0.4px solid var(--acc, #C4907A); }
+    .card-back.style-color .card-back-border { border: 0.4px solid rgba(255,255,255,0.4); }
+
+    /* ── Theme Colors ── */
+    :root,[data-theme="rose"]  { --bg:#FBF5F2; --acc:#C4907A; --txt:#3D2B1F; --txt-strong:#4A3531; --txt2:#8B6A5C; --txt2-deep:#73574A; }
+    [data-theme="sage"]  { --bg:#F2F5F0; --acc:#7A9C7E; --txt:#283527; --txt-strong:#3F4A40; --txt2:#5A7A5E; --txt2-deep:#4B664E; }
+    [data-theme="terra"] { --bg:#F5EDE6; --acc:#B5694A; --txt:#3A1E12; --txt-strong:#4A3025; --txt2:#7A4A35; --txt2-deep:#684029; }
+
+    /* ── Form rows ── */
+    .form-input {
+      width: 100%; padding: 6px 8px;
+      border: 1px solid #eee; font-family: 'DM Sans', sans-serif;
+      font-size: 11px; outline: none; background: #FAFAFA;
+      transition: border-color 0.15s; color: #1A1A1A;
+      box-sizing: border-box; margin-bottom: 6px;
+    }
+    .form-input:focus { border-color: #1A1A1A; background: #fff; }
+    .form-row-2 { display: flex; gap: 6px; }
+    .form-row-2 .form-input { flex: 1; }
+
+    .photo-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .btn-photo {
+      width: 30px; height: 27px; border: 1px solid #ddd;
+      background: #fff; cursor: pointer; position: relative;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: #bbb; transition: all 0.15s; flex-shrink: 0;
+    }
+    .btn-photo:hover { border-color: #888; color: #555; }
+    .btn-photo.has-photo { border-color: #7A9C7E; color: #7A9C7E; font-weight: bold; }
+    .btn-photo input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .photo-row-text {
+      flex: 1; font-size: 10px; color: #888;
+      font-family: 'DM Sans', sans-serif; letter-spacing: 0.04em;
+    }
+    .photo-yslider { display: flex; align-items: center; gap: 5px; margin-bottom: 5px; padding-left: 36px; }
+    .photo-yslider input[type=range] { flex: 1; }
+    .photo-yslider span { font-size: 8px; color: #bbb; width: 22px; text-align: right; }
+
+    /* ── Monogram Row ── */
+    .mono-row { display: flex; gap: 5px; margin-bottom: 5px; }
+    .mono-row input { flex: 1; text-align: center; font-size: 15px; padding: 7px 4px; }
+    .mono-sep { max-width: 36px !important; }
+
+    /* ── Theme Dots ── */
+    .theme-row { display: flex; gap: 8px; margin-bottom: 2px; }
+    .theme-dot {
+      width: 26px; height: 26px; border-radius: 50%; cursor: pointer;
+      border: 2.5px solid transparent; transition: all 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; transform: scale(1.12); }
+    .theme-dot.rose  { background: #C4907A; }
+    .theme-dot.sage  { background: #7A9C7E; }
+    .theme-dot.terra { background: #B5694A; }
+
+    /* ── Copies number input ── */
+    .copies-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .copies-row input[type=number] {
+      width: 60px; padding: 6px 8px; border: 1px solid #eee;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; background: #FAFAFA;
+      outline: none; color: #1A1A1A;
+    }
+    .copies-row .copies-hint {
+      font-size: 9px; color: #888; flex: 1;
+      font-family: 'DM Sans', sans-serif; letter-spacing: 0.04em;
+    }
+
+    /* ── Export Buttons ── */
+    .btn-export {
+      width: 100%; padding: 10px; background: #1A1A1A; color: #fff;
+      border: none; font-family: 'DM Sans', sans-serif; font-size: 9.5px;
+      text-transform: uppercase; letter-spacing: 1.5px; cursor: pointer;
+      margin-bottom: 4px; transition: background 0.15s;
+    }
+    .btn-export:hover:not(:disabled) { background: #333; }
+    .btn-export:disabled { opacity: 0.5; cursor: default; }
+    .btn-export.secondary {
+      background: #fff; color: #1A1A1A; border: 1px solid #1A1A1A;
+    }
+    .btn-export.secondary:hover:not(:disabled) { background: #f5f5f5; }
+  </style>
+</head>
+<body data-theme="sage">
+
+<form class="panel-form" onsubmit="return false">
+  <div class="panel-logo">Wedding Story Atelier</div>
+  <div class="panel-tagline">Romantic Line · Bridal Shower Invitation</div>
+
+  <!-- ── 1. Grundeinstellungen ── -->
+  <span class="section-label">Language / Sprache</span>
+  <div class="lang-buttons">
+    <button type="button" class="lang-btn" onclick="setLang('de')">DE</button>
+    <button type="button" class="lang-btn active" onclick="setLang('en')">EN</button>
+  </div>
+
+  <span class="section-label" id="lbl-format">Format</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-fmt-57" onclick="setFormat('us57')">Portrait</button>
+    <button type="button" class="ui-btn" id="btn-fmt-sq" onclick="setFormat('us46')">Postcard</button>
+  </div>
+
+  <span class="section-label" id="lbl-theme">Color</span>
+  <div class="theme-row">
+    <div class="theme-dot rose" onclick="setTheme('rose')" title="Dusty Rose"></div>
+    <div class="theme-dot sage active" onclick="setTheme('sage')" title="Sage Green"></div>
+    <div class="theme-dot terra" onclick="setTheme('terra')" title="Terracotta"></div>
+  </div>
+
+  <!-- ── 2. Vorschau-Seite ── -->
+  <span class="section-label" id="lbl-preview-toggle">Preview</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-side-front" onclick="setSide('front')">Front</button>
+    <button type="button" class="ui-btn" id="btn-side-back" onclick="setSide('back')">Back</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── 3. Vorderseite ── -->
+  <span class="section-label" id="lbl-section-front">Front</span>
+
+  <span class="section-label" id="lbl-photo">Photo (optional)</span>
+  <div class="photo-row">
+    <div class="btn-photo" id="btn-photo-main">
+      <span id="btn-photo-icon">+</span>
+      <input type="file" id="inp-photo" accept="image/*">
+    </div>
+    <div class="photo-row-text" id="photo-row-text">Upload photo</div>
+    <button type="button" class="ui-btn" style="padding:6px 9px;font-size:9px;" id="btn-photo-clear" onclick="clearPhoto()" hidden>Remove</button>
+  </div>
+  <div class="photo-yslider" id="photo-yslider" hidden>
+    <input type="range" id="inp-photoY" min="0" max="100" value="50">
+    <span id="photoY-val">50%</span>
+  </div>
+
+  <span class="section-label" id="lbl-bride">Bride's Name</span>
+  <input type="text" class="form-input" id="inp-bride" value="Sophia" placeholder="Sophia" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-date">Date</span>
+  <input type="text" class="form-input" id="inp-date" value="June 15, 2026" placeholder="June 15, 2026" oninput="renderPreview()">
+
+  <!-- Front bewusst minimal (Magazincover): Name + Bridal Shower + Datum. Logistik → Rückseite. -->
+  <input type="hidden" id="inp-honor" value="">
+  <input type="hidden" id="inp-tagline" value="">
+
+  <hr class="divider">
+
+  <!-- ── 4. Rückseite — Utility-Karte ── -->
+  <span class="section-label" id="lbl-section-back">Back · Details Card</span>
+
+  <span class="section-label" id="lbl-time">Time</span>
+  <input type="text" class="form-input" id="inp-time" value="2:00 PM" placeholder="2:00 PM" oninput="renderPreview()">
+  <input type="text" class="form-input" id="inp-time-note" value="" placeholder="Optional note — e.g. Saturday afternoon" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-venue">Venue</span>
+  <input type="text" class="form-input" id="inp-venue1" value="The Garden House" placeholder="The Garden House" oninput="renderPreview()">
+  <input type="text" class="form-input" id="inp-venue2" value="123 Rose Lane, Boston MA" placeholder="123 Rose Lane, Boston MA" oninput="renderPreview()">
+  <input type="text" class="form-input" id="inp-venue-note" value="" placeholder="Optional note — e.g. Brunch under the magnolia" oninput="renderPreview()">
+
+  <input type="hidden" id="inp-hosts" value="">
+  <input type="hidden" id="inp-hosts-note" value="">
+
+  <span class="section-label" id="lbl-rsvp">RSVP</span>
+  <input type="text" class="form-input" id="inp-rsvp" value="RSVP by June 1st · emma@email.com" placeholder="RSVP by June 1st · emma@email.com" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-qrurl">QR Code (auto-generated, optional)</span>
+  <input type="text" class="form-input" id="inp-qrurl" value="" placeholder="Paste any URL — Registry, RSVP, Website" oninput="renderPreview()">
+  <p class="hint" id="hint-qrurl" style="margin-top:-2px;margin-bottom:6px;">Auto-generated in your theme color. No upload needed.</p>
+  <input type="text" class="form-input" id="inp-qrlabel" value="" placeholder="Optional caption — e.g. Save details" oninput="renderPreview()">
+  <input type="text" class="form-input" id="inp-qr-note" value="" placeholder="Optional note — e.g. All the details on your phone" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-registry">Registry (optional)</span>
+  <input type="text" class="form-input" id="inp-registry" value="" placeholder="Target · Anthropologie · Crate &amp; Barrel" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-dresscode">Dress Code (optional)</span>
+  <input type="text" class="form-input" id="inp-dresscode" value="" placeholder="Garden Party Chic · Sundresses" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-hashtag">Hashtag (optional)</span>
+  <input type="text" class="form-input" id="inp-hashtag" value="" placeholder="#SophiaShowered" oninput="renderPreview()">
+  <input type="hidden" id="inp-themeline" value="">
+
+  <span class="section-label" id="lbl-mono">Monogram (optional, top corner)</span>
+  <div class="mono-row">
+    <input type="text" class="form-input" id="mono-a" placeholder="S" maxlength="3" oninput="renderPreview()" style="margin-bottom:0">
+    <input type="text" class="form-input mono-sep" id="mono-sep" value="&amp;" maxlength="3" oninput="renderPreview()" style="margin-bottom:0">
+    <input type="text" class="form-input" id="mono-b" placeholder="J" maxlength="3" oninput="renderPreview()" style="margin-bottom:0">
+  </div>
+
+  <span class="section-label" id="lbl-backtext">Closing Line (optional)</span>
+  <input type="text" class="form-input" id="inp-backtext" value="With love · Emma &amp; Sarah" placeholder="With love · We can't wait to celebrate" oninput="renderPreview()">
+
+  <span class="section-label" id="lbl-backstyle">Background</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-back-clean" onclick="setBackStyle('clean')">Clean</button>
+    <button type="button" class="ui-btn" id="btn-back-color" onclick="setBackStyle('color')">Color</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── 5. Export ── -->
+  <span class="section-label" id="lbl-copies">Quantity</span>
+  <div class="copies-row">
+    <input type="number" id="inp-copies" min="1" max="200" value="24">
+    <span class="copies-hint" id="copies-hint">cards in total</span>
+  </div>
+
+  <span class="section-label" id="lbl-paper">Print Paper</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-paper-lt" onclick="setPaper('letter')">Letter</button>
+    <button type="button" class="ui-btn" id="btn-paper-a4" onclick="setPaper('a4')">A4</button>
+  </div>
+
+  <span class="section-label" id="lbl-output">Output</span>
+  <div class="btn-group">
+    <button type="button" class="ui-btn active" id="btn-out-home" onclick="setOutput('home')">Home Print</button>
+    <button type="button" class="ui-btn" id="btn-out-print" onclick="setOutput('print')">Print Shop</button>
+  </div>
+  <p class="hint" id="hint-output"></p>
+
+  <button type="button" class="btn-export" id="btn-exp-front" onclick="exportFronts()">Export Fronts</button>
+  <button type="button" class="btn-export secondary" id="btn-exp-back" onclick="exportBacks()">Export Backs</button>
+</form>
+
+<div class="panel-preview">
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div id="preview-card"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════
+let evt = {
+  photo: null,
+  photoY: 50,
+};
+let lang = 'en', theme = 'sage', format = 'us57';
+let paper = 'letter', output = 'home';
+let showSide = 'front', backStyle = 'clean', sealStyle = 'clean';
+
+// ════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════
+// txtStrong: theme-spezifisches softer Dunkel (Mushroom-Espresso-Familie) — vermeidet harten Schwarz-Eindruck bei großem Display-Time
+const THEMES = {
+  rose:  {bg:[251,245,242], acc:[196,144,122], txt:[61,43,31],  txtStrong:[74,53,49],  txt2:[139,106,92], txt2Deep:[115,87,74]},
+  sage:  {bg:[242,245,240], acc:[122,156,126], txt:[40,53,39],  txtStrong:[63,74,64],  txt2:[90,122,94],  txt2Deep:[75,102,78]},
+  terra: {bg:[245,237,230], acc:[181,105,74],  txt:[58,30,18],  txtStrong:[74,48,37],  txt2:[122,74,53],  txt2Deep:[104,64,41]},
+};
+
+// Sprach-spezifische Default-Werte für die Inhaltsfelder
+// Beim Sprachwechsel werden Felder, die noch auf dem alten Default stehen, auf den neuen umgestellt.
+// Custom-eingaben bleiben unverändert.
+const LOCALE_DEFAULTS = {
+  en: {
+    'inp-bride':    'Sophia',
+    'inp-date':     'June 15, 2026',
+    'inp-time':     '2:00 PM',
+    'inp-venue1':   'The Garden House',
+    'inp-venue2':   '123 Rose Lane, Boston MA',
+    'inp-hosts':    'Emma & Sarah',
+    'inp-rsvp':     'RSVP by June 1st · emma@email.com',
+    'inp-backtext': 'With love · Emma & Sarah',
+  },
+  de: {
+    'inp-bride':    'Sophia',
+    'inp-date':     '15. Juni 2026',
+    'inp-time':     '14:00 Uhr',
+    'inp-venue1':   'Hofgut Schönblick',
+    'inp-venue2':   'Mühlenweg 12, 80331 München',
+    'inp-hosts':    'Emma & Sarah',
+    'inp-rsvp':     'Um Antwort bis 1. Juni · emma@beispiel.de',
+    'inp-backtext': 'Mit Liebe · Emma & Sarah',
+  },
+};
+
+const CARD_DIM = {
+  us57: {w:127, h:178, photoH:108, padX:7,   padY:10, textPadX:9},
+  us46:  {w:102, h:152, photoH:85,  padX:5.6, padY:8,  textPadX:7},
+};
+
+const I18N = {
+  en: {
+    format:'Format', fmtPortrait:'Portrait', fmtSquare:'Postcard',
+    theme:'Color', preview:'Preview', front:'Front', back:'Back · Details Card',
+    photo:'Photo (optional)', uploadPhoto:'Upload photo', photoLoaded:'Photo loaded · adjust Y',
+    bride:"Bride's Name", honor:'Header Line',
+    date:'Date', time:'Time', tagline:'Tagline (optional)',
+    venue:'Venue', hosts:'Hosted by',
+    rsvp:'RSVP', dresscode:'Dress Code (optional)',
+    themeLine:'Theme / Motto (optional)', registry:'Registry (optional)',
+    hashtag:'Hashtag (optional)',
+    qrurl:'QR Code (auto-generated, optional)',
+    qrhint:'Auto-generated in your theme color. No upload needed.',
+    mono:'Monogram (optional, top corner)',
+    backtext:'Closing Note (optional)', bgstyle:'Background',
+    copies:'Quantity', copiesHint:'cards in total',
+    paper:'Print Paper', outputLabel:'Output',
+    homePrint:'Home Print', printShop:'Print Shop',
+    hintHome57: p => `${p.charAt(0).toUpperCase()+p.slice(1)} landscape · 2 cards/page · trim marks`,
+    hintPrint57: '5×7″ single pages · 3 mm bleed',
+    hintHomeSq: p => `${p.charAt(0).toUpperCase()+p.slice(1)} portrait · 2 cards/page · trim marks`,
+    hintPrintSq: '4×6″ single pages · 3 mm bleed',
+    expFront:'Export Fronts', expBack:'Export Backs',
+    alertBride:'Please enter the bride\'s name.', removePhoto:'Remove',
+  },
+  de: {
+    format:'Format', fmtPortrait:'Hochkant', fmtSquare:'Postkarte',
+    theme:'Farbvariante', preview:'Vorschau', front:'Vorderseite', back:'Rückseite · Detail-Karte',
+    photo:'Foto (optional)', uploadPhoto:'Foto hochladen', photoLoaded:'Foto geladen · Y verschieben',
+    bride:'Name der Braut', honor:'Kopfzeile',
+    date:'Datum', time:'Uhrzeit', tagline:'Tagline (optional)',
+    venue:'Veranstaltungsort', hosts:'Veranstaltet von',
+    rsvp:'RSVP / Antwort', dresscode:'Dresscode (optional)',
+    themeLine:'Motto (optional)', registry:'Wunschliste (optional)',
+    hashtag:'Hashtag (optional)',
+    qrurl:'QR-Code (wird automatisch erzeugt, optional)',
+    qrhint:'In eurer Themenfarbe automatisch erstellt. Kein Upload nötig.',
+    mono:'Monogramm (optional, obere Ecke)',
+    backtext:'Schlussnote (optional)', bgstyle:'Hintergrund',
+    copies:'Stückzahl', copiesHint:'Karten insgesamt',
+    paper:'Druckpapier', outputLabel:'Ausgabe',
+    homePrint:'Heimdruck', printShop:'Druckerei',
+    hintHome57: p => `${p.toUpperCase()} quer · 2 Karten/Seite · Schnittmarken`,
+    hintPrint57: '5×7″ Einzelseiten · 3 mm Beschnitt',
+    hintHomeSq: p => `${p.toUpperCase()} hoch · 2 Karten/Seite · Schnittmarken`,
+    hintPrintSq: '4×6″ Einzelseiten · 3 mm Beschnitt',
+    expFront:'Vorderseiten exportieren', expBack:'Rückseiten exportieren',
+    alertBride:'Bitte den Namen der Braut eingeben.', removePhoto:'Entfernen',
+  },
+};
+
+// ════════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════════
+const ge = id => document.getElementById(id);
+const tt = key => I18N[lang][key];
+
+// ════════════════════════════════════════════════════
+// UI SETTERS
+// ════════════════════════════════════════════════════
+function setLang(l) {
+  const oldLang = lang;
+  lang = l;
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.textContent.trim().toLowerCase() === l));
+  // Swap Default-Werte mit, wenn der User die Sprache ändert — aber nur Felder, die noch auf dem alten Default stehen
+  if (oldLang !== l) {
+    const oldDef = LOCALE_DEFAULTS[oldLang] || {};
+    const newDef = LOCALE_DEFAULTS[l] || {};
+    Object.keys(newDef).forEach(id => {
+      const el = ge(id);
+      if (el && el.value === oldDef[id]) {
+        el.value = newDef[id];
+      }
+    });
+  }
+  updateLabels();
+  updateHint();
+  renderPreview();
+}
+
+function setFormat(f) {
+  format = f;
+  ge('btn-fmt-57').classList.toggle('active', f==='us57');
+  ge('btn-fmt-sq').classList.toggle('active', f==='us46');
+  updateHint();
+  renderPreview();
+}
+
+function setTheme(t) {
+  theme = t;
+  document.body.setAttribute('data-theme', t);
+  document.querySelectorAll('.theme-dot').forEach(d =>
+    d.classList.toggle('active', d.classList.contains(t)));
+  renderPreview();
+}
+
+function setSide(s) {
+  showSide = s;
+  ge('btn-side-front').classList.toggle('active', s==='front');
+  ge('btn-side-back').classList.toggle('active', s==='back');
+  renderPreview();
+}
+
+function setPaper(p) {
+  paper = p;
+  ge('btn-paper-a4').classList.toggle('active', p==='a4');
+  ge('btn-paper-lt').classList.toggle('active', p==='letter');
+  updateHint();
+}
+
+function setOutput(o) {
+  output = o;
+  ge('btn-out-home').classList.toggle('active', o==='home');
+  ge('btn-out-print').classList.toggle('active', o==='print');
+  updateHint();
+}
+
+function setBackStyle(s) {
+  backStyle = s;
+  ge('btn-back-clean').classList.toggle('active', s==='clean');
+  ge('btn-back-color').classList.toggle('active', s==='color');
+  renderPreview();
+}
+
+function updateHint() {
+  const p = paper;
+  let h = format==='us57'
+    ? (output==='home' ? tt('hintHome57')(p) : tt('hintPrint57'))
+    : (output==='home' ? tt('hintHomeSq')(p) : tt('hintPrintSq'));
+  ge('hint-output').textContent = h;
+}
+
+function updateLabels() {
+  ge('lbl-format').textContent       = tt('format');
+  ge('btn-fmt-57').textContent       = tt('fmtPortrait');
+  ge('btn-fmt-sq').textContent       = tt('fmtSquare');
+  ge('lbl-theme').textContent        = tt('theme');
+  ge('lbl-preview-toggle').textContent = tt('preview');
+  ge('btn-side-front').textContent   = tt('front');
+  ge('btn-side-back').textContent    = tt('back');
+  ge('lbl-section-front').textContent = tt('front');
+  ge('lbl-photo').textContent        = tt('photo');
+  ge('lbl-bride').textContent        = tt('bride');
+  ge('lbl-date').textContent         = tt('date');
+  ge('lbl-section-back').textContent = tt('back');
+  ge('lbl-time').textContent         = tt('time');
+  ge('lbl-venue').textContent        = tt('venue');
+  ge('lbl-rsvp').textContent         = tt('rsvp');
+  ge('lbl-qrurl').textContent        = tt('qrurl');
+  ge('hint-qrurl').textContent       = tt('qrhint');
+  ge('lbl-registry').textContent     = tt('registry');
+  ge('lbl-dresscode').textContent    = tt('dresscode');
+  ge('lbl-hashtag').textContent      = tt('hashtag');
+  ge('lbl-mono').textContent         = tt('mono');
+  ge('lbl-backtext').textContent     = tt('backtext');
+  ge('lbl-backstyle').textContent    = tt('bgstyle');
+  ge('lbl-copies').textContent       = tt('copies');
+  ge('copies-hint').textContent      = tt('copiesHint');
+  ge('lbl-paper').textContent        = tt('paper');
+  ge('lbl-output').textContent       = tt('outputLabel');
+  ge('btn-out-home').textContent     = tt('homePrint');
+  ge('btn-out-print').textContent    = tt('printShop');
+  ge('btn-exp-front').textContent    = tt('expFront');
+  ge('btn-exp-back').textContent     = tt('expBack');
+  ge('btn-photo-clear').textContent  = tt('removePhoto');
+  ge('photo-row-text').textContent   = evt.photo ? tt('photoLoaded') : tt('uploadPhoto');
+}
+
+// ════════════════════════════════════════════════════
+// PHOTO HANDLING
+// ════════════════════════════════════════════════════
+function clearPhoto() {
+  evt.photo = null;
+  evt.photoY = 50;
+  ge('btn-photo-main').classList.remove('has-photo');
+  ge('btn-photo-icon').innerHTML = '+';
+  ge('btn-photo-clear').hidden = true;
+  ge('photo-yslider').hidden = true;
+  ge('photo-row-text').textContent = tt('uploadPhoto');
+  renderPreview();
+}
+
+function onPhotoChange(e) {
+  if (!e.target.files[0]) return;
+  compressImage(e.target.files[0], 1600, 0.85).then(b64 => {
+    evt.photo = b64;
+    ge('btn-photo-main').classList.add('has-photo');
+    ge('btn-photo-icon').innerHTML = '&#10003;';
+    ge('btn-photo-clear').hidden = false;
+    ge('photo-yslider').hidden = false;
+    ge('photo-row-text').textContent = tt('photoLoaded');
+    renderPreview();
+  });
+}
+
+function compressImage(file, maxPx, quality) {
+  return new Promise(resolve => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h*maxPx/w); w = maxPx; }
+          else        { w = Math.round(w*maxPx/h); h = maxPx; }
+        }
+        const cv = document.createElement('canvas');
+        cv.width = w; cv.height = h;
+        cv.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(cv.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function cropPhoto(base64, targetW, targetH, yPercent) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => {
+      const srcR = img.width/img.height, tgtR = targetW/targetH;
+      let sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        sh = img.height; sw = sh*tgtR;
+        sx = (img.width-sw)/2; sy = 0;
+      } else {
+        sw = img.width; sh = sw/tgtR;
+        sx = 0; sy = (img.height-sh)*((yPercent??50)/100);
+      }
+      const cv = document.createElement('canvas');
+      cv.width = Math.round(sw); cv.height = Math.round(sh);
+      cv.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, cv.width, cv.height);
+      resolve(cv.toDataURL('image/jpeg', 0.9));
+    };
+    img.src = base64;
+  });
+}
+
+// ════════════════════════════════════════════════════
+// QR — Theme-coloriert via qrcode-generator
+// ════════════════════════════════════════════════════
+const _qrCache = new Map();
+function rgbToHex(rgb) {
+  return '#' + rgb.map(n => n.toString(16).padStart(2, '0')).join('');
+}
+function getQrDataUrl(text, hexColor) {
+  if (!text || typeof qrcode === 'undefined') return null;
+  const key = text + '|' + hexColor;
+  if (_qrCache.has(key)) return _qrCache.get(key);
+  try {
+    const qr = qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    const mc = qr.getModuleCount();
+    const cellSize = 6;
+    const margin = 2 * cellSize;
+    const size = mc * cellSize + 2 * margin;
+    const cv = document.createElement('canvas');
+    cv.width = cv.height = size;
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, size, size);
+    ctx.fillStyle = hexColor;
+    for (let r = 0; r < mc; r++) {
+      for (let c = 0; c < mc; c++) {
+        if (qr.isDark(r, c)) {
+          ctx.fillRect(margin + c * cellSize, margin + r * cellSize, cellSize, cellSize);
+        }
+      }
+    }
+    const url = cv.toDataURL('image/png');
+    _qrCache.set(key, url);
+    if (_qrCache.size > 20) {
+      _qrCache.delete(_qrCache.keys().next().value);
+    }
+    return url;
+  } catch(e) { return null; }
+}
+
+// ════════════════════════════════════════════════════
+// HEART ORNAMENT — Bridal Shower Edition Signature
+// Zartes Outline-Herz, gespiegelte SVG-Geometrie aus der Preview.
+// ════════════════════════════════════════════════════
+function drawHeart(pdf, cx, topDipY, w, color) {
+  pdf.setDrawColor(color[0], color[1], color[2]);
+  pdf.setLineWidth(0.35);
+  // Heart proportions match SVG viewBox 24×22:
+  // Top dip at (12, 8), bottom point at (12, 20.5), lobes at (~7,5) and (~17,5)
+  // Total height ratio = 22, but actual heart height (dip→tip) = 12.5 in viewBox
+  const h = w * (12.5 / 24);
+  const sx = w / 24, sy = h / 12.5;
+  // Path: M 12 20.5 → C 2.5 13.5, 2 6, 7 5 → C 9.5 4.5, 11.3 6.4, 12 8 → C 12.7 6.4, 14.5 4.5, 17 5 → C 22 6, 21.5 13.5, 12 20.5 Z
+  // Translate viewBox so (12, 8) = top dip lands at (cx, topDipY)
+  const ox2 = cx - 12*sx, oy2 = topDipY - 8*sy;
+  const pt = (x, y) => [ox2 + x*sx, oy2 + y*sy];
+  const [p0x, p0y] = pt(12, 20.5);  // start at bottom point
+  const segs = [
+    // bottom point → left lobe edge
+    [pt(2.5, 13.5), pt(2, 6), pt(7, 5)],
+    // left lobe → top dip
+    [pt(9.5, 4.5), pt(11.3, 6.4), pt(12, 8)],
+    // top dip → right lobe
+    [pt(12.7, 6.4), pt(14.5, 4.5), pt(17, 5)],
+    // right lobe → bottom point
+    [pt(22, 6), pt(21.5, 13.5), pt(12, 20.5)],
+  ];
+  // Convert to relative lines for pdf.lines()
+  let cur = [p0x, p0y];
+  const lines = segs.map(([c1, c2, p]) => {
+    const rel = [c1[0]-cur[0], c1[1]-cur[1],  c2[0]-cur[0], c2[1]-cur[1],  p[0]-cur[0], p[1]-cur[1]];
+    cur = p;
+    return rel;
+  });
+  pdf.lines(lines, p0x, p0y, [1, 1], 'S', true);
+}
+
+// ════════════════════════════════════════════════════
+// SEAL ARCS (geteilt mit Brautjungfer-Generator)
+// ════════════════════════════════════════════════════
+const ARC_DIM = {
+  us57: { w: 66, h: 5, depth: 3   },
+  us46:  { w: 52, h: 4, depth: 2.4 },
+};
+const ARC_DOT_R = 0.7;
+
+function buildArcSvg(direction, is46) {
+  const d = ARC_DIM[is46 ? 'us46' : 'us57'];
+  const w = d.w, h = d.h, depth = d.depth;
+  const totalW = w + 2 * ARC_DOT_R;
+  const padding = (h - depth) / 2;
+  const yEdge = direction === 'top' ? padding         : h - padding;
+  const yApex = direction === 'top' ? h - padding     : padding;
+  const yQ    = 2 * yApex - yEdge;
+  const arcStart = 2 * ARC_DOT_R;
+  const arcEnd   = totalW - 2 * ARC_DOT_R;
+  const xQ       = totalW / 2;
+  const path = `M ${arcStart} ${yEdge.toFixed(2)} Q ${xQ.toFixed(2)} ${yQ.toFixed(2)} ${arcEnd.toFixed(2)} ${yEdge.toFixed(2)}`;
+  return `<svg class="back-seal arc-${direction}" viewBox="0 0 ${totalW} ${h}" width="${totalW}mm" height="${h}mm">
+    <path d="${path}" stroke="currentColor" stroke-width="0.25" fill="none" stroke-linecap="round"/>
+    <circle cx="${ARC_DOT_R}" cy="${yEdge.toFixed(2)}" r="${ARC_DOT_R}" stroke="currentColor" stroke-width="0.2" fill="none"/>
+    <circle cx="${(totalW - ARC_DOT_R).toFixed(2)}" cy="${yEdge.toFixed(2)}" r="${ARC_DOT_R}" stroke="currentColor" stroke-width="0.2" fill="none"/>
+  </svg>`;
+}
+
+// ════════════════════════════════════════════════════
+// PREVIEW
+// ════════════════════════════════════════════════════
+function positionCornerMarks(cardEl, dim) {
+  const tr = cardEl.querySelector('.corner-mark.tr');
+  const bl = cardEl.querySelector('.corner-mark.bl');
+  if (!tr || !bl) return;
+  const {padX, padY, photoH, h} = dim;
+  const off = Math.max(0, padX - 3.5);
+
+  tr.style.setProperty('--off', off + 'mm');
+  bl.style.setProperty('--off', off + 'mm');
+
+  tr.style.top    = `${padY - off}mm`;
+  tr.style.right  = `${padX - off}mm`;
+  tr.style.left   = '';
+  tr.style.bottom = '';
+
+  const photoBottom = padY + photoH;
+  bl.style.bottom = `${h - photoBottom - off}mm`;
+  bl.style.left   = `${padX - off}mm`;
+  bl.style.top    = '';
+  bl.style.right  = '';
+}
+
+function getEventValues() {
+  return {
+    bride:    ge('inp-bride').value || '',
+    honor:    ge('inp-honor').value || '',
+    date:     ge('inp-date').value || '',
+    tagline:  ge('inp-tagline').value || '',
+    time:     ge('inp-time').value || '',
+    timeNote: ge('inp-time-note').value || '',
+    venue1:   ge('inp-venue1').value || '',
+    venue2:   ge('inp-venue2').value || '',
+    venueNote:ge('inp-venue-note').value || '',
+    hosts:    ge('inp-hosts').value || '',
+    hostsNote:ge('inp-hosts-note').value || '',
+    rsvp:     ge('inp-rsvp').value || '',
+    dresscode:ge('inp-dresscode').value || '',
+    themeLn:  ge('inp-themeline').value || '',
+    registry: ge('inp-registry').value || '',
+    hashtag:  ge('inp-hashtag').value || '',
+    qrUrl:    ge('inp-qrurl').value || '',
+    qrLabel:  ge('inp-qrlabel').value || '',
+    qrNote:   ge('inp-qr-note').value || '',
+  };
+}
+
+function renderPreview() {
+  const dim = CARD_DIM[format];
+  const is46 = format === 'us46';
+  const hasPhoto = !!evt.photo;
+  const v = getEventValues();
+  const monoA = ge('mono-a').value || '';
+  const monoSep = ge('mono-sep').value || '&';
+  const monoB = ge('mono-b').value || '';
+  const monoStr = (monoA||monoB) ? [monoA, monoSep, monoB].filter(Boolean).join(' ') : 'S & J';
+  const backText = ge('inp-backtext').value || '';
+
+  let html = '';
+  if (showSide === 'front') {
+    const photoBlock = hasPhoto
+      ? `<div class="card-photo-wrap"><img class="card-photo-img" src="${evt.photo}" style="object-position:center ${evt.photoY}%"></div>
+         <div class="corner-mark tr"></div>
+         <div class="corner-mark bl"></div>`
+      : '';
+    const headerText = lang === 'de' ? 'Brautparty' : 'Bridal Shower';
+    html = `
+    <div class="card-face${is46?' us46':''}">
+      <div class="card-bg"></div>
+      <div class="card-border-line"></div>
+      ${photoBlock}
+      <div class="card-text ${hasPhoto?'with-photo':'no-photo'}">
+        ${v.bride ? `<div class="evt-name">${v.bride}</div>` : ''}
+        <div class="evt-header">${headerText}</div>
+        ${v.date ? `<div class="evt-datetime">${v.date}</div>` : ''}
+      </div>
+    </div>`;
+  } else {
+    // Back as Concierge Brief — Editorial Layout (Header + Bullet Items + Notes)
+    const v = getEventValues();
+    const monoA = ge('mono-a').value || '';
+    const monoB = ge('mono-b').value || '';
+    const monoSep2 = ge('mono-sep').value || '&';
+    const monoShow = (monoA||monoB) ? [monoA, monoSep2, monoB].filter(Boolean).join(' ') : '';
+
+    let qrSrc = null;
+    if (v.qrUrl) {
+      // QR immer in Akzentfarbe (auf weißem Tile) — bleibt brand-konsistent auf Clean- und Color-Back
+      qrSrc = getQrDataUrl(v.qrUrl, rgbToHex(THEMES[theme].acc));
+    }
+
+    const headerLabel = lang==='de' ? 'Wichtige Details' : 'Practical Details';
+    const headerTitle = lang==='de' ? 'Auf einen Blick' : 'At a Glance';
+
+    function bulletItem(label, valueHtml, note, italic) {
+      const italicCls = italic ? ' italic' : '';
+      return `<div class="util-item">
+        <div class="util-bullet"></div>
+        <div class="util-body">
+          <div class="util-label">${label}</div>
+          <div class="util-value${italicCls}">${valueHtml}</div>
+          ${note ? `<div class="util-note">${note}</div>` : ''}
+        </div>
+      </div>`;
+    }
+
+    // Left column: WHEN as hero (no bullet — hero stands alone)
+    const whenLabel = lang==='de' ? 'Uhrzeit' : 'When';
+    const heroHtml = v.time ? `<div class="util-hero">
+      <div class="util-label">${whenLabel}</div>
+      <div class="util-hero-time">${v.time}</div>
+      ${v.timeNote ? `<div class="util-hero-rule"></div><div class="util-hero-note">${v.timeNote}</div>` : ''}
+    </div>` : '<div class="util-hero"></div>';
+
+    // Right column: stacked items (Where, Hosted by, RSVP)
+    const stackItems = [];
+    if (v.venue1 || v.venue2) {
+      const venueLines = [v.venue1, v.venue2].filter(Boolean).join('<br>');
+      stackItems.push(bulletItem(lang==='de'?'Ort':'Where', venueLines, v.venueNote));
+    }
+    if (v.rsvp) {
+      const rsvpHtml = v.rsvp.replace(/\s·\s/g, '<br>');
+      stackItems.push(bulletItem('RSVP', rsvpHtml, ''));
+    }
+
+    // Footer band: QR | Dress Code | Registry (max 3 columns, only those that are set)
+    const footerCols = [];
+    if (qrSrc) {
+      footerCols.push(`<div class="util-footer-col">
+        <div class="util-qr-wrap"><img class="util-qr-img" src="${qrSrc}"></div>
+        ${v.qrLabel ? `<div class="util-label" style="margin-top:1.5mm">${v.qrLabel}</div>` : ''}
+        ${v.qrNote ? `<div class="util-note">${v.qrNote}</div>` : ''}
+      </div>`);
+    }
+    if (v.dresscode) {
+      footerCols.push(`<div class="util-footer-col">
+        <div class="util-label">${lang==='de'?'Dresscode':'Dress Code'}</div>
+        <div class="util-value italic">${v.dresscode}</div>
+      </div>`);
+    }
+    if (v.registry) {
+      footerCols.push(`<div class="util-footer-col">
+        <div class="util-label">${lang==='de'?'Wunschliste':'Registry'}</div>
+        <div class="util-value italic">${v.registry}</div>
+      </div>`);
+    }
+    let footerHtml = '';
+    if (footerCols.length) {
+      const colsWithDividers = footerCols.reduce((acc, col, i) => {
+        if (i > 0) acc.push('<div class="util-footer-divider"></div>');
+        acc.push(col);
+        return acc;
+      }, []);
+      footerHtml = `<div class="util-hairline"><svg class="util-hairline-heart" viewBox="0 0 24 22"><path d="M12 20.5 C 2.5 13.5, 2 6, 7 5 C 9.5 4.5, 11.3 6.4, 12 8 C 12.7 6.4, 14.5 4.5, 17 5 C 22 6, 21.5 13.5, 12 20.5 Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg></div><div class="util-footer">${colsWithDividers.join('')}</div>`;
+    }
+
+    const hashtagHtml = v.hashtag ? `<div class="util-hashtag" style="text-align:center;margin-top:5mm;z-index:1;">${v.hashtag}</div>` : '';
+
+    html = `
+    <div class="card-back${is46?' us46':''} style-${backStyle} utility">
+      <div class="card-back-border"></div>
+      <div class="util-corner util-corner-tl"></div>
+      <div class="util-corner util-corner-tr"></div>
+      <div class="util-corner util-corner-bl"></div>
+      <div class="util-corner util-corner-br"></div>
+      <div class="util-header">
+        <div class="util-header-label">${headerLabel}</div>
+        <div class="util-header-title">${headerTitle}</div>
+        ${monoShow ? `<div class="util-header-mono">${monoShow}</div>` : ''}
+      </div>
+      <div class="util-main">
+        ${heroHtml}
+        <div class="util-main-divider"></div>
+        <div class="util-stack-wrap">
+          <div class="util-stack">
+            ${stackItems.join('')}
+          </div>
+        </div>
+      </div>
+      ${footerHtml}
+      ${hashtagHtml}
+      ${backText ? `<div class="util-closer">${backText}</div>` : ''}
+    </div>`;
+  }
+
+  ge('preview-card').innerHTML = html;
+
+  if (showSide === 'front' && hasPhoto) {
+    const cardEl = ge('preview-card').firstElementChild;
+    positionCornerMarks(cardEl, dim);
+  }
+  scalePreview();
+}
+
+function scalePreview() {
+  const area = ge('preview-area');
+  const wrap = ge('preview-wrap');
+  const card = wrap.firstElementChild;
+  if (!card) return;
+  wrap.style.transform = 'none';
+  const cW = card.offsetWidth, cH = card.offsetHeight;
+  const aW = area.clientWidth, aH = area.clientHeight;
+  const scale = Math.min((aW-40)/cW, (aH-40)/cH, 1);
+  wrap.style.transform = `translate(${(aW-cW*scale)/2}px,${(aH-cH*scale)/2}px) scale(${scale})`;
+}
+
+// ════════════════════════════════════════════════════
+// PDF HELPERS
+// ════════════════════════════════════════════════════
+const PTmm = 0.3528;
+
+function pdfFont(pdf, name, style) {
+  if (window.WSA_FONTS) {
+    WSA_FONTS.set(pdf, name, style);
+  } else {
+    const fb = {
+      CormorantGaramond:{normal:['Times','normal'],italic:['Times','italic'],light:['Times','normal']},
+      PinyonScript:{normal:['Times','italic']},
+      DMSans:{light:['Helvetica','normal'],normal:['Helvetica','normal']},
+    };
+    const r = ((fb[name]||{})[style])||['Helvetica','normal'];
+    pdf.setFont(r[0],r[1]);
+  }
+}
+
+function drawTrimMark(pdf, x, y) {
+  pdf.setDrawColor(160,160,160); pdf.setLineWidth(0.12);
+  const s = 3;
+  pdf.line(x-s-1, y, x-1, y); pdf.line(x+1, y, x+s+1, y);
+  pdf.line(x, y-s-1, x, y-1); pdf.line(x, y+1, x, y+s+1);
+}
+
+// ════════════════════════════════════════════════════
+// MONO MEASUREMENT — Tinten-Bounding-Box (geteilt mit Brautjungfer-Generator)
+// ════════════════════════════════════════════════════
+let _monoMeasureCtx = null;
+function measurePinyonOpticalCenter(text, fontSizePt) {
+  if (!text) return 0;
+  if (!_monoMeasureCtx) {
+    _monoMeasureCtx = document.createElement('canvas').getContext('2d');
+  }
+  _monoMeasureCtx.font = `${(fontSizePt * 96/72).toFixed(2)}px "Pinyon Script"`;
+  const m = _monoMeasureCtx.measureText(text);
+  const PXmm = 25.4 / 96;
+  return ((m.actualBoundingBoxRight - m.actualBoundingBoxLeft) / 2) * PXmm;
+}
+
+// ════════════════════════════════════════════════════
+// DRAW CARD FRONT (jsPDF)
+// ════════════════════════════════════════════════════
+async function drawCard(pdf, ox, oy, v) {
+  const th = THEMES[theme];
+  const {bg, acc, txt, txtStrong, txt2, txt2Deep} = th;
+  const dim = CARD_DIM[format];
+  const {w:cardW, h:cardH, photoH, padX, padY, textPadX} = dim;
+  const fS = cardW / 127;
+  const is46 = format === 'us46';
+  const hasPhoto = !!evt.photo;
+
+  const sf = r => pdf.setFillColor(r[0],r[1],r[2]);
+  const sd = r => pdf.setDrawColor(r[0],r[1],r[2]);
+  const st = r => pdf.setTextColor(r[0],r[1],r[2]);
+
+  // Background
+  sf(bg); pdf.rect(ox, oy, cardW, cardH, 'F');
+
+  // Outer border
+  sd(acc); pdf.setLineWidth(0.3);
+  pdf.rect(ox+3.5, oy+3.5, cardW-7, cardH-7, 'S');
+
+  // Photo (if any) + corner marks
+  if (hasPhoto) {
+    const pLeft = ox + padX, pTop = oy + padY;
+    const pW = cardW - padX*2, pH = photoH;
+    const cropped = await cropPhoto(evt.photo, pW*12, pH*12, evt.photoY??50);
+    pdf.addImage(cropped, 'JPEG', pLeft, pTop, pW, pH);
+
+    // Corner marks: TR + BL doppeltes versetztes L
+    const CL = 12 * fS;
+    const OFF = Math.max(0, padX - 3.5);
+    sd(acc);
+    pdf.setLineWidth(0.3);
+    pdf.line(pLeft+pW+OFF-CL, pTop-OFF, pLeft+pW+OFF, pTop-OFF);
+    pdf.line(pLeft+pW+OFF,    pTop-OFF, pLeft+pW+OFF, pTop-OFF+CL);
+    pdf.setLineWidth(0.45);
+    pdf.line(pLeft+pW-CL, pTop, pLeft+pW, pTop);
+    pdf.line(pLeft+pW,    pTop, pLeft+pW, pTop+CL);
+    pdf.setLineWidth(0.3);
+    pdf.line(pLeft-OFF, pTop+pH+OFF-CL, pLeft-OFF, pTop+pH+OFF);
+    pdf.line(pLeft-OFF, pTop+pH+OFF,    pLeft-OFF+CL, pTop+pH+OFF);
+    pdf.setLineWidth(0.45);
+    pdf.line(pLeft, pTop+pH-CL, pLeft, pTop+pH);
+    pdf.line(pLeft, pTop+pH,    pLeft+CL, pTop+pH);
+  }
+
+  // ── Event text block ──
+  const textTop = oy + (hasPhoto ? (padY + photoH + 7*fS) : (padY + 2*fS));
+  const textBot = oy + cardH - padY;
+  const cx = ox + cardW / 2;
+
+  // Magazincover-Hierarchie: Name groß und zentral, Header + Datum als zarte Klammer
+  const bride = v.bride || '';
+  const bLen = bride.length;
+  const headerFS = (is46 ? 7.5 : 9) * fS;
+  const nameFS = (is46 ? (bLen<=5?52:bLen<=10?42:34) : (bLen<=5?64:bLen<=10?54:42)) * fS;
+  const dtFS   = (is46 ? 7.5 : 9) * fS;
+
+  // Gaps — Magazincover-Atmung
+  const gSm = (is46 ? 2 : 2.5) * fS;
+  const gMd = (is46 ? 4 : 5) * fS;
+
+  // Front items — Magazincover: Name groß zwischen Header und Datum als zarte Klammer
+  // Alle Logistik (time/venue/hosts/RSVP/QR/registry/dresscode/theme/hashtag) → Rückseite
+  const items = [];
+  if (bride) items.push({type:'pinyon', size:nameFS, text:bride, color:txtStrong, after:gMd});
+  items.push({type:'header', size:headerFS, text:(lang==='de'?'Brautparty':'Bridal Shower'), color:txt2Deep, after:gSm});
+  if (v.date) items.push({type:'multi-uppercase', size:dtFS, lines:[v.date], color:txtStrong, lh:1.5, after:0});
+
+  // Measure block height
+  let blockH = 0;
+  items.forEach(it => {
+    if (it.type === 'ornament') blockH += it.size;
+    else if (it.type === 'multi-serif' || it.type === 'multi-uppercase') {
+      const lineH = it.size * PTmm * (it.lh || 1.4);
+      blockH += lineH * it.lines.length;
+    } else if (it.type === 'qr') {
+      blockH += it.size + (it.label ? 1.5 + 7*PTmm : 0);
+    } else {
+      blockH += it.size * PTmm;
+    }
+    blockH += it.after;
+  });
+  if (items.length) blockH -= items[items.length-1].after;
+
+  // If photo present → block flows from textTop down (top-aligned)
+  // If no photo → block is centered in card
+  const availH = textBot - textTop;
+  let y = hasPhoto ? textTop : (textTop + Math.max(0, (availH - blockH) / 2));
+
+  // Draw items
+  for (const it of items) {
+    if (it.type === 'header') {
+      st(it.color); pdfFont(pdf,'DMSans','normal');
+      pdf.setFontSize(it.size);
+      pdf.setCharSpace((is46?2.5:3.2)*(25.4/96)*fS);
+      pdf.text(it.text.toUpperCase(), cx, y + it.size*PTmm*0.5, {baseline:'middle', align:'center'});
+      pdf.setCharSpace(0);
+      y += it.size*PTmm + it.after;
+    } else if (it.type === 'italic') {
+      st(it.color); pdfFont(pdf,'CormorantGaramond','italic');
+      pdf.setFontSize(it.size);
+      pdf.setCharSpace(0.4*(25.4/96)*fS);
+      pdf.text(it.text, cx, y + it.size*PTmm*0.5, {baseline:'middle', align:'center'});
+      pdf.setCharSpace(0);
+      y += it.size*PTmm + it.after;
+    } else if (it.type === 'pinyon') {
+      st(it.color); pdfFont(pdf,'PinyonScript','normal');
+      pdf.setFontSize(it.size);
+      pdf.setCharSpace(0);
+      const shift = measurePinyonOpticalCenter(it.text, it.size);
+      pdf.text(it.text, cx - shift, y + it.size*PTmm*0.5, {baseline:'middle'});
+      y += it.size*PTmm + it.after;
+    } else if (it.type === 'ornament') {
+      const oW = (is46 ? 22 : 32) * fS;
+      sd(it.color); pdf.setLineWidth(0.22);
+      const oy2 = y + it.size/2;
+      pdf.line(cx-oW/2, oy2, cx-2.5*fS, oy2);
+      pdf.line(cx+2.5*fS, oy2, cx+oW/2, oy2);
+      sf(it.color); pdf.circle(cx, oy2, 1*fS, 'F');
+      y += it.size + it.after;
+    } else if (it.type === 'multi-uppercase') {
+      st(it.color); pdfFont(pdf,'DMSans','normal');
+      pdf.setFontSize(it.size);
+      pdf.setCharSpace(1.5*(25.4/96)*fS);
+      const lineH = it.size * PTmm * (it.lh || 1.5);
+      it.lines.forEach((ln, i) => {
+        pdf.text(ln.toUpperCase(), cx, y + lineH*0.5 + lineH*i, {baseline:'middle', align:'center'});
+      });
+      pdf.setCharSpace(0);
+      y += lineH * it.lines.length + it.after;
+    } else if (it.type === 'multi-serif') {
+      st(it.color); pdfFont(pdf,'CormorantGaramond','normal');
+      pdf.setFontSize(it.size);
+      pdf.setCharSpace(0);
+      const lineH = it.size * PTmm * (it.lh || 1.4);
+      it.lines.forEach((ln, i) => {
+        pdf.text(ln, cx, y + lineH*0.5 + lineH*i, {baseline:'middle', align:'center'});
+      });
+      y += lineH * it.lines.length + it.after;
+    } else if (it.type === 'qr') {
+      const accHex = rgbToHex(acc);
+      const qrSrc = getQrDataUrl(it.url, accHex);
+      if (qrSrc) {
+        pdf.addImage(qrSrc, 'PNG', cx - it.size/2, y, it.size, it.size);
+        y += it.size;
+        if (it.label) {
+          y += 1.5;
+          const labFS = 7 * fS;
+          st(txt2Deep); pdfFont(pdf,'DMSans','normal');
+          pdf.setFontSize(labFS);
+          pdf.setCharSpace(2.2*(25.4/96)*fS);
+          pdf.text(it.label.toUpperCase(), cx, y + labFS*PTmm*0.5, {baseline:'middle', align:'center'});
+          pdf.setCharSpace(0);
+          y += labFS*PTmm;
+        }
+      }
+      y += it.after;
+    }
+  }
+}
+
+// ════════════════════════════════════════════════════
+// DRAW CARD BACK (jsPDF) — identisch zum Brautjungfer-Generator
+// ════════════════════════════════════════════════════
+function drawBack(pdf, ox, oy) {
+  const th = THEMES[theme];
+  const {bg,acc,txt,txt2,txt2Deep,txtStrong} = th;
+  const dim = CARD_DIM[format];
+  const {w:cardW, h:cardH} = dim;
+  const fS = cardW/127;
+  const is46 = format === 'us46';
+  const isColor = backStyle === 'color';
+
+  const sf = r => pdf.setFillColor(r[0],r[1],r[2]);
+  const sd = r => pdf.setDrawColor(r[0],r[1],r[2]);
+  const st = r => pdf.setTextColor(r[0],r[1],r[2]);
+
+  const monoA = ge('mono-a').value || '';
+  const monoSep = ge('mono-sep').value || '&';
+  const monoB = ge('mono-b').value || '';
+  const monoStr = (monoA||monoB) ? [monoA,monoSep,monoB].filter(Boolean).join(' ') : '';
+  const backText = ge('inp-backtext').value || '';
+  const v = getEventValues();
+
+  const WHITE = [255,255,255];
+  const colLabel    = isColor ? WHITE : txt2Deep;
+  const colValue    = isColor ? WHITE : txtStrong;
+  const colItalic   = isColor ? WHITE : txt;
+  const colHeadTitle= isColor ? WHITE : acc;
+  const colHeadLab  = isColor ? WHITE : txt2Deep;
+  const colHeadMono = isColor ? WHITE : txt2Deep;
+  const colBullet   = isColor ? WHITE : acc;
+  const colNote     = isColor ? WHITE : txt2Deep;
+  const colHashtag  = isColor ? WHITE : txt2Deep;
+  const colCloser   = isColor ? WHITE : txt2Deep;
+
+  // QR immer in Akzentfarbe (auf weißem Tile) — brand-konsistent auf Clean- und Color-Back
+  const qrSrc = v.qrUrl ? getQrDataUrl(v.qrUrl, rgbToHex(acc)) : null;
+  const qrSize = is46 ? 13 : 16;
+
+  // Card bg + outer border
+  if (isColor) sf(acc); else sf(bg);
+  pdf.rect(ox, oy, cardW, cardH, 'F');
+  if (isColor) pdf.setDrawColor(255,255,255); else sd(acc);
+  pdf.setLineWidth(0.3);
+  pdf.rect(ox+7, oy+7, cardW-14, cardH-14, 'S');
+
+  // Corner brackets — editorial print marks (4 small L-shapes inside the border)
+  const ckIn = is46 ? 8 : 10;     // inset from card edge
+  const ckLen = is46 ? 5 : 6;     // length of each L-leg
+  if (isColor) pdf.setDrawColor(255,255,255); else sd(acc);
+  pdf.setLineWidth(0.25);
+  // TL
+  pdf.line(ox+ckIn,        oy+ckIn,        ox+ckIn+ckLen, oy+ckIn);
+  pdf.line(ox+ckIn,        oy+ckIn,        ox+ckIn,       oy+ckIn+ckLen);
+  // TR
+  pdf.line(ox+cardW-ckIn-ckLen, oy+ckIn,   ox+cardW-ckIn, oy+ckIn);
+  pdf.line(ox+cardW-ckIn,  oy+ckIn,        ox+cardW-ckIn, oy+ckIn+ckLen);
+  // BL
+  pdf.line(ox+ckIn,        oy+cardH-ckIn,  ox+ckIn+ckLen, oy+cardH-ckIn);
+  pdf.line(ox+ckIn,        oy+cardH-ckIn-ckLen, ox+ckIn,  oy+cardH-ckIn);
+  // BR
+  pdf.line(ox+cardW-ckIn-ckLen, oy+cardH-ckIn, ox+cardW-ckIn, oy+cardH-ckIn);
+  pdf.line(ox+cardW-ckIn,  oy+cardH-ckIn-ckLen, ox+cardW-ckIn, oy+cardH-ckIn);
+
+  const cx = ox + cardW/2;
+  const padTop = is46 ? 12 : 16;
+  const padBot = is46 ? 11 : 14;
+
+  // Header
+  const headLabFS   = (is46 ? 5 : 6) * fS;
+  const headTitleFS = (is46 ? 22 : 28) * fS;
+  const headMonoFS  = (is46 ? 7 : 8) * fS;
+  const headerLabel = lang==='de' ? 'Wichtige Details' : 'Practical Details';
+  const headerTitle = lang==='de' ? 'Auf einen Blick' : 'At a Glance';
+
+  // Item fonts
+  const labelFS  = (is46 ? 5 : 6) * fS;
+  const valueFS  = (is46 ? 9 : 10.5) * fS;
+  const noteFS   = (is46 ? 7.5 : 8.5) * fS;
+  const hashFS   = (is46 ? 6.5 : 7.5) * fS;
+  const closerFS = (is46 ? 8 : 9.5) * fS;
+
+  // LEFT column: WHEN as hero (time in display serif)
+  // RIGHT column: stacked items (Where, Hosted, RSVP)
+  const items = [];
+  if (v.venue1 || v.venue2) items.push({kind:'lv', label: lang==='de'?'Ort':'Where', lines:[v.venue1, v.venue2].filter(Boolean), note:v.venueNote});
+  if (v.rsvp) {
+    const rsvpLines = v.rsvp.split(/\s·\s/).map(p=>p.trim()).filter(Boolean);
+    items.push({kind:'lv', label:'RSVP', lines: rsvpLines.length ? rsvpLines : [v.rsvp]});
+  }
+  const heroLabel = lang==='de' ? 'Uhrzeit' : 'When';
+  const heroTimeFSBase = (is46 ? 26 : 36) * fS;
+  const heroNoteFS = (is46 ? 8 : 9) * fS;
+
+  // Footer band: QR | Dress Code | Registry (only those set)
+  const footerCols = [];
+  if (qrSrc) footerCols.push({kind:'qr'});
+  if (v.dresscode) footerCols.push({kind:'col', label: lang==='de'?'Dresscode':'Dress Code', value:v.dresscode, italic:true});
+  if (v.registry) footerCols.push({kind:'col', label: lang==='de'?'Wunschliste':'Registry', value:v.registry, italic:true});
+  const hasFooter = footerCols.length > 0;
+  const hasHash = !!v.hashtag;
+
+  // Geometry
+  const valueLineH = valueFS * PTmm * 1.35;
+  const noteLineH  = noteFS * PTmm * 1.3;
+  const labelLineH = labelFS * PTmm;
+  const labelToValueGap = 1.5;
+  const valueToNoteGap = 2;
+
+  function itemHeight(it) {
+    if (it.kind === 'lv') {
+      const lines = it.lines || [it.value];
+      let h = labelLineH + labelToValueGap + valueLineH * lines.length;
+      if (it.note) h += valueToNoteGap + noteLineH;
+      return h;
+    }
+    return 0;
+  }
+
+  // Two-column geometry — Hero left, Stack right, vertical divider between
+  const safeInset = is46 ? 12 : 16;
+  const safeLeft = ox + safeInset;
+  const safeRight = ox + cardW - safeInset;
+  const safeWidth = safeRight - safeLeft;
+  const colGap = is46 ? 9 : 13;
+  // Asymmetric column split: left 0.85 / right 1.15 — pushes right column further right
+  const leftColW = (safeWidth - colGap) * 0.425;
+  const rightColW = (safeWidth - colGap) * 0.575;
+  const col1Left = safeLeft;
+  const col2Left = safeLeft + leftColW + colGap;
+  const dividerX = col1Left + leftColW + colGap / 2;
+  const bulletDia = is46 ? 1.1 : 1.4;
+  const bulletGap = is46 ? 3 : 4;
+  const col1BodyLeft = col1Left + bulletDia + bulletGap;
+  const col2BodyLeft = col2Left + bulletDia + bulletGap;
+
+  let y = oy + padTop;
+
+  // ── Header ──
+  // small caps label
+  st(colHeadLab); pdfFont(pdf,'DMSans','normal');
+  pdf.setFontSize(headLabFS);
+  pdf.setCharSpace(3.2*(25.4/96)*fS);
+  pdf.text(headerLabel.toUpperCase(), cx, y + headLabFS*PTmm*0.5, {baseline:'middle', align:'center'});
+  pdf.setCharSpace(0);
+  y += headLabFS*PTmm + 2.5;
+
+  // Pinyon Script title
+  st(colHeadTitle); pdfFont(pdf,'PinyonScript','normal');
+  pdf.setFontSize(headTitleFS);
+  pdf.setCharSpace(0);
+  const titleShift = measurePinyonOpticalCenter(headerTitle, headTitleFS);
+  pdf.text(headerTitle, cx - titleShift, y + headTitleFS*PTmm*0.5, {baseline:'middle'});
+  y += headTitleFS*PTmm;
+
+  // (Heart ornament moved to hairline divider above footer — single ornament moment)
+
+  // Optional mono caption under header
+  if (monoStr) {
+    y += 2.5;
+    st(colHeadMono); pdfFont(pdf,'CormorantGaramond','italic');
+    pdf.setFontSize(headMonoFS);
+    pdf.setCharSpace(2.6*(25.4/96)*fS);
+    pdf.text(monoStr, cx, y + headMonoFS*PTmm*0.5, {baseline:'middle', align:'center'});
+    pdf.setCharSpace(0);
+    y += headMonoFS*PTmm;
+  }
+  y += (is46 ? 10 : 14);  // breathing gap before main section
+
+  // ── Bottom reservations: Closer + Hashtag + Footer ──
+  const hasCloser = !!backText;
+  const closerH = hasCloser ? closerFS*PTmm + 4 : 0;
+  const hashH = hasHash ? hashFS*PTmm + 5 : 0;
+  // Footer height: max of column heights + generous hairline gaps for breathing
+  let footerH = 0;
+  const hairlineGapTop = is46 ? 8 : 12;
+  const hairlineGapBot = is46 ? 6 : 9;
+  if (hasFooter) {
+    footerH = hairlineGapTop + hairlineGapBot;
+    let maxColH = 0;
+    footerCols.forEach(c => {
+      if (c.kind === 'qr') {
+        const ch = qrSize + (v.qrLabel ? 1.5 + labelLineH : 0) + (v.qrNote ? 1 + noteLineH : 0);
+        maxColH = Math.max(maxColH, ch);
+      } else {
+        const ch = labelLineH + 1.5 + valueLineH;
+        maxColH = Math.max(maxColH, ch);
+      }
+    });
+    footerH += maxColH;
+  }
+  // Compute right-stack height
+  const itemHs = items.map(itemHeight);
+  const itemsTotal = itemHs.reduce((s,h)=>s+h, 0);
+  const rightGap = is46 ? 4 : 5;
+  const rightStackH = itemsTotal + rightGap * Math.max(0, items.length - 1);
+
+  // Flow from top: main directly after header, then hairline+footer+hashtag below.
+  // Closer stays anchored at card bottom — slack absorbed between hashtag and closer
+  // (mirrors CSS .util-closer margin-top:auto pattern in editor).
+  const mainToHairlineGap = is46 ? 10 : 14;
+
+  // ── Two-column main: Hero (WHEN) left | vertical divider | Stack right ──
+  const mainTop = y;
+  const mainBot = mainTop + rightStackH;
+  const mainH = mainBot - mainTop;
+
+  let yRight = mainTop;
+
+  for (let i = 0; i < items.length; i++) {
+    const it = items[i];
+    const bulletR = bulletDia / 2;
+    const bulletCx = col2Left + bulletR;
+    const bulletCy = yRight + labelFS*PTmm*0.5 + 0.2;
+    sf(colBullet);
+    pdf.circle(bulletCx, bulletCy, bulletR, 'F');
+
+    st(colLabel); pdfFont(pdf,'DMSans','normal');
+    pdf.setFontSize(labelFS);
+    pdf.setCharSpace(3.0*(25.4/96)*fS);
+    pdf.text(it.label.toUpperCase(), col2BodyLeft, yRight + labelFS*PTmm*0.5, {baseline:'middle'});
+    pdf.setCharSpace(0);
+    yRight += labelLineH + labelToValueGap;
+
+    const lines = it.lines || [it.value];
+    pdfFont(pdf,'CormorantGaramond', it.italic ? 'italic' : 'normal');
+    pdf.setFontSize(valueFS);
+    st(it.italic ? colItalic : colValue);
+    lines.forEach((ln, idx) => {
+      pdf.text(ln, col2BodyLeft, yRight + valueLineH*0.5 + valueLineH*idx, {baseline:'middle'});
+    });
+    yRight += valueLineH * lines.length;
+
+    if (it.note) {
+      yRight += valueToNoteGap;
+      st(colNote); pdfFont(pdf,'CormorantGaramond','italic');
+      pdf.setFontSize(noteFS);
+      pdf.text(it.note, col2BodyLeft, yRight + noteLineH*0.5, {baseline:'middle'});
+      yRight += noteLineH;
+    }
+    if (i < items.length - 1) yRight += rightGap;
+  }
+
+  // LEFT column: WHEN-hero centered vertically with more breath
+  if (v.time) {
+    const labelToTime = is46 ? 5 : 7;
+    const timeToRule = is46 ? 4 : 6;
+    const ruleToNote = is46 ? 3 : 4;
+    // Dynamic shrink: ensure time fits the left column width (handles "14:00 Uhr" etc.)
+    pdf.setFontSize(heroTimeFSBase);
+    pdfFont(pdf,'CormorantGaramond','normal');
+    const baseW = pdf.getTextWidth(v.time);
+    const maxW = leftColW - 1;
+    const heroTimeFS = baseW > maxW ? heroTimeFSBase * (maxW / baseW) : heroTimeFSBase;
+    const heroNoteH = v.timeNote ? (timeToRule + 0.4 + ruleToNote + heroNoteFS*PTmm*1.3) : 0;
+    const heroBlockH = labelLineH + labelToTime + heroTimeFS*PTmm + heroNoteH;
+    let yLeft = mainTop;
+    // Label only — no bullet in the hero column (hero stands alone)
+    st(colLabel); pdfFont(pdf,'DMSans','normal');
+    pdf.setFontSize(labelFS);
+    pdf.setCharSpace(3.0*(25.4/96)*fS);
+    pdf.text(heroLabel.toUpperCase(), col1Left, yLeft + labelFS*PTmm*0.5, {baseline:'middle'});
+    pdf.setCharSpace(0);
+    yLeft += labelLineH + labelToTime;
+    // Time hero
+    st(colValue); pdfFont(pdf,'CormorantGaramond','normal');
+    pdf.setFontSize(heroTimeFS);
+    pdf.setCharSpace(0);
+    pdf.text(v.time, col1Left, yLeft + heroTimeFS*PTmm*0.5*0.95, {baseline:'middle'});
+    yLeft += heroTimeFS*PTmm * 0.95;
+    // Optional rule + note
+    if (v.timeNote) {
+      yLeft += timeToRule;
+      sd(colBullet);
+      pdf.setLineWidth(0.25);
+      const ruleW = is46 ? 11 : 14;
+      pdf.line(col1Left, yLeft, col1Left + ruleW, yLeft);
+      yLeft += ruleToNote;
+      st(colNote); pdfFont(pdf,'CormorantGaramond','italic');
+      pdf.setFontSize(heroNoteFS);
+      pdf.text(v.timeNote, col1Left, yLeft + heroNoteFS*PTmm*0.5, {baseline:'middle'});
+    }
+  }
+
+  // Vertical divider between columns — capped to actual content height (whichever column is taller)
+  const leftContentH = v.time
+    ? (function() {
+        const labelToTime = is46 ? 5 : 7;
+        const timeToRule = is46 ? 4 : 6;
+        const ruleToNote = is46 ? 3 : 4;
+        pdf.setFontSize(heroTimeFSBase);
+        pdfFont(pdf,'CormorantGaramond','normal');
+        const baseW = pdf.getTextWidth(v.time);
+        const maxW = leftColW - 1;
+        const heroTimeFS = baseW > maxW ? heroTimeFSBase * (maxW / baseW) : heroTimeFSBase;
+        const heroNoteH = v.timeNote ? (timeToRule + 0.4 + ruleToNote + heroNoteFS*PTmm*1.3) : 0;
+        return labelLineH + labelToTime + heroTimeFS*PTmm + heroNoteH;
+      })()
+    : 0;
+  const dividerLen = Math.max(rightStackH, leftContentH);
+  sd(colBullet);
+  pdf.setLineWidth(0.25);
+  pdf.line(dividerX, mainTop + 2, dividerX, mainTop + dividerLen - 2);
+
+  y = mainBot;  // ensure subsequent sections start below the main area
+
+  // ── Hairline (with heart ornament) + Footer band ──
+  // Flows directly after main block with breathing gap
+  const footerBlockStart = mainBot + mainToHairlineGap;
+  if (hasFooter) {
+    const footerTop = footerBlockStart - hairlineGapTop;
+    // Hairline with heart in the middle — mirrors Old Money diamond-in-divider pattern
+    const hairlineY = footerTop + hairlineGapTop;
+    const hairW = cardW * (is46 ? 0.75 : 0.72);
+    const heartW = is46 ? 2.5 : 3;
+    const heartH = heartW * (12.5 / 24);
+    const heartGap = is46 ? 2.5 : 3;
+    sd(colBullet);
+    pdf.setLineWidth(0.25);
+    const lineLeftEnd = cx - heartW/2 - heartGap;
+    const lineRightStart = cx + heartW/2 + heartGap;
+    pdf.line(cx - hairW/2, hairlineY, lineLeftEnd, hairlineY);
+    pdf.line(lineRightStart, hairlineY, cx + hairW/2, hairlineY);
+    drawHeart(pdf, cx, hairlineY - heartH*0.35, heartW, colBullet);
+
+    // Footer columns — more side inset for breath
+    const footerBoxTop = hairlineY + hairlineGapBot;
+    const footerInset = is46 ? 9 : 13;
+    const footerW = cardW - 2*footerInset;
+    const colCount = footerCols.length;
+    const colW = footerW / colCount;
+    for (let c = 0; c < colCount; c++) {
+      const colCx = ox + footerInset + colW*c + colW/2;
+      const colItem = footerCols[c];
+      // Vertical divider before column (not for first)
+      if (c > 0) {
+        const divX = ox + footerInset + colW*c;
+        sd(colBullet);
+        pdf.setLineWidth(0.2);
+        const dvTop = footerBoxTop + 1, dvBot = footerBoxTop + (footerH - 10);
+        pdf.line(divX, dvTop, divX, dvBot);
+      }
+      let cy = footerBoxTop;
+      if (colItem.kind === 'qr') {
+        pdf.addImage(qrSrc, 'PNG', colCx - qrSize/2, cy, qrSize, qrSize);
+        cy += qrSize;
+        if (v.qrLabel) {
+          cy += 1.5;
+          const footerLabelFS = (is46 ? 4.5 : 5) * fS;
+          st(colLabel); pdfFont(pdf,'DMSans','normal');
+          pdf.setFontSize(footerLabelFS);
+          pdf.setCharSpace(1.5*(25.4/96)*fS);
+          pdf.text(v.qrLabel.toUpperCase(), colCx, cy + footerLabelFS*PTmm*0.5, {baseline:'middle', align:'center'});
+          pdf.setCharSpace(0);
+          cy += footerLabelFS*PTmm;
+        }
+        if (v.qrNote) {
+          cy += 1;
+          st(colNote); pdfFont(pdf,'CormorantGaramond','italic');
+          pdf.setFontSize(noteFS);
+          pdf.text(v.qrNote, colCx, cy + noteLineH*0.5, {baseline:'middle', align:'center'});
+        }
+      } else {
+        const footerLabelFS = (is46 ? 4.5 : 5) * fS;
+        st(colLabel); pdfFont(pdf,'DMSans','normal');
+        pdf.setFontSize(footerLabelFS);
+        pdf.setCharSpace(1.5*(25.4/96)*fS);
+        pdf.text(colItem.label.toUpperCase(), colCx, cy + footerLabelFS*PTmm*0.5, {baseline:'middle', align:'center'});
+        pdf.setCharSpace(0);
+        cy += footerLabelFS*PTmm + 1.5;
+        pdfFont(pdf,'CormorantGaramond', colItem.italic ? 'italic' : 'normal');
+        pdf.setFontSize(valueFS);
+        st(colItem.italic ? colItalic : colValue);
+        pdf.text(colItem.value, colCx, cy + valueLineH*0.5, {baseline:'middle', align:'center'});
+      }
+    }
+  }
+
+  // ── Hashtag (anchored just above closer — part of the closing block, not footer tail) ──
+  if (hasHash) {
+    const hashToCloserGap = is46 ? 4 : 5;
+    const hashY = oy + cardH - padBot - closerH - hashFS*PTmm - hashToCloserGap;
+    st(colHashtag); pdfFont(pdf,'DMSans','normal');
+    pdf.setFontSize(hashFS);
+    pdf.setCharSpace(1.8*(25.4/96)*fS);
+    pdf.text(v.hashtag.toUpperCase(), cx, hashY + hashFS*PTmm*0.5, {baseline:'middle', align:'center'});
+    pdf.setCharSpace(0);
+  }
+
+  // ── Closer (italic, anchored at card bottom) ──
+  if (hasCloser) {
+    const closerY = oy + cardH - padBot - closerFS*PTmm;
+    st(colCloser); pdfFont(pdf,'CormorantGaramond','italic');
+    pdf.setFontSize(closerFS);
+    pdf.setCharSpace(0.8*(25.4/96)*fS);
+    pdf.text(backText, cx, closerY + closerFS*PTmm*0.5, {baseline:'middle', align:'center'});
+    pdf.setCharSpace(0);
+  }
+}
+
+// ════════════════════════════════════════════════════
+// SEAL DRAWING (jsPDF)
+// ════════════════════════════════════════════════════
+function drawArc(pdf, cx, yTop, direction, is46, color) {
+  const d = ARC_DIM[is46 ? 'us46' : 'us57'];
+  const halfW = d.w / 2;
+  const padding = (d.h - d.depth) / 2;
+  const yEdge = direction === 'top' ? yTop + padding         : yTop + padding + d.depth;
+  const yApex = direction === 'top' ? yTop + padding + d.depth : yTop + padding;
+
+  pdf.setDrawColor(color[0], color[1], color[2]);
+  pdf.setLineWidth(0.25);
+
+  const yQ = 2 * yApex - yEdge;
+  const arcStartX = cx - halfW + 2 * ARC_DOT_R;
+  const arcEndX   = cx + halfW - 2 * ARC_DOT_R;
+  const xQ        = cx;
+
+  const c1x = arcStartX + (2/3) * (xQ - arcStartX);
+  const c1y = yEdge     + (2/3) * (yQ - yEdge);
+  const c2x = arcEndX   + (2/3) * (xQ - arcEndX);
+  const c2y = c1y;
+
+  pdf.lines([
+    [c1x - arcStartX, c1y - yEdge, c2x - arcStartX, c2y - yEdge, arcEndX - arcStartX, 0]
+  ], arcStartX, yEdge, [1, 1], 'S', false);
+
+  pdf.circle(cx - halfW, yEdge, ARC_DOT_R, 'S');
+  pdf.circle(cx + halfW, yEdge, ARC_DOT_R, 'S');
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT FRONTS — N identische Karten (1 Design × Stückzahl)
+// ════════════════════════════════════════════════════
+async function exportFronts() {
+  const btn = ge('btn-exp-front');
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const {jsPDF} = window.jspdf;
+    const bleed = output==='print' ? 3 : 0;
+    const v = getEventValues();
+    if (!v.bride.trim()) { alert(tt('alertBride')); return; }
+    if (window.WSA_FONTS) console.log('WSA_FONTS status:', JSON.stringify(WSA_FONTS.status()));
+
+    const copies = Math.max(1, Math.min(200, parseInt(ge('inp-copies').value) || 24));
+    const dim = CARD_DIM[format];
+    const {w:cW, h:cH} = dim;
+    let pdf;
+
+    if (output==='print') {
+      // Druckerei: 1 Karte pro Seite mit Bleed × Stückzahl
+      const pgW=cW+bleed*2, pgH=cH+bleed*2;
+      const bgC = THEMES[theme].bg;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<copies; i++) {
+        if (i>0) pdf.addPage([pgW,pgH],'portrait');
+        pdf.setFillColor(bgC[0], bgC[1], bgC[2]);
+        pdf.rect(0, 0, pgW, pgH, 'F');
+        await drawCard(pdf, bleed, bleed, v);
+      }
+    } else if (format==='us57') {
+      // Heimdruck 5×7": 2 Karten pro Querseite
+      const pgW = paper==='a4'?297:279.4, pgH = paper==='a4'?210:215.9;
+      const mX = (pgW-cW*2)/2, mY = (pgH-cH)/2;
+      pdf = new jsPDF({orientation:'landscape',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(copies/2);
+      for (let p=0; p<pages; p++) {
+        if (p>0) pdf.addPage();
+        const cardsThisPage = Math.min(2, copies - p*2);
+        for (let s=0; s<cardsThisPage; s++) {
+          const ox = mX + s*cW;
+          await drawCard(pdf, ox, mY, v);
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    } else {
+      // Heimdruck 4×6": 2 Karten nebeneinander auf A4/Letter Hochformat
+      const pgW=paper==='a4'?210:215.9, pgH=paper==='a4'?297:279.4;
+      const mX=(pgW-cW*2)/2, mY=(pgH-cH)/2;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(copies/2);
+      for (let p=0; p<pages; p++) {
+        if (p>0) pdf.addPage();
+        const cardsThisPage = Math.min(2, copies - p*2);
+        for (let s=0; s<cardsThisPage; s++) {
+          const ox = mX + s*cW;
+          await drawCard(pdf, ox, mY, v);
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    }
+
+    const fmt=format==='us46'?'4x6':'5x7';
+    const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
+    pdf.save(`WSA_BS_Invitation_Front_${tn}_${fmt}.pdf`);
+  } finally {
+    btn.disabled=false; btn.textContent=tt('expFront');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// EXPORT BACKS — N identische Rückseiten
+// ════════════════════════════════════════════════════
+async function exportBacks() {
+  const btn = ge('btn-exp-back');
+  btn.disabled = true; btn.textContent = '...';
+  try {
+    const {jsPDF} = window.jspdf;
+    const bleed = output==='print' ? 3 : 0;
+    const copies = Math.max(1, Math.min(200, parseInt(ge('inp-copies').value) || 24));
+    const dim = CARD_DIM[format];
+    const {w:cW, h:cH} = dim;
+    let pdf;
+
+    if (output==='print') {
+      const pgW=cW+bleed*2, pgH=cH+bleed*2;
+      const bleedC = backStyle === 'color' ? THEMES[theme].acc : THEMES[theme].bg;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      for (let i=0; i<copies; i++) {
+        if (i>0) pdf.addPage([pgW,pgH],'portrait');
+        pdf.setFillColor(bleedC[0], bleedC[1], bleedC[2]);
+        pdf.rect(0, 0, pgW, pgH, 'F');
+        drawBack(pdf, bleed, bleed);
+      }
+    } else if (format==='us57') {
+      const pgW=paper==='a4'?297:279.4, pgH=paper==='a4'?210:215.9;
+      const mX=(pgW-cW*2)/2, mY=(pgH-cH)/2;
+      pdf = new jsPDF({orientation:'landscape',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(copies/2);
+      for (let p=0; p<pages; p++) {
+        if (p>0) pdf.addPage();
+        const cardsThisPage = Math.min(2, copies - p*2);
+        for (let s=0; s<cardsThisPage; s++) {
+          const ox = mX + s*cW;
+          drawBack(pdf, ox, mY);
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    } else {
+      // 4×6" 2 cards portrait
+      const pgW=paper==='a4'?210:215.9, pgH=paper==='a4'?297:279.4;
+      const mX=(pgW-cW*2)/2, mY=(pgH-cH)/2;
+      pdf = new jsPDF({orientation:'portrait',unit:'mm',format:paper==='a4'?'a4':[pgW,pgH]});
+      if (window.WSA_FONTS) WSA_FONTS.registerWith(pdf);
+      const pages = Math.ceil(copies/2);
+      for (let p=0; p<pages; p++) {
+        if (p>0) pdf.addPage();
+        const cardsThisPage = Math.min(2, copies - p*2);
+        for (let s=0; s<cardsThisPage; s++) {
+          const ox = mX + s*cW;
+          drawBack(pdf, ox, mY);
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+        }
+      }
+    }
+
+    const fmt=format==='us46'?'4x6':'5x7';
+    const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
+    pdf.save(`WSA_BS_Invitation_Back_${tn}_${fmt}.pdf`);
+  } finally {
+    btn.disabled=false; btn.textContent=tt('expBack');
+  }
+}
+
+// ════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  try { if (window.WSA_FONTS) WSA_FONTS.registerWithCSS(); } catch(e) {}
+
+  // Photo input wiring
+  ge('inp-photo').onchange = onPhotoChange;
+  ge('inp-photoY').oninput = e => {
+    evt.photoY = parseInt(e.target.value);
+    ge('photoY-val').textContent = e.target.value + '%';
+    renderPreview();
+  };
+
+  updateHint();
+  updateLabels();
+  renderPreview();
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(() => renderPreview());
+  }
+  window.addEventListener('resize', scalePreview);
+});
+</script>
+</body>
+</html>
