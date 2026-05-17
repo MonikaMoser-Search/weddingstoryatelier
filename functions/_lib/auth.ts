@@ -55,7 +55,7 @@ export function setCookieHeader(value: string): string {
 
 // Maps slug to env var name: "dankeskarte" -> "PW_DANKESKARTE", "wedding-magazine" -> "PW_WEDDING_MAGAZINE"
 // e.g. "bridal-shower-invitation-romantic" -> "PW_BRIDAL_SHOWER_INVITATION_ROMANTIC"
-// Rebuild marker: 2026-05-17c (env-var consistency retry)
+// Rebuild marker: 2026-05-17d (env-var clean re-set via printf, no trailing newline)
 export function passwordEnvKey(slug: string): string {
   return 'PW_' + slug.toUpperCase().replace(/-/g, '_');
 }
