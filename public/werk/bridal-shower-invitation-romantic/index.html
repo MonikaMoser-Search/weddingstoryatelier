@@ -767,6 +767,7 @@ const I18N = {
     hintPrintSq: '4×6″ single pages · 3 mm bleed',
     expFront:'Export Fronts', expBack:'Export Backs',
     alertBride:'Please enter the bride\'s name.', removePhoto:'Remove',
+    exportError:'The PDF could not be created. Please try again — if the issue persists, reload the page.',
   },
   de: {
     format:'Format', fmtPortrait:'Hochkant', fmtSquare:'Postkarte',
@@ -791,6 +792,7 @@ const I18N = {
     hintPrintSq: '4×6″ Einzelseiten · 3 mm Beschnitt',
     expFront:'Vorderseiten exportieren', expBack:'Rückseiten exportieren',
     alertBride:'Bitte den Namen der Braut eingeben.', removePhoto:'Entfernen',
+    exportError:'Das PDF konnte nicht erstellt werden. Bitte erneut versuchen — falls es weiterhin nicht klappt, Seite neu laden.',
   },
 };
 
@@ -798,6 +800,7 @@ const I18N = {
 // HELPERS
 // ════════════════════════════════════════════════════
 const ge = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const tt = key => I18N[lang][key];
 
 // ════════════════════════════════════════════════════
@@ -1163,9 +1166,9 @@ function renderPreview() {
       <div class="card-border-line"></div>
       ${photoBlock}
       <div class="card-text ${hasPhoto?'with-photo':'no-photo'}">
-        ${v.bride ? `<div class="evt-name">${v.bride}</div>` : ''}
+        ${v.bride ? `<div class="evt-name">${esc(v.bride)}</div>` : ''}
         <div class="evt-header">${headerText}</div>
-        ${v.date ? `<div class="evt-datetime">${v.date}</div>` : ''}
+        ${v.date ? `<div class="evt-datetime">${esc(v.date)}</div>` : ''}
       </div>
     </div>`;
   } else {
@@ -1174,7 +1177,7 @@ function renderPreview() {
     const monoA = ge('mono-a').value || '';
     const monoB = ge('mono-b').value || '';
     const monoSep2 = ge('mono-sep').value || '&';
-    const monoShow = (monoA||monoB) ? [monoA, monoSep2, monoB].filter(Boolean).join(' ') : '';
+    const monoShow = (monoA||monoB) ? [monoA, monoSep2, monoB].filter(Boolean).map(esc).join(' ') : '';
 
     let qrSrc = null;
     if (v.qrUrl) {
@@ -1201,18 +1204,18 @@ function renderPreview() {
     const whenLabel = lang==='de' ? 'Uhrzeit' : 'When';
     const heroHtml = v.time ? `<div class="util-hero">
       <div class="util-label">${whenLabel}</div>
-      <div class="util-hero-time">${v.time}</div>
-      ${v.timeNote ? `<div class="util-hero-rule"></div><div class="util-hero-note">${v.timeNote}</div>` : ''}
+      <div class="util-hero-time">${esc(v.time)}</div>
+      ${v.timeNote ? `<div class="util-hero-rule"></div><div class="util-hero-note">${esc(v.timeNote)}</div>` : ''}
     </div>` : '<div class="util-hero"></div>';
 
     // Right column: stacked items (Where, Hosted by, RSVP)
     const stackItems = [];
     if (v.venue1 || v.venue2) {
-      const venueLines = [v.venue1, v.venue2].filter(Boolean).join('<br>');
-      stackItems.push(bulletItem(lang==='de'?'Ort':'Where', venueLines, v.venueNote));
+      const venueLines = [v.venue1, v.venue2].filter(Boolean).map(esc).join('<br>');
+      stackItems.push(bulletItem(lang==='de'?'Ort':'Where', venueLines, esc(v.venueNote)));
     }
     if (v.rsvp) {
-      const rsvpHtml = v.rsvp.replace(/\s·\s/g, '<br>');
+      const rsvpHtml = esc(v.rsvp).replace(/\s·\s/g, '<br>');
       stackItems.push(bulletItem('RSVP', rsvpHtml, ''));
     }
 
@@ -1221,20 +1224,20 @@ function renderPreview() {
     if (qrSrc) {
       footerCols.push(`<div class="util-footer-col">
         <div class="util-qr-wrap"><img class="util-qr-img" src="${qrSrc}"></div>
-        ${v.qrLabel ? `<div class="util-label" style="margin-top:1.5mm">${v.qrLabel}</div>` : ''}
-        ${v.qrNote ? `<div class="util-note">${v.qrNote}</div>` : ''}
+        ${v.qrLabel ? `<div class="util-label" style="margin-top:1.5mm">${esc(v.qrLabel)}</div>` : ''}
+        ${v.qrNote ? `<div class="util-note">${esc(v.qrNote)}</div>` : ''}
       </div>`);
     }
     if (v.dresscode) {
       footerCols.push(`<div class="util-footer-col">
         <div class="util-label">${lang==='de'?'Dresscode':'Dress Code'}</div>
-        <div class="util-value italic">${v.dresscode}</div>
+        <div class="util-value italic">${esc(v.dresscode)}</div>
       </div>`);
     }
     if (v.registry) {
       footerCols.push(`<div class="util-footer-col">
         <div class="util-label">${lang==='de'?'Wunschliste':'Registry'}</div>
-        <div class="util-value italic">${v.registry}</div>
+        <div class="util-value italic">${esc(v.registry)}</div>
       </div>`);
     }
     let footerHtml = '';
@@ -1247,7 +1250,7 @@ function renderPreview() {
       footerHtml = `<div class="util-hairline"><svg class="util-hairline-heart" viewBox="0 0 24 22"><path d="M12 20.5 C 2.5 13.5, 2 6, 7 5 C 9.5 4.5, 11.3 6.4, 12 8 C 12.7 6.4, 14.5 4.5, 17 5 C 22 6, 21.5 13.5, 12 20.5 Z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round" stroke-linecap="round"/></svg></div><div class="util-footer">${colsWithDividers.join('')}</div>`;
     }
 
-    const hashtagHtml = v.hashtag ? `<div class="util-hashtag" style="text-align:center;margin-top:5mm;z-index:1;">${v.hashtag}</div>` : '';
+    const hashtagHtml = v.hashtag ? `<div class="util-hashtag" style="text-align:center;margin-top:5mm;z-index:1;">${esc(v.hashtag)}</div>` : '';
 
     html = `
     <div class="card-back${is46?' us46':''} style-${backStyle} utility">
@@ -1272,7 +1275,7 @@ function renderPreview() {
       </div>
       ${footerHtml}
       ${hashtagHtml}
-      ${backText ? `<div class="util-closer">${backText}</div>` : ''}
+      ${backText ? `<div class="util-closer">${esc(backText)}</div>` : ''}
     </div>`;
   }
 
@@ -1316,11 +1319,14 @@ function pdfFont(pdf, name, style) {
   }
 }
 
-function drawTrimMark(pdf, x, y) {
+function drawTrimMark(pdf, x, y, pgW, pgH) {
   pdf.setDrawColor(160,160,160); pdf.setLineWidth(0.12);
   const s = 3;
-  pdf.line(x-s-1, y, x-1, y); pdf.line(x+1, y, x+s+1, y);
-  pdf.line(x, y-s-1, x, y-1); pdf.line(x, y+1, x, y+s+1);
+  // Horizontale Marken — überspringen, wenn sie über den Seitenrand laufen würden (4×6 auf A4)
+  if (pgW == null || (x-s-1) >= 0)  pdf.line(x-s-1, y, x-1, y);
+  if (pgW == null || (x+s+1) <= pgW) pdf.line(x+1, y, x+s+1, y);
+  if (pgH == null || (y-s-1) >= 0)  pdf.line(x, y-s-1, x, y-1);
+  if (pgH == null || (y+s+1) <= pgH) pdf.line(x, y+1, x, y+s+1);
 }
 
 // ════════════════════════════════════════════════════
@@ -1976,7 +1982,7 @@ async function exportFronts() {
         for (let s=0; s<cardsThisPage; s++) {
           const ox = mX + s*cW;
           await drawCard(pdf, ox, mY, v);
-          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y,pgW,pgH));
         }
       }
     } else {
@@ -1992,7 +1998,7 @@ async function exportFronts() {
         for (let s=0; s<cardsThisPage; s++) {
           const ox = mX + s*cW;
           await drawCard(pdf, ox, mY, v);
-          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y,pgW,pgH));
         }
       }
     }
@@ -2000,6 +2006,9 @@ async function exportFronts() {
     const fmt=format==='us46'?'4x6':'5x7';
     const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
     pdf.save(`WSA_BS_Invitation_Front_${tn}_${fmt}.pdf`);
+  } catch (err) {
+    console.error('exportFronts failed:', err);
+    alert(tt('exportError'));
   } finally {
     btn.disabled=false; btn.textContent=tt('expFront');
   }
@@ -2042,7 +2051,7 @@ async function exportBacks() {
         for (let s=0; s<cardsThisPage; s++) {
           const ox = mX + s*cW;
           drawBack(pdf, ox, mY);
-          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y,pgW,pgH));
         }
       }
     } else {
@@ -2058,7 +2067,7 @@ async function exportBacks() {
         for (let s=0; s<cardsThisPage; s++) {
           const ox = mX + s*cW;
           drawBack(pdf, ox, mY);
-          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y));
+          [[ox,mY],[ox+cW,mY],[ox,mY+cH],[ox+cW,mY+cH]].forEach(([x,y])=>drawTrimMark(pdf,x,y,pgW,pgH));
         }
       }
     }
@@ -2066,6 +2075,9 @@ async function exportBacks() {
     const fmt=format==='us46'?'4x6':'5x7';
     const tn={rose:'Rose',sage:'Sage',terra:'Terra'}[theme];
     pdf.save(`WSA_BS_Invitation_Back_${tn}_${fmt}.pdf`);
+  } catch (err) {
+    console.error('exportBacks failed:', err);
+    alert(tt('exportError'));
   } finally {
     btn.disabled=false; btn.textContent=tt('expBack');
   }
