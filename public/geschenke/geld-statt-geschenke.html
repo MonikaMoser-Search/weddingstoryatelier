@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Geld statt Geschenke — Beilegkarte gratis · Wedding Story Atelier</title>
+  <meta name="description" content="Beilegkarte „Anstatt Geschenke…" gratis als druckfertiges PDF — 4 Karten pro A4, mit auswählbaren Sprüchen für Reise, Eigenheim oder freie Formulierung. Direkt im Browser, ohne Anmeldung.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+      align-items: stretch; padding: 0; justify-content: flex-start;
+      position: relative;
+    }
+    .preview-header {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .demo-badge {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #C9A96E; border: 1px solid #C9A96E;
+      padding: 3px 9px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+      border-radius: 2px;
+    }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    .a4-portrait {
+      width: 210mm; height: 297mm;
+      background: #fff;
+      box-sizing: border-box;
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 0;
+      padding: 0;
+    }
+
+    /* ── Karte A6 (105 × 148.5mm) ────────────────────── */
+    .gsg-card {
+      position: relative;
+      width: 105mm; height: 148.5mm;
+      overflow: visible;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 18mm 14mm;
+      box-sizing: border-box;
+    }
+
+    .gsg-card.highland {
+      background: #FEFCF7; color: #2B4A1F;
+      --accent: #C9A96E; --frame: rgba(43,74,31,0.32);
+      --rule:   rgba(43,74,31,0.20); --label: rgba(43,74,31,0.58);
+    }
+    .gsg-card.coastal {
+      background: #FAFCFE; color: #1A4A6B;
+      --accent: #C9A96E; --frame: rgba(26,74,107,0.32);
+      --rule:   rgba(26,74,107,0.20); --label: rgba(26,74,107,0.58);
+    }
+    .gsg-card.classic {
+      background: #FFFFFF; color: #1A1A1A;
+      --accent: #C9A96E; --frame: rgba(0,0,0,0.20);
+      --rule:   rgba(0,0,0,0.14); --label: rgba(0,0,0,0.52);
+    }
+
+    /* Innen-Rahmen */
+    .gsg-frame {
+      position: absolute; inset: 6mm;
+      border: 0.5px solid var(--frame);
+      pointer-events: none;
+    }
+    .gsg-card.classic .gsg-frame { border-color: rgba(0,0,0,0.14); }
+
+    /* Inhalt */
+    .gsg-inner {
+      position: relative; z-index: 2;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      width: 100%; height: 100%;
+      text-align: center;
+    }
+
+    .gsg-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      font-size: 2.2mm; letter-spacing: 0.32em; text-transform: uppercase;
+      color: var(--label);
+    }
+
+    .gsg-ornament-row {
+      display: flex; align-items: center; gap: 3mm;
+      width: 60%; margin-top: 3mm;
+    }
+    .gsg-ornament-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .gsg-ornament-diamond { color: var(--accent); font-size: 3.2mm; line-height: 1; }
+
+    .gsg-message-block {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 4mm 0;
+    }
+    .gsg-message {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      font-size: 4mm; line-height: 1.6;
+      color: inherit;
+      max-width: 100%;
+    }
+
+    .gsg-signoff {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      font-size: 3.5mm; color: inherit;
+      margin-bottom: 2mm;
+    }
+    .gsg-initials {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 600;
+      font-size: 5.5mm; color: inherit;
+      letter-spacing: 0.08em;
+    }
+    .gsg-names {
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      font-size: 2.4mm; letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--label);
+      margin-top: 1.5mm;
+    }
+
+    /* Schnittlinien zwischen den Karten (Heimdruck-Hilfe) */
+    .cut-marks {
+      position: absolute; pointer-events: none;
+      z-index: 30;
+      inset: 0;
+    }
+    .cut-marks .h {
+      position: absolute; top: 50%; left: 0; right: 0;
+      height: 0; border-top: 0.3px dashed rgba(150,150,150,0.35);
+    }
+    .cut-marks .v {
+      position: absolute; left: 50%; top: 0; bottom: 0;
+      width: 0; border-left: 0.3px dashed rgba(150,150,150,0.35);
+    }
+
+    /* Spruch-Auswahl Buttons */
+    .spruch-grid {
+      display: flex; flex-direction: column; gap: 4px;
+      margin-top: 4px;
+    }
+    .spruch-btn {
+      text-align: left; padding: 8px 10px;
+      font-size: 10.5px; line-height: 1.5;
+      font-family: 'DM Sans', sans-serif;
+      border: 1px solid #ebebeb; background: #FAFAFA;
+      cursor: pointer; transition: all 0.15s;
+      color: #555;
+    }
+    .spruch-btn:hover { border-color: var(--wsa-dark); color: var(--wsa-dark); background: #fff; }
+    .spruch-btn.active {
+      border-color: var(--wsa-dark);
+      background: #fff;
+      color: var(--wsa-dark);
+    }
+    .spruch-btn .spruch-label {
+      display: block; font-size: 8.5px; text-transform: uppercase;
+      letter-spacing: 0.12em; color: #999; margin-bottom: 3px;
+    }
+    .spruch-btn.active .spruch-label { color: var(--wsa-dark); }
+
+    .sub-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 6px; display: block; }
+
+    .char-row { display: flex; justify-content: space-between; align-items: center; margin-top: 3px; min-height: 14px; }
+    .char-count { font-size: 9px; color: #aaa; transition: color 0.2s; }
+    .char-count.over { color: #c07040; }
+
+    /* CTA-Block */
+    .cta-block {
+      margin-top: 18px;
+      border-top: 1px solid #ede9e0;
+      padding-top: 16px;
+      display: flex; flex-direction: column; gap: 9px;
+    }
+    .cta-tagline { font-size: 11px; color: #888; font-weight: 300; line-height: 1.55; }
+    .cta-tagline strong { color: #1A1A1A; font-weight: 500; }
+    .cta-etsy {
+      display: flex; align-items: center; justify-content: center;
+      padding: 11px 12px; background: #C9A96E; color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500;
+      text-decoration: none; border-radius: 3px;
+      transition: background 0.15s;
+    }
+    .cta-etsy:hover { background: #b39154; }
+  </style>
+  <script>
+  (function(){var _rc={_id:"GSG-Gratis",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+  </script>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo"    id="lbl-logo">Anstatt Geschenke</div>
+  <div class="panel-tagline" id="lbl-tagline">Gratis-Beilegkarte · 4 pro A4</div>
+
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <span class="section-label" id="lbl-style">Stil</span>
+  <div class="btn-group" id="style-btns">
+    <button class="ui-btn active" onclick="setTheme('highland',this)">Highland</button>
+    <button class="ui-btn"        onclick="setTheme('coastal',this)">Coastal</button>
+    <button class="ui-btn"        onclick="setTheme('classic',this)">Classic</button>
+  </div>
+
+  <hr class="divider">
+
+  <span class="section-label" id="lbl-couple">Brautpaar</span>
+
+  <span class="sub-label" id="lbl-initials">Initialen</span>
+  <input type="text" id="inp-initials" maxlength="20" oninput="render()">
+
+  <span class="sub-label" id="lbl-names">Namen (klein unter Initialen)</span>
+  <input type="text" id="inp-names" maxlength="40" oninput="render()">
+
+  <hr class="divider">
+
+  <span class="section-label" id="lbl-spruch">Spruch wählen</span>
+  <p class="hint" id="hint-spruch">Klicke einen Spruch — er erscheint im Textfeld unten und kann frei angepasst werden.</p>
+  <div class="spruch-grid" id="spruch-grid"></div>
+
+  <span class="sub-label" id="lbl-detail" style="margin-top:10px;">Detail einsetzen (optional)</span>
+  <p class="hint" id="hint-detail">Wird im Spruch für „[Ort]" oder „[Wunsch]" eingesetzt — z. B. „Toskana", „neues Sofa".</p>
+  <input type="text" id="inp-detail" maxlength="40" oninput="onDetailChange()">
+
+  <span class="sub-label" id="lbl-message" style="margin-top:10px;">Spruch-Text (anpassbar)</span>
+  <textarea id="inp-message" rows="6" oninput="updateCharCounter();render()"></textarea>
+  <div class="char-row">
+    <span class="char-count" id="char-count"></span>
+  </div>
+
+  <span class="sub-label" id="lbl-signoff" style="margin-top:8px;">Abschluss</span>
+  <input type="text" id="inp-signoff" maxlength="40" oninput="render()">
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
+  </div>
+
+  <div class="cta-block">
+    <p class="cta-tagline" id="cta-tagline">
+      <strong>Passt zur Einladung?</strong> Das komplette Atelier-Einladungsset (Einladung · RSVP · Beilegkarten) gibt's als druckerei-fertiges Werk mit Bleed und Format-Auswahl.
+    </p>
+    <a class="cta-etsy" id="cta-etsy"
+       href="https://weddingstoryatelier.etsy.com"
+       target="_blank" rel="noopener">✦ Einladungsset im Atelier</a>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="preview-header">
+    <span class="demo-badge" id="demo-badge">Gratis · 4 Karten</span>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-portrait" id="preview-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-portrait" id="print-grid"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg"></span>
+</div>
+
+<script>
+  /* ════ SPRUCH-VORLAGEN ═══════════════════════════════ */
+  var SPRUECHE = {
+    de: [
+      {
+        key: 'dezent',
+        label: 'Dezent · klassisch',
+        text: 'Das Wertvollste ist für uns, dass ihr unseren Tag mit uns teilt.\nSolltet ihr uns dennoch eine Freude machen wollen, freuen wir uns über einen Beitrag zu unserer Hochzeitsreise.'
+      },
+      {
+        key: 'reise',
+        label: 'Reiseziel konkret',
+        text: 'Wir wünschen uns nichts sehnlicher als gemeinsame Erinnerungen.\nStatt Geschenken freuen wir uns über einen Beitrag zu unseren Flitterwochen in [Ort].'
+      },
+      {
+        key: 'humorvoll',
+        label: 'Humorvoll',
+        text: 'Geschirr haben wir, Toaster auch.\nWas uns noch fehlt? Ein Honeymoon-Hauch.\nÜber einen kleinen Reisebeitrag freuen wir uns sehr.'
+      },
+      {
+        key: 'eigenheim',
+        label: 'Eigenheim · Möbelstück',
+        text: 'Unser Zuhause füllt sich langsam mit Leben — falls ihr uns eine Freude machen möchtet, hilft uns ein Beitrag für [Wunsch].'
+      },
+      {
+        key: 'frei',
+        label: 'Frei · ganz kurz',
+        text: 'Über alles, was uns gemeinsam wachsen lässt, freuen wir uns sehr.\nVon Herzen danke.'
+      }
+    ],
+    en: [
+      {
+        key: 'dezent',
+        label: 'Gentle · classic',
+        text: 'What matters most to us is sharing this day with you.\nIf you would still like to give us something, we would be delighted by a contribution toward our honeymoon.'
+      },
+      {
+        key: 'reise',
+        label: 'Specific destination',
+        text: 'There is nothing we wish for more than shared memories.\nIn lieu of gifts, we would be grateful for a contribution toward our honeymoon in [Place].'
+      },
+      {
+        key: 'humorvoll',
+        label: 'With a smile',
+        text: 'Plates, we have. A toaster, too.\nWhat\'s missing? A honeymoon view.\nA small travel contribution would mean the world.'
+      },
+      {
+        key: 'eigenheim',
+        label: 'New home',
+        text: 'Our home is slowly filling with life — if you would like to give us something, a contribution toward [Wish] would touch us deeply.'
+      },
+      {
+        key: 'frei',
+        label: 'Free · very short',
+        text: 'Anything that helps us grow together would mean the world.\nThank you, with all our hearts.'
+      }
+    ]
+  };
+
+  var currentLang   = 'de';
+  var currentTheme  = 'highland';
+  var currentSpruchKey = 'dezent';
+  var CHAR_LIMIT = 350;
+
+  var T = {
+    de: {
+      logo:         'Anstatt Geschenke',
+      tagline:      'Gratis-Beilegkarte · 4 pro A4',
+      eyebrow:      'Anstatt Geschenke',
+      lang:         'Sprache', style: 'Stil',
+      couple:       'Brautpaar',
+      initials:     'Initialen',
+      names:        'Namen (klein unter Initialen)',
+      spruch:       'Spruch wählen',
+      hintSpruch:   'Klicke einen Spruch — er erscheint im Textfeld unten und kann frei angepasst werden.',
+      detail:       'Detail einsetzen (optional)',
+      hintDetail:   'Wird im Spruch für „[Ort]" oder „[Wunsch]" eingesetzt — z. B. „Toskana", „neues Sofa".',
+      message:      'Spruch-Text (anpassbar)',
+      signoff:      'Abschluss',
+      charOf:       function(n,m){ return n + ' / ' + m + ' Zeichen'; },
+      charOver:     'Zu lang — Text kürzen',
+      spinDone:     'PDF wird erstellt …',
+      alertFail:    'Export fehlgeschlagen: ',
+      initialsPH:   'A & P',
+      namesPH:      'Anna & Peter',
+      signoffPH:    'Herzlich,',
+      detailPH:     'z. B. Toskana',
+      demoInitials: 'A & P',
+      demoNames:    'Anna & Peter',
+      demoSignoff:  'Herzlich,',
+      demoDetail:   'der Toskana',
+      demoBadge:    'Gratis · 4 Karten',
+      pdfBtn:       'Gratis-PDF laden',
+      ctaTagline:   '<strong>Passt zur Einladung?</strong> Das komplette Atelier-Einladungsset (Einladung · RSVP · Beilegkarten) gibt\'s als druckerei-fertiges Werk mit Bleed und Format-Auswahl.',
+      ctaEtsy:      '✦ Einladungsset im Atelier',
+      pdfFooter:    'Gratis-Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+    },
+    en: {
+      logo:         'In lieu of gifts',
+      tagline:      'Free insert card · 4 per A4',
+      eyebrow:      'In lieu of gifts',
+      lang:         'Language', style: 'Style',
+      couple:       'The couple',
+      initials:     'Initials',
+      names:        'Names (small, under initials)',
+      spruch:       'Choose a wording',
+      hintSpruch:   'Click a wording — it appears in the text field below and can be edited freely.',
+      detail:       'Insert detail (optional)',
+      hintDetail:   'Replaces „[Place]" or „[Wish]" in the wording — e. g. „Tuscany", „a new sofa".',
+      message:      'Wording (editable)',
+      signoff:      'Sign-off',
+      charOf:       function(n,m){ return n + ' / ' + m + ' characters'; },
+      charOver:     'Too long — please shorten',
+      spinDone:     'Creating PDF …',
+      alertFail:    'Export failed: ',
+      initialsPH:   'A & P',
+      namesPH:      'Anna & Peter',
+      signoffPH:    'With love,',
+      detailPH:     'e. g. Tuscany',
+      demoInitials: 'A & P',
+      demoNames:    'Anna & Peter',
+      demoSignoff:  'With love,',
+      demoDetail:   'Tuscany',
+      demoBadge:    'Free · 4 cards',
+      pdfBtn:       'Download free PDF',
+      ctaTagline:   '<strong>Pairs with the invitation?</strong> The full atelier invitation set (invitation · RSVP · insert cards) comes print-ready with bleed and format options.',
+      ctaEtsy:      '✦ Invitation set in the atelier',
+      pdfFooter:    'Free demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+    }
+  };
+
+  function ge(id) { return document.getElementById(id); }
+  function gv(id) { return ge(id).value; }
+  function t()    { return T[currentLang]; }
+  function esc(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    rebuildSpruchButtons();
+    applyLang();
+    applySpruch(currentSpruchKey, false);
+    render();
+  }
+
+  function applyLang() {
+    var l = t();
+    ge('lbl-logo').textContent       = l.logo;
+    ge('lbl-tagline').textContent    = l.tagline;
+    ge('lbl-lang').textContent       = l.lang;
+    ge('lbl-style').textContent      = l.style;
+    ge('lbl-couple').textContent     = l.couple;
+    ge('lbl-initials').textContent   = l.initials;
+    ge('lbl-names').textContent      = l.names;
+    ge('lbl-spruch').textContent     = l.spruch;
+    ge('hint-spruch').textContent    = l.hintSpruch;
+    ge('lbl-detail').textContent     = l.detail;
+    ge('hint-detail').textContent    = l.hintDetail;
+    ge('lbl-message').textContent    = l.message;
+    ge('lbl-signoff').textContent    = l.signoff;
+    ge('inp-initials').placeholder   = l.initialsPH;
+    ge('inp-names').placeholder      = l.namesPH;
+    ge('inp-signoff').placeholder    = l.signoffPH;
+    ge('inp-detail').placeholder     = l.detailPH;
+    ge('demo-badge').textContent     = l.demoBadge;
+    ge('btn-export').textContent     = l.pdfBtn;
+    ge('cta-tagline').innerHTML      = l.ctaTagline;
+    ge('cta-etsy').textContent       = l.ctaEtsy;
+    document.documentElement.lang    = currentLang;
+    updateCharCounter();
+  }
+
+  function setTheme(th, btn) {
+    currentTheme = th;
+    document.querySelectorAll('#style-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    render();
+  }
+
+  function rebuildSpruchButtons() {
+    var grid = ge('spruch-grid');
+    grid.innerHTML = '';
+    var list = SPRUECHE[currentLang];
+    for (var i = 0; i < list.length; i++) {
+      var s = list[i];
+      var preview = s.text.split('\n')[0];
+      if (preview.length > 70) preview = preview.slice(0, 67) + '…';
+      var btn = document.createElement('button');
+      btn.className = 'spruch-btn' + (s.key === currentSpruchKey ? ' active' : '');
+      btn.setAttribute('data-key', s.key);
+      btn.innerHTML = '<span class="spruch-label">' + esc(s.label) + '</span>' + esc(preview);
+      btn.addEventListener('click', (function(key){
+        return function(){ applySpruch(key, true); };
+      })(s.key));
+      grid.appendChild(btn);
+    }
+  }
+
+  function applySpruch(key, focus) {
+    currentSpruchKey = key;
+    var list = SPRUECHE[currentLang];
+    var entry = list.find(function(s){ return s.key === key; }) || list[0];
+    ge('inp-message').value = entry.text;
+    document.querySelectorAll('.spruch-btn').forEach(function(b){
+      b.classList.toggle('active', b.getAttribute('data-key') === key);
+    });
+    onDetailChange();
+    updateCharCounter();
+    render();
+    if (focus) ge('inp-message').focus();
+  }
+
+  function onDetailChange() {
+    var detail = gv('inp-detail').trim();
+    if (!detail) { render(); return; }
+    var current = ge('inp-message').value;
+    var replaced = current
+      .replace(/\[Ort\]/g, detail)
+      .replace(/\[Place\]/g, detail)
+      .replace(/\[Wunsch\]/g, detail)
+      .replace(/\[Wish\]/g, detail);
+    if (replaced !== current) {
+      ge('inp-message').value = replaced;
+      updateCharCounter();
+    }
+    render();
+  }
+
+  function updateCharCounter() {
+    var n  = gv('inp-message').length;
+    var l  = t();
+    var el = ge('char-count');
+    var over = n > CHAR_LIMIT;
+    el.textContent = over ? l.charOver : l.charOf(n, CHAR_LIMIT);
+    el.className   = 'char-count' + (over ? ' over' : '');
+  }
+
+  function cardHTML() {
+    var l        = t();
+    var initials = gv('inp-initials').trim() || l.initialsPH;
+    var names    = gv('inp-names').trim()    || l.namesPH;
+    var message  = gv('inp-message').trim()  || SPRUECHE[currentLang][0].text;
+    var signoff  = gv('inp-signoff').trim()  || l.signoffPH;
+
+    var msgHTML = message.split('\n').map(function(ln){
+      return esc(ln) || '&nbsp;';
+    }).join('<br>');
+
+    return '<div class="gsg-card ' + currentTheme + '">'
+      + '<div class="gsg-frame"></div>'
+      + '<div class="gsg-inner">'
+        + '<div>'
+          + '<div class="gsg-eyebrow">' + esc(l.eyebrow) + '</div>'
+          + '<div class="gsg-ornament-row">'
+            + '<span class="gsg-ornament-line"></span>'
+            + '<span class="gsg-ornament-diamond">&#9670;</span>'
+            + '<span class="gsg-ornament-line"></span>'
+          + '</div>'
+        + '</div>'
+        + '<div class="gsg-message-block">'
+          + '<div class="gsg-message">' + msgHTML + '</div>'
+        + '</div>'
+        + '<div>'
+          + '<div class="gsg-signoff">' + esc(signoff) + '</div>'
+          + '<div class="gsg-initials">' + esc(initials) + '</div>'
+          + '<div class="gsg-names">' + esc(names) + '</div>'
+        + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  function pageHTML() {
+    var card = cardHTML();
+    return card + card + card + card
+      + '<div class="cut-marks"><div class="h"></div><div class="v"></div></div>';
+  }
+
+  function render() {
+    ge('preview-grid').innerHTML = pageHTML();
+    scalePreview();
+  }
+
+  function scalePreview() {
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var a4W   = 210 * 3.7795;
+    var a4H   = 297 * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap  = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  function loadDemo() {
+    var l = t();
+    ge('inp-initials').value = l.demoInitials;
+    ge('inp-names').value    = l.demoNames;
+    ge('inp-signoff').value  = l.demoSignoff;
+    ge('inp-detail').value   = l.demoDetail;
+    applySpruch('reise', false);
+  }
+
+  async function exportPDF() {
+    var l = t();
+
+    var spinner = ge('pdf-spinner');
+    var msg     = ge('spin-msg');
+    spinner.style.display = 'flex';
+    msg.textContent = l.spinDone;
+
+    try {
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+      var printGrid = ge('print-grid');
+      if (window.getSelection) window.getSelection().removeAllRanges();
+
+      printGrid.innerHTML = pageHTML();
+      await new Promise(function(r){ setTimeout(r, 150); });
+      var canvas = await html2canvas(printGrid, {
+        scale: 3, useCORS: true, allowTaint: true,
+        backgroundColor: '#ffffff', logging: false
+      });
+      pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+
+      // Footer
+      pdf.setFont('helvetica', 'normal');
+      pdf.setFontSize(7);
+      pdf.setTextColor(170, 170, 170);
+      pdf.text(l.pdfFooter, 105, 294, { align: 'center' });
+
+      pdf.save('Anstatt_Geschenke_Beilegkarte_Gratis_WeddingStoryAtelier.pdf');
+
+    } catch(e) {
+      alert(l.alertFail + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('resize', scalePreview);
+  rebuildSpruchButtons();
+  applyLang();
+  applySpruch('dezent', false);
+</script>
+</body>
+</html>

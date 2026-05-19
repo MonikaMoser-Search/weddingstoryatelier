@@ -3,11 +3,20 @@ import Layout from '../../layouts/Layout.astro';
 
 const geschenke = [
   {
+    slug: 'geld-statt-geschenke',
+    title: 'Anstatt Geschenke',
+    subtitle: 'Beilegkarte · 4 pro A4',
+    description: 'Die kleine Karte zum Einlegen — 5 fertige Sprüche von dezent bis humorvoll, frei anpassbar. Für Hochzeitsreise, neues Zuhause oder den freien Wunsch.',
+    context: 'Teil der Atelier-Welt für Einladungen und stille Wünsche zwischen den Zeilen.',
+    image: '/images/GeldStattGeschenke.jpeg',
+  },
+  {
     slug: 'allergenkarten',
     title: 'Allergenkarten',
     subtitle: '3 Karten für die Candy Bar',
     description: 'Kleine Allergen-Hinweis-Karten für eure Süßigkeiten — direkt im Browser gestalten, sofort als PDF mitnehmen.',
     context: 'Teil der Atelier-Welt für Menüs, Candy Bars & Hochzeitsdetails.',
+    image: '/images/Allergenkarte.jpeg',
   },
   {
     slug: 'platzkarten',
@@ -15,6 +24,7 @@ const geschenke = [
     subtitle: '6 Karten für eure Gäste',
     description: 'Kleine Platzkarten für Standesamt, Probedinner oder die Brunch-Runde am Tag danach.',
     context: 'Teil der Atelier-Welt für Tischdetails und kleine Anlässe.',
+    image: '/images/Platzkarten.jpg',
   },
   {
     slug: 'gastgeschenk',
@@ -22,6 +32,7 @@ const geschenke = [
     subtitle: '4 Karten mit persönlicher Anrede',
     description: 'Mit zufälliger gemeinschaftsfördernder Aufgabe — als kleine Geste am Gedeck.',
     context: 'Teil der Atelier-Welt für Gastgeschenke und stille Atelier-Momente.',
+    image: '/images/gastgeschenk.jpeg',
   },
 ];
 ---
@@ -57,11 +68,23 @@ const geschenke = [
   <!-- Grid -->
   <section class="px-8 md:px-16 pb-24">
     <div class="max-w-5xl mx-auto">
-      <div class="grid md:grid-cols-3 gap-12">
+      <div class="grid md:grid-cols-2 gap-12">
         {geschenke.map((g) => (
           <a href={`/geschenke/${g.slug}.html`} class="gift-card group block" target="_blank" rel="noopener">
-            <div class="aspect-[4/5] overflow-hidden bg-cream mb-6 flex items-center justify-center">
-              <span class="serif text-7xl text-cognac italic">{g.title.charAt(0)}</span>
+            <div class="aspect-[4/5] overflow-hidden bg-cream mb-6 flex items-center justify-center relative">
+              {g.image ? (
+                <img
+                  src={g.image}
+                  alt={g.title}
+                  class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                  loading="lazy"
+                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"
+                />
+              ) : null}
+              <span
+                class="serif text-7xl text-cognac italic absolute inset-0 flex items-center justify-center"
+                style={g.image ? 'display:none;' : ''}
+              >{g.title.charAt(0)}</span>
             </div>
             <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-2">{g.subtitle}</p>
             <h2 class="serif text-2xl mb-3 group-hover:text-cognac transition-colors">{g.title}</h2>
