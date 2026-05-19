@@ -137,15 +137,15 @@
       font-family:'DM Sans',sans-serif; font-style:italic;
     }
 
-    /* Gästeliste — Textarea-Pattern wie Gastgeschenk */
-    #g-guests {
+    /* Mehrzeilige Listen-Textareas: Gäste, Tagesablauf, Platzkarten */
+    #g-guests, #g-people, #g-schedule {
       width: 100%; min-height: 120px; resize: vertical;
       padding: 10px 11px; border: 1px solid #eee;
       font-family: 'DM Sans', sans-serif; font-size: 12px;
       background: #FAFAFA; color: #1A1A1A; outline: none;
       line-height: 1.7; transition: border-color 0.2s;
     }
-    #g-guests:focus { border-color: var(--ink); background: #fff; }
+    #g-guests:focus, #g-people:focus, #g-schedule:focus { border-color: var(--ink); background: #fff; }
     .guest-list-hint {
       font-size: 10px; color: #999; font-style: italic;
       line-height: 1.55; margin: 6px 0 6px;
