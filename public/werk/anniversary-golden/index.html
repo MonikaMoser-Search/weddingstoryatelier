@@ -1649,28 +1649,32 @@ function formatDateShort(isoDate, lang) {
 
 /* ── Karte neu rendern ── */
 /* Hero-Zahl "50" auf <canvas> rendern (statt SVG/Text — siehe CSS-Kommentar zu .anv-hero-number).
-   Canvas wird zum Pre-Render-Zeitpunkt mit der geladenen Playfair Display gezeichnet, html2canvas
-   kopiert beim Export die fertigen Pixel — kein Font-Lookup im SVG-Image-Context mehr. */
-function drawHeroNumber() {
+   Wichtig: `document.fonts.ready` resolved oft BEVOR die spezifische Font-Variante im Canvas-2D-Cache
+   nutzbar ist (Canvas hat einen eigenen Font-Cache, getrennt vom DOM-Cache). Daher hier explizit
+   `document.fonts.load(<font-shorthand>)` aufrufen — das forciert den Browser, genau diese Variante
+   für die Canvas-API verfügbar zu machen. */
+const HERO_FONT = '700 510px "Playfair Display"';
+
+async function drawHeroNumber() {
   const c = document.getElementById('anv-hero-canvas');
   if (!c) return;
-  const draw = () => {
-    const ctx = c.getContext('2d');
-    ctx.clearRect(0, 0, c.width, c.height);
-    const gold = (getComputedStyle(document.documentElement).getPropertyValue('--gold') || '').trim() || '#C9A24A';
-    const num  = c.getAttribute('data-number') || '50';
-    ctx.fillStyle = gold;
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'alphabetic';
-    ctx.font = "700 510px 'Playfair Display', serif";
-    /* Optisch zentriert: Baseline bei ~80% der Canvas-Höhe (Playfair Bold cap-height ≈ 0.72em) */
-    ctx.fillText(num, c.width / 2, c.height * 0.84);
-  };
-  if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(draw);
-  } else {
-    draw();
-  }
+  try {
+    if (document.fonts && document.fonts.load) {
+      await document.fonts.load(HERO_FONT);
+    } else if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+  } catch (_) { /* fallback auf System-Serif, besser als nichts */ }
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  const gold = (getComputedStyle(document.documentElement).getPropertyValue('--gold') || '').trim() || '#C9A24A';
+  const num  = c.getAttribute('data-number') || '50';
+  ctx.fillStyle = gold;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = HERO_FONT + ', serif';
+  /* Optisch zentriert: Baseline bei ~84% der Canvas-Höhe (Playfair Bold cap-height ≈ 0.72em) */
+  ctx.fillText(num, c.width / 2, c.height * 0.84);
 }
 
 function renderAll() {
