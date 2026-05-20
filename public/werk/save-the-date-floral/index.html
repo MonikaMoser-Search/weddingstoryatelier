@@ -736,20 +736,21 @@ function setBleed(on, btn) {
 // ═══════════════════════════════════════════════════════════════
 //  PDF-EXPORT
 // ═══════════════════════════════════════════════════════════════
-function downloadCard() {
+async function downloadCard() {
   var s       = STRINGS[currentLang];
   var colName = { bordeaux: 'Bordeaux', navy: s.colNavy, sage: s.colSage }[currentColor];
 
   ge('loading-text').textContent = 'Save the Date' + s.loading;
   ge('loading').classList.add('active');
 
-  setTimeout(function () {
-    html2canvas(ge('card-output'), {
+  try {
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+    var canvas = await html2canvas(ge('card-output'), {
       scale: 3, useCORS: true, allowTaint: true,
       backgroundColor: COLORS[currentColor].bg
-    })
-    .then(function (canvas) {
-      var imgData = canvas.toDataURL('image/jpeg', 0.92);
+    });
+    {
+      var imgData = canvas.toDataURL('image/jpeg', 0.95);
       var jsPDF   = window.jspdf.jsPDF;
       var mm      = [FORMATS[currentFormat].w, FORMATS[currentFormat].h];
       var bleed   = currentBleed ? 3 : 0;
@@ -778,14 +779,13 @@ function downloadCard() {
       var n2       = gv('name2') || 'Peter';
       var bleedSfx = currentBleed ? '_3mm' : '';
       pdf.save(n1 + '_' + n2 + '_SaveTheDate_' + colName + bleedSfx + '_WeddingStoryAtelier.pdf');
-      ge('loading').classList.remove('active');
-    })
-    .catch(function (err) {
-      console.error('PDF error:', err);
-      alert('PDF konnte nicht erstellt werden.\nBitte Chrome verwenden und die Datei lokal \u00F6ffnen.');
-      ge('loading').classList.remove('active');
-    });
-  }, 200);
+    }
+  } catch (err) {
+    console.error('PDF error:', err);
+    alert('PDF konnte nicht erstellt werden.\nBitte Chrome verwenden und die Datei lokal \u00F6ffnen.');
+  } finally {
+    ge('loading').classList.remove('active');
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════
