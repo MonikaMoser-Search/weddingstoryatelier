@@ -1750,12 +1750,13 @@ async function drawHeroNumber() {
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
   ctx.font = HERO_FONT + ', "Prata", "Didot", serif';
-  /* Optisch zentriert: Baseline bei ~84% der Canvas-Höhe (Bodoni Moda Black cap-height-Annäherung) */
+  /* Optisch zentriert: Baseline bei ~90% der Canvas-Höhe — verankert die "50" eher unten
+     statt schwebend mittig (Bodoni Moda Black ohne Descender). */
   const metrics = ctx.measureText(num);
   const left = metrics.actualBoundingBoxLeft || 0;
   const right = metrics.actualBoundingBoxRight || metrics.width;
   const x = (c.width + left - right) / 2;
-  ctx.fillText(num, x, c.height * 0.84);
+  ctx.fillText(num, x, c.height * 0.90);
 }
 
 function renderAll() {
