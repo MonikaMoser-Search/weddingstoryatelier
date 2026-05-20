@@ -50,7 +50,7 @@
       width: 105mm; height: 148.5mm;
       overflow: visible;
       display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
+      align-items: stretch; justify-content: flex-start;
       padding: 18mm 14mm;
       box-sizing: border-box;
     }
@@ -92,11 +92,12 @@
       font-family: 'DM Sans', sans-serif; font-weight: 400;
       font-size: 2.2mm; letter-spacing: 0.32em; text-transform: uppercase;
       color: var(--label);
+      text-indent: 0.32em;
     }
 
     .gsg-ornament-row {
       display: flex; align-items: center; gap: 3mm;
-      width: 60%; margin-top: 3mm;
+      width: 60%; margin: 3mm auto 0;
     }
     .gsg-ornament-line { flex: 1; height: 0.5px; background: var(--rule); }
     .gsg-ornament-diamond { color: var(--accent); font-size: 3.2mm; line-height: 1; }
