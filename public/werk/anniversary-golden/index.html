@@ -540,18 +540,17 @@
 
     /* TYPOGRAFIE ─────────────────────────────────────── */
 
-    /* Hero-Zahl "50" — Playfair Display, dominant, editorial, in Antikgold */
+    /* Hero-Zahl "50" — als inline-SVG gerendert.
+       Grund: html2canvas v1.4.1 honoriert font-feature-settings/lnum bei Text nicht zuverlässig,
+       wodurch die "0" beim PDF-Export gegenüber der "5" verrutschte. SVG geht durch die Browser-
+       SVG-Renderpipeline und behält OT-Features sowie scharfe Vektorkanten in jeder Skalierung. */
     .anv-hero-number {
-      font-family:'Playfair Display', serif;
-      font-weight: 700;
-      font-size: 160px;
-      line-height: 0.88;
-      letter-spacing: -0.02em;
+      display: block;
+      width: 220px;
+      height: 142px;
+      margin: 0 auto 2px;
       color: var(--gold);
-      margin: 0 0 2px;
       position:relative; z-index:1;
-      /* Lining + Tabular Figures erzwingen — verhindert "hängende 0" bei Google-Fonts Playfair (vs. lokales TTF) */
-      font-feature-settings: "lnum" 1, "tnum" 1;
     }
 
     /* Subline "GOLDENE HOCHZEIT" — klein, gespaced */
@@ -1136,7 +1135,7 @@ Familie Schmidt</textarea>
 
           <!-- ANLASS-ZONE -->
           <div>
-            <div class="anv-hero-number">50</div>
+            <svg class="anv-hero-number" viewBox="0 0 280 145" preserveAspectRatio="xMidYMid meet" aria-label="50"><text x="140" y="120" text-anchor="middle" font-family="'Playfair Display', serif" font-weight="700" font-size="160" letter-spacing="-3.2" fill="currentColor" style="font-feature-settings: 'lnum' 1, 'tnum' 1;">50</text></svg>
             <div class="anv-rule">
               <div class="anv-rule-line"></div>
               <div class="anv-rule-gem"></div>
