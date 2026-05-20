@@ -27,10 +27,10 @@
       /* Anniversary Golden Edition — Heimdruck-Palette (Cream + Antikgold) */
       --cream:        #FAF7F2;
       --cream-deep:   #F2EDE4;
-      --gold:         #9C7B1A;   /* Antikgold, Heimdruck-tauglich, Kontrast 5.4:1 auf Cream */
-      --gold-bright:  #B8860B;   /* Druckerei-Akzent */
-      --gold-dim:     rgba(156,123,26,0.45);
-      --gold-faint:   rgba(156,123,26,0.20);
+      --gold:         #C9A24A;   /* Champagne-Gold, R201 G162 B74 — Rot>Grün>Blau verhindert Olive-Drift bei Heimdruck */
+      --gold-bright:  #D6B45A;   /* Druckerei-Akzent, brillanter fuer Bleed-PDF */
+      --gold-dim:     rgba(201,162,74,0.45);
+      --gold-faint:   rgba(201,162,74,0.20);
       --ink:          #1C1408;   /* Tiefes Bistre, nicht Reinschwarz */
       --ink-body:     rgba(28,20,8,0.86);
       --ink-dim:      rgba(28,20,8,0.50);
@@ -622,16 +622,16 @@
       letter-spacing: 0.02em;
     }
     .anv-month {
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.32em;
       text-transform: uppercase;
       color: var(--ink);
       margin-top: 7px;
     }
     .anv-year {
-      font-size: 10.5px;
+      font-size: 11.5px;
       letter-spacing: 0.32em;
-      color: var(--ink-body);
+      color: var(--ink);
       margin-top: 6px;
     }
     /* Horizontale Goldlinie unter Datum, vor Uhrzeit */
@@ -642,10 +642,10 @@
     }
     .anv-time {
       font-family:'Cormorant Garamond', serif;
-      font-size: 11.5px;
+      font-size: 12.5px;
       letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: var(--ink-body);
+      color: var(--ink);
       margin: 0;
     }
     /* Feine Trennlinie zwischen Uhrzeit und Ort — statt Raute */
@@ -658,10 +658,10 @@
     /* Ort + Stadt — etwas kleiner, Abstand zum Unterrand */
     .anv-place {
       font-family:'Cormorant Garamond', serif;
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--ink-body);
+      color: var(--ink);
       margin: 6px 0 2px;
       line-height: 1.5;
     }
@@ -786,10 +786,10 @@
     }
     .anv-back-label {
       font-family: 'Cormorant Garamond', serif;
-      font-size: 9px;
+      font-size: 11px;
       letter-spacing: 0.32em;
       text-transform: uppercase;
-      color: var(--gold);
+      color: var(--ink);
       margin-bottom: 3px;
     }
     .anv-back-text {
