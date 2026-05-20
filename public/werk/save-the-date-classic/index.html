@@ -489,7 +489,7 @@ function startDownload() {
   setTimeout(function() { doDownload(); }, 100);
 }
 
-function doDownload() {
+async function doDownload() {
   var el     = document.getElementById('std-output');
   var format = getValue('format') || 'a6';
 
@@ -497,21 +497,22 @@ function doDownload() {
   var pdfW = format === 'a5' ? 148 : format === '5x7' ? 127 : format === '4x6' ? 102 : 105;
   var pdfH = format === 'a5' ? 210 : format === '5x7' ? 178 : format === '4x6' ? 152 : 148;
 
-  html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null })
-    .then(function(canvas) {
-      var imgData = canvas.toDataURL('image/png');
-      var jsPDF = window.jspdf.jsPDF;
-      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, pdfH] });
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
-      var n1 = getValue('name1') || 'Save';
-      var n2 = getValue('name2') || 'Date';
-      pdf.save(n1 + '_' + n2 + '_SaveTheDate_WeddingStoryAtelier.pdf');
-      document.getElementById('loading').classList.remove('active');
-    })
-    .catch(function() {
-      alert('PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
-      document.getElementById('loading').classList.remove('active');
-    });
+  try {
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+    var canvas = await html2canvas(el, { scale: 3, useCORS: true, backgroundColor: null });
+    var imgData = canvas.toDataURL('image/png');
+    var jsPDF = window.jspdf.jsPDF;
+    var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: [pdfW, pdfH] });
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfW, pdfH);
+    var n1 = getValue('name1') || 'Save';
+    var n2 = getValue('name2') || 'Date';
+    pdf.save(n1 + '_' + n2 + '_SaveTheDate_WeddingStoryAtelier.pdf');
+  } catch (err) {
+    console.error(err);
+    alert('PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
+  } finally {
+    document.getElementById('loading').classList.remove('active');
+  }
 }
 
 document.addEventListener('DOMContentLoaded', function() {
