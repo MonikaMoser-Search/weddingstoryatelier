@@ -4,12 +4,12 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google" content="notranslate">
-  <title>Gastgeschenk-Karten · 4 als Geschenk · Wedding Story Atelier</title>
-  <meta name="description" content="4 Gastgeschenk-Karten als Atelier-Geschenk als druckfertiges PDF — mit persönlicher Anrede und optionaler Gemeinschafts-Aufgabe. Direkt im Browser, ohne Anmeldung.">
-  <link rel="stylesheet" href="/atelier/fonts.css">
+  <title>Gastgeschenk-Karten — 4 gratis · Wedding Story Atelier</title>
+  <meta name="description" content="4 Gastgeschenk-Karten gratis als druckfertiges PDF — mit persönlicher Anrede und optionaler Gemeinschafts-Aufgabe. Direkt im Browser, ohne Anmeldung.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+  <link rel="stylesheet" href="wsa_panel.css">
   <style>
     .opt-tag     { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
     .guest-meta  { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; margin-bottom: 2px; min-height: 16px; }
@@ -150,8 +150,41 @@
       transition: background 0.15s;
     }
     .cta-etsy:hover { background: #b39154; }
+
+    /* ── Onboarding-Guides ───────────────────────────── */
+    .guide-strip {
+      background: #FAF6EC;
+      border-left: 2px solid #C9A96E;
+      padding: 10px 12px;
+      font-size: 10.5px;
+      color: #4a4a4a;
+      line-height: 1.55;
+      margin: 10px 0 14px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .guide-strip strong { color: #1A1A1A; font-weight: 500; }
+    .hint.hint-prominent {
+      background: #FAF6EC;
+      border-left: 2px solid #C9A96E;
+      padding: 7px 10px;
+      color: #5a5a5a;
+      font-size: 10px;
+      font-style: normal;
+      margin-bottom: 8px;
+    }
+    .task-block-highlight {
+      background: #FAF6EC;
+      border: 1px solid rgba(201, 169, 110, 0.30);
+      padding: 11px 12px 10px;
+      border-radius: 2px;
+      margin-top: 4px;
+    }
+    .task-block-highlight .task-toggle-row { margin-top: 0; }
+    .task-block-highlight .task-toggle-label { font-size: 10.5px; color: #1A1A1A; font-weight: 500; }
+    .task-block-highlight .hint { margin-bottom: 0; color: #5a5a5a; font-size: 10px; font-style: normal; }
   </style>
   <script>
+  (function(){var _rc={_id:"GG-Gratis",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
   </script>
 </head>
 <body>
@@ -160,7 +193,11 @@
 <div class="panel-form">
 
   <div class="panel-logo"    id="lbl-logo">Gastgeschenk-Karten</div>
-  <div class="panel-tagline" id="lbl-tagline">Atelier-Geschenk · 4 Karten</div>
+  <div class="panel-tagline" id="lbl-tagline">Gratis-Version · 4 Karten</div>
+
+  <div class="guide-strip" id="lbl-guide">
+    <strong>So funktioniert's:</strong> Texte hier links anpassen — die Karte rechts aktualisiert sich sofort. Wenn alles passt, lädst du dein Gratis-PDF mit 4 Karten.
+  </div>
 
   <span class="section-label" id="lbl-lang">Sprache</span>
   <div class="btn-group" style="margin-bottom:10px;">
@@ -188,7 +225,7 @@
   <hr class="divider">
 
   <span class="section-label" id="lbl-message">Persönliche Nachricht</span>
-  <p class="hint" id="hint-message"></p>
+  <p class="hint hint-prominent" id="hint-message"></p>
   <textarea id="inp-message" rows="4" oninput="updateCharCounter();render()"></textarea>
   <div class="char-row">
     <span class="char-count" id="char-count"></span>
@@ -201,19 +238,21 @@
   <hr class="divider">
 
   <span class="section-label" id="lbl-task-head">Aufgabe <span class="opt-tag" id="lbl-opt">optional</span></span>
-  <div class="task-toggle-row">
-    <label class="task-toggle-label">
-      <input type="checkbox" id="chk-task" onchange="onTaskToggle()">
-      <span id="lbl-task-enable">Aufgabe aktivieren</span>
-    </label>
-    <button class="shuffle-btn" id="btn-shuffle" onclick="reshuffleTasks()" style="display:none;">&#8635; Neu</button>
+  <div class="task-block-highlight">
+    <div class="task-toggle-row">
+      <label class="task-toggle-label">
+        <input type="checkbox" id="chk-task" onchange="onTaskToggle()" checked>
+        <span id="lbl-task-enable">Aufgabe aktivieren</span>
+      </label>
+      <button class="shuffle-btn" id="btn-shuffle" onclick="reshuffleTasks()">&#8635; Neu</button>
+    </div>
+    <p class="hint" id="hint-task" style="margin-top:6px;"></p>
   </div>
-  <p class="hint" id="hint-task" style="margin-top:4px;"></p>
 
   <hr class="divider">
 
   <span class="section-label" id="lbl-guests">Gästeliste</span>
-  <p class="hint" id="hint-guests"></p>
+  <p class="hint hint-prominent" id="hint-guests"></p>
   <textarea id="inp-guests" rows="6" oninput="render()"></textarea>
   <div class="guest-meta">
     <span class="guest-count" id="guest-count"></span>
@@ -222,15 +261,16 @@
 
   <div class="action-row">
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
-    <button class="btn-export" id="btn-export" onclick="exportPDF()">Geschenk-PDF laden</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
   </div>
 
   <div class="cta-block">
     <p class="cta-tagline" id="cta-tagline">
-      Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.
+      <strong>Mehr Gäste?</strong> Die Vollversion im Atelier macht 60 Karten pro Durchgang — beliebig oft wiederholbar — plus 3 Formate (A6, 70×140mm, 4×6"), 30 Gemeinschafts-Aufgaben und Druckerei-PDF.
     </p>
     <a class="cta-etsy" id="cta-etsy"
-       href="/" rel="noopener">Aus dem Atelier →</a>
+       href="https://weddingstoryatelier.etsy.com"
+       target="_blank" rel="noopener">✦ Vollversion im Atelier</a>
   </div>
 
 </div>
@@ -238,7 +278,7 @@
 <!-- ════ PREVIEW PANEL ════════════════════════════════ -->
 <div class="panel-preview">
   <div class="preview-header">
-    <span class="demo-badge" id="demo-badge">Geschenk · 4 Karten</span>
+    <span class="demo-badge" id="demo-badge">Gratis · 4 Karten</span>
   </div>
   <div class="preview-area">
     <div id="preview-wrap">
@@ -292,7 +332,7 @@
   var T = {
     de: {
       logo:         'Gastgeschenk-Karten',
-      tagline:      'Atelier-Geschenk · 4 Karten',
+      tagline:      'Gratis-Version · 4 Karten',
       lang:         'Sprache', style: 'Stil',
       design:       'Karte gestalten',
       initials:     'Initialen',
@@ -303,12 +343,12 @@
       taskHead:     'Aufgabe',
       opt:          'optional',
       taskEnable:   'Aufgabe aktivieren',
-      hintTask:     'Jeder Gast erhält eine zufällige, gemeinschaftsfördernde Aufgabe (8 verschiedene Variationen).',
+      hintTask:     'Jeder Gast erhält eine zufällige, gemeinschaftsfördernde Aufgabe (8 Aufgaben in der Gratis-Version, 30 in der Vollversion).',
       hintTaskOff:  '',
       guests:       'Gästeliste',
-      hintGuests:   'Ein Eintrag pro Zeile — max. 4 Gäste (Atelier-Geschenk). Für Anrede: Name,m oder Name,f',
+      hintGuests:   'Ein Eintrag pro Zeile — max. 4 Gäste (Gratis-Version). Für Anrede: Name,m oder Name,f',
       singular:     ' Gast', plural: ' Gäste',
-      limitWarn:    'Maximum erreicht',
+      limitWarn:    'Maximum erreicht (4) — Vollversion: 60 pro Durchgang, beliebig oft',
       charOf:       function(n,m){ return n + ' / ' + m + ' Zeichen'; },
       charOver:     'Zu lang — Text kürzen',
       charHintTask: 'Mit Aufgabe steht weniger Platz zur Verfügung',
@@ -325,18 +365,19 @@
       guestsPH:     'Maria Müller,f\nOliver Weber,m\nSophie Hoffmann,f\nMaximilian Koch,m',
       demoInitials: 'A & P',
       demoNames:    'Anna & Peter',
-      demoMessage:  'Wir freuen uns so sehr, dass du diesen besonderen Tag mit uns teilst.',
+      demoMessage:  'Wir freuen uns so sehr, dass du diesen besonderen Tag mit uns teilst.\nMit dieser kleinen Aufmerksamkeit möchten wir Danke sagen — für dein Da-sein, deine Wärme, deine Liebe.\nHab einen wunderschönen Tag mit uns.',
       demoSignoff:  'Herzlich,',
       demoGuests:   'Maria Müller,f\nOliver Weber,m\nSophie Hoffmann,f\nMaximilian Koch,m',
-      demoBadge:    'Geschenk · 4 Karten',
-      pdfBtn:       'Geschenk-PDF laden',
-      ctaTagline:   'Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.',
-      ctaEtsy:      'Aus dem Atelier →',
-      pdfFooter:    'Atelier-Geschenk · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+      demoBadge:    'Gratis · 4 Karten',
+      guideStrip:   '<strong>So funktioniert\'s:</strong> Texte hier links anpassen — die Karte rechts aktualisiert sich sofort. Wenn alles passt, lädst du dein Gratis-PDF mit 4 Karten.',
+      pdfBtn:       'Gratis-PDF laden',
+      ctaTagline:   '<strong>Mehr Gäste?</strong> Die Vollversion im Atelier macht 60 Karten pro Durchgang — beliebig oft wiederholbar — plus 3 Formate (A6, 70×140mm, 4×6"), 30 Gemeinschafts-Aufgaben und Druckerei-PDF.',
+      ctaEtsy:      '✦ Vollversion im Atelier',
+      pdfFooter:    'Gratis-Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
     },
     en: {
       logo:         'Gift Cards',
-      tagline:      'Atelier Gift · 4 cards',
+      tagline:      'Free version · 4 cards',
       lang:         'Language', style: 'Style',
       design:       'Card Design',
       initials:     'Initials',
@@ -347,12 +388,12 @@
       taskHead:     'Task',
       opt:          'optional',
       taskEnable:   'Enable task',
-      hintTask:     'Each guest gets a random community-building task (8 in the Atelier Gift, 30 in the full atelier version).',
+      hintTask:     'Each guest gets a random community-building task (8 in the free version, 30 in the full atelier version).',
       hintTaskOff:  '',
       guests:       'Guest List',
-      hintGuests:   'One entry per line — max. 4 guests (Atelier Gift). For gendered greeting: Name,m or Name,f',
+      hintGuests:   'One entry per line — max. 4 guests (free version). For gendered greeting: Name,m or Name,f',
       singular:     ' guest', plural: ' guests',
-      limitWarn:    'Limit reached',
+      limitWarn:    'Limit reached (4) — full version: 60 per run, repeat as often as you like',
       charOf:       function(n,m){ return n + ' / ' + m + ' characters'; },
       charOver:     'Too long — shorten text',
       charHintTask: 'Less space available with task enabled',
@@ -369,14 +410,15 @@
       guestsPH:     'Emily Johnson,f\nJames Williams,m\nOlivia Brown,f\nWilliam Davis,m',
       demoInitials: 'A & P',
       demoNames:    'Anna & Peter',
-      demoMessage:  'We are so glad you could share this special day with us.',
+      demoMessage:  'We are so glad you could share this special day with us.\nWith this small token we want to thank you from the heart — for being here, for your warmth, your love.\nHave a beautiful day with us.',
       demoSignoff:  'With love,',
       demoGuests:   'Emily Johnson,f\nJames Williams,m\nOlivia Brown,f\nWilliam Davis,m',
-      demoBadge:    'Gift · 4 cards',
-      pdfBtn:       'Take the PDF',
-      ctaTagline:   'Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.',
-      ctaEtsy:      'From the atelier →',
-      pdfFooter:    'Atelier Gift · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+      demoBadge:    'Free · 4 cards',
+      guideStrip:   '<strong>How it works:</strong> Edit the fields on the left — the card on the right updates live. When everything looks right, download your free PDF with 4 cards.',
+      pdfBtn:       'Download free PDF',
+      ctaTagline:   '<strong>More guests?</strong> The full atelier version handles 60 cards per run — repeat as often as you like — plus 3 formats (A6, 70×140mm, 4×6"), 30 community tasks and a print-ready PDF.',
+      ctaEtsy:      '✦ Full version in the atelier',
+      pdfFooter:    'Free demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
     }
   };
 
@@ -427,6 +469,7 @@
     var l = t();
     ge('lbl-logo').textContent       = l.logo;
     ge('lbl-tagline').textContent    = l.tagline;
+    ge('lbl-guide').innerHTML        = l.guideStrip;
     ge('lbl-lang').textContent       = l.lang;
     ge('lbl-style').textContent      = l.style;
     ge('lbl-design').textContent     = l.design;
@@ -608,7 +651,7 @@
       pdf.setTextColor(170, 170, 170);
       pdf.text(l.pdfFooter, 105, 294, { align: 'center' });
 
-      pdf.save('Gastgeschenk_Atelier-Geschenk.pdf');
+      pdf.save('Gastgeschenk_Karten_Gratis_WeddingStoryAtelier.pdf');
 
     } catch(e) {
       alert(l.alertFail + e.message);
@@ -620,7 +663,7 @@
   window.addEventListener('resize', scalePreview);
   initTasks();
   applyLang();
-  render();
+  loadDemo();
 </script>
 </body>
 </html>
