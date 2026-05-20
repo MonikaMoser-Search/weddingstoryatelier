@@ -834,7 +834,7 @@ function startDownload() {
   setTimeout(doDownload, 150);
 }
 
-function doDownload() {
+async function doDownload() {
   var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
   var el = ge('newspaper');
   var bleedRgb = null;
@@ -842,31 +842,32 @@ function doDownload() {
     var _bg = getComputedStyle(el).backgroundColor.match(/\d+/g);
     if (_bg && _bg.length >= 3) bleedRgb = [+_bg[0], +_bg[1], +_bg[2]];
   }
-  html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null })
-    .then(function(canvas) {
-      var imgData = canvas.toDataURL('image/jpeg', 0.90);
-      var jsPDF = window.jspdf.jsPDF;
-      var fmt  = (document.getElementById('sel-format') || {value:'a3'}).value;
-      var pdfW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
-      var pdfH = canvas.height * pdfW / canvas.width;
-      var namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pdfW,pdfH];
-      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm',
-        format: bleed ? [pdfW + bleed * 2, pdfH + bleed * 2] : namedFmt });
-      if (bleedRgb) {
-        pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
-        pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
-      }
-      pdf.addImage(imgData, 'JPEG', bleed, bleed, pdfW, pdfH);
-      var n1 = gv('name1') || 'Newspaper';
-      var n2 = gv('name2') || '';
-      var suffix = currentLang === 'en' ? '_WeddingNewspaper_WSA.pdf' : '_Hochzeitszeitung_WSA.pdf';
-      pdf.save(n1 + (n2 ? '_' + n2 : '') + suffix);
-      ge('loading').classList.remove('active');
-    })
-    .catch(function(e) {
-      alert(currentLang === 'en' ? 'PDF could not be created. Please try again.' : 'PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
-      ge('loading').classList.remove('active');
-    });
+  try {
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+    var canvas = await html2canvas(el, { scale: 2, useCORS: true, allowTaint: true, backgroundColor: null });
+    var imgData = canvas.toDataURL('image/jpeg', 0.95);
+    var jsPDF = window.jspdf.jsPDF;
+    var fmt  = (document.getElementById('sel-format') || {value:'a3'}).value;
+    var pdfW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+    var pdfH = canvas.height * pdfW / canvas.width;
+    var namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pdfW,pdfH];
+    var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm',
+      format: bleed ? [pdfW + bleed * 2, pdfH + bleed * 2] : namedFmt });
+    if (bleedRgb) {
+      pdf.setFillColor(bleedRgb[0], bleedRgb[1], bleedRgb[2]);
+      pdf.rect(0, 0, pdfW + bleed*2, pdfH + bleed*2, 'F');
+    }
+    pdf.addImage(imgData, 'JPEG', bleed, bleed, pdfW, pdfH);
+    var n1 = gv('name1') || 'Newspaper';
+    var n2 = gv('name2') || '';
+    var suffix = currentLang === 'en' ? '_WeddingNewspaper_WSA.pdf' : '_Hochzeitszeitung_WSA.pdf';
+    pdf.save(n1 + (n2 ? '_' + n2 : '') + suffix);
+  } catch (e) {
+    console.error(e);
+    alert(currentLang === 'en' ? 'PDF could not be created. Please try again.' : 'PDF konnte nicht erstellt werden. Bitte nochmal versuchen.');
+  } finally {
+    ge('loading').classList.remove('active');
+  }
 }
 
 // Init
