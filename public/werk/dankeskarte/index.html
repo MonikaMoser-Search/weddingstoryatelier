@@ -985,6 +985,7 @@ async function exportPDF() {
   spinner.style.display = 'flex';
 
   try {
+    if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
     var { jsPDF } = window.jspdf;
 
     if (currentOutput === 'print') {
@@ -1009,7 +1010,7 @@ async function exportPDF() {
         var cvs = await html2canvas(pps,{scale:3,useCORS:true,allowTaint:true,backgroundColor:themeBg,logging:false});
         if (i > 0) pdfVS.addPage([pgW, pgH]);
         fillBleed(pdfVS);
-        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.92),'JPEG', bleed, bleed, cW, cH);
+        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.95),'JPEG', bleed, bleed, cW, cH);
       }
       msg.textContent = t().spinDone;
       pdfVS.save('Dankeskarte_VS_'+label+'_OldMoney_Druck_'+dateStr+'.pdf');
@@ -1024,7 +1025,7 @@ async function exportPDF() {
           var cvsR = await html2canvas(pps,{scale:3,useCORS:true,allowTaint:true,backgroundColor:themeBg,logging:false});
           if (k > 0) pdfRS.addPage([pgW, pgH]);
           fillBleed(pdfRS);
-          pdfRS.addImage(cvsR.toDataURL('image/jpeg',0.92),'JPEG', bleed, bleed, cW, cH);
+          pdfRS.addImage(cvsR.toDataURL('image/jpeg',0.95),'JPEG', bleed, bleed, cW, cH);
         }
         pdfRS.save('Dankeskarte_RS_'+label+'_OldMoney_Druck_'+dateStr+'.pdf');
       }
@@ -1043,7 +1044,7 @@ async function exportPDF() {
         await new Promise(function(r){ setTimeout(r,150); });
         var cvs = await html2canvas(pp,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
         if (i > 0) pdfVS.addPage();
-        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.92),'JPEG',0,0,p.w,p.h);
+        pdfVS.addImage(cvs.toDataURL('image/jpeg',0.95),'JPEG',0,0,p.w,p.h);
       }
       msg.textContent = t().spinDone;
       pdfVS.save('Dankeskarte_VS_'+label+'_'+p.label+'_OldMoney_'+dateStr+'.pdf');
@@ -1061,7 +1062,7 @@ async function exportPDF() {
           await new Promise(function(r){ setTimeout(r,150); });
           var cvs2 = await html2canvas(pp,{scale:3,useCORS:true,allowTaint:true,backgroundColor:'#ffffff',logging:false});
           if (j > 0) pdfRS.addPage();
-          pdfRS.addImage(cvs2.toDataURL('image/jpeg',0.92),'JPEG',0,0,p.w,p.h);
+          pdfRS.addImage(cvs2.toDataURL('image/jpeg',0.95),'JPEG',0,0,p.w,p.h);
         }
         pdfRS.save('Dankeskarte_RS_'+label+'_'+p.label+'_OldMoney_'+dateStr+'.pdf');
       }
