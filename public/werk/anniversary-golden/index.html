@@ -540,16 +540,17 @@
 
     /* TYPOGRAFIE ─────────────────────────────────────── */
 
-    /* Hero-Zahl "50" — als inline-SVG gerendert.
-       Grund: html2canvas v1.4.1 honoriert font-feature-settings/lnum bei Text nicht zuverlässig,
-       wodurch die "0" beim PDF-Export gegenüber der "5" verrutschte. SVG geht durch die Browser-
-       SVG-Renderpipeline und behält OT-Features sowie scharfe Vektorkanten in jeder Skalierung. */
+    /* Hero-Zahl "50" — als <canvas> per JS pre-rendered (siehe drawHeroNumber()).
+       Grund: html2canvas v1.4.1 hat zwei Limits, die uns hier nacheinander einholten:
+       1) Text-Rasterizer honoriert font-feature-settings (lnum/tnum) nicht → "0" verrutschte
+       2) SVG-Text-Pipeline rendert SVGs in isoliertem Context ohne Zugriff auf Google Fonts → Schrift kippt auf System-Serif
+       Canvas-Element ist Teil des Haupt-Dokuments, JS zeichnet mit der echt-geladenen Playfair Display,
+       html2canvas kopiert dann nur die fertigen Pixel — kein Font-Resolving im Export-Pfad. */
     .anv-hero-number {
       display: block;
       width: 240px;
       height: 160px;
       margin: 0 auto 2px;
-      color: var(--gold);
       position:relative; z-index:1;
     }
 
@@ -1135,7 +1136,7 @@ Familie Schmidt</textarea>
 
           <!-- ANLASS-ZONE -->
           <div>
-            <svg class="anv-hero-number" width="240" height="160" viewBox="0 0 240 160" aria-label="50"><text x="120" y="138" text-anchor="middle" font-family="'Playfair Display', serif" font-weight="700" font-size="170" fill="currentColor" style="font-feature-settings: 'lnum' 1, 'tnum' 1; letter-spacing: -3px;">50</text></svg>
+            <canvas class="anv-hero-number" id="anv-hero-canvas" width="720" height="480" data-number="50" aria-label="50"></canvas>
             <div class="anv-rule">
               <div class="anv-rule-line"></div>
               <div class="anv-rule-gem"></div>
@@ -1647,6 +1648,31 @@ function formatDateShort(isoDate, lang) {
 }
 
 /* ── Karte neu rendern ── */
+/* Hero-Zahl "50" auf <canvas> rendern (statt SVG/Text — siehe CSS-Kommentar zu .anv-hero-number).
+   Canvas wird zum Pre-Render-Zeitpunkt mit der geladenen Playfair Display gezeichnet, html2canvas
+   kopiert beim Export die fertigen Pixel — kein Font-Lookup im SVG-Image-Context mehr. */
+function drawHeroNumber() {
+  const c = document.getElementById('anv-hero-canvas');
+  if (!c) return;
+  const draw = () => {
+    const ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+    const gold = (getComputedStyle(document.documentElement).getPropertyValue('--gold') || '').trim() || '#C9A24A';
+    const num  = c.getAttribute('data-number') || '50';
+    ctx.fillStyle = gold;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'alphabetic';
+    ctx.font = "700 510px 'Playfair Display', serif";
+    /* Optisch zentriert: Baseline bei ~80% der Canvas-Höhe (Playfair Bold cap-height ≈ 0.72em) */
+    ctx.fillText(num, c.width / 2, c.height * 0.84);
+  };
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(draw);
+  } else {
+    draw();
+  }
+}
+
 function renderAll() {
   const names    = document.getElementById('g-names').value || '—';
   const sinceY   = document.getElementById('g-since-year').value || '—';
@@ -1674,6 +1700,9 @@ function renderAll() {
   document.getElementById('r-place').textContent = place;
   document.getElementById('r-city').textContent  = city;
   document.getElementById('r-city').style.display = city ? '' : 'none';
+
+  /* Hero-Zahl auf Canvas (re-)zeichnen — Farbe wechselt mit Theme/Variant */
+  drawHeroNumber();
 }
 
 /* ════════════════════════════════════════════════════════════
