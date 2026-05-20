@@ -1665,6 +1665,22 @@ async function drawHeroNumber() {
       await document.fonts.ready;
     }
   } catch (_) { /* fallback auf System-Serif, besser als nichts */ }
+
+  /* Warmup-Trick: Canvas-2D hat einen vom DOM getrennten Glyph-Cache.
+     document.fonts.load() lädt die Schrift, aber Canvas-2D nutzt sie erst nach
+     einem echten DOM-Render. Ein unsichtbarer Span mit derselben Font-Variante
+     + erzwungenem Layout (getBoundingClientRect) füllt den Canvas-Cache. */
+  let warmup = document.getElementById('anv-hero-font-warmup');
+  if (!warmup) {
+    warmup = document.createElement('span');
+    warmup.id = 'anv-hero-font-warmup';
+    warmup.style.cssText = 'position:fixed;left:-9999px;top:0;font:' + HERO_FONT + ';color:transparent;pointer-events:none;';
+    warmup.textContent = '0123456789';
+    document.body.appendChild(warmup);
+    warmup.getBoundingClientRect();
+    await new Promise(r => requestAnimationFrame(r));
+  }
+
   const ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
   const gold = (getComputedStyle(document.documentElement).getPropertyValue('--gold') || '').trim() || '#C9A24A';
