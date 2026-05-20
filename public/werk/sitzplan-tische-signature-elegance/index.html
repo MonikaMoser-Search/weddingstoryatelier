@@ -242,7 +242,7 @@
   </div>
 
   <label class="section-label">5 · Druckformat</label>
-  <select id="sel-format">
+  <select id="sel-format" onchange="setPosterFormat(this.value)">
     <option value="a4" selected>A4 — 210 × 297 mm</option>
     <option value="letter">Letter — 216 × 279 mm (US)</option>
     <option value="a3">A3 — 297 × 420 mm</option>
@@ -363,6 +363,10 @@ function esc(s) {
 function changeCount(d) {
   const n = Math.max(1, Math.min(12, tableCount + d));
   if (n === tableCount) return;
+  if (n < tableCount) {
+    const lost = tableData.slice(n).some(t => (t.name && t.name.trim()) || (t.guests_raw && t.guests_raw.trim()));
+    if (lost && !confirm('Tische ' + (n + 1) + '–' + tableCount + ' enthalten Daten. Wirklich entfernen?')) return;
+  }
   tableCount = n;
   document.getElementById('count-num').textContent = n;
   initTableData(n);
@@ -475,6 +479,16 @@ function renderPoster() {
   setTimeout(scalePreview, 20);
 }
 
+// ── POSTER-FORMAT (Editor ↔ Export-Parität) ───────────
+function setPosterFormat(key) {
+  const FMT = { a4:[210,297], letter:[216,279], a3:[297,420], tabloid:[279,432], a2:[420,594], a1:[594,841], a0:[841,1189] };
+  const dims = FMT[key] || FMT.a4;
+  const p = document.getElementById('poster');
+  p.style.width = dims[0] + 'mm';
+  p.style.minHeight = dims[1] + 'mm';
+  renderPoster();
+}
+
 // ── SCALE PREVIEW ─────────────────────────────────────
 function scalePreview() {
   const scaler   = document.getElementById('preview-scaler');
@@ -558,6 +572,17 @@ function exportPDF_vector() {
   const PTmm = 0.3528;
   const fs   = fontScale;
 
+  // Truncate-Helfer: kürzt Text mit … bis er in maxW (mm) passt; berücksichtigt charSpace
+  function fitText(text, maxW, charSpace) {
+    if (!text) return text;
+    charSpace = charSpace || 0;
+    const w = (s) => pdf.getTextWidth(s) + charSpace * Math.max(0, s.length - 1);
+    if (w(text) <= maxW) return text;
+    let s = text;
+    while (s.length > 1 && w(s + '…') > maxW) s = s.slice(0, -1);
+    return s + '…';
+  }
+
   // Hintergrund (inkl. Bleed)
   sf(bg); pdf.rect(0, 0, docW, docH, 'F');
 
@@ -603,7 +628,7 @@ function exportPDF_vector() {
   st(tc); setFont('PlayfairDisplay', titleStyle); pdf.setFontSize(titleFS * fs);
   pdf.setCharSpace(trackingPx(7));
   y += titleFS * fs * PTmm * 0.5;
-  pdf.text(titleTxt, cxPage, y, { align: 'center', baseline: 'middle' });
+  pdf.text(fitText(titleTxt, contW - 2 * fS, trackingPx(7)), cxPage, y, { align: 'center', baseline: 'middle' });
   pdf.setCharSpace(0);
   y += titleFS * fs * PTmm * 0.5 + 2 * fS;
 
@@ -746,7 +771,7 @@ function exportPDF_vector() {
     if (hasName) {
       st(tc); setFont('PlayfairDisplay', 'bold'); pdf.setFontSize(FS_NAME * cS);
       cy += FS_NAME * cS * PTmm * 0.5;
-      pdf.text(t.name.trim(), cardCx, cy, { align: 'center', baseline: 'middle' });
+      pdf.text(fitText(t.name.trim(), cardW * 0.88), cardCx, cy, { align: 'center', baseline: 'middle' });
       cy += FS_NAME * cS * PTmm * 0.5 + 2.5 * fS * cS;
     }
 
@@ -766,7 +791,7 @@ function exportPDF_vector() {
     st(tc); setFont('CormorantGaramond', 'normal'); pdf.setFontSize(FS_GUEST * cS);
     guests.forEach(g => {
       cy += FS_GUEST * cS * PTmm * 0.5 + 0.5 * fS * cS;
-      pdf.text(g, cardCx, cy, { align: 'center', baseline: 'middle' });
+      pdf.text(fitText(g, cardW * 0.92), cardCx, cy, { align: 'center', baseline: 'middle' });
       cy += FS_GUEST * cS * PTmm * 0.5 + 0.5 * fS * cS + 1.4 * fS * cS;
     });
 
