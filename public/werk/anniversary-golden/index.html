@@ -371,7 +371,7 @@
     .anv-pcard {
       position: relative;
       background: var(--gold);
-      padding: 2.5mm;
+      padding: 3.5mm;  /* Goldrahmen-Breite: 3.5mm verzeiht Heimdruck-Schneidefehler bis ~3mm, Atelier-Standard */
       display: flex; align-items: center; justify-content: center;
       overflow: visible;
       box-sizing: border-box;
@@ -550,6 +550,8 @@
       color: var(--gold);
       margin: 0 0 2px;
       position:relative; z-index:1;
+      /* Lining + Tabular Figures erzwingen — verhindert "hängende 0" bei Google-Fonts Playfair (vs. lokales TTF) */
+      font-feature-settings: "lnum" 1, "tnum" 1;
     }
 
     /* Subline "GOLDENE HOCHZEIT" — klein, gespaced */
