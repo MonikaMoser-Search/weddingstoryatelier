@@ -1,0 +1,2719 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Anniversary Kit · Silver Edition · Wedding Story Atelier</title>
+  <!--
+    PHASE-1-BUILD · 2026-05-18
+    Fokus: 3-Karten-Set (Einladung + Tagesablauf + Platzkarten), beide Druckvarianten.
+    Schrift: Bodoni Moda (Hero) + Cinzel (ANLASS) + Cormorant Garamond (Body) + DM Sans (UI) + Prata (Canvas-Fallback) — alle lokal aus /Schriftarten/ unter OFL-Lizenz.
+    Farben: Heimdruck Cream + Antikgold, Druckerei mit 3mm Bleed.
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link rel="stylesheet" href="/atelier/wsa_panel.css">
+
+  <style>
+
+    @font-face {
+      font-family: 'Bodoni Moda';
+      src: url('/Schriftarten/Bodoni_Moda/BodoniModa-Variable.ttf') format('truetype');
+      font-weight: 400 900;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Cinzel';
+      src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype');
+      font-weight: 400 900;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Prata';
+      src: url('/Schriftarten/Prata/Prata-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Cormorant Garamond';
+      src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Cormorant Garamond';
+      src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Cormorant Garamond';
+      src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Italic.ttf') format('truetype');
+      font-weight: 400;
+      font-style: italic;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'Cormorant Garamond';
+      src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-MediumItalic.ttf') format('truetype');
+      font-weight: 500;
+      font-style: italic;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/Schriftarten/DM_Sans/static/DMSans-Regular.ttf') format('truetype');
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+    @font-face {
+      font-family: 'DM Sans';
+      src: url('/Schriftarten/DM_Sans/static/DMSans-Medium.ttf') format('truetype');
+      font-weight: 500;
+      font-style: normal;
+      font-display: block;
+    }
+
+    :root {
+      --wsa-panel-width: 380px;
+      /* Anniversary Silver Edition — Heimdruck-Palette (Cream + Antik-Silber warm) */
+      --cream:        #F5F5F3;   /* Neutrales Off-White ohne Rotstich, Test-Palette */
+      --cream-deep:   #ECECEA;
+      --silver:         #B5B4B0;   /* Antik-Silber warm, R181 G180 B176 — leicht warmgrau */
+      --silver-bright:  #C7C6C2;   /* Druckerei-Akzent, brillanter fuer Bleed-PDF */
+      --silver-dim:     rgba(181,180,176,0.55);   /* etwas kraeftiger als Gold-Dim, da Silber heller wirkt */
+      --silver-faint:   rgba(181,180,176,0.28);
+      --ink:          #494849;   /* Warmes Dunkelgrau statt Bistre, Test-Palette */
+      --ink-body:     rgba(73,72,73,0.92);
+      --ink-dim:      rgba(73,72,73,0.62);
+    }
+
+    /* ══ TABS ════════════════════════════════════════════════ */
+    .tabs {
+      display:flex; gap:4px;
+      margin: 0 -10px 22px;
+      padding: 10px;
+      background: rgba(201,168,76,0.10);
+      border-top: 1.5px solid var(--silver);
+      border-bottom: 1.5px solid var(--silver);
+    }
+    .tab-btn {
+      flex:1; padding:11px 4px; border:1.5px solid #e0ddd8;
+      background:#fff; cursor:pointer;
+      font-family:'DM Sans',sans-serif;
+      font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+      color:#777; transition:all 0.18s; text-align:center;
+    }
+    .tab-btn:hover  { border-color:var(--ink); color:var(--ink); }
+    .tab-btn.active { border-color:var(--ink); background:var(--ink); color:#fff; }
+    .tab-content    { display:none; }
+    .tab-content.active { display:block; }
+
+    /* ══ FORM ════════════════════════════════════════════════ */
+    .form-section { margin-bottom:16px; }
+    .section-title {
+      font-size:9px; letter-spacing:0.25em; text-transform:uppercase;
+      color:#aaa; margin-bottom:8px; padding-bottom:5px;
+      border-bottom:1px solid #f0eee9;
+    }
+    .field { margin-bottom:9px; }
+    .field label { display:block; font-size:11px; color:#666; margin-bottom:3px; }
+    .opt { font-size:9px; color:#bbb; margin-left:4px; font-style:italic; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+
+    /* Lang-Toggle */
+    .lang-toggle {
+      display:flex; gap:0; border:1px solid #e0ddd8; padding:2px; border-radius:0;
+      background:#fafafa; margin-bottom:12px;
+    }
+    .lang-btn {
+      flex:1; padding:6px 0; border:none; background:transparent; cursor:pointer;
+      font-family:'DM Sans',sans-serif; font-size:10px; letter-spacing:0.1em;
+      text-transform:uppercase; color:#999;
+    }
+    .lang-btn.active { background:var(--ink); color:#fff; }
+
+    /* Druckvarianten-Toggle */
+    .mode-toggle {
+      border: 1px solid #e0ddd8; padding: 10px 12px;
+      background: #fcfaf6; margin-bottom: 18px;
+    }
+    .mode-toggle-label {
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #999; margin-bottom: 8px;
+    }
+    .mode-buttons { display: flex; gap: 6px; margin-bottom: 8px; }
+    .mode-btn {
+      flex: 1; padding: 9px 6px; border: 1px solid #e0ddd8;
+      background: #fff; cursor: pointer;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12px; color: var(--ink); transition: all 0.18s;
+      letter-spacing: 0.04em;
+    }
+    .mode-btn:hover { border-color: var(--silver); }
+    .mode-btn.active {
+      background: var(--silver); color: #fff; border-color: var(--silver);
+    }
+    .mode-desc {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 11px;
+      color: #777; line-height: 1.5;
+      margin-top: 6px;
+    }
+
+    /* Tonalität-Picker */
+    .tone-picker { display:flex; gap:4px; margin-bottom:6px; }
+    .tone-btn {
+      flex:1; padding:7px 4px; border:1px solid #e0ddd8; background:#fff;
+      cursor:pointer; font-family:'DM Sans',sans-serif; font-size:9px;
+      letter-spacing:0.08em; text-transform:uppercase; color:#888;
+    }
+    .tone-btn.active { border-color:var(--silver); background:var(--silver); color:#fff; }
+
+    /* Buttons */
+    .btn-dl {
+      width:100%; padding:11px; background:var(--ink); color:#fff;
+      border:none; font-family:'DM Sans',sans-serif;
+      font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+      cursor:pointer; margin-bottom:6px; transition:opacity 0.2s;
+    }
+    .btn-dl:hover { opacity:0.85; }
+    .btn-dl.sec   { background:transparent; color:var(--ink); border:1.5px solid var(--ink); }
+    .btn-dl.sec:hover { background:var(--ink); color:#fff; opacity:1; }
+    .btn-dl.silver  { background:var(--silver); }
+    .btn-dl.silver:hover { background:var(--silver-bright); opacity:1; }
+
+    .download-section { margin-top:16px; border-top:1px solid #f0eee9; padding-top:14px; }
+    .privacy-note {
+      font-size:9.5px; color:#bbb; text-align:center; margin-top:8px;
+      font-family:'DM Sans',sans-serif; font-style:italic;
+    }
+
+    /* Mehrzeilige Listen-Textareas: Gäste, Tagesablauf, Platzkarten */
+    #g-guests, #g-people, #g-schedule {
+      width: 100%; min-height: 120px; resize: vertical;
+      padding: 10px 11px; border: 1px solid #eee;
+      font-family: 'DM Sans', sans-serif; font-size: 12px;
+      background: #FAFAFA; color: #1A1A1A; outline: none;
+      line-height: 1.7; transition: border-color 0.2s;
+    }
+    #g-guests:focus, #g-people:focus, #g-schedule:focus { border-color: var(--ink); background: #fff; }
+    .guest-list-hint {
+      font-size: 10px; color: #999; font-style: italic;
+      line-height: 1.55; margin: 6px 0 6px;
+    }
+    .guest-count {
+      font-family: 'DM Sans', sans-serif; font-size: 9.5px;
+      color: #aaa; text-align: right; margin-top: 4px;
+      letter-spacing: 0.06em;
+    }
+
+    /* Stub-Notice für noch-nicht-gebaute Tabs */
+    .stub-notice {
+      padding:24px 16px; text-align:center; background:#fafafa;
+      border:1px dashed #ddd; font-family:'DM Sans',sans-serif;
+      font-size:11px; color:#888; line-height:1.7; letter-spacing:0.04em;
+    }
+    .stub-notice strong { color:var(--silver); font-weight:500; letter-spacing:0.1em; text-transform:uppercase; }
+
+    /* ══ PREVIEW ════════════════════════════════════════════ */
+    .panel-preview {
+      flex-direction:column; align-items:center;
+      justify-content:flex-start; gap:18px; padding:30px 20px;
+    }
+    .preview-label {
+      font-family:'DM Sans',sans-serif;
+      font-size:9px; letter-spacing:0.24em; text-transform:uppercase;
+      color:#999; margin-bottom:-8px; align-self:center;
+    }
+
+    /* ══ CARD — Einladung 5×7" (127×178 mm) ═════════════════ */
+    #invite-output, #back-output {
+      width: 380px;
+      box-shadow: 0 14px 50px rgba(0,0,0,0.18);
+    }
+    .card-stack { display: flex; flex-direction: column; gap: 28px; align-items: center; }
+    .preview-cluster { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+
+    /* Gast-Selektor über der Rückseiten-Karte */
+    .guest-picker {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border: 1px solid #e8e4df;
+      padding: 8px 12px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .guest-picker-label {
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #999;
+    }
+    .guest-picker select {
+      border: none; background: transparent; outline: none;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; color: var(--ink); cursor: pointer;
+      padding: 2px 18px 2px 4px; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23999'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 2px center;
+    }
+    .guest-picker-counter {
+      font-size: 9.5px; color: #aaa; letter-spacing: 0.06em;
+      border-left: 1px solid #eee; padding-left: 10px;
+    }
+
+    /* ══ CARD — Tagesablauf 5×7" ════════════════════════════ */
+    #schedule-output { width: 380px; box-shadow: 0 14px 50px rgba(0,0,0,0.18); }
+
+    .anv-sched-inner {
+      position: relative; z-index: 1;
+      background: var(--cream);
+      padding: 30px 26px;
+      aspect-ratio: 127 / 178;
+      display: flex; flex-direction: column;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+    }
+    /* Tagesablauf nutzt fragmentierten Rahmen wie VS (gleiche .anv-corner/.anv-edge/.anv-gem Klassen) */
+    /* Header */
+    .anv-sched-anlass {
+      font-family: 'Cinzel', serif;
+      font-weight: 500; font-size: 9.5px;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--silver);
+      text-align: center;
+      margin-bottom: 2px;
+    }
+    .anv-sched-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 500;
+      font-size: 26px;
+      color: var(--ink);
+      text-align: center;
+      margin: 6px 0 4px;
+    }
+    .anv-sched-date {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      letter-spacing: 0.28em; text-transform: uppercase;
+      color: var(--ink-body);
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .anv-sched-rule {
+      width: 50px; height: 0.6px;
+      background: var(--silver-dim);
+      margin: 0 auto 14px;
+    }
+
+    /* Timeline-Container */
+    .anv-sched-timeline {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      padding: 4px 0;
+    }
+    /* Zentrale Vertikallinie */
+    .anv-sched-timeline::before {
+      content: '';
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      top: 6px; bottom: 6px;
+      width: 0.6px;
+      background: var(--silver-dim);
+    }
+
+    /* Slot — alternierend links/rechts, jede Slot-Zeile hat 2 Hälften (eine leer) */
+    .anv-slot {
+      position: relative;
+      display: flex;
+      margin-bottom: 14px;
+    }
+    .anv-slot:last-child { margin-bottom: 0; }
+    .anv-slot-half {
+      width: 50%;
+      padding: 0 14px;
+      box-sizing: border-box;
+    }
+    .anv-slot.left  .anv-slot-half:first-child { text-align: right; padding-right: 18px; }
+    .anv-slot.right .anv-slot-half:last-child  { text-align: left;  padding-left: 18px; }
+
+    .anv-slot-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: 12.5px;
+      letter-spacing: 0.18em;
+      color: var(--ink);
+      margin-bottom: 1px;
+    }
+    .anv-slot-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      line-height: 1.35;
+    }
+    .anv-slot-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 10.5px;
+      color: var(--ink-body);
+      margin-top: 1px;
+    }
+    /* Icon-Marker auf der Linie — bewusst dezent, kein Disneyland */
+    .anv-slot-icon {
+      position: absolute;
+      left: 50%; transform: translateX(-50%);
+      top: 0;
+      width: 13px; height: 13px;
+      background: var(--cream);
+      padding: 2px 5px;
+      box-sizing: content-box;
+      z-index: 1;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.85;
+    }
+    .anv-slot-icon svg { width: 100%; height: 100%; display: block; }
+
+    /* Footer-Closer */
+    .anv-sched-closer {
+      text-align: center;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 11px;
+      color: var(--ink-body);
+      margin-top: 12px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ══ PLATZKARTEN — flach, 136×59,33 mm, 6 pro A4/Letter quer ═══════════ */
+    #place-output {
+      width: 540px; height: 382px;          /* A4 quer: 210mm scaled */
+      overflow: hidden; position: relative;
+      box-shadow: 0 14px 50px rgba(0,0,0,0.18);
+    }
+    #place-output.letter {
+      height: 417px;                         /* Letter quer: 215.9mm scaled mit 0.511 */
+    }
+    #place-output.print-mode {
+      width: 540px; height: auto;
+      overflow: hidden; box-shadow: none;
+    }
+    #place-grid {
+      transform-origin: top left;
+      /* Default Heimdruck-Scale: 297mm = 1122,5 px → 540/1122,5 ≈ 0,481 */
+      transform: scale(0.481);
+    }
+    #place-grid.letter { transform: scale(0.511); }  /* 279,4mm = 1056 → 540/1056 */
+    #place-grid.anv-pcard-print-stack {
+      transform: scale(0.78);  /* Druckerei-Stapel etwas kleiner zeigen */
+    }
+    .anv-pcard-grid {
+      width: 297mm; height: 210mm;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6mm 5mm;
+      padding: 10mm;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .anv-pcard-grid.letter {
+      width: 279.4mm; height: 215.9mm;
+    }
+    .anv-pcard {
+      position: relative;
+      background: var(--silver);
+      padding: 3.5mm;  /* Goldrahmen-Breite: 3.5mm verzeiht Heimdruck-Schneidefehler bis ~3mm, Atelier-Standard */
+      display: flex; align-items: center; justify-content: center;
+      overflow: visible;
+      box-sizing: border-box;
+    }
+    /* Cream-Innenfläche als physikalisch getrenntes Element */
+    .anv-pcard-inner {
+      background: var(--cream);
+      flex: 1;
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .anv-pcard.empty { visibility: hidden; }
+    .anv-pcard-content {
+      position: relative; z-index: 1;
+      width: 100%; padding: 0 7mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1.5mm;
+    }
+    .anv-pcard-orn {
+      display: flex; align-items: center; gap: 5px;
+      width: 60%;
+    }
+    .anv-pcard-orn-line { flex: 1; height: 0.5px; background: var(--silver-dim); }
+    .anv-pcard-orn-gem {
+      width: 4px; height: 4px;
+      background: var(--silver);
+      transform: rotate(45deg); flex-shrink: 0;
+    }
+    .anv-pcard-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: 7mm;
+      letter-spacing: 0.08em;
+      color: var(--ink);
+      text-align: center;
+      line-height: 1.15;
+    }
+    .anv-pcard-sub {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 2.4mm;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--silver);
+      text-align: center;
+    }
+    /* Schneidmarken — analog platzkarten_old_money */
+    .anv-pcard .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
+    .anv-pcard .cut.h { height: 0.4px; width: 4mm; }
+    .anv-pcard .cut.v { width: 0.4px; height: 4mm; }
+    .anv-pcard .cut.tl.h { top: 0; left: -5mm; }
+    .anv-pcard .cut.tl.v { top: -5mm; left: 0; }
+    .anv-pcard .cut.tr.h { top: 0; right: -5mm; }
+    .anv-pcard .cut.tr.v { top: -5mm; right: 0; }
+    .anv-pcard .cut.bl.h { bottom: 0; left: -5mm; }
+    .anv-pcard .cut.bl.v { bottom: -5mm; left: 0; }
+    .anv-pcard .cut.br.h { bottom: 0; right: -5mm; }
+    .anv-pcard .cut.br.v { bottom: -5mm; right: 0; }
+
+    /* Druckerei-Modus: einzelne Karte 136×59mm + 3mm Bleed, randlos */
+    .anv-pcard-print-stack { display: flex; flex-direction: column; align-items: center; gap: 6mm; background: transparent; }
+    .anv-pcard-print-page {
+      position: relative;
+      background: var(--silver);  /* 3mm Silber-Bleed: nach Trimm steht Silberrahmen am Kartenrand */
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+    .anv-pcard-print-page > .anv-pcard {
+      width: 130mm; height: 53.33mm;
+      margin: 3mm;  /* 3mm Cream-Bleed außen, Goldrahmen bleibt vom Card-Element */
+    }
+    .anv-pcard-print-page > .anv-pcard .cut { display: none; }
+
+    /* Page-Nav für Platzkarten-Pagination */
+    .anv-place-nav {
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+      margin-top: 8px;
+    }
+    .anv-place-nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555;
+    }
+    .anv-place-nav-btn:hover:not(:disabled) { border-color: var(--ink); color: var(--ink); }
+    .anv-place-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    /* Outer-Wrapper mit Antikgold-Rand · 7px ≈ 2.3mm auf 5×7" — schlank, aber Heimdruck-sicher */
+    .anv-outer {
+      position:relative; box-sizing:border-box;
+      background: var(--cream);
+      padding: 0;
+      --c-gold:     #F2D88A;
+      --c-gold-dim: rgba(242,216,138,0.55);
+    }
+    /* Bleed-Modus für Druckerei-Export: 9px ≈ 3mm Cream-Bleed außen */
+    .anv-outer.with-bleed { padding: 9px; }
+
+    /* Inner Cream-Fläche */
+    .anv-inner {
+      position:relative; z-index:1;
+      background: var(--cream);
+      padding: 38px 30px 32px;
+      text-align:center;
+      font-family:'Cormorant Garamond', serif;
+      color: var(--ink);
+      /* 5×7" Verhältnis: 127:178 ≈ 0.713 */
+      aspect-ratio: 127 / 178;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    /* Fragmentierter Rahmen — architektonisch, freistehende L-Ecken + Liniensegmente mit Mittenrauten */
+
+    /* L-Ecken — freistehend, nicht verbunden mit Linien */
+    .anv-corner {
+      position:absolute; pointer-events:none; z-index:2;
+      width:18px; height:18px;
+      box-sizing:border-box;
+    }
+    .anv-corner.tl { top:22px;    left:22px;    border-top: 0.7px solid var(--silver); border-left: 0.7px solid var(--silver); }
+    .anv-corner.tr { top:22px;    right:22px;   border-top: 0.7px solid var(--silver); border-right: 0.7px solid var(--silver); }
+    .anv-corner.bl { bottom:22px; left:22px;    border-bottom: 0.7px solid var(--silver); border-left: 0.7px solid var(--silver); }
+    .anv-corner.br { bottom:22px; right:22px;   border-bottom: 0.7px solid var(--silver); border-right: 0.7px solid var(--silver); }
+
+    /* Seitenlinien — jeweils 2 Segmente pro Seite mit Lücke in der Mitte */
+    .anv-edge {
+      position:absolute; pointer-events:none; z-index:1;
+      background: var(--silver-dim);
+    }
+    /* Linien sitzen auf der Achse der L-Schenkel (22px vom Innenrand) — gebrochenes Rechteck */
+    .anv-edge.h { height: 0.6px; }
+    .anv-edge.v { width: 0.6px; }
+    /* Linie geht von 50px (10px nach Ende des L bei 22+18=40) bis 50% minus 14px (Lücke für Raute) */
+    .anv-edge.top-l    { top: 22px; left: 50px; right: calc(50% + 12px); }
+    .anv-edge.top-r    { top: 22px; left: calc(50% + 12px); right: 50px; }
+    .anv-edge.bot-l    { bottom: 22px; left: 50px; right: calc(50% + 12px); }
+    .anv-edge.bot-r    { bottom: 22px; left: calc(50% + 12px); right: 50px; }
+    .anv-edge.left-t   { left: 22px; top: 50px; bottom: calc(50% + 12px); }
+    .anv-edge.left-b   { left: 22px; top: calc(50% + 12px); bottom: 50px; }
+    .anv-edge.right-t  { right: 22px; top: 50px; bottom: calc(50% + 12px); }
+    .anv-edge.right-b  { right: 22px; top: calc(50% + 12px); bottom: 50px; }
+
+    /* Mittenrauten — sitzen auf der Linie, mittig in der Lücke */
+    .anv-gem {
+      position:absolute; pointer-events:none; z-index:2;
+      width: 5px; height: 5px;
+      background: var(--silver);
+      transform: rotate(45deg);
+    }
+    .anv-gem.top    { top: 22px;    left: 50%; margin-left: -2.5px; margin-top: -2.5px; }
+    .anv-gem.bottom { bottom: 16px; left: 50%; margin-left: -2.5px; }  /* leicht tiefer wie Skizze */
+    .anv-gem.left   { left: 22px;   top: 50%;  margin-top: -2.5px; margin-left: -2.5px; }
+    .anv-gem.right  { right: 22px;  top: 50%;  margin-top: -2.5px; margin-right: -2.5px; }
+
+    /* Trennlinie ── ◆ ── */
+    .anv-rule {
+      display:flex; align-items:center; gap:9px;
+      margin: 10px auto; width: 50%;
+    }
+    .anv-rule-line { flex:1; height:0.5px; background: var(--silver-dim); }
+    .anv-rule-gem {
+      width:5px; height:5px; flex-shrink:0;
+      background: var(--silver); transform: rotate(45deg);
+    }
+
+    /* TYPOGRAFIE ─────────────────────────────────────── */
+
+    /* Hero-Zahl "50" — als <canvas> per JS pre-rendered (siehe drawHeroNumber()).
+       Grund: html2canvas v1.4.1 hat zwei Limits, die uns hier nacheinander einholten:
+       1) Text-Rasterizer honoriert font-feature-settings (lnum/tnum) nicht → "0" verrutschte
+       2) SVG-Text-Pipeline rendert SVGs in isoliertem Context ohne Zugriff auf Google Fonts → Schrift kippt auf System-Serif
+       Canvas-Element ist Teil des Haupt-Dokuments, JS zeichnet mit der echt-geladenen Bodoni Moda,
+       html2canvas kopiert dann nur die fertigen Pixel — kein Font-Resolving im Export-Pfad. */
+    .anv-hero-number {
+      display: block;
+      width: 240px;
+      height: 160px;
+      margin: 0 auto 2px;
+      position:relative; z-index:1;
+    }
+
+    /* Subline "SILBERNE HOCHZEIT" — klein, gespaced */
+    .anv-anlass {
+      font-family:'Cinzel', serif;
+      font-weight: 500;
+      font-size: 10px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--silver);
+      margin: 6px 0 0;
+    }
+
+    /* Namen — etwas breiter via Tracking, nicht größer */
+    .anv-names {
+      font-family:'Cormorant Garamond', serif;
+      font-weight: 500;
+      font-size: 22px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink);
+      line-height: 1.1;
+      margin: 18px 0 2px;
+      padding: 0 14px; /* extra Atemraum links/rechts */
+    }
+
+    /* Untertitel "Seit 2001 verbunden" — italic, klein, voll kontrastiert */
+    .anv-since {
+      font-family:'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+      color: var(--ink-body);
+      margin: 0 0 6px;
+    }
+    /* Kleine Goldlinie unter "Seit 2001" */
+    .anv-since-line {
+      width: 32px; height: 0.6px;
+      background: var(--silver-dim);
+      margin: 0 auto 16px;
+    }
+
+    /* Body */
+    .anv-body {
+      font-family:'Cormorant Garamond', serif;
+      font-weight: 400;
+      font-size: 13.5px;
+      line-height: 1.55;
+      letter-spacing: 0.04em;
+      color: var(--ink-body);
+      margin: 8px 16px 14px;
+    }
+
+    /* Datums-Block — zentriert, ohne vertikale Linien */
+    .anv-date-stack {
+      display: flex; flex-direction: column; align-items: center;
+      margin: 12px 0 0;
+      font-family:'Cormorant Garamond', serif;
+      color: var(--ink);
+      line-height: 1.05;
+    }
+    .anv-day {
+      font-family:'Bodoni Moda', 'Prata', serif;
+      font-weight: 500;
+      font-size: 32px;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+    }
+    .anv-month {
+      font-size: 12px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin-top: 7px;
+    }
+    .anv-year {
+      font-size: 11.5px;
+      letter-spacing: 0.32em;
+      color: var(--ink);
+      margin-top: 6px;
+    }
+    /* Horizontale Goldlinie unter Datum, vor Uhrzeit */
+    .anv-date-line {
+      width: 44px; height: 0.6px;
+      background: var(--silver-dim);
+      margin: 12px auto 10px;
+    }
+    .anv-time {
+      font-family:'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 0;
+    }
+    /* Feine Trennlinie zwischen Uhrzeit und Ort — statt Raute */
+    .anv-place-gem {
+      width: 32px; height: 0.5px;
+      background: var(--silver-dim);
+      margin: 10px auto 8px;
+    }
+
+    /* Ort + Stadt — etwas kleiner, Abstand zum Unterrand */
+    .anv-place {
+      font-family:'Cormorant Garamond', serif;
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--ink);
+      margin: 6px 0 2px;
+      line-height: 1.5;
+    }
+    .anv-city {
+      font-family:'Cormorant Garamond', serif;
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--ink-body);
+      margin-top: -3px;
+    }
+
+    /* Mini-Trennlinie vor RSVP */
+    .anv-rsvp-gem {
+      width: 4px; height: 4px;
+      background: var(--silver);
+      transform: rotate(45deg);
+      margin: 14px auto 6px;
+    }
+
+    /* ══ RÜCKSEITE — Brief-Layout ═══════════════════════════ */
+    .anv-back-inner {
+      position: relative; z-index: 1;
+      background: var(--cream);
+      padding: 30px 28px;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      aspect-ratio: 127 / 178;
+      display: flex; flex-direction: column;
+      text-align: left;
+    }
+    /* Rückseite: nur angedeutete L-Ecken + sehr zarte Linienfragmente, keine Mittenrauten */
+    .anv-back-corner {
+      position: absolute; pointer-events: none; z-index: 2;
+      width: 14px; height: 14px;
+      box-sizing: border-box;
+    }
+    .anv-back-corner.tl { top: 22px;    left: 22px;    border-top: 0.5px solid var(--silver-dim); border-left: 0.5px solid var(--silver-dim); }
+    .anv-back-corner.tr { top: 22px;    right: 22px;   border-top: 0.5px solid var(--silver-dim); border-right: 0.5px solid var(--silver-dim); }
+    .anv-back-corner.bl { bottom: 22px; left: 22px;    border-bottom: 0.5px solid var(--silver-dim); border-left: 0.5px solid var(--silver-dim); }
+    .anv-back-corner.br { bottom: 22px; right: 22px;   border-bottom: 0.5px solid var(--silver-dim); border-right: 0.5px solid var(--silver-dim); }
+
+    /* Kurze Linienfragmente nahe den Ecken — Andeutung statt voller Linie */
+    .anv-back-frag {
+      position: absolute; pointer-events: none; z-index: 1;
+      background: var(--silver-dim);
+      opacity: 0.7;
+    }
+    .anv-back-frag.h { height: 0.5px; width: 30px; }
+    .anv-back-frag.v { width: 0.5px; height: 30px; }
+    .anv-back-frag.top-l    { top: 28px; left: 44px; }
+    .anv-back-frag.top-r    { top: 28px; right: 44px; }
+    .anv-back-frag.bot-l    { bottom: 28px; left: 44px; }
+    .anv-back-frag.bot-r    { bottom: 28px; right: 44px; }
+    .anv-back-frag.left-t   { left: 28px; top: 44px; }
+    .anv-back-frag.left-b   { left: 28px; bottom: 44px; }
+    .anv-back-frag.right-t  { right: 28px; top: 44px; }
+    .anv-back-frag.right-b  { right: 28px; bottom: 44px; }
+
+    .anv-greeting {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 19px;
+      color: var(--ink);
+      margin: 4px 0 4px 28px;
+      letter-spacing: 0.01em;
+    }
+    /* Goldlinie direkt unter Greeting — gemeinsam mit Anrede eingerückt, frei vom L-Bracket */
+    .anv-greeting-line {
+      width: 32px; height: 0.6px;
+      background: var(--silver-dim);
+      margin: 0 0 12px 28px;
+    }
+
+    /* Einleitungs-Brieftext — leichte Einrückung, etwas mehr Luft zum Rand */
+    .anv-back-intro {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--ink);
+      letter-spacing: 0.02em;
+      margin: 0 8px 14px 12px;
+    }
+
+    /* Middle-Container mit vertikaler Goldlinie als Sequenz-Anker */
+    .anv-back-middle {
+      flex: 1 1 auto;
+      position: relative;
+      display: flex; flex-direction: column;
+      justify-content: center;
+      gap: 14px;
+      padding: 8px 0 8px 22px;
+    }
+    /* Durchgehende vertikale Linie links */
+    .anv-back-middle::before {
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 14px;
+      bottom: 14px;
+      width: 0.6px;
+      background: var(--silver-dim);
+    }
+    .anv-back-section {
+      position: relative;
+      margin-bottom: 0;
+    }
+    /* ◆-Marker sitzt ON der Linie, mit Cream-Hintergrund-Patch der die Linie unterbricht */
+    .anv-back-section::before {
+      content: '◆';
+      position: absolute;
+      left: -22px;
+      top: -2px;
+      width: 11px;
+      text-align: center;
+      color: var(--silver);
+      font-size: 6.5px;
+      background: var(--cream);
+      padding: 2px 0;
+    }
+    .anv-back-label {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--silver);
+      margin-bottom: 3px;
+    }
+    .anv-back-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 12.5px;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    .anv-back-text.dim {
+      color: var(--ink-body);
+    }
+
+    /* Brief-Abschluss-Block: Linie + "Herzlich, Anna & Peter" auf einer Zeile, rechtsbündig */
+    .anv-back-close-block {
+      padding-top: 10px;
+      display: flex; flex-direction: column;
+      align-items: flex-end;
+    }
+    .anv-back-close-line {
+      width: 32px; height: 0.6px;
+      background: var(--silver-dim);
+      margin: 0 28px 6px 0;
+    }
+    .anv-back-signline {
+      display: flex; align-items: baseline; gap: 8px;
+      margin-right: 28px;
+    }
+    .anv-back-close {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 12.5px;
+      color: var(--ink-body);
+      letter-spacing: 0.04em;
+    }
+    .anv-back-signature {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 15px;
+      color: var(--ink);
+      letter-spacing: 0.04em;
+    }
+
+    /* RSVP — Magazin-Marginalie · italic, klein, höherer Kontrast via Farbton (nicht Opacity) */
+    .anv-rsvp {
+      font-family:'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: 10.5px;
+      letter-spacing: 0.06em;
+      color: rgba(28, 20, 8, 0.75);  /* 75% statt 50% — lesbar für die, die es anzeigen */
+      margin: 0;
+    }
+    .anv-rsvp.hidden { display: none; }
+
+    /* ══ LOADING ═════════════════════════════════════════════ */
+    .loading {
+      display:none; position:fixed; inset:0;
+      background:rgba(28,20,8,0.78); z-index:9999;
+      align-items:center; justify-content:center;
+      flex-direction:column; gap:14px;
+      color:#fff; font-family:'Cormorant Garamond',serif;
+      font-size:15px; letter-spacing:0.14em; text-transform:uppercase;
+    }
+    .loading.active { display:flex; }
+    .spinner {
+      width:36px; height:36px;
+      border:2px solid rgba(255,255,255,0.2);
+      border-top-color:#fff; border-radius:50%;
+      animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div id="loading-text">PDF wird erstellt …</div>
+</div>
+
+  <!-- ═══════════════ FORM PANEL ═══════════════ -->
+  <aside class="panel-form">
+    <header class="panel-head">
+      <h1>Silberne Hochzeit</h1>
+      <p>Anniversary Kit · Art Deco Edition</p>
+    </header>
+
+    <!-- Sprach-Toggle -->
+    <div class="lang-toggle">
+      <button class="lang-btn active" data-lang="de" onclick="setLang('de')">Deutsch</button>
+      <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
+    </div>
+
+    <!-- Druckvariante -->
+    <div class="mode-toggle">
+      <div class="mode-toggle-label" data-i18n="modeToggleLabel">Druckvariante</div>
+      <div class="mode-buttons">
+        <button class="mode-btn active" data-mode="home" onclick="setPrintMode('home')" data-i18n="modeHome">Heimdruck · Persönliche Brief-Version</button>
+        <button class="mode-btn"        data-mode="pro"  onclick="setPrintMode('pro')"  data-i18n="modePro">Druckerei · Atelier-Version</button>
+      </div>
+      <div class="mode-desc" id="mode-desc" data-i18n="modeDescHome">Jede Karte mit Vornamen-Anrede aus der Brief-Liste. Ideal für Heimdrucker, Copyshop oder DM-Fotoservice.</div>
+    </div>
+
+    <!-- GLOBAL: gilt für alle Tabs -->
+    <div class="form-section">
+      <div class="section-title" data-i18n="globalSection">Eure Eckdaten</div>
+
+      <div class="field">
+        <label data-i18n="namesLabel">Namen <span class="opt" data-i18n="namesHint">(genau wie es auf der Karte stehen soll)</span></label>
+        <input type="text" id="g-names" value="Anna & Peter" oninput="renderAll()">
+      </div>
+
+      <div class="field">
+        <label data-i18n="sinceLabel">Verbunden seit <span class="opt">(Jahr)</span></label>
+        <input type="text" id="g-since-year" value="2001" oninput="renderAll()">
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="dateLabel">Datum der Feier</label>
+          <input type="date" id="g-date" value="2026-09-12" oninput="renderAll()">
+        </div>
+        <div class="field">
+          <label data-i18n="timeLabel">Uhrzeit</label>
+          <input type="text" id="g-time" value="18 Uhr" oninput="renderAll()">
+        </div>
+      </div>
+
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="placeLabel">Ort</label>
+          <input type="text" id="g-place" value="Restaurant Belvedere" oninput="renderAll()">
+        </div>
+        <div class="field">
+          <label data-i18n="cityLabel">Stadt <span class="opt" data-i18n="cityHint">(optional)</span></label>
+          <input type="text" id="g-city" value="München" oninput="renderAll()">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- BRIEF-TEXT (Tonalität + Einleitung + Abschluss) -->
+    <div class="form-section">
+      <div class="section-title" data-i18n="briefTextSection">Brief-Text</div>
+      <p class="guest-list-hint" data-i18n="briefTextHint">Einleitung und Abschluss erscheinen auf jeder Rückseite. Bewusst ohne du/Sie/Euch — der Brief wirkt für alle persönlich.</p>
+
+      <div class="tone-picker">
+        <button class="tone-btn active" data-btone="warm"      onclick="setBriefTone('warm')">Warm</button>
+        <button class="tone-btn"        data-btone="elegant"   onclick="setBriefTone('elegant')">Elegant</button>
+        <button class="tone-btn"        data-btone="editorial" onclick="setBriefTone('editorial')">Editorial</button>
+      </div>
+
+      <div class="field">
+        <label data-i18n="briefIntroLabel">Einleitung <span class="opt" data-i18n="optional">(frei editierbar)</span></label>
+        <textarea id="g-brief-intro" rows="3" style="width:100%; resize:vertical; padding:8px; border:1px solid #e0ddd8; font-family:inherit; font-size:12px;" oninput="renderAll()">wir freuen uns sehr auf diesen besonderen Tag. Hier alle Details auf einen Blick:</textarea>
+      </div>
+
+      <div class="field">
+        <label data-i18n="briefCloseLabel">Abschluss-Gruß</label>
+        <input type="text" id="g-brief-close" value="Herzlich" oninput="renderAll()">
+      </div>
+    </div>
+
+    <!-- ADRESSE & KONTAKT -->
+    <div class="form-section">
+      <div class="section-title" data-i18n="backSection">Adresse & Kontakt</div>
+      <p class="guest-list-hint" data-i18n="backHint">Diese Angaben erscheinen auf der personalisierten Rückseite jeder Karte.</p>
+
+      <div class="field">
+        <label data-i18n="streetLabel">Straße und Hausnummer</label>
+        <input type="text" id="g-street" value="Leopoldstraße 170" oninput="renderAll()">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="zipLabel">PLZ</label>
+          <input type="text" id="g-zip" value="80804" oninput="renderAll()">
+        </div>
+        <div class="field">
+          <label data-i18n="weekdayLabel">Wochentag</label>
+          <input type="text" id="g-weekday" value="Samstag" oninput="renderAll()">
+        </div>
+      </div>
+
+      <div class="field">
+        <label data-i18n="travelLabel">Anfahrt <span class="opt" data-i18n="optional">(optional)</span></label>
+        <textarea id="g-travel" rows="2" style="width:100%; resize:vertical; padding:8px; border:1px solid #e0ddd8; font-family:inherit; font-size:11px;" oninput="renderAll()">Parken im Hof möglich · U-Bahn Münchner Freiheit</textarea>
+      </div>
+
+      <div class="field">
+        <label data-i18n="dressLabel">Dresscode <span class="opt" data-i18n="optional">(optional)</span></label>
+        <input type="text" id="g-dress" value="Festlich-elegant" oninput="renderAll()">
+      </div>
+
+      <div class="field">
+        <label data-i18n="rsvpLabel">U.A.w.g. bis</label>
+        <input type="date" id="g-rsvp" value="2026-08-01" oninput="renderAll()">
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label data-i18n="emailLabel">E-Mail</label>
+          <input type="text" id="g-email" value="anna.peter@email.de" oninput="renderAll()">
+        </div>
+        <div class="field">
+          <label data-i18n="phoneLabel">Telefon</label>
+          <input type="text" id="g-phone" value="0151 23 45 67" oninput="renderAll()">
+        </div>
+      </div>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="invite"   onclick="setTab('invite')">Einladung</button>
+      <button class="tab-btn"        data-tab="schedule" onclick="setTab('schedule')">Tagesablauf</button>
+      <button class="tab-btn"        data-tab="place"    onclick="setTab('place')">Platzkarte</button>
+    </div>
+
+    <!-- TAB: EINLADUNG -->
+    <div class="tab-content active" id="tab-invite">
+      <div class="form-section">
+        <div class="section-title" data-i18n="toneSection">Tonalität des Einladungstextes</div>
+        <div class="tone-picker">
+          <button class="tone-btn active" data-tone="classic"   onclick="setTone('classic')">Klassisch</button>
+          <button class="tone-btn"        data-tone="heartfelt" onclick="setTone('heartfelt')">Herzlich</button>
+          <button class="tone-btn"        data-tone="editorial" onclick="setTone('editorial')">Editorial</button>
+        </div>
+        <div class="field">
+          <label data-i18n="inviteTextLabel">Einladungstext <span class="opt">(frei editierbar)</span></label>
+          <textarea id="g-invite-text" rows="3" oninput="renderAll()" style="width:100%; resize:vertical; font-family:inherit; padding:8px; border:1px solid #e0ddd8;">Wir laden herzlich ein, diesen besonderen Tag mit uns zu feiern.</textarea>
+        </div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title" data-i18n="guestSection">Brief-Empfänger</div>
+        <p class="guest-list-hint" data-i18n-html="guestHint">Ein Eintrag pro <strong>Haushalt</strong> (1 Brief). Paare und Familien gemeinsam — die Aufteilung in einzelne Platzkarten erfolgt später im Platzkarten-Tab. <br><br><strong>Format:</strong> <code>Name [,m|,f] [| Brief-Vorname]</code><br>• <code>,m</code> = „Lieber" · ohne Suffix = „Liebe"<br>• <code>| Brief-Vorname</code> macht den Brief intim (z. B. „Liebe Sofie" statt „Liebe Sofie Hofmann")</p>
+        <textarea id="g-guests" oninput="updateGuestCount()" spellcheck="false">Brigitte
+Andi Müller,m | Andi
+Sofie Hofmann,f | Sofie
+Anna & Thomas Koch | Anna & Thomas
+Familie Schmidt
+Dr. Klaus Müller,m</textarea>
+        <div class="guest-count" id="guest-count">6 Empfänger</div>
+      </div>
+
+      <div class="download-section">
+        <button class="btn-dl" onclick="exportInvite('home')" data-i18n="dlHome">PDF Heimdruck · Vorder + Rückseiten</button>
+        <button class="btn-dl sec" onclick="exportInvite('pro')" data-i18n="dlPrint">PDF Druckerei · Vorder + Rück (Bleed)</button>
+        <button class="btn-dl silver" onclick="exportKit()" data-i18n="dlKit">Gesamt-Kit als ZIP (beide Varianten)</button>
+        <p class="privacy-note" data-i18n="privacy">Alle Daten bleiben lokal in Ihrem Browser.</p>
+      </div>
+    </div>
+
+    <!-- TAB: TAGESABLAUF -->
+    <div class="tab-content" id="tab-schedule">
+      <div class="form-section">
+        <div class="section-title" data-i18n="scheduleSection">Programm-Slots</div>
+        <p class="guest-list-hint" data-i18n-html="scheduleHint">Eine Zeile pro Slot. Format: <code>Zeit | Titel | Untertitel</code> — Untertitel optional. Max. 6 Slots empfohlen, damit die Timeline lesbar bleibt.</p>
+        <textarea id="g-schedule" oninput="renderSchedule()" spellcheck="false">17:00 | Sektempfang | im Garten
+18:00 | Festliches Dinner
+20:00 | Rede und Anekdoten
+21:00 | Kaffee und Torte
+22:00 | Musik und Tanz
+23:30 | Ausklang</textarea>
+      </div>
+
+      <div class="download-section">
+        <button class="btn-dl" onclick="exportSchedule('home')" data-i18n="dlScheduleHome">PDF Tagesablauf · Heimdruck</button>
+        <button class="btn-dl sec" onclick="exportSchedule('pro')" data-i18n="dlSchedulePro">PDF Tagesablauf · Druckerei</button>
+      </div>
+    </div>
+
+    <!-- TAB: PLATZKARTE -->
+    <div class="tab-content" id="tab-place">
+      <div class="form-section">
+        <div class="section-title" data-i18n="placeBridgeSection">Aus Brief-Liste übernehmen</div>
+        <p class="guest-list-hint" data-i18n="placeBridgeHint">Brief-Liste = Haushalte (1 pro Brief). Platzkarten = Personen. Der Bridge-Button splittet Paare an „&amp;" auf — Familien-Einträge bleiben als eine Zeile und müssen manuell aufgeteilt werden.</p>
+        <button class="btn-dl sec" style="margin-bottom:0;" onclick="bridgeFromBriefList()" data-i18n="placeBridgeBtn">Aus Brief-Liste vor-befüllen</button>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title" data-i18n="placeSection">Platzkarten-Personen</div>
+        <p class="guest-list-hint" data-i18n="placeHint">Ein Name pro Zeile — max. 60. Jede Zeile wird eine eigene Karte.</p>
+        <textarea id="g-people" oninput="renderPlace()" spellcheck="false">Brigitte Hofmann
+Andi Müller
+Sofie Hofmann
+Anna Koch
+Thomas Koch
+Familie Schmidt</textarea>
+        <div class="guest-count" id="place-count">6 Personen</div>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title" data-i18n="placeSubSection">Sublabel <span class="opt">(optional)</span></div>
+        <input type="text" id="g-place-sub" value="" oninput="renderPlace()" placeholder="z. B. 12. September 2026">
+        <p class="guest-list-hint" data-i18n="placeSubHint">Erscheint klein unter dem Namen — auf allen Karten gleich.</p>
+      </div>
+
+      <div class="form-section">
+        <div class="section-title" data-i18n="placeModeSection">Druckvariante</div>
+        <div class="mode-buttons">
+          <button class="mode-btn active" data-pmode="home" onclick="setPlaceMode('home')" data-i18n="placeModeHome">Heimdruck · 6 / A4 quer</button>
+          <button class="mode-btn"        data-pmode="pro"  onclick="setPlaceMode('pro')"  data-i18n="placeModePro">Druckerei · einzeln + Bleed</button>
+        </div>
+      </div>
+
+      <div class="download-section">
+        <button class="btn-dl" onclick="exportPlace('home')" data-i18n="dlPlaceHome">PDF Platzkarten · Heimdruck</button>
+        <button class="btn-dl sec" onclick="exportPlace('pro')" data-i18n="dlPlacePro">PDF Platzkarten · Druckerei</button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- ═══════════════ PREVIEW PANEL ═══════════════ -->
+  <main class="panel-preview">
+   <div class="card-stack">
+
+    <div class="preview-cluster" data-tabs="invite">
+    <span class="preview-label" data-i18n="frontLabel">Vorderseite · 5×7"</span>
+
+    <div id="invite-output">
+      <div class="anv-outer" id="anv-outer">
+        <div class="anv-inner">
+          <!-- Fragmentierter Rahmen: L-Ecken + Liniensegmente + Mittenrauten -->
+          <div class="anv-corner tl"></div>
+          <div class="anv-corner tr"></div>
+          <div class="anv-corner bl"></div>
+          <div class="anv-corner br"></div>
+          <div class="anv-edge h top-l"></div>
+          <div class="anv-edge h top-r"></div>
+          <div class="anv-edge h bot-l"></div>
+          <div class="anv-edge h bot-r"></div>
+          <div class="anv-edge v left-t"></div>
+          <div class="anv-edge v left-b"></div>
+          <div class="anv-edge v right-t"></div>
+          <div class="anv-edge v right-b"></div>
+          <div class="anv-gem top"></div>
+          <div class="anv-gem bottom"></div>
+          <div class="anv-gem left"></div>
+          <div class="anv-gem right"></div>
+
+          <!-- ANLASS-ZONE -->
+          <div>
+            <canvas class="anv-hero-number" id="anv-hero-canvas" width="720" height="480" data-number="25" aria-label="25"></canvas>
+            <div class="anv-rule">
+              <div class="anv-rule-line"></div>
+              <div class="anv-rule-gem"></div>
+              <div class="anv-rule-line"></div>
+            </div>
+            <div class="anv-anlass" id="r-anlass">SILBERNE HOCHZEIT</div>
+          </div>
+
+          <!-- PERSONEN-ZONE -->
+          <div>
+            <div class="anv-names" id="r-names">ANNA &amp; PETER</div>
+            <div class="anv-since" id="r-since">Seit 2001 verbunden</div>
+            <div class="anv-since-line"></div>
+          </div>
+
+          <!-- EVENT-ZONE -->
+          <div>
+            <div class="anv-body" id="r-body">Wir laden herzlich ein, diesen besonderen Tag mit uns zu feiern.</div>
+
+            <div class="anv-date-stack">
+              <div class="anv-day"   id="r-day">12</div>
+              <div class="anv-month" id="r-month">SEPTEMBER</div>
+              <div class="anv-year"  id="r-year">2026</div>
+            </div>
+            <div class="anv-date-line"></div>
+            <div class="anv-time" id="r-time">18 UHR</div>
+            <div class="anv-place-gem"></div>
+            <div class="anv-place" id="r-place">RESTAURANT BELVEDERE</div>
+            <div class="anv-city"  id="r-city">MÜNCHEN</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+   </div>
+
+    <!-- ═══ RÜCKSEITE — Brief ═══ -->
+    <div class="preview-cluster" data-tabs="invite">
+      <div class="guest-picker">
+        <span class="guest-picker-label" data-i18n="backPickerLabel">Rückseite für</span>
+        <select id="back-guest-select" onchange="renderBack()"></select>
+        <span class="guest-picker-counter" id="back-guest-counter">1 / 6</span>
+      </div>
+
+      <div id="back-output">
+        <div class="anv-outer">
+          <div class="anv-back-inner">
+            <div class="anv-back-corner tl"></div>
+            <div class="anv-back-corner tr"></div>
+            <div class="anv-back-corner bl"></div>
+            <div class="anv-back-corner br"></div>
+            <div class="anv-back-frag h top-l"></div>
+            <div class="anv-back-frag h top-r"></div>
+            <div class="anv-back-frag h bot-l"></div>
+            <div class="anv-back-frag h bot-r"></div>
+            <div class="anv-back-frag v left-t"></div>
+            <div class="anv-back-frag v left-b"></div>
+            <div class="anv-back-frag v right-t"></div>
+            <div class="anv-back-frag v right-b"></div>
+
+            <div class="anv-greeting" id="b-greeting">Liebe Brigitte,</div>
+            <div class="anv-greeting-line"></div>
+
+            <div class="anv-back-intro" id="b-intro">wir freuen uns sehr auf diesen besonderen Tag. Hier alle Details auf einen Blick:</div>
+
+            <div class="anv-back-middle">
+              <div class="anv-back-section">
+                <div class="anv-back-label" data-i18n="lblWhen">Wann</div>
+                <div class="anv-back-text" id="b-when">Samstag, 12. September 2026, ab 18 Uhr</div>
+              </div>
+
+              <div class="anv-back-section">
+                <div class="anv-back-label" data-i18n="lblWhere">Wo</div>
+                <div class="anv-back-text" id="b-where">Restaurant Belvedere<br>Leopoldstraße 170<br>80804 München</div>
+              </div>
+
+              <div class="anv-back-section" id="b-travel-section">
+                <div class="anv-back-label" data-i18n="lblTravel">Anfahrt</div>
+                <div class="anv-back-text dim" id="b-travel">Parken im Hof möglich · U-Bahn Münchner Freiheit</div>
+              </div>
+
+              <div class="anv-back-section" id="b-dress-section">
+                <div class="anv-back-label" data-i18n="lblDress">Dresscode</div>
+                <div class="anv-back-text dim" id="b-dress">Festlich-elegant</div>
+              </div>
+
+              <div class="anv-back-section">
+                <div class="anv-back-label" data-i18n="lblRsvp">Um Antwort wird gebeten</div>
+                <div class="anv-back-text" id="b-rsvp">bis 1. August 2026<br>anna.peter@email.de · 0151 23 45 67</div>
+              </div>
+            </div>
+
+            <div class="anv-back-close-block">
+              <div class="anv-back-close-line"></div>
+              <div class="anv-back-signline">
+                <span class="anv-back-close" id="b-close">Herzlich,</span>
+                <span class="anv-back-signature" id="b-signature">Anna &amp; Peter</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ TAGESABLAUF ═══ -->
+    <div class="preview-cluster" data-tabs="schedule">
+      <span class="preview-label" data-i18n="scheduleLabel">Tagesablauf · 5×7"</span>
+
+      <div id="schedule-output">
+        <div class="anv-outer">
+          <div class="anv-sched-inner">
+            <div class="anv-corner tl"></div>
+            <div class="anv-corner tr"></div>
+            <div class="anv-corner bl"></div>
+            <div class="anv-corner br"></div>
+            <div class="anv-edge h top-l"></div>
+            <div class="anv-edge h top-r"></div>
+            <div class="anv-edge h bot-l"></div>
+            <div class="anv-edge h bot-r"></div>
+            <div class="anv-edge v left-t"></div>
+            <div class="anv-edge v left-b"></div>
+            <div class="anv-edge v right-t"></div>
+            <div class="anv-edge v right-b"></div>
+            <div class="anv-gem top"></div>
+            <div class="anv-gem bottom"></div>
+            <div class="anv-gem left"></div>
+            <div class="anv-gem right"></div>
+
+            <div class="anv-sched-anlass" id="s-anlass">SILBERNE HOCHZEIT</div>
+            <div class="anv-sched-title" data-i18n="scheduleTitle">Tagesablauf</div>
+            <div class="anv-sched-date" id="s-date">12 SEPTEMBER 2026</div>
+            <div class="anv-sched-rule"></div>
+
+            <div class="anv-sched-timeline" id="s-timeline"></div>
+
+            <div class="anv-sched-closer" id="s-closer">Anna &amp; Peter freuen sich auf euch.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PLATZKARTEN ═══ -->
+    <div class="preview-cluster" data-tabs="place">
+      <span class="preview-label" data-i18n="placePreviewLabel">Platzkarten · 6 pro A4 quer</span>
+      <div id="place-output">
+        <div class="anv-pcard-grid" id="place-grid"></div>
+      </div>
+      <div class="anv-place-nav" id="place-nav" style="display:none;">
+        <button class="anv-place-nav-btn" id="place-prev" onclick="changePlacePage(-1)">&#8592;</button>
+        <span id="place-page-info"></span>
+        <button class="anv-place-nav-btn" id="place-next" onclick="changePlacePage(1)">&#8594;</button>
+      </div>
+    </div>
+
+   </div>
+  </main>
+
+<script>
+/* ════════════════════════════════════════════════════════════
+   ANNIVERSARY · SILVER EDITION · PHASE 1
+   ════════════════════════════════════════════════════════════ */
+
+let currentLang = 'de';
+let currentTone = 'classic';
+let currentBriefTone = 'warm';
+let currentPrintMode = 'home';  /* 'home' (personalisiert) oder 'pro' (clean) */
+
+/* ── Brief-Einleitungstexte je Tonalität · Sprache (ohne du/Sie/Euch) ── */
+const briefIntros = {
+  de: {
+    warm:      'wir freuen uns sehr auf diesen besonderen Tag. Hier alle Details auf einen Blick:',
+    elegant:   'fünfundzwanzig Jahre voller schöner Momente — und jetzt ein Abend, an dem wir gemeinsam feiern. Hier alle Details:',
+    editorial: 'ein Abend, der bleibt. Hier alles auf einen Blick:'
+  },
+  en: {
+    warm:      'we are so looking forward to this special day. Here are all the details at a glance:',
+    elegant:   'twenty-five years of beautiful moments — and now an evening to celebrate together. Here are all the details:',
+    editorial: 'an evening to remember. Everything at a glance:'
+  }
+};
+const briefCloses = {
+  de: 'Herzlich',
+  en: 'Warmly'
+};
+
+/* ── Locale-aware Demo-Defaults je Sprache (US-Beispiel für EN, DE-Beispiel für DE) ── */
+const demoData = {
+  de: {
+    names:    'Anna & Peter',
+    sinceY:   '2001',
+    time:     '18 Uhr',
+    place:    'Restaurant Belvedere',
+    city:     'München',
+    street:   'Leopoldstraße 170',
+    zip:      '80804',
+    weekday:  'Samstag',
+    travel:   'Parken im Hof möglich · U-Bahn Münchner Freiheit',
+    dress:    'Festlich-elegant',
+    email:    'anna.peter@email.de',
+    phone:    '0151 23 45 67',
+    guests:   'Brigitte\nAndi Müller,m | Andi\nSofie Hofmann,f | Sofie\nAnna & Thomas Koch | Anna & Thomas\nFamilie Schmidt\nDr. Klaus Müller,m',
+    schedule: '17:00 | Sektempfang | im Garten\n18:00 | Festliches Dinner\n20:00 | Rede und Anekdoten\n21:00 | Kaffee und Torte\n22:00 | Musik und Tanz\n23:30 | Ausklang',
+    people:   'Brigitte Hofmann\nAndi Müller\nSofie Hofmann\nAnna Koch\nThomas Koch\nFamilie Schmidt'
+  },
+  en: {
+    names:    'Margaret & Robert',
+    sinceY:   '2001',
+    time:     '6 PM',
+    place:    'The Belvedere',
+    city:     'Boston',
+    street:   '170 Commonwealth Avenue',
+    zip:      '02116',
+    weekday:  'Saturday',
+    travel:   'Valet parking available · Hynes T station 3 min',
+    dress:    'Cocktail attire',
+    email:    'margaret.robert@email.com',
+    phone:    '+1 617 555 0142',
+    guests:   'Elizabeth\nJames Anderson,m | James\nClara Whitfield,f | Clara\nSarah & Thomas Brooks | Sarah & Thomas\nThe Reynolds Family\nDr. William Hart,m',
+    schedule: '5:00 PM | Champagne reception | in the garden\n6:00 PM | Dinner\n8:00 PM | Speeches and stories\n9:00 PM | Coffee and cake\n10:00 PM | Music and dancing\n11:30 PM | Farewell',
+    people:   'Elizabeth Anderson\nJames Anderson\nClara Whitfield\nSarah Brooks\nThomas Brooks\nThe Reynolds Family'
+  }
+};
+
+/* Wendet Demo-Daten für die gegebene Sprache an — nur wenn Feld noch unverändert vom Default ist */
+function applyDemoData(lang) {
+  const d = demoData[lang];
+  const other = demoData[lang === 'de' ? 'en' : 'de'];
+  const fieldMap = [
+    ['g-names',   d.names,   other.names],
+    ['g-since-year', d.sinceY, other.sinceY],
+    ['g-time',    d.time,    other.time],
+    ['g-place',   d.place,   other.place],
+    ['g-city',    d.city,    other.city],
+    ['g-street',  d.street,  other.street],
+    ['g-zip',     d.zip,     other.zip],
+    ['g-weekday', d.weekday, other.weekday],
+    ['g-travel',  d.travel,  other.travel],
+    ['g-dress',   d.dress,   other.dress],
+    ['g-email',   d.email,   other.email],
+    ['g-phone',   d.phone,   other.phone],
+    ['g-guests',  d.guests,  other.guests],
+    ['g-schedule', d.schedule, other.schedule],
+    ['g-people',  d.people,  other.people]
+  ];
+  fieldMap.forEach(([id, newVal, prevVal]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    /* Nur ersetzen, wenn Feld noch der andersprachige Default ist — User-Eingaben bleiben erhalten */
+    if (el.value === prevVal) el.value = newVal;
+  });
+}
+
+/* ── Default-Texte je Tonalität · Sprache · Edition ── */
+const inviteTexts = {
+  de: {
+    classic:   'Wir laden herzlich ein, diesen besonderen Tag mit uns zu feiern.',
+    heartfelt: 'Fünfundzwanzig Jahre voller Erinnerungen — wir feiern mit euch.',
+    editorial: 'Fünfundzwanzig Jahre. Eine gemeinsame Geschichte.'
+  },
+  en: {
+    classic:   'Please join us as we celebrate 25 wonderful years together.',
+    heartfelt: '25 years of love, laughter, and unforgettable memories.',
+    editorial: 'Twenty-five years. One beautiful story.'
+  }
+};
+
+/* ── i18n-Strings für UI ── */
+const i18n = {
+  de: {
+    globalSection:'Eure Eckdaten',
+    namesLabel:'Namen', namesHint:'(genau wie es auf der Karte stehen soll)',
+    sinceLabel:'Verbunden seit',
+    rsvpText:'U.A.w.g. bis {d}',
+    dateLabel:'Datum der Feier', timeLabel:'Uhrzeit',
+    placeLabel:'Ort', cityLabel:'Stadt', cityHint:'(optional)',
+    guestSection:'Brief-Empfänger',
+    guestHint:'Ein Eintrag pro <strong>Haushalt</strong> (1 Brief). Paare und Familien gemeinsam — die Aufteilung in einzelne Platzkarten erfolgt später im Platzkarten-Tab. <br><br><strong>Format:</strong> <code>Name [,m|,f] [| Brief-Vorname]</code><br>• <code>,m</code> = „Lieber" · ohne Suffix = „Liebe"<br>• <code>| Brief-Vorname</code> macht den Brief intim (z. B. „Liebe Sofie" statt „Liebe Sofie Hofmann")',
+    guestCount:'{n} Empfänger',
+    modeToggleLabel:'Druckvariante',
+    modeHome:'Heimdruck · Persönliche Brief-Version',
+    modePro:'Druckerei · Atelier-Version',
+    modeDescHome:'Jede Karte mit Vornamen-Anrede aus der Brief-Liste. Ideal für Heimdrucker, Copyshop oder DM-Fotoservice.',
+    modeDescPro:'Einheitliche, fertige Briefkarte ohne Anrede — eine Rückseite für alle Karten. Ideal für professionelle Druckauflagen.',
+    backSection:'Adresse & Kontakt',
+    backHint:'Diese Angaben erscheinen auf der Rückseite jeder Karte.',
+    briefTextSection:'Brief-Text',
+    briefTextHint:'Einleitung und Abschluss erscheinen auf jeder Rückseite. Bewusst ohne du/Sie/Euch — der Brief wirkt für alle persönlich.',
+    briefIntroLabel:'Einleitung',
+    briefCloseLabel:'Abschluss-Gruß',
+    streetLabel:'Straße und Hausnummer', zipLabel:'PLZ',
+    weekdayLabel:'Wochentag',
+    travelLabel:'Anfahrt', dressLabel:'Dresscode',
+    rsvpLabel:'U.A.w.g. bis', emailLabel:'E-Mail', phoneLabel:'Telefon',
+    optional:'(optional)',
+    frontLabel:'Vorderseite · 5×7"',
+    backPickerLabel:'Rückseite für',
+    lblWhen:'Wann', lblWhere:'Wo', lblTravel:'Anfahrt', lblDress:'Dresscode',
+    lblRsvp:'Um Antwort wird gebeten',
+    rsvpUntil:'bis {d}',
+    scheduleSection:'Programm-Slots',
+    scheduleHint:'Eine Zeile pro Slot. Format: <code>Zeit | Titel | Untertitel</code> — Untertitel optional. Max. 6 Slots empfohlen, damit die Timeline lesbar bleibt.',
+    scheduleLabel:'Tagesablauf · 5×7"',
+    scheduleTitle:'Tagesablauf',
+    scheduleCloser:'{names} freuen sich auf euch.',
+    dlScheduleHome:'PDF Tagesablauf · Heimdruck',
+    dlSchedulePro:'PDF Tagesablauf · Druckerei',
+    placeBridgeSection:'Aus Brief-Liste übernehmen',
+    placeBridgeHint:'Brief-Liste = Haushalte (1 pro Brief). Platzkarten = Personen. Der Bridge-Button splittet Paare an „&" auf — Familien-Einträge bleiben als eine Zeile und müssen manuell aufgeteilt werden.',
+    placeBridgeBtn:'Aus Brief-Liste vor-befüllen',
+    placeSection:'Platzkarten-Personen',
+    placeHint:'Ein Name pro Zeile — max. 60. Jede Zeile wird eine eigene Karte.',
+    placeSubSection:'Sublabel',
+    placeSubHint:'Erscheint klein unter dem Namen — auf allen Karten gleich.',
+    placeModeSection:'Druckvariante',
+    placeModeHome:'Heimdruck · 6 / A4 quer',
+    placeModePro:'Druckerei · einzeln + Bleed',
+    dlPlaceHome:'PDF Platzkarten · Heimdruck',
+    dlPlacePro:'PDF Platzkarten · Druckerei',
+    placeCount:'{n} Personen',
+    placePreviewLabel:'Platzkarten · 6 pro A4 quer',
+    pageOf:'Seite {c} von {t}',
+    toneSection:'Tonalität des Einladungstextes',
+    inviteTextLabel:'Einladungstext',
+    dlHome:'PDF Heimdruck · Vorder + Rückseiten',
+    dlPrint:'PDF Druckerei · Vorder + Rück (Bleed)',
+    dlKit:'Gesamt-Kit als ZIP (beide Varianten)',
+    privacy:'Alle Daten bleiben lokal in Ihrem Browser.',
+    previewLabel:'Vorschau · Einladung 5×7"',
+    anlass:'SILBERNE HOCHZEIT',
+    since:'Seit {y} verbunden'
+  },
+  en: {
+    globalSection:'Your details',
+    namesLabel:'Names', namesHint:'(exactly as it should appear on the card)',
+    sinceLabel:'Together since',
+    rsvpText:'RSVP by {d}',
+    dateLabel:'Date of celebration', timeLabel:'Time',
+    placeLabel:'Venue', cityLabel:'City', cityHint:'(optional)',
+    guestSection:'Letter recipients',
+    guestHint:'One entry per <strong>household</strong> (1 letter). Couples and families together — splitting into individual place cards happens later in the place card tab.<br><br><strong>Format:</strong> <code>Name [| short name]</code><br>EN uses one universal "Dear" — no gender suffix needed. <code>| short name</code> makes the salutation intimate.',
+    guestCount:'{n} recipients',
+    modeToggleLabel:'Print variant',
+    modeHome:'Home print · Personal letter version',
+    modePro:'Print shop · Atelier version',
+    modeDescHome:'Each card with first-name salutation from the letter list. Ideal for home printers, copy shops or photo services.',
+    modeDescPro:'Uniform, finished letter card without salutation — one back side for all cards. Ideal for professional print runs.',
+    backSection:'Address & Contact',
+    backHint:'These details appear on the back of each card.',
+    briefTextSection:'Letter text',
+    briefTextHint:'Introduction and closing appear on every back side. Deliberately written without you-singular/you-plural — the letter feels personal for everyone.',
+    briefIntroLabel:'Introduction',
+    briefCloseLabel:'Closing salutation',
+    streetLabel:'Street and number', zipLabel:'ZIP',
+    weekdayLabel:'Weekday',
+    travelLabel:'Travel', dressLabel:'Dress code',
+    rsvpLabel:'RSVP by', emailLabel:'E-mail', phoneLabel:'Phone',
+    optional:'(optional)',
+    frontLabel:'Front · 5×7"',
+    backPickerLabel:'Back for',
+    lblWhen:'When', lblWhere:'Where', lblTravel:'Travel', lblDress:'Dress code',
+    lblRsvp:'RSVP',
+    rsvpUntil:'by {d}',
+    scheduleSection:'Programme slots',
+    scheduleHint:'One line per slot. Format: <code>Time | Title | Subtitle</code> — subtitle optional. Max 6 slots recommended for readability.',
+    scheduleLabel:'Schedule · 5×7"',
+    scheduleTitle:'Schedule',
+    scheduleCloser:'{names} are looking forward to celebrating with you.',
+    dlScheduleHome:'PDF Schedule · Home print',
+    dlSchedulePro:'PDF Schedule · Print shop',
+    placeBridgeSection:'Take over from letter list',
+    placeBridgeHint:'Letter list = households (1 per letter). Place cards = individual people. The bridge button splits couples at "&" — family entries stay as one line and must be split manually.',
+    placeBridgeBtn:'Pre-fill from letter list',
+    placeSection:'Place card people',
+    placeHint:'One name per line — max 60. Each line becomes one card.',
+    placeSubSection:'Sublabel',
+    placeSubHint:'Appears small below each name — same on all cards.',
+    placeModeSection:'Print variant',
+    placeModeHome:'Home print · 6 / Letter landscape',
+    placeModePro:'Print shop · single + bleed',
+    dlPlaceHome:'PDF Place cards · Home print',
+    dlPlacePro:'PDF Place cards · Print shop',
+    placeCount:'{n} people',
+    placePreviewLabel:'Place cards · 6 per Letter landscape',
+    pageOf:'Page {c} of {t}',
+    toneSection:'Tone of the invitation text',
+    inviteTextLabel:'Invitation text',
+    dlHome:'PDF Home Print · Front + Backs',
+    dlPrint:'PDF Print Shop · Front + Back (bleed)',
+    dlKit:'Complete Kit as ZIP (both variants)',
+    privacy:'All data stays local in your browser.',
+    previewLabel:'Preview · Invitation 5×7"',
+    anlass:'SILVER ANNIVERSARY',
+    since:'Together since {y}'
+  }
+};
+
+/* ── Monate für Editorial-Datum ── */
+const months = {
+  de: ['JANUAR','FEBRUAR','MÄRZ','APRIL','MAI','JUNI','JULI','AUGUST','SEPTEMBER','OKTOBER','NOVEMBER','DEZEMBER'],
+  en: ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER']
+};
+
+/* ── Tab-Switch · Form + Preview synchron ── */
+function setTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.id === 'tab-' + tab));
+
+  /* Preview-Cluster auf gewähltes Werk filtern */
+  document.querySelectorAll('.preview-cluster[data-tabs]').forEach(c => {
+    const tabs = (c.dataset.tabs || '').split(',').map(s => s.trim());
+    c.style.display = tabs.includes(tab) ? '' : 'none';
+  });
+}
+
+/* ── Tonalität wechseln (Einladungs-Vorderseite) ── */
+function setTone(tone) {
+  currentTone = tone;
+  document.querySelectorAll('.tone-btn[data-tone]').forEach(b => b.classList.toggle('active', b.dataset.tone === tone));
+  document.getElementById('g-invite-text').value = inviteTexts[currentLang][tone];
+  renderAll();
+}
+
+/* ── Druckvariante wechseln ── */
+function setPrintMode(mode) {
+  currentPrintMode = mode;
+  /* Nur Einladungs-Mode-Buttons (data-mode), nicht Platzkarten-Buttons (data-pmode) */
+  document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+
+  /* Beschreibung aktualisieren */
+  const desc = document.getElementById('mode-desc');
+  desc.textContent = mode === 'home'
+    ? i18n[currentLang].modeDescHome
+    : i18n[currentLang].modeDescPro;
+
+  /* Gast-Selektor nur bei Heimdruck relevant */
+  document.querySelector('.guest-picker').style.display = mode === 'home' ? '' : 'none';
+
+  renderBack();
+}
+
+/* ── Brief-Tonalität wechseln (Rückseite) ── */
+function setBriefTone(tone) {
+  currentBriefTone = tone;
+  document.querySelectorAll('.tone-btn[data-btone]').forEach(b => b.classList.toggle('active', b.dataset.btone === tone));
+  document.getElementById('g-brief-intro').value = briefIntros[currentLang][tone];
+  renderAll();
+}
+
+/* ── Sprache wechseln ── */
+function setLang(lang) {
+  currentLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+
+  /* UI-Texte — Plaintext via textContent */
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.dataset.i18n;
+    if (i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+  /* UI-Texte mit erlaubtem HTML (z.B. <strong>, <code>, <br>) via innerHTML — nur für vom Atelier kontrollierte Strings */
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.dataset.i18nHtml;
+    if (i18n[lang][key]) el.innerHTML = i18n[lang][key];
+  });
+
+  /* Default-Einladungstext nach aktueller Tonalität nachziehen */
+  document.getElementById('g-invite-text').value = inviteTexts[lang][currentTone];
+  document.getElementById('g-brief-intro').value = briefIntros[lang][currentBriefTone];
+  document.getElementById('g-brief-close').value = briefCloses[lang];
+
+  /* Locale-aware Demo-Daten für alle Eckdaten-Felder */
+  applyDemoData(lang);
+
+  /* Gästezähler nachziehen, da Liste sich geändert haben kann */
+  updateGuestCount();
+
+  renderAll();
+}
+
+/* parst YYYY-MM-DD als lokales Datum (vermeidet UTC-Shift in US-Zeitzonen) */
+function parseISODate(iso) {
+  if (!iso) return null;
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d);
+}
+
+/* ── Datum formatieren · editorial Versalien ── */
+function formatDateEditorial(isoDate, lang) {
+  if (!isoDate) return '';
+  const d = parseISODate(isoDate);
+  const day = d.getDate();
+  const month = months[lang][d.getMonth()];
+  const year = d.getFullYear();
+  if (lang === 'en') {
+    /* US-Konvention: SEPTEMBER 12 · 2026 */
+    return `${month} ${day} · ${year}`;
+  }
+  /* DE: 12 SEPTEMBER 2026 */
+  return `${day} ${month} ${year}`;
+}
+
+/* ── Datum lesbar für RSVP (klein) ── */
+function formatDateShort(isoDate, lang) {
+  if (!isoDate) return '';
+  const d = parseISODate(isoDate);
+  if (lang === 'en') {
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+  }
+  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long' });
+}
+
+/* ── Karte neu rendern ── */
+/* Hero-Zahl "50" auf <canvas> rendern (statt SVG/Text — siehe CSS-Kommentar zu .anv-hero-number).
+   Wichtig: `document.fonts.ready` resolved oft BEVOR die spezifische Font-Variante im Canvas-2D-Cache
+   nutzbar ist (Canvas hat einen eigenen Font-Cache, getrennt vom DOM-Cache). Daher hier explizit
+   `document.fonts.load(<font-shorthand>)` aufrufen — das forciert den Browser, genau diese Variante
+   für die Canvas-API verfügbar zu machen. */
+const HERO_FONT = '900 510px "Bodoni Moda"';
+
+async function drawHeroNumber() {
+  const c = document.getElementById('anv-hero-canvas');
+  if (!c) return;
+  try {
+    if (document.fonts && document.fonts.load) {
+      await document.fonts.load(HERO_FONT, '50');
+    } else if (document.fonts && document.fonts.ready) {
+      await document.fonts.ready;
+    }
+  } catch (_) { /* fallback auf System-Serif, besser als nichts */ }
+
+  /* Warmup-Trick: Canvas-2D hat einen vom DOM getrennten Glyph-Cache.
+     document.fonts.load() lädt die Schrift, aber Canvas-2D nutzt sie erst nach
+     einem echten DOM-Render. Ein unsichtbarer Span mit derselben Font-Variante
+     + erzwungenem Layout (getBoundingClientRect) füllt den Canvas-Cache. */
+  let warmup = document.getElementById('anv-hero-font-warmup');
+  if (!warmup) {
+    warmup = document.createElement('span');
+    warmup.id = 'anv-hero-font-warmup';
+    warmup.style.cssText = 'position:fixed;left:-9999px;top:0;font:' + HERO_FONT + ';color:transparent;pointer-events:none;';
+    warmup.textContent = '0123456789';
+    document.body.appendChild(warmup);
+    warmup.getBoundingClientRect();
+    await new Promise(r => requestAnimationFrame(r));
+  }
+
+  const ctx = c.getContext('2d');
+  ctx.clearRect(0, 0, c.width, c.height);
+  const gold = (getComputedStyle(document.documentElement).getPropertyValue('--silver') || '').trim() || '#C9A24A';
+  const num  = c.getAttribute('data-number') || '50';
+  ctx.fillStyle = gold;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  ctx.font = HERO_FONT + ', "Prata", "Didot", serif';
+  /* Optisch zentriert: Baseline bei ~90% der Canvas-Höhe — verankert die "50" eher unten
+     statt schwebend mittig (Bodoni Moda Black ohne Descender). */
+  const metrics = ctx.measureText(num);
+  const left = metrics.actualBoundingBoxLeft || 0;
+  const right = metrics.actualBoundingBoxRight || metrics.width;
+  const x = (c.width + left - right) / 2;
+  ctx.fillText(num, x, c.height * 0.90);
+}
+
+function renderAll() {
+  const names    = document.getElementById('g-names').value || '—';
+  const sinceY   = document.getElementById('g-since-year').value || '—';
+  const dateIso  = document.getElementById('g-date').value;
+  const time     = (document.getElementById('g-time').value || '').toUpperCase();
+  const place    = (document.getElementById('g-place').value || '').toUpperCase();
+  const city     = (document.getElementById('g-city').value || '').toUpperCase();
+  const body     = document.getElementById('g-invite-text').value || '';
+
+  document.getElementById('r-names').textContent = names.toUpperCase();
+  document.getElementById('r-since').textContent = i18n[currentLang].since.replace('{y}', sinceY);
+  document.getElementById('r-anlass').textContent = i18n[currentLang].anlass;
+  document.getElementById('r-body').textContent = body;
+
+  /* Datums-Block aufgesplittet */
+  if (dateIso) {
+    const d = parseISODate(dateIso);
+    document.getElementById('r-day').textContent   = d.getDate();
+    document.getElementById('r-month').textContent = months[currentLang][d.getMonth()];
+    document.getElementById('r-year').textContent  = d.getFullYear();
+  }
+  document.getElementById('r-time').textContent = time;
+
+  /* Ort + Stadt */
+  document.getElementById('r-place').textContent = place;
+  document.getElementById('r-city').textContent  = city;
+  document.getElementById('r-city').style.display = city ? '' : 'none';
+
+  /* Hero-Zahl auf Canvas (re-)zeichnen — Farbe wechselt mit Theme/Variant */
+  drawHeroNumber();
+}
+
+/* ════════════════════════════════════════════════════════════
+   PDF-EXPORT — Vorderseite + Rückseite
+   ════════════════════════════════════════════════════════════ */
+
+/* Capture eines Karten-Elements mit optionalem Bleed.
+   backgroundColor: Cream statt null — JPEG hat keinen Alpha-Channel,
+   transparente Pixel würden zu Schwarz und im Druck als Strich sichtbar. */
+async function captureCard(cardEl, withBleed) {
+  if (withBleed) cardEl.classList.add('with-bleed');
+  try {
+    await new Promise(r => requestAnimationFrame(r));
+    return await html2canvas(cardEl, {
+      scale: 3, useCORS: true, backgroundColor: '#FAF7F2', logging: false
+    });
+  } finally {
+    if (withBleed) cardEl.classList.remove('with-bleed');
+  }
+}
+
+/* Heimdruck-Bogen-Geometrie: 2 Karten 5×7" nebeneinander auf A4/Letter Landscape */
+function getHomeSheetLayout() {
+  const isEN  = currentLang === 'en';
+  const format = isEN ? 'letter' : 'a4';
+  const pageW = isEN ? 279.4 : 297;
+  const pageH = isEN ? 215.9 : 210;
+  const cardW = 127, cardH = 178;
+  const gap   = (pageW - 2 * cardW) / 3;
+  return {
+    format, pageW, pageH, cardW, cardH,
+    ox1: gap,
+    ox2: gap + cardW + gap,
+    oy:  (pageH - cardH) / 2
+  };
+}
+
+/* Schneidemarken — L-Marken außerhalb der 4 Ecken einer Karte */
+function drawCutMarks(pdf, x, y, w, h) {
+  pdf.setLineWidth(0.1);
+  pdf.setDrawColor(110, 110, 110);
+  const len = 4, gap = 1.5;
+  /* TL */
+  pdf.line(x - gap - len, y,           x - gap,       y);
+  pdf.line(x,             y - gap - len, x,             y - gap);
+  /* TR */
+  pdf.line(x + w + gap,     y, x + w + gap + len, y);
+  pdf.line(x + w,           y - gap - len, x + w,         y - gap);
+  /* BL */
+  pdf.line(x - gap - len, y + h, x - gap, y + h);
+  pdf.line(x,             y + h + gap, x,       y + h + gap + len);
+  /* BR */
+  pdf.line(x + w + gap, y + h, x + w + gap + len, y + h);
+  pdf.line(x + w,       y + h + gap, x + w,         y + h + gap + len);
+}
+
+/* Vorderseite rendern · gibt Blob zurück
+   Heimdruck: 1 Bogen mit 2 identischen Vorderseiten nebeneinander
+   Druckerei: 1 Karte mit Bleed (133×184mm) */
+async function renderFrontPdf(mode) {
+  const { jsPDF } = window.jspdf;
+  const cardEl = document.querySelector('#invite-output .anv-outer');
+  const canvas = await captureCard(cardEl, mode === 'pro');
+  /* JPEG Quality 0.95 — Halos unter Text minimal, Datei bleibt schlank */
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+  let pdf;
+  if (mode === 'home') {
+    const L = getHomeSheetLayout();
+    pdf = new jsPDF({ unit:'mm', format: L.format, orientation:'landscape' });
+    pdf.addImage(imgData, 'JPEG', L.ox1, L.oy, L.cardW, L.cardH);
+    pdf.addImage(imgData, 'JPEG', L.ox2, L.oy, L.cardW, L.cardH);
+    drawCutMarks(pdf, L.ox1, L.oy, L.cardW, L.cardH);
+    drawCutMarks(pdf, L.ox2, L.oy, L.cardW, L.cardH);
+  } else {
+    const w = 133, h = 184;
+    pdf = new jsPDF({ unit:'mm', format:[w, h], orientation:'portrait' });
+    pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+  }
+  return pdf.output('blob');
+}
+
+/* Rückseite rendern · gibt Blob zurück
+   Heimdruck: Mehr-Seiten-PDF mit einer Seite pro Gast (personalisiert)
+   Druckerei: Ein-Seiten-PDF mit cleaner Atelier-Variante */
+async function renderBackPdf(mode) {
+  const { jsPDF } = window.jspdf;
+  const cardEl = document.querySelector('#back-output .anv-outer');
+  const sel = document.getElementById('back-guest-select');
+  const savedIdx = sel.value;
+  const savedPrintMode = currentPrintMode;
+
+  let pdf;
+
+  if (mode === 'home') {
+    /* Personalisiert: 2 Karten pro Bogen, paarweise sortiert */
+    setPrintMode('home');
+    const guests = parseGuests(document.getElementById('g-guests').value);
+    const L = getHomeSheetLayout();
+    pdf = new jsPDF({ unit:'mm', format: L.format, orientation:'landscape' });
+
+    for (let i = 0; i < guests.length; i += 2) {
+      if (i > 0) pdf.addPage();
+
+      /* Linke Karte */
+      sel.value = i;
+      renderBack();
+      const canvas1 = await captureCard(cardEl, false);
+      pdf.addImage(canvas1.toDataURL('image/jpeg', 0.95), 'JPEG', L.ox1, L.oy, L.cardW, L.cardH);
+      drawCutMarks(pdf, L.ox1, L.oy, L.cardW, L.cardH);
+
+      /* Rechte Karte — nur wenn weiterer Gast vorhanden */
+      if (i + 1 < guests.length) {
+        sel.value = i + 1;
+        renderBack();
+        const canvas2 = await captureCard(cardEl, false);
+        pdf.addImage(canvas2.toDataURL('image/jpeg', 0.95), 'JPEG', L.ox2, L.oy, L.cardW, L.cardH);
+        drawCutMarks(pdf, L.ox2, L.oy, L.cardW, L.cardH);
+      }
+    }
+  } else {
+    /* Druckerei: einheitliche Atelier-Variante mit Bleed */
+    setPrintMode('pro');
+    const w = 133, h = 184;
+    pdf = new jsPDF({ unit:'mm', format:[w, h], orientation:'portrait' });
+    const canvas = await captureCard(cardEl, true);
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
+    pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+  }
+
+  /* Restore */
+  sel.value = savedIdx;
+  setPrintMode(savedPrintMode);
+
+  return pdf.output('blob');
+}
+
+/* Beide Seiten als 2 PDFs exportieren · gewählter Modus */
+async function exportInvitePackage(mode) {
+  const loading = document.getElementById('loading');
+  loading.classList.add('active');
+  document.getElementById('loading-text').textContent =
+    mode === 'home' ? 'Heimdruck-PDFs werden erstellt …' : 'Druckerei-PDFs werden erstellt …';
+
+  try {
+    const frontBlob = await renderFrontPdf(mode);
+    const backBlob  = await renderBackPdf(mode);
+
+    const lang = currentLang;
+    if (mode === 'home') {
+      saveBlob(frontBlob, lang === 'en' ? 'Invitation_Front_Home.pdf'    : 'Einladung_Vorderseite_Heimdruck.pdf');
+      saveBlob(backBlob,  lang === 'en' ? 'Invitation_Backs_Personal.pdf' : 'Einladung_Rueckseiten_Heimdruck.pdf');
+    } else {
+      saveBlob(frontBlob, lang === 'en' ? 'Invitation_Front_PrintShop.pdf' : 'Einladung_Vorderseite_Druckerei.pdf');
+      saveBlob(backBlob,  lang === 'en' ? 'Invitation_Back_PrintShop.pdf'  : 'Einladung_Rueckseite_Druckerei.pdf');
+    }
+  } catch (e) {
+    console.error(e); alert('Fehler beim Export: ' + e.message);
+  } finally {
+    loading.classList.remove('active');
+  }
+}
+
+function saveBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* Alias für die alte Button-Funktion (kompatibel) */
+async function exportInvite(mode) {
+  return exportInvitePackage(mode);
+}
+
+/* ── Gesamt-Kit als ZIP — alle 3 Werke × 2 Druck-Varianten + LIESMICH ── */
+async function exportKit() {
+  const loading = document.getElementById('loading');
+  loading.classList.add('active');
+  const lt = document.getElementById('loading-text');
+  const lang = currentLang;
+
+  try {
+    const zip = new JSZip();
+
+    /* Einladung */
+    lt.textContent = lang === 'en' ? 'Building invitation cards …' : 'Einladungen werden gebaut …';
+    const homeFront = await renderFrontPdf('home');
+    const homeBack  = await renderBackPdf('home');
+    const proFront  = await renderFrontPdf('pro');
+    const proBack   = await renderBackPdf('pro');
+
+    /* Tagesablauf */
+    lt.textContent = lang === 'en' ? 'Building schedule …' : 'Tagesablauf wird gebaut …';
+    const homeSchedule = await renderSchedulePdf('home');
+    const proSchedule  = await renderSchedulePdf('pro');
+
+    /* Platzkarten — Heimdruck = 1 PDF mit 6/A4-Bogen, Druckerei = 1 PDF mit N Einzelseiten */
+    lt.textContent = lang === 'en' ? 'Building place cards …' : 'Platzkarten werden gebaut …';
+    const homePlace = await renderPlaceBlob('home');
+    const proPlace  = await renderPlaceBlob('pro');
+
+    lt.textContent = lang === 'en' ? 'Packing ZIP …' : 'ZIP wird gepackt …';
+
+    if (lang === 'en') {
+      zip.file('Home_Print/1_Invitation_Front.pdf',          homeFront);
+      zip.file('Home_Print/2_Invitation_Backs_Personalised.pdf', homeBack);
+      zip.file('Home_Print/3_Schedule.pdf',                  homeSchedule);
+      zip.file('Home_Print/4_Place_Cards.pdf',               homePlace);
+      zip.file('Print_Shop/1_Invitation_Front_Bleed.pdf',    proFront);
+      zip.file('Print_Shop/2_Invitation_Back_Bleed.pdf',     proBack);
+      zip.file('Print_Shop/3_Schedule_Bleed.pdf',            proSchedule);
+      zip.file('Print_Shop/4_Place_Cards_Bleed.pdf',         proPlace);
+      zip.file('README.txt', readmeEN());
+    } else {
+      zip.file('Heimdruck/1_Einladung_Vorderseite.pdf',           homeFront);
+      zip.file('Heimdruck/2_Einladung_Rueckseiten_personalisiert.pdf', homeBack);
+      zip.file('Heimdruck/3_Tagesablauf.pdf',                    homeSchedule);
+      zip.file('Heimdruck/4_Platzkarten.pdf',                    homePlace);
+      zip.file('Druckerei/1_Einladung_Vorderseite_mit_Bleed.pdf', proFront);
+      zip.file('Druckerei/2_Einladung_Rueckseite_mit_Bleed.pdf',  proBack);
+      zip.file('Druckerei/3_Tagesablauf_mit_Bleed.pdf',           proSchedule);
+      zip.file('Druckerei/4_Platzkarten_mit_Bleed.pdf',           proPlace);
+      zip.file('LIESMICH.txt', readmeDE());
+    }
+
+    const blob = await zip.generateAsync({ type:'blob' });
+    saveBlob(blob, lang === 'en' ? 'Anniversary_Kit_Silver.zip' : 'Silberne_Hochzeit_Kit.zip');
+  } catch (e) {
+    console.error(e); alert('Fehler beim Kit-Export: ' + e.message);
+  } finally {
+    loading.classList.remove('active');
+  }
+}
+
+function readmeDE() {
+  return `Silberne Hochzeit — Anniversary Kit
+═══════════════════════════════════════
+
+Drei Karten für ein Restaurant-Hochzeitsessen —
+eingeladen, gesetzt, geleitet.
+
+Inhalt:
+  • Einladung (Vorderseite + persönliche Brief-Rückseite)
+  • Tagesablauf (5×7", optional als Rückseite der Einladung)
+  • Platzkarten (130×53mm, 6 pro A4)
+
+──── HEIMDRUCK · PERSÖNLICHE BRIEF-VERSION ────
+Ordner: Heimdruck/
+
+  1_Einladung_Vorderseite.pdf
+     A4-Querformat mit 2 identischen Vorderseiten nebeneinander.
+     Drucken Sie diese Datei so oft, dass Sie genug Karten erhalten
+     (z. B. für 6 Karten = 3-mal drucken). Mit Schneidemarken.
+
+  2_Einladung_Rueckseiten_personalisiert.pdf
+     Mehrseitiges PDF, je 2 personalisierte Rückseiten pro Seite,
+     paarweise sortiert nach Brief-Liste. Jede Seite einmal drucken.
+
+  3_Tagesablauf.pdf
+     A4-Querformat mit 2 Tagesablauf-Karten nebeneinander.
+     Drucken Sie so oft wie nötig. Mit Schneidemarken.
+     Tipp: Sie können den Tagesablauf auf die Rückseite der
+     Einladung drucken (statt der Brief-Rückseite) oder als
+     separate Karte für die Tischdekoration nutzen.
+
+  4_Platzkarten.pdf
+     A4-Querformat, 6 Platzkarten pro Bogen mit Schneidemarken.
+     Mehrseitig wenn nötig.
+
+  Hinweis: Browser fragen bei mehreren PDF-Downloads ggf. nach
+  Download-Erlaubnis. Bitte bestätigen.
+
+  Empfehlung: 230 g/m² matt, doppelseitig.
+  Geeignet für: Heimdrucker, Copyshop, DM-Fotoservice.
+
+──── DRUCKEREI · ATELIER-VERSION ────
+Ordner: Druckerei/
+
+  Alle Dateien mit 3mm Beschnitt allseits, druckereifertig.
+
+  1_Einladung_Vorderseite_mit_Bleed.pdf  (5×7" + 3mm Bleed = 133×184mm)
+  2_Einladung_Rueckseite_mit_Bleed.pdf   (Atelier-Variante ohne Anrede)
+  3_Tagesablauf_mit_Bleed.pdf            (5×7" + 3mm Bleed = 133×184mm)
+  4_Platzkarten_mit_Bleed.pdf            (130×53,33mm + 3mm Bleed = 136×59,33mm)
+
+  Briefing an die Druckerei:
+  "Bitte folgende Karten beidseitig drucken (4/4 Farbdruck),
+   300g/m² matt, mit 3mm Beschnitt:
+   • Einladung 12,7 × 17,8 cm, X Stück
+   • Tagesablauf 12,7 × 17,8 cm, X Stück
+   • Platzkarten 13 × 5,33 cm, X Stück"
+
+  Geeignet für: Saal Digital, Cewe, Vistaprint, Pixum,
+  lokale Druckereien.
+
+═══════════════════════════════════════
+Heimdruck = persönlich (Anrede pro Gast).
+Druckerei = elegant (einheitlich, ohne Anrede).
+Beide Varianten sind gleichwertige Atelier-Ausgaben.
+
+Bei Fragen: wedding-story-atelier.de
+`;
+}
+
+function readmeEN() {
+  return `Silver Anniversary — Invitation Kit
+═══════════════════════════════════════
+
+Three cards for a restaurant anniversary dinner —
+invited, seated, guided.
+
+Contents:
+  • Invitation (front + personalised letter back)
+  • Schedule (5×7", optional as invitation back)
+  • Place cards (130×53mm, 6 per Letter sheet)
+
+──── HOME PRINT · PERSONAL LETTER VERSION ────
+Folder: Home_Print/
+
+  1_Invitation_Front.pdf
+     US Letter landscape with 2 identical fronts side by side.
+     Print as many times as needed (6 cards = print 3 times).
+     With cut marks.
+
+  2_Invitation_Backs_Personalised.pdf
+     Multi-page PDF, 2 personalised backs per page, sorted
+     by letter list. Print each page once.
+
+  3_Schedule.pdf
+     Letter landscape with 2 schedule cards side by side.
+     Print as needed. With cut marks.
+     Tip: you can print the schedule on the back of the invitation
+     (instead of the personalised letter back), or keep it as a
+     separate card for the dinner table.
+
+  4_Place_Cards.pdf
+     Letter landscape, 6 place cards per sheet with cut marks.
+     Multi-page if needed.
+
+  Note: browsers may ask permission for multiple PDF downloads.
+  Please allow.
+
+  Recommended: 230 gsm matte, double-sided.
+  Suitable for: home printers, copy shops, photo services.
+
+──── PRINT SHOP · ATELIER VERSION ────
+Folder: Print_Shop/
+
+  All files with 3mm bleed all around, print-ready.
+
+  1_Invitation_Front_Bleed.pdf  (5×7" + 3mm bleed = 133×184mm)
+  2_Invitation_Back_Bleed.pdf   (atelier version, no salutation)
+  3_Schedule_Bleed.pdf          (5×7" + 3mm bleed = 133×184mm)
+  4_Place_Cards_Bleed.pdf       (130×53.33mm + 3mm bleed = 136×59.33mm)
+
+  Briefing for the print shop:
+  "Please print these cards double-sided (4/4 colour), 300gsm matte,
+   with 3mm bleed:
+   • Invitation 5×7 inches, X copies
+   • Schedule 5×7 inches, X copies
+   • Place cards 5.12 × 2.10 inches, X copies"
+
+  Suitable for: Vistaprint, Moo, Minted, local print shops.
+
+═══════════════════════════════════════
+Home Print = personal (salutation per guest).
+Print Shop = elegant (uniform, no salutation).
+Both variants are equal atelier editions.
+
+Questions: wedding-story-atelier.com
+`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   GÄSTELISTE — Textarea-Pattern wie Gastgeschenk
+   Format pro Zeile: "Name" oder "Name,m" oder "Name,f"
+   Default (kein Suffix) = weiblich/Paar/Familie → "Liebe"
+   ════════════════════════════════════════════════════════════ */
+const MAX_GUESTS = 60;
+
+function extractGender(str) {
+  const idx = str.lastIndexOf(',');
+  if (idx > 0 && /^[mf]$/i.test(str.slice(idx + 1).trim())) {
+    return {
+      name: str.slice(0, idx).trim(),
+      gender: str.slice(idx + 1).trim().toLowerCase()
+    };
+  }
+  return { name: str, gender: null };
+}
+
+function parseGuests(raw) {
+  return raw.split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .slice(0, MAX_GUESTS)
+    .map(line => {
+      /* Pipe trennt: links = Haushalts-/Karten-Name, rechts = Brief-Vorname */
+      const pipeIdx = line.indexOf('|');
+      let leftRaw, rightRaw;
+      if (pipeIdx > 0) {
+        leftRaw  = line.slice(0, pipeIdx).trim();
+        rightRaw = line.slice(pipeIdx + 1).trim();
+      } else {
+        leftRaw  = line;
+        rightRaw = '';
+      }
+      const left  = extractGender(leftRaw);
+      const right = rightRaw ? extractGender(rightRaw) : null;
+
+      /* Gender: priorisiert rechtsseitig (Brief-Anrede-Kontext), fällt zurück auf links, Default 'f' */
+      const gender = (right && right.gender) ? right.gender : (left.gender || 'f');
+
+      return {
+        kartenName: left.name,                       /* Haushalts-/Adress-Name */
+        briefName:  right ? right.name : left.name,  /* Anrede im Brief */
+        gender
+      };
+    });
+}
+
+function getSalutation(guest, lang) {
+  if (lang === 'en') return 'Dear ' + guest.briefName + ',';
+  return (guest.gender === 'm' ? 'Lieber ' : 'Liebe ') + guest.briefName + ',';
+}
+
+function updateGuestCount() {
+  const guests = parseGuests(document.getElementById('g-guests').value);
+  const tpl = i18n[currentLang].guestCount || '{n} Gäste';
+  document.getElementById('guest-count').textContent = tpl.replace('{n}', guests.length);
+  refreshGuestSelect(guests);
+  renderBack();
+}
+
+function refreshGuestSelect(guests) {
+  const sel = document.getElementById('back-guest-select');
+  const prevIdx = sel.value ? parseInt(sel.value, 10) : 0;
+  sel.innerHTML = '';
+  guests.forEach((g, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = g.kartenName;
+    sel.appendChild(opt);
+  });
+  if (prevIdx >= 0 && prevIdx < guests.length) sel.value = prevIdx;
+}
+
+/* ── Datum lang formatiert ── */
+function formatDateLong(isoDate, lang) {
+  if (!isoDate) return '';
+  const d = parseISODate(isoDate);
+  if (lang === 'en') {
+    return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  }
+  return d.toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+/* ── Rückseite rendern ── */
+function renderBack() {
+  const guests = parseGuests(document.getElementById('g-guests').value);
+  if (guests.length === 0) return;
+
+  const sel = document.getElementById('back-guest-select');
+  let idx = parseInt(sel.value, 10);
+  if (isNaN(idx) || idx < 0 || idx >= guests.length) idx = 0;
+  const guest = guests[idx];
+
+  document.getElementById('back-guest-counter').textContent = `${idx + 1} / ${guests.length}`;
+
+  /* Anrede — bei Heimdruck sichtbar, bei Druckerei ausgeblendet */
+  const isPro = currentPrintMode === 'pro';
+  document.getElementById('b-greeting').textContent = getSalutation(guest, currentLang);
+  document.getElementById('b-greeting').style.display = isPro ? 'none' : '';
+  document.querySelector('.anv-greeting-line').style.display = isPro ? 'none' : '';
+
+  /* Brief-Einleitung — bei Druckerei erstes Zeichen großschreiben */
+  let intro = document.getElementById('g-brief-intro').value || '';
+  if (isPro && intro.length > 0) {
+    intro = intro.charAt(0).toUpperCase() + intro.slice(1);
+  }
+  document.getElementById('b-intro').textContent = intro;
+
+  /* Wann */
+  const wd      = document.getElementById('g-weekday').value || '';
+  const dateIso = document.getElementById('g-date').value;
+  const time    = document.getElementById('g-time').value || '';
+  const dateLong = formatDateLong(dateIso, currentLang);
+  const prefix = currentLang === 'en' ? 'from' : 'ab';
+  document.getElementById('b-when').textContent =
+    [wd, dateLong].filter(Boolean).join(', ') + (time ? `, ${prefix} ${time}` : '');
+
+  /* Wo */
+  const place  = document.getElementById('g-place').value || '';
+  const street = document.getElementById('g-street').value || '';
+  const zip    = document.getElementById('g-zip').value || '';
+  const city   = document.getElementById('g-city').value || '';
+  const whereParts = [place, street, [zip, city].filter(Boolean).join(' ')].filter(Boolean);
+  document.getElementById('b-where').innerHTML =
+    whereParts.map(escapeHTML).join('<br>');
+
+  /* Anfahrt — optional ausblenden */
+  const travel = document.getElementById('g-travel').value.trim();
+  document.getElementById('b-travel').textContent = travel;
+  document.getElementById('b-travel-section').style.display = travel ? '' : 'none';
+
+  /* Dresscode — optional */
+  const dress = document.getElementById('g-dress').value.trim();
+  document.getElementById('b-dress').textContent = dress;
+  document.getElementById('b-dress-section').style.display = dress ? '' : 'none';
+
+  /* RSVP */
+  const rsvpIso  = document.getElementById('g-rsvp').value;
+  const rsvpDate = formatDateLong(rsvpIso, currentLang);
+  const email    = document.getElementById('g-email').value || '';
+  const phone    = document.getElementById('g-phone').value || '';
+  const rsvpLine = i18n[currentLang].rsvpUntil.replace('{d}', rsvpDate);
+  const contact  = [email, phone].filter(Boolean).join(' · ');
+  document.getElementById('b-rsvp').innerHTML =
+    escapeHTML(rsvpLine) + (contact ? '<br>' + escapeHTML(contact) : '');
+
+  /* Abschluss-Gruß */
+  const closeText = document.getElementById('g-brief-close').value || '';
+  document.getElementById('b-close').textContent = closeText ? closeText + ',' : '';
+
+  /* Unterschrift */
+  document.getElementById('b-signature').textContent =
+    document.getElementById('g-names').value || '';
+}
+
+/* ════════════════════════════════════════════════════════════
+   TAGESABLAUF — Timeline alternierend mit stilvollen Icons
+   Icons übernommen aus tagesprogramm_old_money.html, Farbe ICON_COLOR
+   wird per CSS auf Antikgold gefärbt
+   ════════════════════════════════════════════════════════════ */
+const SCHEDULE_ICONS = {
+  rings:     '<circle cx="3.5" cy="5" r="2.2" fill="none" stroke="ICON_COLOR" stroke-width="0.9"/><circle cx="6.5" cy="5" r="2.2" fill="none" stroke="ICON_COLOR" stroke-width="0.9"/>',
+  camera:    '<rect x="1" y="3.5" width="8" height="5" rx="0.5" fill="none" stroke="ICON_COLOR" stroke-width="0.8"/><circle cx="5" cy="6" r="1.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><path d="M3.2,3.5 L3.8,2.2 L6.2,2.2 L6.8,3.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/>',
+  cutlery:   '<line x1="3.5" y1="1.5" x2="3.5" y2="8.5" stroke="ICON_COLOR" stroke-width="0.8"/><path d="M2.5,1.5 L2.5,4 Q3.5,4.8 4.5,4 L4.5,1.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><line x1="6.5" y1="1.5" x2="6.5" y2="8.5" stroke="ICON_COLOR" stroke-width="0.8"/><path d="M6.5,4.5 Q7.5,3 7.5,1.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/>',
+  cake:      '<path d="M2,8.5 L5,2.2 L8,8.5 Z" fill="none" stroke="ICON_COLOR" stroke-width="0.8"/><line x1="2.5" y1="6" x2="7.5" y2="6" stroke="ICON_COLOR" stroke-width="0.6"/><line x1="5" y1="2.2" x2="5" y2="1" stroke="ICON_COLOR" stroke-width="0.8"/><circle cx="5" cy="0.7" r="0.4" fill="ICON_COLOR"/>',
+  dance:     '<circle cx="3.5" cy="1.5" r="0.9" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><circle cx="6.8" cy="1.5" r="0.9" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><path d="M3.5,2.4 Q3,5 2.5,8.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><path d="M3.5,2.4 Q5.2,4 6.8,2.4" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><path d="M6.8,2.4 Q7.3,5 7.8,8.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><line x1="2.5" y1="5.5" x2="1.5" y2="8.5" stroke="ICON_COLOR" stroke-width="0.6"/><line x1="7.8" y1="5.5" x2="8.8" y2="8.5" stroke="ICON_COLOR" stroke-width="0.6"/>',
+  champagne: '<path d="M3.5,1.5 L6.5,1.5 L6,5 Q6,7 5,7 Q4,7 4,5 Z" fill="none" stroke="ICON_COLOR" stroke-width="0.8"/><line x1="5" y1="7" x2="5" y2="9" stroke="ICON_COLOR" stroke-width="0.8"/><line x1="3.5" y1="9" x2="6.5" y2="9" stroke="ICON_COLOR" stroke-width="0.7"/>',
+  car:       '<rect x="1" y="4.5" width="8.5" height="3.2" rx="0.7" fill="none" stroke="ICON_COLOR" stroke-width="0.8"/><path d="M2.5,4.5 L3.5,2.5 L7,2.5 L8,4.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><circle cx="3" cy="8" r="0.9" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/><circle cx="7.5" cy="8" r="0.9" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/>',
+  star:      '<polygon points="5,0.8 6.2,3.5 9.2,3.8 7,5.8 7.6,8.8 5,7.2 2.4,8.8 3,5.8 0.8,3.8 3.8,3.5" fill="none" stroke="ICON_COLOR" stroke-width="0.7"/>',
+  diamond:   '<polygon points="5,0.8 9.2,5 5,9.2 0.8,5" fill="none" stroke="ICON_COLOR" stroke-width="0.8"/>'
+};
+
+function iconSVG(key) {
+  const paths = (SCHEDULE_ICONS[key] || SCHEDULE_ICONS.diamond)
+    .replace(/ICON_COLOR/g, '#7C7B78');  /* Antik-Silber kraeftig fuer Linien-Icons — Test, alternativ Anthrazit #494849 */
+  return '<svg viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg">' + paths + '</svg>';
+}
+
+/* Auto-Erkennung Icon aus Titel via Keyword-Mapping */
+function detectIcon(title) {
+  const t = title.toLowerCase();
+  if (/sekt|empfang|welcome|aperitif/.test(t))          return 'champagne';
+  if (/trauung|ceremony|standes/.test(t))               return 'rings';
+  if (/foto|photo|shoot/.test(t))                       return 'camera';
+  if (/dinner|essen|festessen|menü|menu|buffet/.test(t))return 'cutlery';
+  if (/rede|speech|toast|anekdot|highlight/.test(t))    return 'star';
+  if (/kaffee|coffee|torte|kuchen|cake|dessert/.test(t))return 'cake';
+  if (/musik|music|tanz|dance|party/.test(t))           return 'dance';
+  if (/ausklang|ende|farewell|abschied|carriage/.test(t)) return 'car';
+  return 'diamond';
+}
+
+function parseSchedule(raw) {
+  return raw.split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .slice(0, 8)
+    .map(line => {
+      const parts = line.split('|').map(s => s.trim());
+      return {
+        time: parts[0] || '',
+        title: parts[1] || '',
+        sub:   parts[2] || ''
+      };
+    });
+}
+
+function renderSchedule() {
+  /* Header */
+  document.getElementById('s-anlass').textContent = i18n[currentLang].anlass;
+  document.getElementById('s-date').textContent =
+    formatDateEditorial(document.getElementById('g-date').value, currentLang);
+
+  /* Closer */
+  const names = document.getElementById('g-names').value || '';
+  document.getElementById('s-closer').textContent =
+    i18n[currentLang].scheduleCloser.replace('{names}', names);
+
+  /* Timeline */
+  const slots = parseSchedule(document.getElementById('g-schedule').value);
+  const tl = document.getElementById('s-timeline');
+  tl.innerHTML = '';
+  slots.forEach((s, i) => {
+    const side = i % 2 === 0 ? 'left' : 'right';
+    const slot = document.createElement('div');
+    slot.className = 'anv-slot ' + side;
+    const filled = `
+      <div class="anv-slot-half">
+        <div class="anv-slot-time">${escapeHTML(s.time)}</div>
+        <div class="anv-slot-title">${escapeHTML(s.title)}</div>
+        ${s.sub ? `<div class="anv-slot-sub">${escapeHTML(s.sub)}</div>` : ''}
+      </div>
+    `;
+    const empty = '<div class="anv-slot-half"></div>';
+    const iconKey = detectIcon(s.title);
+    const iconHTML = `<span class="anv-slot-icon">${iconSVG(iconKey)}</span>`;
+    slot.innerHTML = (side === 'left' ? (filled + empty) : (empty + filled)) + iconHTML;
+    tl.appendChild(slot);
+  });
+}
+
+/* ── Tagesablauf-PDF-Export ── */
+async function exportSchedule(mode) {
+  const loading = document.getElementById('loading');
+  loading.classList.add('active');
+  document.getElementById('loading-text').textContent =
+    mode === 'home' ? 'Heimdruck-PDF wird erstellt …' : 'Druckerei-PDF wird erstellt …';
+
+  try {
+    const blob = await renderSchedulePdf(mode);
+    const lang = currentLang;
+    saveBlob(blob,
+      mode === 'home'
+        ? (lang === 'en' ? 'Schedule_Home.pdf' : 'Tagesablauf_Heimdruck.pdf')
+        : (lang === 'en' ? 'Schedule_PrintShop.pdf' : 'Tagesablauf_Druckerei.pdf')
+    );
+  } catch (e) {
+    console.error(e); alert('Fehler beim Export: ' + e.message);
+  } finally {
+    loading.classList.remove('active');
+  }
+}
+
+async function renderSchedulePdf(mode) {
+  const { jsPDF } = window.jspdf;
+  const cardEl = document.querySelector('#schedule-output .anv-outer');
+  const canvas = await captureCard(cardEl, mode === 'pro');
+  const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+  let pdf;
+  if (mode === 'home') {
+    /* 2 Karten pro Bogen wie Einladung */
+    const L = getHomeSheetLayout();
+    pdf = new jsPDF({ unit:'mm', format: L.format, orientation:'landscape' });
+    pdf.addImage(imgData, 'JPEG', L.ox1, L.oy, L.cardW, L.cardH);
+    pdf.addImage(imgData, 'JPEG', L.ox2, L.oy, L.cardW, L.cardH);
+    drawCutMarks(pdf, L.ox1, L.oy, L.cardW, L.cardH);
+    drawCutMarks(pdf, L.ox2, L.oy, L.cardW, L.cardH);
+  } else {
+    const w = 133, h = 184;
+    pdf = new jsPDF({ unit:'mm', format:[w, h], orientation:'portrait' });
+    pdf.addImage(imgData, 'JPEG', 0, 0, w, h);
+  }
+  return pdf.output('blob');
+}
+
+/* ════════════════════════════════════════════════════════════
+   PLATZKARTEN — flach 136×59mm, 6/A4 quer (Heimdruck) oder
+   einzeln + Bleed (Druckerei). Bridge zur Brief-Empfänger-Liste.
+   ════════════════════════════════════════════════════════════ */
+const MAX_PEOPLE   = 60;
+const PEOPLE_PER_PAGE = 6;
+let placePage = 0;
+let placeMode = 'home';
+
+function parsePeople(raw) {
+  return raw.split('\n')
+    .map(l => l.trim())
+    .filter(Boolean)
+    .slice(0, MAX_PEOPLE);
+}
+
+/* Aus Brief-Liste → Personen-Liste: splittet "Anna & Thomas Koch" in 2 Einträge,
+   "Familie Schmidt" bleibt 1 Eintrag (User entscheidet, wer wirklich sitzt). */
+function bridgeFromBriefList() {
+  const briefRaw = document.getElementById('g-guests').value;
+  const guests   = parseGuests(briefRaw);
+  const people   = [];
+  guests.forEach(g => {
+    const name = g.kartenName;
+    if (!name) return;
+    if (/^familie\b/i.test(name) || /^family\b/i.test(name)) {
+      people.push(name);  /* Familie als eine Zeile — manuell aufzuteilen */
+      return;
+    }
+    if (name.includes('&')) {
+      /* "Anna & Thomas Koch" → ["Anna Koch", "Thomas Koch"] */
+      const parts = name.split('&').map(s => s.trim()).filter(Boolean);
+      /* Nachname-Heuristik: letzter Teil enthält oft Vor + Nachname */
+      const lastPart = parts[parts.length - 1];
+      const lastWords = lastPart.split(/\s+/);
+      const surname = lastWords.length >= 2 ? lastWords[lastWords.length - 1] : '';
+      parts.forEach((p, i) => {
+        if (i === parts.length - 1) {
+          people.push(p);
+        } else if (surname && !/\s/.test(p)) {
+          people.push(p + ' ' + surname);
+        } else {
+          people.push(p);
+        }
+      });
+    } else {
+      people.push(name);
+    }
+  });
+  document.getElementById('g-people').value = people.join('\n');
+  placePage = 0;
+  renderPlace();
+}
+
+function setPlaceMode(mode) {
+  placeMode = mode;
+  document.querySelectorAll('.mode-btn[data-pmode]').forEach(b =>
+    b.classList.toggle('active', b.dataset.pmode === mode)
+  );
+  placePage = 0;
+  renderPlace();
+}
+
+function placeCardHTML(name, sub, withCutMarks) {
+  const subHTML = sub
+    ? `<div class="anv-pcard-sub">${escapeHTML(sub)}</div>`
+    : '';
+  const cuts = withCutMarks
+    ? '<div class="cut tl h"></div><div class="cut tl v"></div>'
+    + '<div class="cut tr h"></div><div class="cut tr v"></div>'
+    + '<div class="cut bl h"></div><div class="cut bl v"></div>'
+    + '<div class="cut br h"></div><div class="cut br v"></div>'
+    : '';
+  return '<div class="anv-pcard">'
+    +   '<div class="anv-pcard-inner">'
+    +     '<div class="anv-pcard-content">'
+    +       '<div class="anv-pcard-orn"><span class="anv-pcard-orn-line"></span><span class="anv-pcard-orn-gem"></span><span class="anv-pcard-orn-line"></span></div>'
+    +       `<div class="anv-pcard-name">${escapeHTML(name)}</div>`
+    +       subHTML
+    +     '</div>'
+    +   '</div>'
+    + cuts
+    + '</div>';
+}
+
+function escapeHTML(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function renderPlace() {
+  const people = parsePeople(document.getElementById('g-people').value);
+  const sub    = document.getElementById('g-place-sub').value.trim();
+
+  /* Counter */
+  const cTpl = i18n[currentLang].placeCount || '{n} Personen';
+  document.getElementById('place-count').textContent = cTpl.replace('{n}', people.length);
+
+  const grid = document.getElementById('place-grid');
+  const nav  = document.getElementById('place-nav');
+  const out  = document.getElementById('place-output');
+
+  if (placeMode === 'pro') {
+    /* Druckerei: Stapel einzelner Karten (1 / Seite) mit Bleed-Wrapper */
+    grid.className = 'anv-pcard-print-stack';
+    out.classList.add('print-mode');
+    const list = people.length ? people : ['Vorname Nachname'];
+    grid.innerHTML = list.map(n =>
+      '<div class="anv-pcard-print-page">' + placeCardHTML(n, sub, false) + '</div>'
+    ).join('');
+    nav.style.display = 'none';
+  } else {
+    /* Heimdruck: 6/A4 quer mit Pagination */
+    const pages = Math.max(1, Math.ceil(people.length / PEOPLE_PER_PAGE));
+    placePage = Math.min(placePage, pages - 1);
+    const isEN = currentLang === 'en';
+    grid.className = 'anv-pcard-grid' + (isEN ? ' letter' : '');
+    out.classList.remove('print-mode');
+    out.classList.toggle('letter', isEN);
+
+    const pageList = people.slice(placePage * PEOPLE_PER_PAGE, (placePage + 1) * PEOPLE_PER_PAGE);
+    let html = '';
+    for (let i = 0; i < PEOPLE_PER_PAGE; i++) {
+      html += i < pageList.length
+        ? placeCardHTML(pageList[i], sub, true)
+        : '<div class="anv-pcard empty"></div>';
+    }
+    grid.innerHTML = html;
+
+    if (pages > 1) {
+      nav.style.display = '';
+      const tpl = i18n[currentLang].pageOf || 'Seite {c} von {t}';
+      document.getElementById('place-page-info').textContent =
+        tpl.replace('{c}', placePage + 1).replace('{t}', pages);
+      document.getElementById('place-prev').disabled = placePage === 0;
+      document.getElementById('place-next').disabled = placePage === pages - 1;
+    } else {
+      nav.style.display = 'none';
+    }
+  }
+}
+
+function changePlacePage(dir) {
+  const people = parsePeople(document.getElementById('g-people').value);
+  const pages  = Math.max(1, Math.ceil(people.length / PEOPLE_PER_PAGE));
+  placePage = Math.max(0, Math.min(placePage + dir, pages - 1));
+  renderPlace();
+}
+
+/* ── Platzkarten-PDF — gibt Blob zurück (für ZIP) oder speichert direkt (Einzelexport) ── */
+async function renderPlaceBlob(mode) {
+  const { jsPDF } = window.jspdf;
+  const people = parsePeople(document.getElementById('g-people').value);
+  if (people.length === 0) throw new Error(currentLang === 'en' ? 'No people' : 'Keine Personen');
+  const sub = document.getElementById('g-place-sub').value.trim();
+  const savedMode = placeMode;
+  const savedPage = placePage;
+  let pdfBlob;
+  try {
+    if (mode === 'home') {
+      setPlaceMode('home');
+      const isEN = currentLang === 'en';
+      const pageW = isEN ? 279.4 : 297;
+      const pageH = isEN ? 215.9 : 210;
+      const fmt   = isEN ? [pageW, pageH] : 'a4';
+      const pdf = new jsPDF({ unit:'mm', format: fmt, orientation:'landscape' });
+
+      const pages = Math.ceil(people.length / PEOPLE_PER_PAGE);
+      const grid  = document.getElementById('place-grid');
+      const savedTransform = grid.style.transform;
+      grid.style.transform = 'none';
+      try {
+        for (let p = 0; p < pages; p++) {
+          placePage = p;
+          renderPlace();
+          grid.style.transform = 'none';
+          await new Promise(r => requestAnimationFrame(r));
+          await new Promise(r => setTimeout(r, 80));
+          const canvas = await html2canvas(grid, {
+            scale: 3, useCORS: true, backgroundColor: '#ffffff', logging: false
+          });
+          if (p > 0) pdf.addPage();
+          pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
+        }
+      } finally {
+        grid.style.transform = savedTransform;
+      }
+      pdfBlob = pdf.output('blob');
+    } else {
+      setPlaceMode('pro');
+      const cardW = 136, cardH = 59.33, bleed = 3;
+      const pageW = cardW + bleed * 2;
+      const pageH = cardH + bleed * 2;
+      const pdf = new jsPDF({ unit:'mm', format:[pageW, pageH], orientation:'landscape' });
+      const tmp = document.createElement('div');
+      tmp.style.cssText =
+        'position:fixed;left:-9999px;top:0;width:' + pageW + 'mm;height:' + pageH + 'mm;' +
+        'display:flex;align-items:center;justify-content:center;background:' + getComputedStyle(document.documentElement).getPropertyValue('--silver').trim() + ';';
+      document.body.appendChild(tmp);
+      for (let i = 0; i < people.length; i++) {
+        tmp.innerHTML = placeCardHTML(people[i], sub, false);
+        const card = tmp.querySelector('.anv-pcard');
+        if (card) {
+          card.style.width  = '130mm';
+          card.style.height = '53.33mm';
+        }
+        await new Promise(r => requestAnimationFrame(r));
+        await new Promise(r => setTimeout(r, 80));
+        const canvas = await html2canvas(tmp, {
+          scale: 3, useCORS: true, logging: false,
+          width: tmp.offsetWidth, height: tmp.offsetHeight
+        });
+        if (i > 0) pdf.addPage([pageW, pageH], 'landscape');
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pageW, pageH);
+      }
+      document.body.removeChild(tmp);
+      pdfBlob = pdf.output('blob');
+    }
+  } finally {
+    setPlaceMode(savedMode);
+    placePage = savedPage;
+    renderPlace();
+  }
+  return pdfBlob;
+}
+
+async function exportPlace(mode) {
+  const loading = document.getElementById('loading');
+  loading.classList.add('active');
+  document.getElementById('loading-text').textContent =
+    mode === 'home' ? 'Heimdruck-PDF wird erstellt …' : 'Druckerei-PDF wird erstellt …';
+  try {
+    const people = parsePeople(document.getElementById('g-people').value);
+    if (people.length === 0) {
+      alert(currentLang === 'en' ? 'Please add people first.' : 'Bitte zuerst Personen eintragen.');
+      return;
+    }
+    const blob = await renderPlaceBlob(mode);
+    const fname = mode === 'home'
+      ? (currentLang === 'en' ? 'Place_Cards_Home.pdf' : 'Platzkarten_Heimdruck.pdf')
+      : (currentLang === 'en' ? 'Place_Cards_PrintShop.pdf' : 'Platzkarten_Druckerei.pdf');
+    saveBlob(blob, fname);
+  } catch (e) {
+    console.error(e); alert('Fehler beim Export: ' + e.message);
+  } finally {
+    loading.classList.remove('active');
+  }
+}
+
+/* renderAll triggert renderBack + renderSchedule + renderPlace — alle Globaldaten fließen rein */
+const _origRenderAll = renderAll;
+renderAll = function() {
+  _origRenderAll();
+  renderBack();
+  renderSchedule();
+  renderPlace();
+};
+
+/* ── Initial render ── */
+updateGuestCount();
+renderAll();
+setTab('invite');  /* Preview auf Default-Tab filtern */
+</script>
+</body>
+</html>
