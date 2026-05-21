@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="google" content="notranslate">
+  <title>He Said / She Said · Old Money · Wedding Story Atelier</title>
+  <style>
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+    @font-face { font-family: 'Cinzel'; src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype'); font-weight: 400 600; font-style: normal; font-display: swap; }
+
+    @page { size: Letter portrait; margin: 0; }
+
+    :root {
+      --burgund:       #8B1A35;
+      --burgund-soft:  rgba(139,26,53,0.45);
+      --burgund-faint: rgba(139,26,53,0.10);
+      --cream:         #FEF8F7;
+      --gold:          #9C7B1A;
+      --ink:           #2A1014;
+      --ink-body:      rgba(42,16,20,0.86);
+      --ink-soft:      rgba(42,16,20,0.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: #d8d4cf;
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      -webkit-print-color-adjust: exact; print-color-adjust: exact;
+    }
+    .page {
+      width: 215.9mm; height: 279.4mm;
+      background: var(--cream);
+      padding: 16mm 22mm 12mm;
+      display: flex; flex-direction: column;
+      margin: 12mm auto; box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+    .header { text-align: center; margin-bottom: 5mm; }
+    .eyebrow {
+      font-family: 'Cinzel', serif; font-size: 10pt; letter-spacing: 0.32em;
+      color: var(--burgund); text-transform: uppercase; margin-bottom: 3mm;
+    }
+    .title {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 500; font-size: 36pt; color: var(--burgund);
+      line-height: 1.0; margin-bottom: 4mm;
+    }
+    .rule {
+      display: flex; align-items: center; justify-content: center;
+      gap: 9px; margin: 0 auto 4mm; width: 45%;
+    }
+    .rule-line { flex: 1; height: 0.4px; background: var(--burgund-soft); }
+    .rule-gem { width: 7px; height: 7px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+
+    .instructions {
+      background: var(--burgund-faint);
+      padding: 4mm 6mm;
+      margin-bottom: 4mm;
+      font-size: 10.5pt;
+      font-style: italic;
+      color: var(--ink-body);
+      line-height: 1.45;
+      text-align: center;
+    }
+    .instructions strong {
+      font-family: 'Cinzel', serif;
+      font-style: normal;
+      font-size: 8.5pt;
+      letter-spacing: 0.28em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 1.5mm;
+    }
+
+    .columns-head {
+      display: grid;
+      grid-template-columns: 1fr 18mm 18mm;
+      gap: 3mm;
+      padding: 2mm 1mm 2mm;
+      border-bottom: 0.5px solid var(--burgund);
+      font-family: 'Cinzel', serif;
+      font-size: 8.5pt;
+      letter-spacing: 0.28em;
+      color: var(--burgund);
+      text-transform: uppercase;
+    }
+    .columns-head .label { text-align: left; }
+    .columns-head .sie, .columns-head .er { text-align: center; }
+
+    .quotes {
+      flex: 1;
+      display: flex; flex-direction: column;
+    }
+    .quote {
+      display: grid;
+      grid-template-columns: 1fr 18mm 18mm;
+      gap: 3mm;
+      align-items: end;
+      padding: 4mm 1mm 0;
+      min-height: 11mm;
+    }
+    .quote-line {
+      border-bottom: 0.5px solid var(--burgund-soft);
+      height: 0;
+      margin-bottom: 2mm;
+    }
+    /* Ausfuellbare Quote-Inputs — wirken wie Atelier-Schreiblinien */
+    .quote-input {
+      border: none;
+      border-bottom: 0.5px solid var(--burgund-soft);
+      background: transparent;
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-size: 11pt;
+      color: var(--burgund);
+      padding: 0 0 2mm 0;
+      outline: none;
+      width: 100%;
+    }
+    .quote-input:focus { border-bottom-color: var(--burgund); }
+    .quote-input::placeholder { color: rgba(139,26,53,0.30); font-style: italic; }
+    /* Side-Buttons (Browser-only) */
+    .side-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      writing-mode: vertical-rl;
+      font-family: 'Cinzel', serif;
+      font-size: 10pt;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: var(--burgund);
+      background: var(--cream);
+      border: 1px solid var(--burgund);
+      padding: 14px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      z-index: 100;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .side-btn:hover { background: var(--burgund); color: var(--cream); }
+    .side-btn.back  { left: 30px; }
+    .side-btn.print { right: 30px; }
+    .quote.example .quote-line {
+      border-bottom: none;
+      padding-bottom: 1.5mm;
+      font-style: italic;
+      font-size: 10.5pt;
+      color: var(--ink-soft);
+      height: auto;
+      margin-bottom: 0;
+    }
+    .quote.example {
+      background: var(--burgund-faint);
+      padding: 3mm 4mm;
+      margin-bottom: 1mm;
+    }
+    .quote-box {
+      width: 4mm; height: 4mm;
+      border: 0.5px solid var(--burgund);
+      margin: 0 auto 2mm;
+    }
+    .quote.example .quote-box.filled {
+      background: var(--burgund);
+    }
+
+    @media print {
+      html, body { background: #fff; }
+      .page { margin: 0; box-shadow: none; }
+      .side-btn { display: none; }
+      .buyer-only { display: none; }  /* Anleitungs-Box + Beispiele im Druck unsichtbar */
+      .quote-input::placeholder { color: transparent; }
+      .quote-input:focus { border-bottom-color: var(--burgund-soft); }
+    }
+  </style>
+</head>
+<body>
+
+<a class="side-btn back" href="index.html">← Back to overview</a>
+<button class="side-btn print" onclick="window.print()">Print or save as PDF</button>
+
+<section class="page">
+  <div class="header">
+    <div class="eyebrow">He Said / She Said</div>
+    <h1 class="title">Who said it?</h1>
+    <div class="rule">
+      <div class="rule-line"></div>
+      <div class="rule-gem"></div>
+      <div class="rule-line"></div>
+    </div>
+  </div>
+
+  <div class="instructions buyer-only">
+    <strong>Fill in before printing</strong>
+    Click in the lines below and type your personal quotes — inside jokes, characteristic
+    phrases, funny moments. Then print this page or save it as PDF. The instructions and the
+    two example quotes disappear automatically when printed. Your guests guess who said what —
+    you keep the answers in mind.
+  </div>
+
+  <div class="columns-head">
+    <span class="label">Quote</span>
+    <span class="sie">She</span>
+    <span class="er">He</span>
+  </div>
+
+  <div class="quotes">
+    <div class="quote example buyer-only">
+      <span class="quote-line">"Let's walk around the block once and then back."</span>
+      <span class="quote-box"></span>
+      <span class="quote-box filled"></span>
+    </div>
+    <div class="quote example buyer-only">
+      <span class="quote-line">"Let's just order pizza and watch a movie."</span>
+      <span class="quote-box filled"></span>
+      <span class="quote-box"></span>
+    </div>
+
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+    <div class="quote"><input type="text" class="quote-input" placeholder="Your quote here …"><span class="quote-box"></span><span class="quote-box"></span></div>
+  </div>
+</section>
+
+</body>
+</html>
