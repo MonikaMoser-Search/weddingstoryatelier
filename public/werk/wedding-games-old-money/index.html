@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Wedding Games Bundle · Old Money · Wedding Story Atelier</title>
+  <style>
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+    @font-face { font-family: 'Cinzel'; src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype'); font-weight: 400 600; font-style: normal; font-display: swap; }
+
+    :root {
+      --burgund:       #8B1A35;
+      --burgund-soft:  rgba(139,26,53,0.45);
+      --cream:         #FEF8F7;
+      --gold:          #9C7B1A;
+      --ink:           #2A1014;
+      --ink-body:      rgba(42,16,20,0.86);
+      --ink-soft:      rgba(42,16,20,0.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .stage {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .wordmark {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11pt;
+      letter-spacing: 0.36em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 11pt;
+      letter-spacing: 0.32em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .title {
+      font-style: italic;
+      font-weight: 500;
+      font-size: 48pt;
+      color: var(--burgund);
+      line-height: 1.05;
+      margin-bottom: 16px;
+    }
+    .rule {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin: 22px auto 22px; width: 30%;
+    }
+    .rule-line { flex: 1; height: 0.5px; background: var(--burgund-soft); }
+    .rule-gem {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg); flex-shrink: 0;
+    }
+    .intro {
+      font-style: italic;
+      font-size: 14pt;
+      color: var(--ink-body);
+      line-height: 1.45;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10pt;
+      letter-spacing: 0.32em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      text-align: center;
+      margin: 70px 0 30px;
+    }
+
+    .games {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .game {
+      background: #fff;
+      border: 1px solid var(--burgund-soft);
+      padding: 22px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .game:hover {
+      border-color: var(--burgund);
+      background: #fffaf9;
+    }
+    .game-num {
+      font-family: 'Cinzel', serif;
+      font-size: 9pt;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .game-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 18pt;
+      color: var(--burgund);
+      line-height: 1.15;
+    }
+    .game-meta {
+      font-size: 10.5pt;
+      color: var(--ink-soft);
+      font-style: italic;
+      margin-top: auto;
+      padding-top: 6px;
+    }
+    .game-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 9pt;
+      letter-spacing: 0.24em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .game.bonus {
+      background: var(--burgund);
+      color: var(--cream);
+      grid-column: 1 / -1;
+      border-color: var(--burgund);
+    }
+    .game.bonus .game-num { color: rgba(254,248,247,0.65); }
+    .game.bonus .game-name { color: var(--cream); }
+    .game.bonus .game-meta { color: rgba(254,248,247,0.75); }
+    .game.bonus .game-action { color: var(--cream); }
+    .game.bonus:hover { background: #6F1429; }
+
+    .tip {
+      background: rgba(139,26,53,0.06);
+      padding: 20px 28px;
+      margin: 50px 0 30px;
+      font-style: italic;
+      font-size: 12pt;
+      color: var(--ink-body);
+      line-height: 1.5;
+    }
+    .tip strong {
+      font-family: 'Cinzel', serif;
+      font-style: normal;
+      font-size: 9pt;
+      letter-spacing: 0.28em;
+      color: var(--burgund);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer-rule {
+      text-align: center;
+      margin-top: 70px;
+    }
+    .footer-text {
+      font-family: 'Cinzel', serif;
+      font-size: 8.5pt;
+      letter-spacing: 0.36em;
+      color: var(--burgund-soft);
+      text-transform: uppercase;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .stage { padding: 40px 20px 60px; }
+      .title { font-size: 36pt; }
+      .games { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="wordmark">Wedding Story Atelier</div>
+
+  <div class="header">
+    <div class="eyebrow">Wedding Games Bundle · Old Money</div>
+    <h1 class="title">Acht Spiele, ein Abend voller Erinnerungen.</h1>
+    <div class="rule">
+      <div class="rule-line"></div>
+      <div class="rule-gem"></div>
+      <div class="rule-line"></div>
+    </div>
+    <p class="intro">
+      Willkommen in eurem Atelier-Set. Acht Spielblätter im Editorial-Stil
+      zum Herunterladen — plus eine ausfüllbare Bonus-Seite für eure ganz
+      eigenen Trivia-Fragen.
+    </p>
+  </div>
+
+  <div class="section-label">— Eure Spielblätter —</div>
+
+  <div class="games">
+    <a class="game" href="01_wedding_bingo.pdf" download>
+      <div class="game-num">No. 01</div>
+      <div class="game-name">Wedding Bingo</div>
+      <div class="game-meta">5×5 Raster · Beobachtungsspiel für den ganzen Abend</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="02_wedding_trivia.pdf" download>
+      <div class="game-num">No. 02</div>
+      <div class="game-name">Wedding Trivia</div>
+      <div class="game-meta">15 Fragen · Wer kennt das Paar am besten?</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game bonus" href="02b_bonus_questions.html">
+      <div class="game-num">No. 02 · Bonus</div>
+      <div class="game-name">Eure persönlichen Trivia-Fragen</div>
+      <div class="game-meta">Ausfüllbar im Browser · 10 eigene Fragen ergänzen, dann drucken oder als PDF speichern</div>
+      <div class="game-action">Im Browser öffnen →</div>
+    </a>
+
+    <a class="game" href="03_would_they_rather.pdf" download>
+      <div class="game-num">No. 03</div>
+      <div class="game-name">Would They Rather</div>
+      <div class="game-meta">18 Paare · Käufer tippen die typische Wahl des Paars</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="04_finish_the_love_story.pdf" download>
+      <div class="game-num">No. 04</div>
+      <div class="game-name">Finish The Love Story</div>
+      <div class="game-meta">5 Prompts · Eure Gäste schreiben das Kapitel weiter</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="05_he_said_she_said.pdf" download>
+      <div class="game-num">No. 05</div>
+      <div class="game-name">He Said / She Said</div>
+      <div class="game-meta">14 Zitate · Vor der Hochzeit eintragen, Gäste raten</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="06_scavenger_hunt.pdf" download>
+      <div class="game-num">No. 06</div>
+      <div class="game-name">Schnitzeljagd</div>
+      <div class="game-meta">20 Aufgaben · Wer alle zuerst zusammen hat, gewinnt</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="07_photo_challenge.pdf" download>
+      <div class="game-num">No. 07</div>
+      <div class="game-name">Photo Challenge</div>
+      <div class="game-meta">32 Karten · 4 Bögen mit Foto-Aufgaben zum Ausschneiden</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+
+    <a class="game" href="08_notes_for_couple.pdf" download>
+      <div class="game-num">No. 08</div>
+      <div class="game-name">Notes For The Couple</div>
+      <div class="game-meta">8 Karten zum Ausschneiden · Worte, die bleiben</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+  </div>
+
+  <div class="tip">
+    <strong>Atelier-Empfehlung zum Druck</strong>
+    Die fünf hellen Spielblätter (Bingo, Trivia, Would They Rather, Finish The Love Story,
+    He Said / She Said, Schnitzeljagd) drucken sich sauber auf normalem Druckerpapier
+    (80 g/m²). Für die drei Karten-Sets mit Farbfläche (Photo Challenge, Notes For The
+    Couple) empfehlen wir 200–230 g/m² matt oder Seidenglanz — dort kommt die Editorial-Optik
+    voll zur Geltung.
+  </div>
+
+  <div class="footer-rule">
+    <div class="rule" style="width:20%;">
+      <div class="rule-line"></div>
+      <div class="rule-gem"></div>
+      <div class="rule-line"></div>
+    </div>
+    <div class="footer-text">Wedding Story Atelier</div>
+  </div>
+
+</div>
+
+</body>
+</html>
