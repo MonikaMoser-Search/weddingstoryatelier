@@ -1,0 +1,323 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const etsyUrl = 'https://weddingstoryatelier.etsy.com/listing/4485890320';
+const demoUrl = '/atelier/sitzplan.html';
+
+const faq = [
+  {
+    q: 'Brauche ich Designkenntnisse?',
+    a: 'Nein. Gästeliste einfügen — direkt aus Excel, Word oder einer einfachen Liste — und der Sitzplan ordnet sich automatisch alphabetisch. Drei Farbwelten zur Wahl, Spaltenanzahl rechnet das Atelier selbst aus.',
+  },
+  {
+    q: 'Kann ich die Liste aus Excel rüberkopieren?',
+    a: 'Genau dafür gebaut. Eine Zeile pro Gast — „Vorname Nachname, Tisch X" — Spalte markieren, kopieren, ins Atelier einfügen. Fertig sortiert in Sekunden.',
+  },
+  {
+    q: 'Welche Druckformate sind dabei?',
+    a: 'Sieben Größen in einem Werk: A4, A3, A2, A1, A0 für den deutschen Markt, Letter und Tabloid für US. Der Export ist Vektor-PDF — skaliert ohne Qualitätsverlust. 300 DPI, optional 3 mm Beschnitt für die Druckerei.',
+  },
+  {
+    q: 'Ist das Tischnummern-Set wirklich dabei?',
+    a: 'Ja. Passend zum Sitzplan in derselben Farbwelt — A5 für Deutschland, 5 × 7 Zoll für US. Ein Werk, das auf dem Tisch und an der Wand zusammenspielt.',
+  },
+  {
+    q: 'Was bekomme ich nach dem Kauf?',
+    a: 'Direkt nach der Etsy-Bestellung einen Link ins Atelier — Browser-Tool, kein Download, keine Software-Installation. Eure Daten bleiben lokal im Browser, nichts wird hochgeladen.',
+  },
+  {
+    q: 'Kann ich beliebig oft ändern?',
+    a: 'Ja. Der Zugang bleibt offen — Gästeliste anpassen, Farbe wechseln, neu exportieren, so oft ihr wollt. Anleitung liegt zweisprachig bei (DE + EN).',
+  },
+];
+---
+
+<Layout
+  title="Sitzplan Hochzeit — Alphabetisch automatisch · Wedding Story Atelier"
+  description="Sitzplan für eure Hochzeit: Gästeliste einfügen, fertig. Alphabetisch automatisch in Forest, Bordeaux oder Cognac. Vektor-PDF in sieben Größen, A4 bis A0. Inklusive Tischnummern-Set."
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero — Foto links, Text rechts -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-20">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+      <div class="order-2 md:order-1">
+        <img
+          src="/images/card-sitzplan.png"
+          alt="Sitzplan Hochzeit — alphabetisch sortiert, gerahmt auf Staffelei, Old Money Design"
+          loading="eager"
+          fetchpriority="high"
+          class="w-full"
+        />
+      </div>
+      <div class="order-1 md:order-2 text-center md:text-left">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+          Aus dem Atelier
+        </p>
+        <h1 class="serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8">
+          Sitzplan Hochzeit —<br />
+          <em class="text-cognac">Gästeliste einfügen,<br />fertig.</em>
+        </h1>
+        <p class="serif text-lg md:text-xl italic text-ink-muted leading-relaxed mb-10">
+          Liste aus Excel oder Word direkt ins Atelier kopieren — der Plan ordnet sich automatisch alphabetisch, perfekt ausbalanciert, in Forest, Bordeaux oder Cognac.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 items-center md:items-start text-sm tracking-wider">
+          <a
+            href={etsyUrl}
+            target="_blank"
+            rel="noopener"
+            class="bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+          >
+            Auf Etsy holen — 5,26 € →
+          </a>
+          <a
+            href="#demo"
+            class="text-ink-muted border-b border-ink-muted pb-1 hover:text-cognac hover:border-cognac transition-colors uppercase tracking-[0.2em] text-xs"
+          >
+            Erst die Demo testen
+          </a>
+        </div>
+        <p class="text-xs text-ink-muted mt-8 italic">
+          Sofortiger Atelier-Zugang nach Kauf · Tischnummern-Set inklusive · Daten bleiben bei euch
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drei Versprechen -->
+  <section class="px-8 md:px-16 py-20 bg-cream">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-12">
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">I.</p>
+        <h3 class="serif text-xl mb-3">Liste rein, Plan fertig</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Eine Zeile pro Gast aus Excel — Spalte markieren, einfügen. Keine Drag-and-Drop-Übungen, kein Layouträtsel. Alphabetisch automatisch.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">II.</p>
+        <h3 class="serif text-xl mb-3">Sieben Größen — A4 bis A0</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          A4, A3, A2, A1, A0 + US Letter & Tabloid. Vektor-PDF, skaliert ohne Qualitätsverlust. Optionaler 3 mm Beschnitt für die Druckerei.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">III.</p>
+        <h3 class="serif text-xl mb-3">Old Money Linie</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Forest, Bordeaux oder Cognac — drei zurückhaltende Farbwelten, Cormorant-Serifen, ruhige Trennlinien. Probedruck-validiert.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="px-4 md:px-16 py-24">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Direkt ausprobieren
+        </p>
+        <h2 class="serif text-4xl md:text-5xl mb-6">
+          So sieht euer Sitzplan aus.
+        </h2>
+        <p class="serif text-lg italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+          Demo läuft mit Beispieldaten. Gästeliste rechts einfügen, Farbe wechseln — der Plan reagiert live. Export ist hier reduziert; die Vollversion liegt im Etsy-Werk.
+        </p>
+      </div>
+
+      <div class="border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
+        <iframe
+          src={demoUrl}
+          title="Sitzplan Hochzeit — Live-Demo"
+          loading="lazy"
+          class="w-full"
+          style="height: 900px; border: 0; display: block;"
+        ></iframe>
+      </div>
+
+      <p class="text-xs text-ink-muted text-center mt-6 italic">
+        Demo ohne PDF-Export · Vollversion mit allen Druckformaten im Etsy-Werk
+      </p>
+
+      <div class="text-center mt-12">
+        <a
+          href={etsyUrl}
+          target="_blank"
+          rel="noopener"
+          class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+        >
+          Vollversion auf Etsy holen →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- So funktioniert es -->
+  <section class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        So funktioniert es
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Vier stille Schritte.
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt eins</p>
+          <h3 class="serif text-xl mb-3">Link aus Etsy öffnen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Direkt nach dem Kauf landet ein privater Atelier-Link in der Etsy-Nachricht. Ein Klick — ihr seid drin.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt zwei</p>
+          <h3 class="serif text-xl mb-3">Gästeliste einfügen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Aus Excel oder Word: eine Zeile pro Gast, „Name, Tisch X". Spalte markieren, einfügen — fertig.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt drei</p>
+          <h3 class="serif text-xl mb-3">Farbe & Größe wählen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Forest, Bordeaux oder Cognac — und sieben Größen von A4 bis A0. Plus Letter und Tabloid für US.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt vier</p>
+          <h3 class="serif text-xl mb-3">PDF mitnehmen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Vektor-PDF, skaliert ohne Qualitätsverlust. Sitzplan und Tischnummern in einem Werk. Beliebig oft exportieren.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Was im Werk steckt — Foto rechts -->
+  <section class="px-8 md:px-16 py-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div>
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Im Werk enthalten
+        </p>
+        <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+          Ein Werk — und alles,<br />was dazugehört.
+        </h2>
+        <ul class="space-y-4 text-sm text-ink-muted leading-relaxed">
+          <li class="flex gap-3"><span class="text-cognac">·</span> Atelier-Zugang als Browser-Tool — kein Download, kein Konto</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Drei Farbwelten Old Money: Forest, Bordeaux, Cognac</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Automatische alphabetische Sortierung, immer balanciert</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Vektor-PDF in sieben Größen: A4, A3, A2, A1, A0 + Letter + Tabloid</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> 300 DPI, optionaler 3 mm Beschnitt für die Druckerei</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Passendes Tischnummern-Set in derselben Farbwelt (A5 + 5×7")</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Anleitung zweisprachig DE + EN</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Unbegrenzte Bearbeitung — Daten bleiben lokal</li>
+        </ul>
+      </div>
+      <div>
+        <img
+          src="/images/nahaufnahme-sitzplan-alphabetisch.jpeg"
+          alt="Sitzplan alphabetisch — Atelier-Nahaufnahme, Old Money Design"
+          loading="lazy"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        Häufige Fragen
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Was Brautpaare oft fragen.
+      </h2>
+      <div class="space-y-8">
+        {faq.map((item) => (
+          <details class="group border-b border-sand pb-6">
+            <summary class="cursor-pointer flex justify-between items-start gap-6 list-none">
+              <h3 class="serif text-xl group-open:text-cognac transition-colors">{item.q}</h3>
+              <span class="serif text-2xl text-cognac mt-[-4px] group-open:rotate-45 transition-transform inline-block">+</span>
+            </summary>
+            <p class="text-sm text-ink-muted leading-relaxed mt-4 max-w-2xl">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Schluss-CTA -->
+  <section class="px-8 md:px-16 py-32 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Bereit für euren Sitzplan
+    </p>
+    <h2 class="serif text-4xl md:text-6xl mb-10 max-w-3xl mx-auto leading-tight">
+      Heute Gästeliste,<br />
+      <em class="text-cognac">morgen druckfertig.</em>
+    </h2>
+    <a
+      href={etsyUrl}
+      target="_blank"
+      rel="noopener"
+      class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+    >
+      Sitzplan auf Etsy holen — 5,26 € →
+    </a>
+    <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
+      Sofortiger Atelier-Zugang · Tischnummern-Set inklusive · Beliebig oft bearbeiten
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- FAQ Schema für Rich Results -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  })} />
+
+  <!-- Product Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Sitzplan Hochzeit Vorlage — Old Money Design",
+    "description": "Sitzplan Hochzeit alphabetisch sortiert, automatisches Layout in Forest, Bordeaux oder Cognac. Inklusive passendem Tischnummern-Set. Vektor-PDF in sieben Größen: A4, A3, A2, A1, A0 + Letter + Tabloid. 300 DPI.",
+    "image": "https://weddingstoryatelier.de/images/card-sitzplan.png",
+    "brand": { "@type": "Brand", "name": "Wedding Story Atelier" },
+    "offers": {
+      "@type": "Offer",
+      "url": etsyUrl,
+      "priceCurrency": "EUR",
+      "price": "5.26",
+      "availability": "https://schema.org/InStock"
+    }
+  })} />
+</Layout>
