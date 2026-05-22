@@ -76,6 +76,7 @@ const faq = [
             href={etsyUrl}
             target="_blank"
             rel="noopener"
+            data-conversion="sitzplan-etsy"
             class="bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
           >
             Auf Etsy holen — 5,26 € →
@@ -155,6 +156,7 @@ const faq = [
           href={etsyUrl}
           target="_blank"
           rel="noopener"
+          data-conversion="sitzplan-etsy"
           class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
         >
           Vollversion auf Etsy holen →
@@ -273,6 +275,7 @@ const faq = [
       href={etsyUrl}
       target="_blank"
       rel="noopener"
+      data-conversion="sitzplan-etsy"
       class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
     >
       Sitzplan auf Etsy holen — 5,26 € →
@@ -320,4 +323,37 @@ const faq = [
       "availability": "https://schema.org/InStock"
     }
   })} />
+
+  <!-- Google Ads Conversion Trigger — feuert beim Etsy-Outbound-Klick, sofern Cookie-Consent granted -->
+  <script is:inline>
+    (function () {
+      const SEND_TO = 'AW-18181056795/Kr2cCPOdp7EcEJvSs91D';
+
+      function fireConversion() {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('event', 'conversion', {
+          send_to: SEND_TO,
+          value: 5.26,
+          currency: 'EUR',
+        });
+      }
+
+      function attach() {
+        const els = document.querySelectorAll('a[data-conversion="sitzplan-etsy"]');
+        els.forEach(function (el) {
+          if (el.dataset.wsaWired === '1') return;
+          el.dataset.wsaWired = '1';
+          el.addEventListener('click', fireConversion);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+      } else {
+        attach();
+      }
+      // Falls Consent erst nach DOM-Load erteilt wird, Handler nochmal hängen
+      window.addEventListener('wsa:ads-ready', attach);
+    })();
+  </script>
 </Layout>

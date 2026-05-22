@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import CookieBanner from '../components/CookieBanner.astro';
 
 interface Props {
   title?: string;
@@ -76,5 +77,6 @@ const ogImage = new URL(image, Astro.site).toString();
   </head>
   <body class="bg-paper text-ink">
     <slot />
+    <CookieBanner />
   </body>
 </html>
