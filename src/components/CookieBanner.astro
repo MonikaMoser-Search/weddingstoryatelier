@@ -2,13 +2,17 @@
 // Cookie-Consent-Banner für Google Ads Conversion-Tracking.
 // Lädt gtag.js erst nach explizitem Klick auf "Akzeptieren".
 // Entscheidung wird in localStorage gespeichert (wsa_consent).
+//
+// Hinweis: Sichtbarkeit wird per inline-style="display:..." gesteuert,
+// NICHT per Tailwind .hidden — Tailwind v4 purged dynamisch verwendete
+// Utility-Klassen aus dem Production-Bundle.
 const GTAG_ID = 'AW-18181056795';
 ---
 
 <div
   id="wsa-cookie-banner"
-  class="hidden fixed bottom-0 left-0 right-0 z-50 bg-cream border-t border-sand"
-  style="box-shadow: 0 -8px 24px rgba(0,0,0,0.06);"
+  class="fixed bottom-0 left-0 right-0 z-50 bg-cream border-t border-sand"
+  style="display: none; box-shadow: 0 -8px 24px rgba(0,0,0,0.06);"
 >
   <div class="max-w-5xl mx-auto px-6 md:px-10 py-6 md:py-5 flex flex-col md:flex-row gap-4 md:gap-8 items-start md:items-center">
     <div class="flex-1 text-sm leading-relaxed">
@@ -45,6 +49,13 @@ const GTAG_ID = 'AW-18181056795';
     const acceptBtn = document.getElementById('wsa-consent-accept');
     const denyBtn = document.getElementById('wsa-consent-deny');
 
+    function showBanner() {
+      if (banner) banner.style.display = 'block';
+    }
+    function hideBanner() {
+      if (banner) banner.style.display = 'none';
+    }
+
     function loadGtag() {
       if (window.wsaGtagLoaded) return;
       window.wsaGtagLoaded = true;
@@ -63,15 +74,11 @@ const GTAG_ID = 'AW-18181056795';
       window.dispatchEvent(new Event('wsa:ads-ready'));
     }
 
-    function hideBanner() {
-      if (banner) banner.classList.add('hidden');
-    }
-
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'granted') {
       loadGtag();
     } else if (stored !== 'denied') {
-      if (banner) banner.classList.remove('hidden');
+      showBanner();
     }
 
     if (acceptBtn) {
