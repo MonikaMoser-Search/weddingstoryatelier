@@ -137,7 +137,8 @@ const faq = [
         </p>
       </div>
 
-      <div class="border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
+      <!-- Desktop: Live-Demo per iframe -->
+      <div class="hidden md:block border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
         <iframe
           src={demoUrl}
           title="Sitzplan Hochzeit — Live-Demo"
@@ -145,6 +146,25 @@ const faq = [
           class="w-full"
           style="height: 900px; border: 0; display: block;"
         ></iframe>
+      </div>
+
+      <!-- Mobile: Fallback mit Foto + Hinweis (Demo ist für Desktop gemacht) -->
+      <div class="md:hidden border border-sand bg-cream">
+        <img
+          src="/images/nahaufnahme-sitzplan-alphabetisch.jpeg"
+          alt="Sitzplan alphabetisch — Atelier-Nahaufnahme"
+          loading="lazy"
+          class="w-full"
+        />
+        <div class="px-6 py-8 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-cognac mb-3">Demo am Desktop</p>
+          <p class="serif italic text-lg leading-relaxed text-ink-muted">
+            Die Live-Demo ist für den Laptop oder größere Bildschirme gemacht — dort lässt sich die Gästeliste komfortabel einfügen und das Layout in Echtzeit ausprobieren.
+          </p>
+          <p class="text-sm text-ink-muted mt-4">
+            Öffne <span class="serif italic">weddingstoryatelier.de/sitzplan-hochzeit</span> später am Desktop.
+          </p>
+        </div>
       </div>
 
       <p class="text-xs text-ink-muted text-center mt-6 italic">
