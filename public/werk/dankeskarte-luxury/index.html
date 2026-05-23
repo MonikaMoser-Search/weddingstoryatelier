@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -89,85 +89,90 @@
 <body>
 
 <div class="panel-form">
-  <div class="panel-logo">Thank You Card</div>
-  <div class="panel-tagline">Luxury Collection · Wedding Story Atelier</div>
+  <div class="panel-logo" id="lbl-logo">Thank You Card</div>
+  <div class="panel-tagline" id="lbl-tagline">Luxury Collection · Wedding Story Atelier</div>
 
-  <label class="section-label">1. Stil wählen</label>
+  <label class="section-label" id="lbl-lang">Sprache</label>
+  <div class="btn-group" id="lang-btns">
+    <button class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <label class="section-label" id="lbl-style">1. Stil wählen</label>
   <div class="btn-group">
     <button class="ui-btn active" onclick="setTheme('neodeco', this)">Neo-Deco</button>
     <button class="ui-btn" onclick="setTheme('opera', this)">Opera</button>
     <button class="ui-btn" onclick="setTheme('clouddancer', this)">Cloud</button>
   </div>
 
-  <!-- Empfehlung: Erst Namen eingeben, dann Hintergrund ändern -->
-  <label class="section-label">2. Euer Hochzeitsfoto hochladen</label>
+  <label class="section-label" id="lbl-photo">2. Euer Hochzeitsfoto hochladen</label>
   <div class="upload-zone">
-    <span>Klicken für Foto oder Material</span>
+    <span id="lbl-upload">Klicken für Foto oder Material</span>
     <input type="file" accept="image/*" onchange="loadMedia(this)">
   </div>
 
-  <label class="section-label">Lesbarkeits-Filter</label>
+  <label class="section-label" id="lbl-overlay">Lesbarkeits-Filter</label>
   <div class="btn-group">
-    <button class="ui-btn active" onclick="setOverlay('transparent', this)">Kein</button>
-    <button class="ui-btn" onclick="setOverlay('rgba(255,255,255,0.40)', this)">Hell</button>
-    <button class="ui-btn" onclick="setOverlay('rgba(0,0,0,0.50)', this)">Dunkel</button>
+    <button class="ui-btn active" id="btn-ov-none"  onclick="setOverlay('transparent', this)">Kein</button>
+    <button class="ui-btn"        id="btn-ov-light" onclick="setOverlay('rgba(255,255,255,0.40)', this)">Hell</button>
+    <button class="ui-btn"        id="btn-ov-dark"  onclick="setOverlay('rgba(0,0,0,0.50)', this)">Dunkel</button>
   </div>
 
-  <label class="section-label">3. Personalisierung</label>
+  <label class="section-label" id="lbl-personal">3. Personalisierung</label>
   <input type="text" id="n1" value="Anna" oninput="update()">
   <input type="text" id="n2" value="Peter" oninput="update()">
   <input type="text" id="date" value="14. Juni 2026" oninput="update()">
   <textarea id="footer" oninput="update()">Für immer dankbar</textarea>
 
-  <label class="section-label">Dankestext</label>
+  <label class="section-label" id="lbl-thanks">Dankestext</label>
   <textarea id="thanks" oninput="autoResize(this); update()">Danke, dass du unseren besonderen Tag mit uns gefeiert hast</textarea>
 
-  <label class="section-label">QR-Code</label>
+  <label class="section-label" id="lbl-qr">QR-Code</label>
   <div class="checkbox-row">
     <input type="checkbox" id="qr-show" onchange="toggleQRVisibility()">
-    <label for="qr-show">QR-Code anzeigen</label>
+    <label for="qr-show" id="lbl-qr-show">QR-Code anzeigen</label>
   </div>
   <div id="qr-options" style="display:none;">
     <div class="radio-row">
       <input type="radio" name="qr-mode" id="qr-mode-auto" value="auto" checked onchange="toggleQRMode()">
-      <label for="qr-mode-auto">QR-Code automatisch generieren</label>
+      <label for="qr-mode-auto" id="lbl-qr-auto">QR-Code automatisch generieren</label>
     </div>
     <div class="radio-row">
       <input type="radio" name="qr-mode" id="qr-mode-upload" value="upload" onchange="toggleQRMode()">
-      <label for="qr-mode-upload">Eigenen QR-Code hochladen</label>
+      <label for="qr-mode-upload" id="lbl-qr-upload">Eigenen QR-Code hochladen</label>
     </div>
     <div id="qr-auto-section">
       <input type="text" id="qr-url" placeholder="Link zur Online-Galerie" oninput="update()">
     </div>
     <div id="qr-upload-section" style="display:none;">
       <div class="upload-zone">
-        <span>QR-Code Bild hochladen (PNG oder JPG)</span>
+        <span id="lbl-qr-upload-zone">QR-Code Bild hochladen (PNG oder JPG)</span>
         <input type="file" accept="image/png,image/jpeg" onchange="loadQRImage(this)">
       </div>
     </div>
   </div>
 
-  <label class="section-label">Schriftfarbe – Text</label>
+  <label class="section-label" id="lbl-text-color">Schriftfarbe – Text</label>
   <div class="btn-group">
-    <button class="ui-btn active" onclick="setColor('#000', this)">Schwarz</button>
-    <button class="ui-btn" onclick="setColor('#fff', this)">Weiß</button>
-    <button class="ui-btn" onclick="setColor('#C89A5A', this)">Gold</button>
-    <button class="ui-btn" onclick="setColor('#8B0000', this)">D.Rot</button>
-    <button class="ui-btn" onclick="setColor('#1A5C2A', this)">D.Grün</button>
-    <button class="ui-btn" onclick="setColor('#1B3A6B', this)">D.Blau</button>
-    <button class="ui-btn" onclick="setColor('#A9A9A9', this)">Silber</button>
+    <button class="ui-btn active" data-col="black"  onclick="setColor('#000', this)">Schwarz</button>
+    <button class="ui-btn"        data-col="white"  onclick="setColor('#fff', this)">Weiß</button>
+    <button class="ui-btn"        data-col="gold"   onclick="setColor('#C89A5A', this)">Gold</button>
+    <button class="ui-btn"        data-col="dred"   onclick="setColor('#8B0000', this)">D.Rot</button>
+    <button class="ui-btn"        data-col="dgreen" onclick="setColor('#1A5C2A', this)">D.Grün</button>
+    <button class="ui-btn"        data-col="dblue"  onclick="setColor('#1B3A6B', this)">D.Blau</button>
+    <button class="ui-btn"        data-col="silver" onclick="setColor('#A9A9A9', this)">Silber</button>
   </div>
 
-  <label class="section-label">Schriftfarbe – Namen</label>
+  <label class="section-label" id="lbl-names-color">Schriftfarbe – Namen</label>
   <div class="btn-group">
-    <button class="ui-btn active" onclick="setNamesColor('', this)">Theme</button>
-    <button class="ui-btn" onclick="setNamesColor('#000', this)">Schwarz</button>
-    <button class="ui-btn" onclick="setNamesColor('#fff', this)">Weiß</button>
-    <button class="ui-btn" onclick="setNamesColor('#C89A5A', this)">Gold</button>
-    <button class="ui-btn" onclick="setNamesColor('#8B0000', this)">D.Rot</button>
-    <button class="ui-btn" onclick="setNamesColor('#1A5C2A', this)">D.Grün</button>
-    <button class="ui-btn" onclick="setNamesColor('#1B3A6B', this)">D.Blau</button>
-    <button class="ui-btn" onclick="setNamesColor('#A9A9A9', this)">Silber</button>
+    <button class="ui-btn active" data-col="theme"  onclick="setNamesColor('', this)">Theme</button>
+    <button class="ui-btn"        data-col="black"  onclick="setNamesColor('#000', this)">Schwarz</button>
+    <button class="ui-btn"        data-col="white"  onclick="setNamesColor('#fff', this)">Weiß</button>
+    <button class="ui-btn"        data-col="gold"   onclick="setNamesColor('#C89A5A', this)">Gold</button>
+    <button class="ui-btn"        data-col="dred"   onclick="setNamesColor('#8B0000', this)">D.Rot</button>
+    <button class="ui-btn"        data-col="dgreen" onclick="setNamesColor('#1A5C2A', this)">D.Grün</button>
+    <button class="ui-btn"        data-col="dblue"  onclick="setNamesColor('#1B3A6B', this)">D.Blau</button>
+    <button class="ui-btn"        data-col="silver" onclick="setNamesColor('#A9A9A9', this)">Silber</button>
   </div>
 
   <div class="format-box">
@@ -178,15 +183,15 @@
       <label class="format-opt"><input type="radio" name="card-format" value="5x7" onchange="updateCardSize()"> 5×7" <em>127×178 mm</em></label>
     </div>
   </div>
-  <button class="export-btn" onclick="downloadPDF()">Export PDF</button>
+  <button class="export-btn" id="btn-export" onclick="downloadPDF()">Export PDF</button>
   <div class="bleed-box">
     <input type="checkbox" id="chk-bleed">
     <label class="bleed-row" for="chk-bleed">
       <span class="bleed-check">&#10003;</span>
-      <span class="bleed-title">Beschnittzugabe 3 mm</span>
+      <span class="bleed-title" id="lbl-bleed">Beschnittzugabe 3 mm</span>
     </label>
-    <p class="bleed-off-desc"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
-    <p class="bleed-on-desc"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
+    <p class="bleed-off-desc" id="lbl-bleed-off"><strong>Ohne Beschnitt</strong> &mdash; Ideal f&uuml;r den Druck zu Hause oder lokal. Die Datei hat die exakte Endgr&ouml;&szlig;e.</p>
+    <p class="bleed-on-desc"  id="lbl-bleed-on"><strong>Mit Beschnitt</strong> (3&thinsp;mm) &mdash; F&uuml;r Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.</p>
   </div>
   <div class="print-hint">
     <span class="print-hint-de">Deine Druckdatei ist im sRGB-Farbraum — von allen gängigen Online-Druckereien problemlos verarbeitet. Für randlose Drucke empfehlen wir die Beschnittzugabe (3 mm).</span>
@@ -200,7 +205,7 @@
       <div id="std-overlay" class="card-overlay"></div>
       <div class="card-content">
         <!-- Reihenfolge: Titel → Namen → Datum → Dankestext → QR-Code -->
-        <div style="text-transform:uppercase; letter-spacing:5px; font-size:13pt; font-weight:500; margin-bottom:18px;">Thank You</div>
+        <div id="out-eyebrow" style="text-transform:uppercase; letter-spacing:5px; font-size:13pt; font-weight:500; margin-bottom:18px;">Thank You</div>
         <div style="width:32px; height:1px; background:currentColor; opacity:0.35; margin:0 auto 28px;"></div>
         <div class="names" id="out-n1">Anna</div>
         <div style="font-family:'Cormorant Garamond'; font-style:italic; font-size:20pt; margin:5px 0;">&</div>
@@ -216,6 +221,101 @@
 
 <script>
 let currentTheme = 'neodeco', currentBG = '', currentColor = '#000', currentNamesColor = '', currentOverlay = 'transparent';
+let currentLang = 'de';
+
+const T = {
+  de: {
+    logo: 'Thank You Card', tagline: 'Luxury Collection · Wedding Story Atelier',
+    lang: 'Sprache', style: '1. Stil wählen', photo: '2. Euer Hochzeitsfoto hochladen',
+    upload: 'Klicken für Foto oder Material',
+    overlay: 'Lesbarkeits-Filter', ovNone: 'Kein', ovLight: 'Hell', ovDark: 'Dunkel',
+    personal: '3. Personalisierung',
+    thanksLbl: 'Dankestext',
+    qr: 'QR-Code',
+    qrShow: 'QR-Code anzeigen', qrAuto: 'QR-Code automatisch generieren',
+    qrUpload: 'Eigenen QR-Code hochladen', qrUrlPh: 'Link zur Online-Galerie',
+    qrUploadZone: 'QR-Code Bild hochladen (PNG oder JPG)',
+    textColor: 'Schriftfarbe – Text', namesColor: 'Schriftfarbe – Namen',
+    colors: { theme:'Theme', black:'Schwarz', white:'Weiß', gold:'Gold', dred:'D.Rot', dgreen:'D.Grün', dblue:'D.Blau', silver:'Silber' },
+    eyebrow: 'Thank You',
+    defaultDate: '14. Juni 2026', defaultFooter: 'Für immer dankbar',
+    defaultThanks: 'Danke, dass du unseren besonderen Tag mit uns gefeiert hast',
+    btnExport: 'Export PDF', btnExportRun: 'Erstelle PDF…',
+    bleed: 'Beschnittzugabe 3 mm',
+    bleedOff: '<strong>Ohne Beschnitt</strong> — Ideal für den Druck zu Hause oder lokal. Die Datei hat die exakte Endgröße.',
+    bleedOn:  '<strong>Mit Beschnitt</strong> (3 mm) — Für Online-Druckereien wie Flyeralarm, Moo oder Vistaprint.',
+    exportErr: 'Export fehlgeschlagen. Bitte Chrome verwenden.',
+    saveName: 'ThankYou',
+  },
+  en: {
+    logo: 'Thank You Card', tagline: 'Luxury Collection · Wedding Story Atelier',
+    lang: 'Language', style: '1. Choose style', photo: '2. Upload your wedding photo',
+    upload: 'Click for photo or material',
+    overlay: 'Readability filter', ovNone: 'None', ovLight: 'Light', ovDark: 'Dark',
+    personal: '3. Personalize',
+    thanksLbl: 'Thank you message',
+    qr: 'QR Code',
+    qrShow: 'Show QR code', qrAuto: 'Generate QR code automatically',
+    qrUpload: 'Upload your own QR code', qrUrlPh: 'Link to online gallery',
+    qrUploadZone: 'Upload QR code image (PNG or JPG)',
+    textColor: 'Text colour', namesColor: 'Names colour',
+    colors: { theme:'Theme', black:'Black', white:'White', gold:'Gold', dred:'D.Red', dgreen:'D.Green', dblue:'D.Blue', silver:'Silver' },
+    eyebrow: 'Thank You',
+    defaultDate: 'June 14, 2026', defaultFooter: 'Forever grateful',
+    defaultThanks: 'Thank you for celebrating our special day with us',
+    btnExport: 'Export PDF', btnExportRun: 'Creating PDF…',
+    bleed: '3 mm bleed',
+    bleedOff: '<strong>No bleed</strong> — Ideal for home or local print. The file has the exact final size.',
+    bleedOn:  '<strong>With bleed</strong> (3 mm) — For online print shops like Moo, Vistaprint or local services.',
+    exportErr: 'Export failed. Please use Chrome.',
+    saveName: 'ThankYou',
+  },
+};
+function tt() { return T[currentLang]; }
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.documentElement.lang = lang;
+  applyLang();
+}
+
+function applyLang() {
+  const l = tt();
+  const s = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+  const h = (id, v) => { const e = document.getElementById(id); if (e) e.innerHTML = v; };
+  const p = (id, v) => { const e = document.getElementById(id); if (e) e.placeholder = v; };
+
+  s('lbl-logo', l.logo); s('lbl-tagline', l.tagline);
+  s('lbl-lang', l.lang); s('lbl-style', l.style); s('lbl-photo', l.photo);
+  s('lbl-upload', l.upload);
+  s('lbl-overlay', l.overlay);
+  s('btn-ov-none', l.ovNone); s('btn-ov-light', l.ovLight); s('btn-ov-dark', l.ovDark);
+  s('lbl-personal', l.personal);
+  s('lbl-thanks', l.thanksLbl); s('lbl-qr', l.qr);
+  s('lbl-qr-show', l.qrShow); s('lbl-qr-auto', l.qrAuto);
+  s('lbl-qr-upload', l.qrUpload); s('lbl-qr-upload-zone', l.qrUploadZone);
+  p('qr-url', l.qrUrlPh);
+  s('lbl-text-color', l.textColor); s('lbl-names-color', l.namesColor);
+  document.querySelectorAll('.btn-group .ui-btn[data-col]').forEach(b => {
+    const k = b.getAttribute('data-col');
+    if (l.colors[k]) b.textContent = l.colors[k];
+  });
+  // Locale-aware defaults — nur swappen wenn unverändert
+  const dateEl = document.getElementById('date');
+  const footerEl = document.getElementById('footer');
+  const thanksEl = document.getElementById('thanks');
+  if (dateEl   && (dateEl.value   === T.de.defaultDate   || dateEl.value   === T.en.defaultDate))   dateEl.value   = l.defaultDate;
+  if (footerEl && (footerEl.value === T.de.defaultFooter || footerEl.value === T.en.defaultFooter)) footerEl.value = l.defaultFooter;
+  if (thanksEl && (thanksEl.value === T.de.defaultThanks || thanksEl.value === T.en.defaultThanks)) thanksEl.value = l.defaultThanks;
+  s('out-eyebrow', l.eyebrow);
+  s('btn-export', l.btnExport);
+  s('lbl-bleed', l.bleed);
+  h('lbl-bleed-off', l.bleedOff);
+  h('lbl-bleed-on',  l.bleedOn);
+  update();
+}
 
 function autoResize(el) {
   el.style.height = 'auto';
@@ -396,7 +496,7 @@ function updateCardSize() {
 async function downloadPDF() {
   const btn = document.querySelector('.export-btn');
   const prevLabel = btn ? btn.textContent : null;
-  if (btn) { btn.textContent = 'Erstelle PDF…'; btn.disabled = true; }
+  if (btn) { btn.textContent = tt().btnExportRun; btn.disabled = true; }
 
   const el = document.getElementById('std-output');
   const scaler = document.getElementById('preview-scaler');
@@ -480,16 +580,17 @@ async function downloadPDF() {
     } else {
       pdf.addImage(img, 'PNG', 0, 0, dims.w, dims.h);
     }
-    const namen = document.getElementById('n1').value || 'ThankYou';
-    pdf.save('WSA_ThankYou_' + namen + '.pdf');
+    const namen = document.getElementById('n1').value || tt().saveName;
+    pdf.save('WSA_' + tt().saveName + '_' + namen + '.pdf');
   } catch (err) {
     console.error(err);
-    alert('Export fehlgeschlagen. Bitte Chrome verwenden.');
+    alert(tt().exportErr);
   } finally {
     cleanup();
   }
 }
 
+applyLang();
 update();
 autoResize(document.getElementById('thanks'));
 window.onresize = update;

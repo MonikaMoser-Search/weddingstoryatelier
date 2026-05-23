@@ -197,10 +197,18 @@
 
 <!-- LEFT PANEL -->
 <div class="panel-form">
-  <div class="panel-logo">Tischplan</div>
-  <div class="panel-tagline">Signature Line · Cards Edition</div>
+  <div class="panel-logo" id="lbl-logo">Tischplan</div>
+  <div class="panel-tagline" id="lbl-tagline">Signature Line · Cards Edition</div>
 
-  <label class="section-label">1 · Stil</label>
+  <label class="section-label" id="lbl-lang">Sprache</label>
+  <div class="btn-group" id="lang-btns">
+    <button class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <hr class="divider">
+
+  <label class="section-label" id="lbl-style">1 · Stil</label>
   <div class="btn-group">
     <button class="ui-btn active" onclick="setTheme('highland',this)">Highland</button>
     <button class="ui-btn" onclick="setTheme('coastal',this)">Coastal</button>
@@ -209,28 +217,28 @@
 
   <hr class="divider">
 
-  <label class="section-label">2 · Titel</label>
+  <label class="section-label" id="lbl-title">2 · Titel</label>
   <input type="text" id="inp-title" placeholder="TISCHPLAN" oninput="renderPoster()">
 
-  <label class="section-label">Untertitel</label>
+  <label class="section-label" id="lbl-subtitle">Untertitel</label>
   <input type="text" id="inp-subtitle" placeholder="Anna &amp; Maximilian · 12. Juli 2026" oninput="renderPoster()">
 
   <hr class="divider">
 
-  <label class="section-label">3 · Anzahl Tische</label>
+  <label class="section-label" id="lbl-count">3 · Anzahl Tische</label>
   <div class="count-row">
     <button class="count-btn" onclick="changeCount(-1)">−</button>
     <span class="count-num" id="count-num">8</span>
     <button class="count-btn" onclick="changeCount(1)">+</button>
-    <span class="count-sub">max. 12</span>
+    <span class="count-sub" id="lbl-count-max">max. 12</span>
   </div>
 
-  <label class="section-label" style="margin-bottom:8px;">4 · Namen eintragen · eine Person pro Zeile</label>
+  <label class="section-label" id="lbl-tables" style="margin-bottom:8px;">4 · Namen eintragen · eine Person pro Zeile</label>
   <div class="tables-wrap" id="tables-wrap"></div>
 
   <hr class="divider" style="flex-shrink:0;">
 
-  <label class="section-label">Schriftgröße</label>
+  <label class="section-label" id="lbl-font">Schriftgröße</label>
   <div class="duplex-row">
     <input type="range" id="font-slider" min="70" max="130" value="100" step="5" oninput="updateFontScale(this.value)">
     <span class="range-val" id="font-val">100%</span>
@@ -238,10 +246,10 @@
   <div class="btn-group" style="margin-bottom: 6px;">
     <button class="ui-btn" onclick="setFontPreset(80,this)">A4</button>
     <button class="ui-btn" onclick="setFontPreset(115,this)">A3</button>
-    <button class="ui-btn active" onclick="setFontPreset(100,this)">Standard</button>
+    <button class="ui-btn active" id="btn-fs-std" onclick="setFontPreset(100,this)">Standard</button>
   </div>
 
-  <label class="section-label">5 · Druckformat</label>
+  <label class="section-label" id="lbl-format">5 · Druckformat</label>
   <select id="sel-format" onchange="setPosterFormat(this.value)">
     <option value="a4" selected>A4 — 210 × 297 mm</option>
     <option value="letter">Letter — 216 × 279 mm (US)</option>
@@ -253,10 +261,10 @@
   </select>
 
   <div class="action-row">
-    <button class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
-    <button class="btn-export" onclick="exportPDF()">Export PDF</button>
+    <button class="btn-demo" id="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Export PDF</button>
   </div>
-  <span class="section-label" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
+  <span class="section-label" id="lbl-output" style="font-size:10px;margin-top:10px;margin-bottom:4px;display:block">Modus</span>
   <div class="btn-group" id="output-btns" style="margin-bottom:8px">
     <button type="button" class="ui-btn active" id="btn-out-home"  onclick="setOutput('home',this)">Heimdruck</button>
     <button type="button" class="ui-btn"        id="btn-out-print" onclick="setOutput('print',this)">Druckerei</button>
@@ -312,9 +320,103 @@
 
 <script>
 let currentTheme = 'highland';
+let currentLang  = 'de';
 let fontScale = 1.0;
 let tableCount = 8;
 let tableData = [];
+
+// ── I18N STRINGS ──────────────────────────────────────
+const T = {
+  de: {
+    logo:        'Tischplan',
+    tagline:     'Signature Line · Cards Edition',
+    lang:        'Sprache',
+    style:       '1 · Stil',
+    title:       '2 · Titel',
+    subtitle:    'Untertitel',
+    count:       '3 · Anzahl Tische',
+    countMax:    'max. 12',
+    tables:      '4 · Namen eintragen · eine Person pro Zeile',
+    fontSize:    'Schriftgröße',
+    fsStd:       'Standard',
+    format:      '5 · Druckformat',
+    titlePh:     'TISCHPLAN',
+    subtitlePh:  'Anna & Maximilian · 12. Juli 2026',
+    tableNamePh: 'Tischname (optional)',
+    guestsPh:    'Max Müller\nAnna Schmidt\n...',
+    tableLabel:  'Tisch',
+    guestUnit:   ' Gäste',
+    confirmReduce: (a, b) => 'Tische ' + a + '–' + b + ' enthalten Daten. Wirklich entfernen?',
+    btnDemo:     '▷ Demo',
+    btnExport:   'Export PDF',
+    outputLabel: 'Modus',
+    outBtnHome:  'Heimdruck',
+    outBtnPrint: 'Druckerei',
+    eyebrow:     'Seating Chart',
+    spinnerTxt:  'PDF wird erstellt …',
+    exportErr:   'Export fehlgeschlagen: ',
+    saveFallback:'Tischplan',
+    saveBrand:   'SignatureLine',
+    demoTitle:   'TISCHPLAN',
+    demoSub:     'Anna & Maximilian · 12. Juli 2026',
+    demoTables: [
+      { name: 'Brautpaar',      guests: 'Anna Müller\nMaximilian Becker' },
+      { name: 'Familie Müller', guests: 'Brigitte Müller\nHeinz Müller\nSophia Müller\nJonas Müller' },
+      { name: 'Familie Becker', guests: 'Ursula Becker\nGerhard Becker\nLena Becker' },
+      { name: 'Freunde',        guests: 'Claudia Hoffmann\nStefan Klein\nJulia Richter' },
+      { name: 'Kollegen',       guests: 'Petra Schäfer\nRalf Vogt\nMarina Bauer\nDaniel Krause' },
+      { name: 'Tisch 6',        guests: 'Ingrid Lange\nWerner Lange\nBrigitte Otto' },
+      { name: 'Tisch 7',        guests: 'Sabine Fischer\nKarl Fischer\nHelga Weber' },
+      { name: 'Tisch 8',        guests: 'Manfred Roth\nElise Roth\nPeter Braun' },
+      { name: 'Kinder',         guests: 'Mia Müller\nLeon Becker\nEmma Hoffmann\nBen Klein' },
+    ],
+  },
+  en: {
+    logo:        'Table Plan',
+    tagline:     'Signature Line · Cards Edition',
+    lang:        'Language',
+    style:       '1 · Style',
+    title:       '2 · Title',
+    subtitle:    'Subtitle',
+    count:       '3 · Number of tables',
+    countMax:    'max. 12',
+    tables:      '4 · Enter names · one person per line',
+    fontSize:    'Font size',
+    fsStd:       'Default',
+    format:      '5 · Print format',
+    titlePh:     'TABLE PLAN',
+    subtitlePh:  'Anna & Maximilian · July 12, 2026',
+    tableNamePh: 'Table name (optional)',
+    guestsPh:    'James Miller\nEmily Smith\n...',
+    tableLabel:  'Table',
+    guestUnit:   ' guests',
+    confirmReduce: (a, b) => 'Tables ' + a + '–' + b + ' contain data. Really remove?',
+    btnDemo:     '▷ Demo',
+    btnExport:   'Export PDF',
+    outputLabel: 'Mode',
+    outBtnHome:  'Home',
+    outBtnPrint: 'Print shop',
+    eyebrow:     'Seating Chart',
+    spinnerTxt:  'Creating PDF …',
+    exportErr:   'Export failed: ',
+    saveFallback:'TablePlan',
+    saveBrand:   'SignatureLine',
+    demoTitle:   'TABLE PLAN',
+    demoSub:     'Anna & Maximilian · July 12, 2026',
+    demoTables: [
+      { name: 'Bride & Groom',    guests: 'Anna Miller\nMaximilian Baker' },
+      { name: 'Miller Family',    guests: 'Bridget Miller\nHenry Miller\nSophie Miller\nJonas Miller' },
+      { name: 'Baker Family',     guests: 'Ursula Baker\nGeorge Baker\nLena Baker' },
+      { name: 'Friends',          guests: 'Claudia Hoffman\nSteven Klein\nJulia Richter' },
+      { name: 'Colleagues',       guests: 'Patricia Shaw\nRalph Vogt\nMarina Bower\nDaniel Cross' },
+      { name: 'Table 6',          guests: 'Ingrid Lane\nWarren Lane\nBridget Otto' },
+      { name: 'Table 7',          guests: 'Sarah Fisher\nKarl Fisher\nHelen Weber' },
+      { name: 'Table 8',          guests: 'Martin Ross\nElise Ross\nPeter Brown' },
+      { name: 'Kids',             guests: 'Mia Miller\nLeon Baker\nEmma Hoffman\nBen Klein' },
+    ],
+  },
+};
+function tt() { return T[currentLang]; }
 
 // ── DATA ──────────────────────────────────────────────
 function initTableData(count) {
@@ -327,6 +429,7 @@ function initTableData(count) {
 
 function renderTableInputs() {
   const wrap = document.getElementById('tables-wrap');
+  const l = tt();
   wrap.innerHTML = '';
   tableData.forEach((t, i) => {
     const n = parseGuests(t.guests_raw).length;
@@ -334,13 +437,13 @@ function renderTableInputs() {
     el.className = 't-card';
     el.innerHTML = `
       <div class="t-head">
-        <span class="t-num">Tisch ${i + 1}</span>
-        <input class="t-name-in" type="text" placeholder="Tischname (optional)"
+        <span class="t-num">${l.tableLabel} ${i + 1}</span>
+        <input class="t-name-in" type="text" placeholder="${esc(l.tableNamePh)}"
           value="${esc(t.name)}" oninput="tableData[${i}].name=this.value;renderPoster()">
       </div>
-      <textarea class="t-guests" placeholder="Max Müller&#10;Anna Schmidt&#10;..."
+      <textarea class="t-guests" placeholder="${esc(l.guestsPh)}"
         oninput="tableData[${i}].guests_raw=this.value;updateGC(${i},this);renderPoster()">${esc(t.guests_raw)}</textarea>
-      <div class="t-gc" id="gc-${i}">${n > 0 ? n + ' Gäste' : ''}</div>
+      <div class="t-gc" id="gc-${i}">${n > 0 ? n + l.guestUnit : ''}</div>
     `;
     wrap.appendChild(el);
   });
@@ -348,7 +451,7 @@ function renderTableInputs() {
 
 function updateGC(i, el) {
   const n = parseGuests(el.value).length;
-  document.getElementById('gc-' + i).textContent = n > 0 ? n + ' Gäste' : '';
+  document.getElementById('gc-' + i).textContent = n > 0 ? n + tt().guestUnit : '';
 }
 
 // ── HELPERS ───────────────────────────────────────────
@@ -365,7 +468,7 @@ function changeCount(d) {
   if (n === tableCount) return;
   if (n < tableCount) {
     const lost = tableData.slice(n).some(t => (t.name && t.name.trim()) || (t.guests_raw && t.guests_raw.trim()));
-    if (lost && !confirm('Tische ' + (n + 1) + '–' + tableCount + ' enthalten Daten. Wirklich entfernen?')) return;
+    if (lost && !confirm(tt().confirmReduce(n + 1, tableCount))) return;
   }
   tableCount = n;
   document.getElementById('count-num').textContent = n;
@@ -379,6 +482,46 @@ function setTheme(t, btn) {
   btn.parentElement.querySelectorAll('.ui-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   renderPoster();
+}
+
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  document.documentElement.lang = lang;
+  applyLang();
+  renderTableInputs();
+  renderPoster();
+}
+
+function applyLang() {
+  const l = tt();
+  function s(id, v) { const e = document.getElementById(id); if (e) e.textContent = v; }
+  function p(id, v) { const e = document.getElementById(id); if (e) e.placeholder  = v; }
+
+  s('lbl-logo',      l.logo);
+  s('lbl-tagline',   l.tagline);
+  s('lbl-lang',      l.lang);
+  s('lbl-style',     l.style);
+  s('lbl-title',     l.title);
+  s('lbl-subtitle',  l.subtitle);
+  s('lbl-count',     l.count);
+  s('lbl-count-max', l.countMax);
+  s('lbl-tables',    l.tables);
+  s('lbl-font',      l.fontSize);
+  s('btn-fs-std',    l.fsStd);
+  s('lbl-format',    l.format);
+  s('btn-demo',      l.btnDemo);
+  s('btn-export',    l.btnExport);
+  s('lbl-output',    l.outputLabel);
+  s('btn-out-home',  l.outBtnHome);
+  s('btn-out-print', l.outBtnPrint);
+
+  p('inp-title',     l.titlePh);
+  p('inp-subtitle',  l.subtitlePh);
+
+  const spinTxt = document.querySelector('#pdf-spinner span');
+  if (spinTxt) spinTxt.textContent = l.spinnerTxt;
 }
 
 function updateFontScale(val) {
@@ -432,9 +575,11 @@ const ORN_SMALL = `<svg viewBox="0 0 90 12" xmlns="http://www.w3.org/2000/svg"
 function renderPoster() {
   const poster = document.getElementById('poster');
   poster.className = currentTheme;
+  const l = tt();
 
   document.getElementById('poster-title').textContent =
-    document.getElementById('inp-title').value.trim() || 'TISCHPLAN';
+    document.getElementById('inp-title').value.trim() || l.titlePh;
+  document.querySelector('.poster-eyebrow').textContent = l.eyebrow;
 
   const sub   = document.getElementById('inp-subtitle').value.trim();
   const subEl = document.getElementById('poster-subtitle');
@@ -464,7 +609,7 @@ function renderPoster() {
     return `
       <div class="table-card">
         ${topOrn}
-        <div class="card-num">Tisch ${i + 1}</div>
+        <div class="card-num">${l.tableLabel} ${i + 1}</div>
         ${hasName ? `<div class="card-name">${esc(t.name)}</div>` : ''}
         <div class="card-rule"><span class="card-orn">◆</span></div>
         <div class="card-guests">
@@ -505,7 +650,7 @@ function exportPDF() {
   const spinner = document.getElementById('pdf-spinner');
   spinner.style.display = 'flex';
   try { exportPDF_vector(); }
-  catch(e) { alert('Export fehlgeschlagen: ' + e.message); console.error(e); }
+  catch(e) { alert(tt().exportErr + e.message); console.error(e); }
   finally { spinner.style.display = 'none'; }
 }
 
@@ -612,18 +757,19 @@ function exportPDF_vector() {
   // CSS letter-spacing (px) → jsPDF setCharSpace (mm), skaliert mit fS
   const PXmm = 0.2645;
   function trackingPx(px) { return px * PXmm * fS; }
+  const lP = tt();
   let y = contY;
   const eyeFS = 7 * fS;
   st(bl(tc, 0.42)); setFont('DMSans', 'normal'); pdf.setFontSize(eyeFS);
   pdf.setCharSpace(trackingPx(5));
   y += eyeFS * PTmm * 0.5;
-  pdf.text('SEATING CHART', cxPage, y, { align: 'center', baseline: 'middle' });
+  pdf.text(lP.eyebrow.toUpperCase(), cxPage, y, { align: 'center', baseline: 'middle' });
   pdf.setCharSpace(0);
   y += eyeFS * PTmm * 0.5 + 2.5 * fS;
 
   // Titel — PlayfairDisplay bold (coastal: bolditalic)
   const titleFS  = 26 * fS;
-  const titleTxt = document.getElementById('inp-title').value.trim() || 'TISCHPLAN';
+  const titleTxt = document.getElementById('inp-title').value.trim() || lP.titlePh;
   const titleStyle = currentTheme === 'coastal' ? 'bolditalic' : 'bold';
   st(tc); setFont('PlayfairDisplay', titleStyle); pdf.setFontSize(titleFS * fs);
   pdf.setCharSpace(trackingPx(7));
@@ -763,7 +909,7 @@ function exportPDF_vector() {
     st(bl(tc, 0.55)); setFont('DMSans', 'normal'); pdf.setFontSize(FS_NUM * cS);
     pdf.setCharSpace(trackingPx(1) * cS);
     cy += FS_NUM * cS * PTmm * 0.5;
-    pdf.text('Tisch ' + (i + 1), cardCx, cy, { align: 'center', baseline: 'middle' });
+    pdf.text(lP.tableLabel + ' ' + (i + 1), cardCx, cy, { align: 'center', baseline: 'middle' });
     pdf.setCharSpace(0);
     cy += FS_NUM * cS * PTmm * 0.5 + 1.5 * fS * cS;
 
@@ -812,29 +958,19 @@ function exportPDF_vector() {
   sf(bl(tc, 0.45)); pdf.circle(cxPage, fY, 0.75 * fS, 'F');
 
   // Speichern
-  const saveName = (document.getElementById('inp-title').value.trim() || 'Tischplan').replace(/\s+/g, '_');
-  pdf.save('Tischplan_SignatureLine_' + saveName + '_' + formatKey.toUpperCase() + '.pdf');
+  const saveName = (document.getElementById('inp-title').value.trim() || lP.saveFallback).replace(/\s+/g, '_');
+  pdf.save(lP.saveFallback + '_' + lP.saveBrand + '_' + saveName + '_' + formatKey.toUpperCase() + '.pdf');
 }
 
 // ── DEMO ──────────────────────────────────────────────
 function loadDemo() {
-  document.getElementById('inp-title').value    = 'TISCHPLAN';
-  document.getElementById('inp-subtitle').value = 'Anna & Maximilian · 12. Juli 2026';
+  const l = tt();
+  document.getElementById('inp-title').value    = l.demoTitle;
+  document.getElementById('inp-subtitle').value = l.demoSub;
   tableCount = 9;
   document.getElementById('count-num').textContent = 9;
-  const demo = [
-    { name: 'Brautpaar',      guests: 'Anna Müller\nMaximilian Becker' },
-    { name: 'Familie Müller', guests: 'Brigitte Müller\nHeinz Müller\nSophia Müller\nJonas Müller' },
-    { name: 'Familie Becker', guests: 'Ursula Becker\nGerhard Becker\nLena Becker' },
-    { name: 'Freunde',        guests: 'Claudia Hoffmann\nStefan Klein\nJulia Richter' },
-    { name: 'Kollegen',       guests: 'Petra Schäfer\nRalf Vogt\nMarina Bauer\nDaniel Krause' },
-    { name: 'Tisch 6',        guests: 'Ingrid Lange\nWerner Lange\nBrigitte Otto' },
-    { name: 'Tisch 7',        guests: 'Sabine Fischer\nKarl Fischer\nHelga Weber' },
-    { name: 'Tisch 8',        guests: 'Manfred Roth\nElise Roth\nPeter Braun' },
-    { name: 'Kinder',         guests: 'Mia Müller\nLeon Becker\nEmma Hoffmann\nBen Klein' },
-  ];
   initTableData(tableCount);
-  demo.forEach((d, i) => {
+  l.demoTables.forEach((d, i) => {
     if (tableData[i]) { tableData[i].name = d.name; tableData[i].guests_raw = d.guests; }
   });
   renderTableInputs();
@@ -843,6 +979,7 @@ function loadDemo() {
 
 // ── STARTUP ───────────────────────────────────────────
 initTableData(tableCount);
+applyLang();
 renderTableInputs();
 renderPoster();
 applyFontScale();
