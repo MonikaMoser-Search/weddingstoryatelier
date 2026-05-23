@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -832,7 +832,14 @@ function update() {
   document.getElementById('preview-scaler').style.transform = 'scale(' + scale + ')';
 }
 
-function downloadPDF() {
+async function downloadPDF() {
+  var btn  = document.getElementById('btn-export');
+  var orig = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = currentLang === 'de' ? 'Wird erstellt…' : 'Creating…';
+  }
+
   var el     = document.getElementById('news-output');
   var scaler = document.getElementById('preview-scaler');
   var prev   = scaler.style.transform;
@@ -843,42 +850,43 @@ function downloadPDF() {
   var clone = el.cloneNode(true);
   clone.style.backgroundColor = currentBG;
   ['img-main','img-qr'].forEach(function(id) {
-    var orig = document.getElementById(id);
-    var cl   = clone.querySelector('#'+id);
-    if (orig && cl) { cl.src = orig.src; cl.style.display = orig.style.display; }
+    var origEl = document.getElementById(id);
+    var cl     = clone.querySelector('#'+id);
+    if (origEl && cl) { cl.src = origEl.src; cl.style.display = origEl.style.display; }
   });
   wrap.appendChild(clone);
   document.body.appendChild(wrap);
 
-  setTimeout(function() {
-    html2canvas(clone, {
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(function(r) { setTimeout(r, 350); });
+    var canvas = await html2canvas(clone, {
       scale:2, useCORS:false, allowTaint:true,
       backgroundColor:currentBG, logging:false, imageTimeout:0
-    }).then(function(canvas) {
-      document.body.removeChild(wrap);
-      scaler.style.transform = prev;
-      var img = canvas.toDataURL('image/jpeg', 0.88);
-      var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
-      var fmt = (document.getElementById('sel-format') || {value:'a3'}).value;
-      var pW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
-      var pH = {a3:420,a4:297,tabloid:431.8,letter:279.4}[fmt] || 420;
-      var fmtSpec = bleed ? [pW+bleed*2,pH+bleed*2] : ((fmt==='a3'||fmt==='a4') ? fmt : [pW,pH]);
-      var pdf = new window.jspdf.jsPDF('p','mm', fmtSpec);
-      if (bleed) {
-        var m = currentBG.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-        if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pW+bleed*2, pH+bleed*2, 'F'); }
-      }
-      pdf.addImage(img,'JPEG',bleed,bleed,pW,pH);
-      var name = document.getElementById('in-name1').value || 'Wedding';
-      var suffix = currentLang === 'de' ? 'WSA_ClassicWedding_' : 'WSA_ClassicWeddingNewspaper_';
-      pdf.save(suffix+name+'.pdf');
-    }).catch(function(err) {
-      document.body.removeChild(wrap);
-      scaler.style.transform = prev;
-      console.error(err);
-      alert(currentLang === 'de' ? 'Export fehlgeschlagen. Bitte Chrome verwenden.' : 'Export failed. Please use Chrome.');
     });
-  }, 350);
+    var img = canvas.toDataURL('image/jpeg', 0.95);
+    var bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
+    var fmt = (document.getElementById('sel-format') || {value:'a3'}).value;
+    var pW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+    var pH = {a3:420,a4:297,tabloid:431.8,letter:279.4}[fmt] || 420;
+    var fmtSpec = bleed ? [pW+bleed*2,pH+bleed*2] : ((fmt==='a3'||fmt==='a4') ? fmt : [pW,pH]);
+    var pdf = new window.jspdf.jsPDF('p','mm', fmtSpec);
+    if (bleed) {
+      var m = currentBG.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+      if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pW+bleed*2, pH+bleed*2, 'F'); }
+    }
+    pdf.addImage(img,'JPEG',bleed,bleed,pW,pH);
+    var name = document.getElementById('in-name1').value || 'Wedding';
+    var suffix = currentLang === 'de' ? 'WSA_ClassicWedding_' : 'WSA_ClassicWeddingNewspaper_';
+    pdf.save(suffix+name+'.pdf');
+  } catch(err) {
+    console.error(err);
+    alert(currentLang === 'de' ? 'Export fehlgeschlagen. Bitte Chrome verwenden.' : 'Export failed. Please use Chrome.');
+  } finally {
+    if (wrap.parentNode) document.body.removeChild(wrap);
+    scaler.style.transform = prev;
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
+  }
 }
 
 window.onload   = update;

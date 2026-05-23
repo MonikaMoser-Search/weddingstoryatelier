@@ -1083,8 +1083,11 @@ function downloadPDF() {
   var isHome = currentOutput === 'home';
   var done   = function() { btn.textContent = orig; btn.disabled = false; };
 
-  if (isHome) exportHome(bleed, isUS, done);
-  else        exportPrint(bleed, isUS, done);
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve())
+    .then(function() {
+      if (isHome) exportHome(bleed, isUS, done);
+      else        exportPrint(bleed, isUS, done);
+    });
 }
 
 function captureCard(cardId, callback) {
@@ -1179,8 +1182,8 @@ function exportHome(bleed, isUS, done) {
         backX  = halfW + bleed;
       }
 
-      pdf.addImage(frontC.toDataURL('image/jpeg', 0.90), 'JPEG', frontX, marginV, cardW, cardH);
-      pdf.addImage(backC.toDataURL('image/jpeg',  0.90), 'JPEG', backX,  marginV, cardW, cardH);
+      pdf.addImage(frontC.toDataURL('image/jpeg', 0.95), 'JPEG', frontX, marginV, cardW, cardH);
+      pdf.addImage(backC.toDataURL('image/jpeg',  0.95), 'JPEG', backX,  marginV, cardW, cardH);
 
       // Crop marks for US 5×7" (card doesn't fill A4 half, so marks show where to cut)
       if (isUS) {
@@ -1217,9 +1220,9 @@ function exportPrint(bleed, isUS, done) {
       if (!backC) { alert(currentLang === 'de' ? 'Export fehlgeschlagen.' : 'Export failed.'); done(); return; }
 
       var pdf = new window.jspdf.jsPDF(orient, 'mm', [pdfW, pdfH]);
-      pdf.addImage(frontC.toDataURL('image/jpeg', 0.90), 'JPEG', 0, 0, pdfW, pdfH);
+      pdf.addImage(frontC.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, pdfW, pdfH);
       pdf.addPage([pdfW, pdfH], orient);
-      pdf.addImage(backC.toDataURL('image/jpeg',  0.90), 'JPEG', 0, 0, pdfW, pdfH);
+      pdf.addImage(backC.toDataURL('image/jpeg',  0.95), 'JPEG', 0, 0, pdfW, pdfH);
 
       var n1     = ge('in-name1').value || 'Wedding';
       var suffix = isUS ? 'USProgram_Print_' : 'Kirchenprogramm_Print_';

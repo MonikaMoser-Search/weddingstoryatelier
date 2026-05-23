@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -909,7 +909,14 @@ function update() {
   document.getElementById('preview-scaler').style.transform = 'scale(' + scale + ')';
 }
 
-function downloadPDF() {
+async function downloadPDF() {
+  const btn  = document.getElementById('btn-export');
+  const origLabel = btn ? btn.textContent : '';
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = currentLang === 'en' ? 'Creating…' : 'Wird erstellt…';
+  }
+
   const el     = document.getElementById('news-output');
   const scaler = document.getElementById('preview-scaler');
   const prev   = scaler.style.transform;
@@ -932,34 +939,35 @@ function downloadPDF() {
   document.body.appendChild(wrap);
 
   const bleed = document.getElementById('chk-bleed').checked ? 3 : 0;
-  setTimeout(function() {
-    html2canvas(clone, {
+  try {
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    await new Promise(r => setTimeout(r, 350));
+    const canvas = await html2canvas(clone, {
       scale:2, useCORS:false, allowTaint:true,
       backgroundColor:currentBG, logging:false, imageTimeout:0
-    }).then(function(canvas) {
-      document.body.removeChild(wrap);
-      scaler.style.transform = prev;
-      const img = canvas.toDataURL('image/jpeg', 0.88);
-      const fmt = (document.getElementById('sel-format') || {value:'a3'}).value;
-      const pW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
-      const pH = {a3:420,a4:297,tabloid:431.8,letter:279.4}[fmt] || 420;
-      const namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pW,pH];
-      const pdf = new window.jspdf.jsPDF('p','mm', bleed ? [pW+bleed*2,pH+bleed*2] : namedFmt);
-      if (bleed) {
-        const m = currentBG.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
-        if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pW+bleed*2, pH+bleed*2, 'F'); }
-      }
-      pdf.addImage(img,'JPEG',bleed,bleed,pW,pH);
-      const name = document.getElementById('in-name1').value || 'Dark';
-      const suffix = currentLang === 'en' ? '_DarkRomanceNewspaper.pdf' : '_DarkRomance.pdf';
-      pdf.save('WSA_' + name + suffix);
-    }).catch(function(err) {
-      document.body.removeChild(wrap);
-      scaler.style.transform = prev;
-      console.error(err);
-      alert(currentLang === 'en' ? 'Export failed. Please use Chrome.' : 'Export fehlgeschlagen. Bitte Chrome verwenden.');
     });
-  }, 350);
+    const img = canvas.toDataURL('image/jpeg', 0.95);
+    const fmt = (document.getElementById('sel-format') || {value:'a3'}).value;
+    const pW = {a3:297,a4:210,tabloid:279.4,letter:215.9}[fmt] || 297;
+    const pH = {a3:420,a4:297,tabloid:431.8,letter:279.4}[fmt] || 420;
+    const namedFmt = (fmt==='a3'||fmt==='a4') ? fmt : [pW,pH];
+    const pdf = new window.jspdf.jsPDF('p','mm', bleed ? [pW+bleed*2,pH+bleed*2] : namedFmt);
+    if (bleed) {
+      const m = currentBG.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+      if (m) { pdf.setFillColor(parseInt(m[1],16), parseInt(m[2],16), parseInt(m[3],16)); pdf.rect(0, 0, pW+bleed*2, pH+bleed*2, 'F'); }
+    }
+    pdf.addImage(img,'JPEG',bleed,bleed,pW,pH);
+    const name = document.getElementById('in-name1').value || 'Dark';
+    const suffix = currentLang === 'en' ? '_DarkRomanceNewspaper.pdf' : '_DarkRomance.pdf';
+    pdf.save('WSA_' + name + suffix);
+  } catch(err) {
+    console.error(err);
+    alert(currentLang === 'en' ? 'Export failed. Please use Chrome.' : 'Export fehlgeschlagen. Bitte Chrome verwenden.');
+  } finally {
+    if (wrap.parentNode) document.body.removeChild(wrap);
+    scaler.style.transform = prev;
+    if (btn) { btn.disabled = false; btn.textContent = origLabel; }
+  }
 }
 
 window.onload   = update;
