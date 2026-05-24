@@ -295,16 +295,60 @@ input.field { line-height: 1.2; }
   const card = document.getElementById('card');
   const btn  = document.getElementById('btnDownload');
 
+  // ===== Capture helper: replaces <input> elements with text spans ========
+  // html2canvas does not render <input> contents reliably (baseline shifts,
+  // text clipping). Fix: build an off-screen clone with spans instead.
+  function buildCaptureClone() {
+    const clone = card.cloneNode(true);
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;left:-99999px;top:0;background:#FFFFFF;';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    const origInputs  = Array.from(card.querySelectorAll('input.field'));
+    const cloneInputs = Array.from(clone.querySelectorAll('input.field'));
+
+    cloneInputs.forEach((cInp, i) => {
+      const oInp = origInputs[i];
+      const text = oInp.value.trim(); // Don't carry placeholder (same as print)
+      const cs   = window.getComputedStyle(oInp);
+      const rect = oInp.getBoundingClientRect();
+
+      const span = document.createElement('div');
+      span.className = cInp.className;
+      span.textContent = text;
+      [
+        'fontFamily','fontSize','fontStyle','fontWeight',
+        'color','textAlign','textTransform','letterSpacing',
+        'padding','boxSizing','width'
+      ].forEach(k => span.style[k] = cs[k]);
+      span.style.display       = 'flex';
+      span.style.alignItems    = 'center';
+      span.style.justifyContent= cs.textAlign === 'center' ? 'center' :
+                                  cs.textAlign === 'right'  ? 'flex-end' : 'flex-start';
+      span.style.height        = rect.height + 'px';
+      span.style.lineHeight    = '1';
+      span.style.whiteSpace    = 'nowrap';
+
+      cInp.parentNode.replaceChild(span, cInp);
+    });
+
+    return { clone, wrapper };
+  }
+
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     const original = btn.textContent;
     btn.textContent = 'Creating invitation …';
-    card.classList.add('is-capturing');
 
+    let wrapper = null;
     try {
       if (document.fonts && document.fonts.ready) await document.fonts.ready;
 
-      const canvas = await html2canvas(card, {
+      const built = buildCaptureClone();
+      wrapper = built.wrapper;
+
+      const canvas = await html2canvas(built.clone, {
         scale: 3,
         backgroundColor: '#FFFFFF',
         useCORS: true,
@@ -323,7 +367,7 @@ input.field { line-height: 1.2; }
       alert('An error occurred — please reload the page and try again.');
       console.error(err);
     } finally {
-      card.classList.remove('is-capturing');
+      if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
       btn.disabled = false;
       btn.textContent = original;
     }
