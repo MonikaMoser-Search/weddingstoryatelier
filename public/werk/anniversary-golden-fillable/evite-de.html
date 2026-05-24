@@ -1,0 +1,393 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>Goldene Hochzeit · Digitale Einladung · Wedding Story Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype-variations');
+  font-weight: 400 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  src: url('/Schriftarten/Bodoni_Moda/BodoniModa-Variable.ttf') format('truetype-variations');
+  font-weight: 400 900; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700; font-style: italic; font-display: block;
+}
+
+:root {
+  --gold:         #C9A24A;
+  --gold-soft:    rgba(201,162,74,0.55);
+  --gold-faint:   rgba(201,162,74,0.28);
+  --mushroom:     #9D907F;
+  --mushroom-soft:rgba(157,144,127,0.78);
+  --ink:          #2A2826;
+  --ink-soft:     #5A5854;
+  --paper:        #FFFFFF;
+  --bg:           #E8E4DE;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'Cinzel', serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px 64px;
+}
+
+.buyer-only { width: 100%; max-width: 540px; }
+.buyer-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+.buyer-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 11pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: #fff;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.buyer-btn:hover { background: var(--mushroom); border-color: var(--mushroom); }
+.buyer-hint {
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 9.5pt;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin: 0 0 22px;
+  line-height: 1.6;
+}
+
+.card {
+  width: 360px;
+  height: 640px;
+  background: var(--paper);
+  position: relative;
+  padding: 48px 28px 38px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+.hero { color: var(--gold); line-height: 0.95; margin: 0; padding: 0; }
+.hero-50 {
+  font-family: 'Bodoni Moda', 'Prata', serif;
+  font-weight: 900;
+  font-size: 110pt;
+  display: block;
+  line-height: 0.82;
+  letter-spacing: -0.02em;
+}
+
+.intro {
+  margin-top: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5pt;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--mushroom);
+  line-height: 1.8;
+}
+
+.names {
+  margin-top: 22px;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--gold);
+  width: 100%;
+}
+.name-row {
+  width: 280px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.05;
+}
+.name-row--1 { transform: translateX(-12px); margin-bottom: -8px; }
+.name-row--2 { transform: translateX(12px); margin-top: -8px; }
+.name-amp {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+  font-size: 22pt;
+  line-height: 1;
+  text-align: center;
+  margin: 0;
+  transform: translateX(-2px);
+}
+.name-input {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+  color: var(--gold) !important;
+  font-size: 34pt !important;
+  text-align: center;
+  width: 100%;
+  line-height: 1.05;
+}
+
+.datetime {
+  margin-top: 22px;
+  font-family: 'Cinzel', serif;
+  font-size: 9pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mushroom);
+  width: 100%;
+}
+
+.venue {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-family: 'Cinzel', serif;
+  font-size: 8.5pt;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--mushroom);
+  line-height: 1.6;
+  width: 100%;
+}
+
+.rsvp {
+  margin-top: auto;
+  font-family: 'Cinzel', serif;
+  font-size: 7.5pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--mushroom-soft);
+  line-height: 1.7;
+  width: 100%;
+}
+
+.ornament {
+  margin-top: 14px;
+  color: var(--gold);
+  font-size: 10pt;
+  line-height: 1;
+}
+.ornament svg { display: block; margin: 0 auto; }
+
+.field {
+  background: transparent;
+  border: none;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  padding: 2px 4px;
+  width: 100%;
+  transition: background .12s ease, box-shadow .12s ease;
+  border-radius: 2px;
+}
+.field:hover  { background: rgba(157,144,127,0.05); }
+.field:focus  { background: rgba(157,144,127,0.10); box-shadow: 0 0 0 1px var(--gold-faint); }
+.field::placeholder { color: var(--mushroom-soft); font-style: inherit; opacity: 1; }
+.names .field::placeholder { color: rgba(201,162,74,0.40); }
+.names .field { color: var(--gold) !important; }
+input.field { line-height: 1.2; }
+</style>
+</head>
+<body>
+
+<div class="buyer-only">
+  <div class="buyer-bar">
+    <button class="buyer-btn" id="btnDownload" type="button">Digitale Einladung speichern</button>
+  </div>
+  <p class="buyer-hint">
+    In die Felder tippen, dann „Digitale Einladung speichern" — das Bild landet im Downloads-Ordner (Format 1080 × 1920 px, ideal für WhatsApp, iMessage, Instagram-Story).
+  </p>
+</div>
+
+<article class="card" id="card">
+
+  <h1 class="hero">
+    <span class="hero-50">50</span>
+  </h1>
+
+  <p class="intro">
+    Wir laden euch herzlich ein<br>
+    zur Goldenen Hochzeit von
+  </p>
+
+  <div class="names">
+    <div class="name-row name-row--1">
+      <input class="field name-input" type="text" id="fName1" placeholder="Elisabeth">
+    </div>
+    <div class="name-amp" aria-hidden="true">&amp;</div>
+    <div class="name-row name-row--2">
+      <input class="field name-input" type="text" id="fName2" placeholder="Thomas">
+    </div>
+  </div>
+
+  <div class="datetime">
+    <input class="field" type="text" id="fDate" placeholder="Samstag, 14. Juni 2026 · 16:00">
+  </div>
+
+  <div class="venue">
+    <input class="field" type="text" id="fVenueName"   placeholder="Landhaus Sonnenhof">
+    <input class="field" type="text" id="fVenueStreet" placeholder="Lindenstraße 14">
+    <input class="field" type="text" id="fVenueCity"   placeholder="79100 Freiburg im Breisgau">
+  </div>
+
+  <div class="rsvp">
+    <input class="field" type="text" id="fRsvp" placeholder="Zusage bis 15. März · 0761 1234567">
+  </div>
+
+  <div class="ornament" aria-hidden="true">
+    <svg width="50" height="18" viewBox="0 0 60 22" fill="none" stroke="currentColor" stroke-width="0.9">
+      <path d="M2 8 Q 12 18 22 8" />
+      <path d="M38 8 Q 48 18 58 8" />
+      <path d="M28 11 C 28 8, 32 8, 32 11 C 32 8, 36 8, 36 11 C 36 15, 32 18, 32 18 C 32 18, 28 15, 28 11 Z" fill="currentColor"/>
+    </svg>
+  </div>
+
+</article>
+
+<script>
+  const card = document.getElementById('card');
+  const btn  = document.getElementById('btnDownload');
+
+  // Capture-Helper: tauscht <input> gegen styling-identische <div>-Spans aus
+  // (siehe Memory feedback_html2canvas_input_swap.md — html2canvas rendert
+  // Input-Inhalte unzuverlässig, deshalb Off-Screen-Clone mit Spans)
+  function buildCaptureClone() {
+    const clone = card.cloneNode(true);
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;left:-99999px;top:0;background:#FFFFFF;';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+
+    const origInputs  = Array.from(card.querySelectorAll('input.field'));
+    const cloneInputs = Array.from(clone.querySelectorAll('input.field'));
+
+    cloneInputs.forEach((cInp, i) => {
+      const oInp = origInputs[i];
+      const text = oInp.value.trim();
+      const cs   = window.getComputedStyle(oInp);
+      const rect = oInp.getBoundingClientRect();
+
+      const span = document.createElement('div');
+      span.className = cInp.className;
+      span.textContent = text;
+      [
+        'fontFamily','fontSize','fontStyle','fontWeight',
+        'color','textAlign','textTransform','letterSpacing',
+        'padding','boxSizing','width'
+      ].forEach(k => span.style[k] = cs[k]);
+      span.style.display       = 'flex';
+      span.style.alignItems    = 'center';
+      span.style.justifyContent= cs.textAlign === 'center' ? 'center' :
+                                  cs.textAlign === 'right'  ? 'flex-end' : 'flex-start';
+      span.style.height        = rect.height + 'px';
+      span.style.lineHeight    = '1';
+      span.style.whiteSpace    = 'nowrap';
+
+      cInp.parentNode.replaceChild(span, cInp);
+    });
+
+    return { clone, wrapper };
+  }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true;
+    const original = btn.textContent;
+    btn.textContent = 'Erzeuge Einladung …';
+
+    let wrapper = null;
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+
+      const built = buildCaptureClone();
+      wrapper = built.wrapper;
+
+      const canvas = await html2canvas(built.clone, {
+        scale: 3,
+        backgroundColor: '#FFFFFF',
+        useCORS: true,
+        logging: false,
+        width: 360,
+        height: 640,
+      });
+
+      const link = document.createElement('a');
+      const name1 = (document.getElementById('fName1').value || 'Elisabeth').trim();
+      const name2 = (document.getElementById('fName2').value || 'Thomas').trim();
+      link.download = `Goldene-Hochzeit-Einladung-${name1}-${name2}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      alert('Es ist ein Fehler aufgetreten — bitte Seite neu laden und nochmal versuchen.');
+      console.error(err);
+    } finally {
+      if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+      btn.disabled = false;
+      btn.textContent = original;
+    }
+  });
+
+  // ===== Autofit =====
+  const _measureCtx = document.createElement('canvas').getContext('2d');
+
+  function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
+    function fit() {
+      const cs = getComputedStyle(input);
+      const family = cs.fontFamily, style = cs.fontStyle, weight = cs.fontWeight;
+      const text = input.value || input.placeholder || '';
+      function widthAt(pt) {
+        const px = (pt * 4 / 3).toFixed(2);
+        _measureCtx.font = `${style} ${weight} ${px}px ${family}`;
+        return _measureCtx.measureText(text).width;
+      }
+      const available = (input.clientWidth - 4) / swashSafety;
+      const needed = widthAt(maxPt);
+      let pt = needed > available ? Math.max(minPt, maxPt * (available / needed)) : maxPt;
+      input.style.fontSize = pt.toFixed(1) + 'pt';
+    }
+    input.addEventListener('input', fit);
+    return fit;
+  }
+
+  const fits = [];
+  function setup() {
+    fits.push(autofitField(document.getElementById('fName1'),     34, 18, 1.08));
+    fits.push(autofitField(document.getElementById('fName2'),     34, 18, 1.08));
+    fits.push(autofitField(document.getElementById('fDate'),       9, 6.5, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueName'),  8.5, 6, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueStreet'),8.5, 6, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueCity'),  8.5, 6, 1.15));
+    fits.push(autofitField(document.getElementById('fRsvp'),       7.5, 6, 1.15));
+    fits.forEach(f => f());
+  }
+
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setup);
+  else window.addEventListener('load', setup);
+</script>
+
+</body>
+</html>

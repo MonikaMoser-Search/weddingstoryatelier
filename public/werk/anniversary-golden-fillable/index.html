@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -14,9 +14,12 @@
 
     :root {
       --gold:        #C9A24A;
+      
       --gold-soft:   rgba(201,162,74,0.55);
-      --gold-faint:  rgba(201,162,74,0.18);
-      --cream:       #FBF8F2;
+      --gold-faint:  rgba(201,162,74,0.20);
+      --mushroom:    #9D907F;
+      --mushroom-soft: rgba(157,144,127,0.78);
+      --cream:       #F5F5F3;
       --paper:       #FFFFFF;
       --ink:         #2A2826;
       --ink-body:    rgba(42,40,38,0.85);
@@ -41,7 +44,7 @@
       font-family: 'Cinzel', serif;
       font-size: 11pt;
       letter-spacing: 0.36em;
-      color: var(--gold);
+      color: var(--mushroom);
       text-transform: uppercase;
       margin-bottom: 50px;
     }
@@ -51,7 +54,7 @@
       font-family: 'Cinzel', serif;
       font-size: 11pt;
       letter-spacing: 0.32em;
-      color: var(--gold);
+      color: var(--mushroom);
       text-transform: uppercase;
       margin-bottom: 22px;
     }
@@ -79,7 +82,7 @@
     .rule-line { flex: 1; height: 0.5px; background: var(--gold-soft); }
     .rule-gem {
       width: 8px; height: 8px;
-      background: var(--gold);
+      background: var(--mushroom);
       transform: rotate(45deg); flex-shrink: 0;
     }
     .intro {
@@ -95,68 +98,63 @@
       font-family: 'Cinzel', serif;
       font-size: 10pt;
       letter-spacing: 0.32em;
-      color: var(--gold);
+      color: var(--mushroom);
       text-transform: uppercase;
       text-align: center;
       margin: 60px 0 24px;
     }
 
-    .cards {
+    .pair {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
-    .card-tile {
+    .btn {
       background: var(--paper);
       border: 1px solid var(--gold-faint);
-      padding: 26px 28px 22px;
+      padding: 22px 22px 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       text-decoration: none;
       color: inherit;
-      transition: all 0.2s;
+      transition: all 0.18s;
+      position: relative;
     }
-    .card-tile:hover {
-      border-color: var(--gold);
-      background: #fffdf8;
+    .btn:hover {
+      border-color: var(--mushroom);
+      background: #fbfaf6;
     }
-    .card-num {
-      font-family: 'Cinzel', serif;
-      font-size: 9pt;
-      letter-spacing: 0.28em;
-      color: var(--gold);
-      text-transform: uppercase;
-    }
-    .card-name {
+    .btn-lang {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 20pt;
+      font-size: 22pt;
       color: var(--ink);
-      line-height: 1.15;
+      line-height: 1.05;
     }
-    .card-meta {
-      font-size: 11pt;
-      color: var(--ink-soft);
-      font-style: italic;
-      margin-top: auto;
-      padding-top: 4px;
-    }
-    .card-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .btn-meta {
       font-family: 'Cinzel', serif;
-      font-size: 9pt;
+      font-size: 8.5pt;
       letter-spacing: 0.24em;
-      color: var(--gold);
+      color: var(--mushroom);
       text-transform: uppercase;
-      margin-top: 10px;
+    }
+    .btn-arrow {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      font-family: 'Cinzel', serif;
+      font-size: 14pt;
+      color: var(--mushroom);
+      line-height: 1;
+    }
+    @media (max-width: 540px) {
+      .pair { grid-template-columns: 1fr; }
     }
 
     .tip {
-      background: rgba(201,162,74,0.07);
+      background: rgba(157,144,127,0.07);
       padding: 22px 28px;
       margin: 50px 0 30px;
       font-style: italic;
@@ -169,7 +167,7 @@
       font-style: normal;
       font-size: 9pt;
       letter-spacing: 0.28em;
-      color: var(--gold);
+      color: var(--mushroom);
       text-transform: uppercase;
       display: block;
       margin-bottom: 6px;
@@ -183,7 +181,7 @@
       font-family: 'Cinzel', serif;
       font-size: 8.5pt;
       letter-spacing: 0.36em;
-      color: var(--gold-soft);
+      color: var(--mushroom-soft);
       text-transform: uppercase;
       margin-top: 18px;
     }
@@ -204,49 +202,66 @@
   <div class="header">
     <div class="eyebrow">Anniversary Kit · Goldene Hochzeit</div>
     <div class="hero-50">50</div>
-    <h1 class="title">Eine Karte. Zwei Sprachen. Direkt im Browser ausfüllen.</h1>
+    <h1 class="title">Zwei Karten. Zwei Sprachen. Direkt im Browser ausfüllen.</h1>
     <div class="rule">
       <div class="rule-line"></div>
       <div class="rule-gem"></div>
       <div class="rule-line"></div>
     </div>
     <p class="intro">
-      Willkommen in eurem Atelier-Set. Eure Einladung zur Goldenen Hochzeit
-      in zwei Sprachversionen — direkt im Browser ausfüllen, anschließend
-      drucken oder als PDF speichern. Kein Editor, kein Account.
+      Willkommen in eurem Atelier-Set. Zwei Karten — Druck-Einladung
+      (A5 oder 5 × 7 in) und Digitale Einladung (für WhatsApp, iMessage, Instagram-Story) —
+      jeweils auf Deutsch und Englisch. Direkt im Browser ausfüllen, kein Editor, kein Account.
     </p>
   </div>
 
-  <div class="section-label">— Deutsch · A5 —</div>
+  <div class="section-label">— Druck-Einladung · Printable Invitation —</div>
 
-  <div class="cards">
-    <a class="card-tile" href="einladung-de.html">
-      <div class="card-num">No. 01 · Ausfüllbar</div>
-      <div class="card-name">Einladung zur Goldenen Hochzeit</div>
-      <div class="card-meta">A5 · Eure Namen, Datum und Veranstaltungsort direkt in die Karte eintragen, dann drucken</div>
-      <div class="card-action">Im Browser öffnen →</div>
+  <div class="pair">
+    <a class="btn" href="einladung-de.html">
+      <div class="btn-meta">Deutsch · A5</div>
+      <div class="btn-lang">Einladung</div>
+      <div class="btn-arrow">→</div>
+    </a>
+    <a class="btn" href="invitation-en.html">
+      <div class="btn-meta">English · 5 × 7 in</div>
+      <div class="btn-lang">Invitation</div>
+      <div class="btn-arrow">→</div>
     </a>
   </div>
 
-  <div class="section-label">— English · 5 × 7 in —</div>
+  <div class="section-label">— Digitale Einladung · Digital Invitation —</div>
 
-  <div class="cards">
-    <a class="card-tile" href="invitation-en.html">
-      <div class="card-num">No. 02 · Fillable</div>
-      <div class="card-name">Golden Anniversary Invitation</div>
-      <div class="card-meta">5 × 7 in · Type your names, date and venue directly into the card, then print</div>
-      <div class="card-action">Open in browser →</div>
+  <div class="pair">
+    <a class="btn" href="evite-de.html">
+      <div class="btn-meta">Deutsch · 1080 × 1920</div>
+      <div class="btn-lang">Digitale Einladung</div>
+      <div class="btn-arrow">→</div>
+    </a>
+    <a class="btn" href="evite-en.html">
+      <div class="btn-meta">English · 1080 × 1920</div>
+      <div class="btn-lang">Digital Invitation</div>
+      <div class="btn-arrow">→</div>
     </a>
   </div>
 
   <div class="tip">
     <strong>Atelier-Empfehlung zum Druck</strong>
-    Für die volle Champagne-Wirkung empfehlen wir 200–230 g/m² mattes oder
-    seidenglänzendes Papier. Im Druckdialog bitte „Hintergrundgrafiken
-    drucken" aktivieren, sonst fehlt das Gold. Tipp: einmal „Als PDF
-    speichern" zur Vorschau, bevor Tinte fließt. Bei sehr langen
-    Bindestrich-Namen passt sich die Schriftgröße automatisch an — für
-    maximale Wirkung empfehlen wir Rufnamen.
+    Für die volle Wirkung von Champagne-Gold und Mushroom empfehlen wir 200–230 g/m²
+    mattes oder seidenglänzendes Papier. Im Druckdialog bitte „Hintergrundgrafiken
+    drucken" aktivieren, sonst fehlen die Farben. Tipp: einmal „Als PDF speichern"
+    zur Vorschau, bevor Tinte fließt. Bei sehr langen Bindestrich-Namen passt
+    sich die Schriftgröße automatisch an — für maximale Wirkung empfehlen wir
+    Rufnamen.
+  </div>
+
+  <div class="tip">
+    <strong>Atelier-Empfehlung für die Digitale Einladung</strong>
+    Die digitale Karte wird als PNG im Format 1080 × 1920 px gespeichert —
+    optimiert für WhatsApp, iMessage, Telegram und Instagram-Story. Einmal
+    ausfüllen genügt für beide Sprachen: gedruckte Karte für Familie und
+    enge Freunde, digitale Einladung für entfernte Gäste, die per Messenger
+    eingeladen werden. Funktioniert auf Laptop, Tablet und Smartphone.
   </div>
 
   <div class="footer-rule">

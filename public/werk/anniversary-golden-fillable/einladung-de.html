@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de">
 <head>
 <meta charset="UTF-8">
@@ -38,9 +38,11 @@
 
 /* ===== Farben =========================================================== */
 :root {
-  --gold:        #C9A24A;   /* Champagne-Gold, R201 G162 B74 — Rot>Grün>Blau verhindert Olive-Drift bei Heimdruck */
+  --gold:        #C9A24A;   /* Champagne-Gold, R201 G162 B74 — Hero „50" und Namen */
   --gold-soft:   rgba(201,162,74,0.55);
   --gold-faint:  rgba(201,162,74,0.20);
+  --mushroom:    #9D907F;   /* Softes Mushroom, R157 G144 B127 — kühl-neutraler Akzent gegen warmes Gold; analog Mauve bei Silber */
+  --mushroom-soft: rgba(157,144,127,0.78);
   --ink:         #2A2826;
   --ink-soft:    #5A5854;
   --paper:       #FFFFFF;
@@ -132,7 +134,7 @@ body {
   font-size: 10.5pt;
   letter-spacing: 0.24em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: var(--mushroom);
   line-height: 1.8;
 }
 
@@ -150,14 +152,14 @@ body {
   margin-right: auto;
   line-height: 1.05;
 }
-.name-row--1 { transform: translateX(-5mm); }
-.name-row--2 { transform: translateX(5mm); margin-top: 0; }
+.name-row--1 { transform: translateX(-5mm); margin-bottom: -3mm; }
+.name-row--2 { transform: translateX(5mm); margin-top: -3mm; }
 .name-amp {
   font-family: 'Cormorant Garamond', serif;
   font-style: italic;
   font-weight: 400;
   color: var(--gold);
-  font-size: 30pt;
+  font-size: 32pt;
   line-height: 1;
   text-align: center;
   margin: 0;
@@ -168,7 +170,7 @@ body {
   font-style: italic !important;
   font-weight: 500 !important;
   color: var(--gold) !important;
-  font-size: 42pt !important;
+  font-size: 48pt !important;
   text-align: center;
   width: 100%;
   line-height: 1.05;
@@ -181,7 +183,7 @@ body {
   font-size: 11pt;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--mushroom);
   width: 100%;
 }
 
@@ -195,7 +197,7 @@ body {
   font-size: 10pt;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--gold);
+  color: var(--mushroom);
   line-height: 1.6;
   width: 100%;
 }
@@ -207,7 +209,7 @@ body {
   font-size: 9pt;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--gold-soft);
+  color: var(--mushroom-soft);
   line-height: 1.7;
   width: 100%;
 }
@@ -372,8 +374,8 @@ input.field { line-height: 1.2; }
   // Felder + Pt-Grenzen
   const fits = [];
   function setup() {
-    fits.push(autofitField(document.getElementById('fName1'),     42, 22, 1.08));
-    fits.push(autofitField(document.getElementById('fName2'),     42, 22, 1.08));
+    fits.push(autofitField(document.getElementById('fName1'),     48, 24, 1.08));
+    fits.push(autofitField(document.getElementById('fName2'),     48, 24, 1.08));
     fits.push(autofitField(document.getElementById('fDate'),      11, 8));
     fits.push(autofitField(document.getElementById('fVenueName'), 10, 7));
     fits.push(autofitField(document.getElementById('fVenueStreet'),10, 7));
