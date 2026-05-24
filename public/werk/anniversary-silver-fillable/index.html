@@ -104,58 +104,53 @@
       margin: 60px 0 24px;
     }
 
-    .cards {
+    .pair {
       display: grid;
-      grid-template-columns: 1fr;
-      gap: 18px;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
     }
-    .card-tile {
+    .btn {
       background: var(--paper);
       border: 1px solid var(--silver-faint);
-      padding: 26px 28px 22px;
+      padding: 22px 22px 20px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
       text-decoration: none;
       color: inherit;
-      transition: all 0.2s;
+      transition: all 0.18s;
+      position: relative;
     }
-    .card-tile:hover {
+    .btn:hover {
       border-color: var(--mauve);
       background: #fbf9fa;
     }
-    .card-num {
-      font-family: 'Cinzel', serif;
-      font-size: 9pt;
-      letter-spacing: 0.28em;
-      color: var(--mauve);
-      text-transform: uppercase;
-    }
-    .card-name {
+    .btn-lang {
       font-family: 'Cormorant Garamond', serif;
       font-style: italic;
       font-weight: 500;
-      font-size: 20pt;
+      font-size: 22pt;
       color: var(--ink);
-      line-height: 1.15;
+      line-height: 1.05;
     }
-    .card-meta {
-      font-size: 11pt;
-      color: var(--ink-soft);
-      font-style: italic;
-      margin-top: auto;
-      padding-top: 4px;
-    }
-    .card-action {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .btn-meta {
       font-family: 'Cinzel', serif;
-      font-size: 9pt;
+      font-size: 8.5pt;
       letter-spacing: 0.24em;
       color: var(--mauve);
       text-transform: uppercase;
-      margin-top: 10px;
+    }
+    .btn-arrow {
+      position: absolute;
+      top: 22px;
+      right: 22px;
+      font-family: 'Cinzel', serif;
+      font-size: 14pt;
+      color: var(--mauve);
+      line-height: 1;
+    }
+    @media (max-width: 540px) {
+      .pair { grid-template-columns: 1fr; }
     }
 
     .tip {
@@ -207,50 +202,46 @@
   <div class="header">
     <div class="eyebrow">Anniversary Kit · Silberne Hochzeit</div>
     <div class="hero-50">25</div>
-    <h1 class="title">Eine Karte. Zwei Sprachen. Direkt im Browser ausfüllen.</h1>
+    <h1 class="title">Zwei Karten. Zwei Sprachen. Direkt im Browser ausfüllen.</h1>
     <div class="rule">
       <div class="rule-line"></div>
       <div class="rule-gem"></div>
       <div class="rule-line"></div>
     </div>
     <p class="intro">
-      Willkommen in eurem Atelier-Set. Vier Karten — gedruckte Einladung
-      (A5 oder 5 × 7 in) und digitale Evite (für WhatsApp, iMessage, Instagram)
-      in beiden Sprachen. Direkt im Browser ausfüllen, kein Editor, kein Account.
+      Willkommen in eurem Atelier-Set. Zwei Karten — gedruckte Einladung
+      (A5 oder 5 × 7 in) und digitale Evite (für WhatsApp, iMessage, Instagram-Story) —
+      jeweils auf Deutsch und Englisch. Direkt im Browser ausfüllen, kein Editor, kein Account.
     </p>
   </div>
 
-  <div class="section-label">— Deutsch —</div>
+  <div class="section-label">— Druck-Einladung · Printable Invitation —</div>
 
-  <div class="cards">
-    <a class="card-tile" href="einladung-de.html">
-      <div class="card-num">No. 01 · Druck · A5</div>
-      <div class="card-name">Einladung zur Silbernen Hochzeit</div>
-      <div class="card-meta">A5 · Namen, Datum und Veranstaltungsort eintragen, dann am Heimdrucker oder in der Druckerei drucken</div>
-      <div class="card-action">Im Browser öffnen →</div>
+  <div class="pair">
+    <a class="btn" href="einladung-de.html">
+      <div class="btn-meta">Deutsch · A5</div>
+      <div class="btn-lang">Einladung</div>
+      <div class="btn-arrow">→</div>
     </a>
-    <a class="card-tile" href="evite-de.html">
-      <div class="card-num">No. 02 · Digital · 1080 × 1920 px</div>
-      <div class="card-name">Evite zur Silbernen Hochzeit</div>
-      <div class="card-meta">9 : 16 Hochformat als PNG · zum Versenden via WhatsApp, iMessage oder Instagram-Story</div>
-      <div class="card-action">Im Browser öffnen →</div>
+    <a class="btn" href="invitation-en.html">
+      <div class="btn-meta">English · 5 × 7 in</div>
+      <div class="btn-lang">Invitation</div>
+      <div class="btn-arrow">→</div>
     </a>
   </div>
 
-  <div class="section-label">— English —</div>
+  <div class="section-label">— Digitale Evite · Digital Evite —</div>
 
-  <div class="cards">
-    <a class="card-tile" href="invitation-en.html">
-      <div class="card-num">No. 03 · Print · 5 × 7 in</div>
-      <div class="card-name">Silver Anniversary Invitation</div>
-      <div class="card-meta">5 × 7 in · type names, date and venue into the card, then print at home or order through a print shop</div>
-      <div class="card-action">Open in browser →</div>
+  <div class="pair">
+    <a class="btn" href="evite-de.html">
+      <div class="btn-meta">Deutsch · 1080 × 1920</div>
+      <div class="btn-lang">Evite</div>
+      <div class="btn-arrow">→</div>
     </a>
-    <a class="card-tile" href="evite-en.html">
-      <div class="card-num">No. 04 · Digital · 1080 × 1920 px</div>
-      <div class="card-name">Silver Anniversary Evite</div>
-      <div class="card-meta">9 : 16 portrait as PNG · share via WhatsApp, iMessage, or Instagram Stories</div>
-      <div class="card-action">Open in browser →</div>
+    <a class="btn" href="evite-en.html">
+      <div class="btn-meta">English · 1080 × 1920</div>
+      <div class="btn-lang">Evite</div>
+      <div class="btn-arrow">→</div>
     </a>
   </div>
 
