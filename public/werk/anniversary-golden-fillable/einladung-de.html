@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>Goldene Hochzeit · Einladung · Wedding Story Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== Schriften: lokal, OFL ============================================ */
+@font-face {
+  font-family: 'Great Vibes';
+  src: url('/Schriftarten/Great_Vibes/GreatVibes-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype-variations');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Bodoni Moda';
+  src: url('/Schriftarten/Bodoni_Moda/BodoniModa-Variable.ttf') format('truetype-variations');
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: block;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700;
+  font-style: italic;
+  font-display: block;
+}
+
+/* ===== Farben =========================================================== */
+:root {
+  --gold:        #C9A24A;   /* Champagne-Gold, R201 G162 B74 — Rot>Grün>Blau verhindert Olive-Drift bei Heimdruck */
+  --gold-soft:   rgba(201,162,74,0.55);
+  --gold-faint:  rgba(201,162,74,0.20);
+  --ink:         #2A2826;
+  --ink-soft:    #5A5854;
+  --paper:       #FFFFFF;
+  --bg:          #E8E4DE;
+}
+
+/* ===== Bildschirm-Rahmen ================================================ */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'Cinzel', serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px 16px 64px;
+}
+
+/* ===== Käufer-UI (wird im Druck ausgeblendet) =========================== */
+.buyer-only { width: 100%; max-width: 600px; }
+.buyer-bar {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+.buyer-btn {
+  font-family: 'Cinzel', serif;
+  font-size: 11pt;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: #fff;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.buyer-btn:hover { background: var(--gold); border-color: var(--gold); }
+.buyer-hint {
+  text-align: center;
+  font-family: 'Cinzel', serif;
+  font-size: 10pt;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  margin: 0 0 28px;
+  line-height: 1.6;
+}
+
+/* ===== Die Karte (A5: 148 × 210 mm) ==================================== */
+.card {
+  width: 148mm;
+  height: 210mm;
+  background: var(--paper);
+  position: relative;
+  padding: 14mm 12mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+/* ===== Hero: "50" in Bodoni Moda Black, Champagne-Gold ================== */
+.hero {
+  color: var(--gold);
+  line-height: 0.95;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.hero-50 {
+  font-family: 'Bodoni Moda', 'Prata', serif;
+  font-weight: 900;
+  font-size: 130pt;
+  display: block;
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+}
+
+/* ===== Intro-Block (zwei Caps-Zeilen, ein zusammenhängender Satz) ====== */
+.intro {
+  margin-top: 3mm;
+  font-family: 'Cinzel', serif;
+  font-size: 10.5pt;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  line-height: 1.8;
+}
+
+/* ===== Namen (Cormorant Italic, dreizeilig mit Treppen-Versatz) ======== */
+.names {
+  margin-top: 7mm;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  color: var(--gold);
+  width: 100%;
+}
+.name-row {
+  width: 115mm;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.05;
+}
+.name-row--1 { transform: translateX(-5mm); }
+.name-row--2 { transform: translateX(5mm); margin-top: 0; }
+.name-amp {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--gold);
+  font-size: 30pt;
+  line-height: 1;
+  text-align: center;
+  margin: 0;
+  transform: translateX(-1mm);
+}
+.name-input {
+  font-family: 'Cormorant Garamond', serif !important;
+  font-style: italic !important;
+  font-weight: 500 !important;
+  color: var(--gold) !important;
+  font-size: 42pt !important;
+  text-align: center;
+  width: 100%;
+  line-height: 1.05;
+}
+
+/* ===== Datum / Uhrzeit ================================================== */
+.datetime {
+  margin-top: 6mm;
+  font-family: 'Cinzel', serif;
+  font-size: 11pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  width: 100%;
+}
+
+/* ===== Venue + Adresse ================================================= */
+.venue {
+  margin-top: 7mm;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5mm;
+  font-family: 'Cinzel', serif;
+  font-size: 10pt;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  line-height: 1.6;
+  width: 100%;
+}
+
+/* ===== RSVP ============================================================ */
+.rsvp {
+  margin-top: 6mm;
+  font-family: 'Cinzel', serif;
+  font-size: 9pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  line-height: 1.7;
+  width: 100%;
+}
+
+/* ===== Ornament ========================================================= */
+.ornament {
+  margin-top: 5mm;
+  color: var(--gold);
+  font-size: 12pt;
+  line-height: 1;
+}
+.ornament svg { display: block; margin: 0 auto; }
+
+/* ===== Input-Styling ==================================================== */
+.field {
+  background: transparent;
+  border: none;
+  outline: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  padding: 2px 4px;
+  width: 100%;
+  transition: background .12s ease, box-shadow .12s ease;
+  border-radius: 2px;
+}
+.field:hover  { background: rgba(201,162,74,0.05); }
+.field:focus  { background: rgba(201,162,74,0.10); box-shadow: 0 0 0 1px var(--gold-faint); }
+.field::placeholder { color: var(--gold-soft); font-style: inherit; opacity: 1; }
+.names .field::placeholder { color: rgba(201,162,74,0.40); }
+input.field { line-height: 1.2; }
+
+/* ===== Print ============================================================ */
+@media print {
+  @page {
+    size: A5;
+    margin: 0;
+  }
+  html, body {
+    background: #fff !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 148mm !important;
+    height: 210mm !important;
+    min-height: 0 !important;
+    display: block !important;
+  }
+  .buyer-only { display: none !important; }
+  .card {
+    box-shadow: none !important;
+    width: 148mm;
+    height: 210mm;
+    margin: 0;
+    overflow: hidden;
+    page-break-inside: avoid;
+  }
+  .field {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+  .field::placeholder { color: transparent !important; }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="buyer-only">
+  <div class="buyer-bar">
+    <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
+  </div>
+  <p class="buyer-hint">
+    Klicken Sie in die Karte, um Ihre Daten einzutragen. Anschließend „Drucken / PDF" wählen. Tipp: im Druckdialog Hintergrundgrafiken aktivieren. Format: A5.
+  </p>
+</div>
+
+<article class="card">
+
+  <h1 class="hero">
+    <span class="hero-50">50</span>
+  </h1>
+
+  <p class="intro">
+    Wir laden euch herzlich ein<br>
+    zur Goldenen Hochzeit von
+  </p>
+
+  <div class="names">
+    <div class="name-row name-row--1">
+      <input class="field name-input" type="text" id="fName1" placeholder="Elisabeth">
+    </div>
+    <div class="name-amp" aria-hidden="true">&amp;</div>
+    <div class="name-row name-row--2">
+      <input class="field name-input" type="text" id="fName2" placeholder="Thomas">
+    </div>
+  </div>
+
+  <div class="datetime">
+    <input class="field" type="text" id="fDate" placeholder="Samstag, 14. Juni 2026 · 16:00">
+  </div>
+
+  <div class="venue">
+    <input class="field" type="text" id="fVenueName"   placeholder="Landhaus Sonnenhof">
+    <input class="field" type="text" id="fVenueStreet" placeholder="Lindenstraße 14">
+    <input class="field" type="text" id="fVenueCity"   placeholder="79100 Freiburg im Breisgau">
+  </div>
+
+  <div class="rsvp">
+    <input class="field" type="text" id="fRsvp" placeholder="Wir freuen uns über eine Zusage bis zum 15. März · 0761 1234567">
+  </div>
+
+  <div class="ornament" aria-hidden="true">
+    <svg width="60" height="22" viewBox="0 0 60 22" fill="none" stroke="currentColor" stroke-width="0.9">
+      <path d="M2 8 Q 12 18 22 8" />
+      <path d="M38 8 Q 48 18 58 8" />
+      <path d="M28 11 C 28 8, 32 8, 32 11 C 32 8, 36 8, 36 11 C 36 15, 32 18, 32 18 C 32 18, 28 15, 28 11 Z" fill="currentColor"/>
+    </svg>
+  </div>
+
+</article>
+
+<script>
+  document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+  // ===== Autofit: Schriftgröße schrumpfen wenn Text zu breit ===========
+  // Misst via verstecktem Span (1:1 Font-Eigenschaften) und reduziert pt
+  // bis der Text in den Container passt — Untergrenze schützt Lesbarkeit
+  // Canvas-basierte Messung: deterministisch, unabhängig von Input-Reflow-Quirks
+  const _measureCtx = document.createElement('canvas').getContext('2d');
+
+  function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
+    function fit() {
+      const cs = getComputedStyle(input);
+      const family = cs.fontFamily;
+      const style  = cs.fontStyle  || 'normal';
+      const weight = cs.fontWeight || '400';
+      const text   = input.value || input.placeholder || '';
+
+      function widthAt(pt) {
+        // Canvas akzeptiert nur px, also pt → px (1pt = 4/3 px)
+        const px = (pt * 4 / 3).toFixed(2);
+        _measureCtx.font = `${style} ${weight} ${px}px ${family}`;
+        return _measureCtx.measureText(text).width;
+      }
+
+      const available = (input.clientWidth - 4) / swashSafety;
+      let pt = maxPt;
+      const needed = widthAt(maxPt);
+      if (needed > available) {
+        pt = Math.max(minPt, maxPt * (available / needed));
+      }
+      input.style.fontSize = pt.toFixed(1) + 'pt';
+    }
+
+    input.addEventListener('input', fit);
+    return fit;
+  }
+
+  // Felder + Pt-Grenzen
+  const fits = [];
+  function setup() {
+    fits.push(autofitField(document.getElementById('fName1'),     42, 22, 1.08));
+    fits.push(autofitField(document.getElementById('fName2'),     42, 22, 1.08));
+    fits.push(autofitField(document.getElementById('fDate'),      11, 8));
+    fits.push(autofitField(document.getElementById('fVenueName'), 10, 7));
+    fits.push(autofitField(document.getElementById('fVenueStreet'),10, 7));
+    fits.push(autofitField(document.getElementById('fVenueCity'), 10, 7));
+    fits.push(autofitField(document.getElementById('fRsvp'),       9, 7));
+    fits.forEach(f => f());
+  }
+
+  // Schriften MÜSSEN geladen sein vor erster Messung (sonst falscher Fallback)
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(setup);
+  } else {
+    window.addEventListener('load', setup);
+  }
+</script>
+
+</body>
+</html>

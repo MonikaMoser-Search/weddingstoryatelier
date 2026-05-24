@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Goldene Hochzeit · Einladung · Wedding Story Atelier</title>
+  <style>
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-VariableFont_wght.ttf') format('truetype-variations'); font-weight: 300 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations'); font-weight: 300 700; font-style: italic; font-display: swap; }
+    @font-face { font-family: 'Cinzel'; src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype-variations'); font-weight: 400 700; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Bodoni Moda'; src: url('/Schriftarten/Bodoni_Moda/BodoniModa-Variable.ttf') format('truetype-variations'); font-weight: 400 900; font-style: normal; font-display: swap; }
+
+    :root {
+      --gold:        #C9A24A;
+      --gold-soft:   rgba(201,162,74,0.55);
+      --gold-faint:  rgba(201,162,74,0.18);
+      --cream:       #FBF8F2;
+      --paper:       #FFFFFF;
+      --ink:         #2A2826;
+      --ink-body:    rgba(42,40,38,0.85);
+      --ink-soft:    rgba(42,40,38,0.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .stage {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 60px 40px 80px;
+    }
+
+    .wordmark {
+      text-align: center;
+      font-family: 'Cinzel', serif;
+      font-size: 11pt;
+      letter-spacing: 0.36em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 11pt;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-bottom: 22px;
+    }
+    .hero-50 {
+      font-family: 'Bodoni Moda', 'Prata', serif;
+      font-weight: 900;
+      font-size: 92pt;
+      line-height: 0.85;
+      letter-spacing: -0.02em;
+      color: var(--gold);
+      margin-bottom: 18px;
+    }
+    .title {
+      font-style: italic;
+      font-weight: 500;
+      font-size: 32pt;
+      color: var(--ink);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .rule {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; margin: 22px auto 22px; width: 30%;
+    }
+    .rule-line { flex: 1; height: 0.5px; background: var(--gold-soft); }
+    .rule-gem {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      transform: rotate(45deg); flex-shrink: 0;
+    }
+    .intro {
+      font-style: italic;
+      font-size: 14pt;
+      color: var(--ink-body);
+      line-height: 1.5;
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      font-family: 'Cinzel', serif;
+      font-size: 10pt;
+      letter-spacing: 0.32em;
+      color: var(--gold);
+      text-transform: uppercase;
+      text-align: center;
+      margin: 60px 0 24px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+    .card-tile {
+      background: var(--paper);
+      border: 1px solid var(--gold-faint);
+      padding: 26px 28px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s;
+    }
+    .card-tile:hover {
+      border-color: var(--gold);
+      background: #fffdf8;
+    }
+    .card-num {
+      font-family: 'Cinzel', serif;
+      font-size: 9pt;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      text-transform: uppercase;
+    }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic;
+      font-weight: 500;
+      font-size: 20pt;
+      color: var(--ink);
+      line-height: 1.15;
+    }
+    .card-meta {
+      font-size: 11pt;
+      color: var(--ink-soft);
+      font-style: italic;
+      margin-top: auto;
+      padding-top: 4px;
+    }
+    .card-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: 'Cinzel', serif;
+      font-size: 9pt;
+      letter-spacing: 0.24em;
+      color: var(--gold);
+      text-transform: uppercase;
+      margin-top: 10px;
+    }
+
+    .tip {
+      background: rgba(201,162,74,0.07);
+      padding: 22px 28px;
+      margin: 50px 0 30px;
+      font-style: italic;
+      font-size: 12pt;
+      color: var(--ink-body);
+      line-height: 1.55;
+    }
+    .tip strong {
+      font-family: 'Cinzel', serif;
+      font-style: normal;
+      font-size: 9pt;
+      letter-spacing: 0.28em;
+      color: var(--gold);
+      text-transform: uppercase;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .footer-rule {
+      text-align: center;
+      margin-top: 70px;
+    }
+    .footer-text {
+      font-family: 'Cinzel', serif;
+      font-size: 8.5pt;
+      letter-spacing: 0.36em;
+      color: var(--gold-soft);
+      text-transform: uppercase;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 640px) {
+      .stage { padding: 40px 20px 60px; }
+      .hero-50 { font-size: 64pt; }
+      .title { font-size: 24pt; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="wordmark">Wedding Story Atelier</div>
+
+  <div class="header">
+    <div class="eyebrow">Anniversary Kit · Goldene Hochzeit</div>
+    <div class="hero-50">50</div>
+    <h1 class="title">Eine Karte. Zwei Sprachen. Direkt im Browser ausfüllen.</h1>
+    <div class="rule">
+      <div class="rule-line"></div>
+      <div class="rule-gem"></div>
+      <div class="rule-line"></div>
+    </div>
+    <p class="intro">
+      Willkommen in eurem Atelier-Set. Eure Einladung zur Goldenen Hochzeit
+      in zwei Sprachversionen — direkt im Browser ausfüllen, anschließend
+      drucken oder als PDF speichern. Kein Editor, kein Account.
+    </p>
+  </div>
+
+  <div class="section-label">— Deutsch · A5 —</div>
+
+  <div class="cards">
+    <a class="card-tile" href="einladung-de.html">
+      <div class="card-num">No. 01 · Ausfüllbar</div>
+      <div class="card-name">Einladung zur Goldenen Hochzeit</div>
+      <div class="card-meta">A5 · Eure Namen, Datum und Veranstaltungsort direkt in die Karte eintragen, dann drucken</div>
+      <div class="card-action">Im Browser öffnen →</div>
+    </a>
+  </div>
+
+  <div class="section-label">— English · 5 × 7 in —</div>
+
+  <div class="cards">
+    <a class="card-tile" href="invitation-en.html">
+      <div class="card-num">No. 02 · Fillable</div>
+      <div class="card-name">Golden Anniversary Invitation</div>
+      <div class="card-meta">5 × 7 in · Type your names, date and venue directly into the card, then print</div>
+      <div class="card-action">Open in browser →</div>
+    </a>
+  </div>
+
+  <div class="tip">
+    <strong>Atelier-Empfehlung zum Druck</strong>
+    Für die volle Champagne-Wirkung empfehlen wir 200–230 g/m² mattes oder
+    seidenglänzendes Papier. Im Druckdialog bitte „Hintergrundgrafiken
+    drucken" aktivieren, sonst fehlt das Gold. Tipp: einmal „Als PDF
+    speichern" zur Vorschau, bevor Tinte fließt. Bei sehr langen
+    Bindestrich-Namen passt sich die Schriftgröße automatisch an — für
+    maximale Wirkung empfehlen wir Rufnamen.
+  </div>
+
+  <div class="footer-rule">
+    <div class="rule" style="width:20%;">
+      <div class="rule-line"></div>
+      <div class="rule-gem"></div>
+      <div class="rule-line"></div>
+    </div>
+    <div class="footer-text">Wedding Story Atelier</div>
+  </div>
+
+</div>
+
+</body>
+</html>
