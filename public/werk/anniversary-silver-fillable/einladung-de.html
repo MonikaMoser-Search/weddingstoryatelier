@@ -338,6 +338,37 @@ input.field { line-height: 1.2; }
 <script>
   document.getElementById('btnPrint').addEventListener('click', () => window.print());
 
+  // ===== localStorage-Sync zwischen Druck- und Digitalkarte derselben Edition
+  // Käuferin tippt Namen/Datum/Venue einmal — beide Karten ziehen sich's automatisch.
+  // Daten bleiben lokal auf dem Gerät, keine Server-Übertragung.
+  const STORAGE_KEY = 'wsa_anniversary_silver_data';
+
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const data = JSON.parse(raw);
+      Object.entries(data).forEach(([id, val]) => {
+        const el = document.getElementById(id);
+        if (el && typeof val === 'string') el.value = val;
+      });
+    } catch (err) { /* private mode / disabled storage — kein Problem */ }
+  }
+
+  function saveToStorage() {
+    try {
+      const data = {};
+      document.querySelectorAll('input.field').forEach(inp => {
+        if (inp.id) data[inp.id] = inp.value;
+      });
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch (err) {}
+  }
+
+  document.querySelectorAll('input.field').forEach(inp => {
+    inp.addEventListener('input', saveToStorage);
+  });
+
   const _measureCtx = document.createElement('canvas').getContext('2d');
 
   function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
@@ -369,6 +400,7 @@ input.field { line-height: 1.2; }
 
   const fits = [];
   function setup() {
+    loadFromStorage();
     fits.push(autofitField(document.getElementById('fName1'),     48, 24, 1.08));
     fits.push(autofitField(document.getElementById('fName2'),     48, 24, 1.08));
     fits.push(autofitField(document.getElementById('fDate'),      11, 8));
