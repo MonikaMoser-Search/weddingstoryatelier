@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex,nofollow">
-<title>Silver Anniversary · Evite · Wedding Story Atelier</title>
+<title>Silver Anniversary · Digital Invitation · Wedding Story Atelier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -235,10 +235,10 @@ input.field { line-height: 1.2; }
 
 <div class="buyer-only">
   <div class="buyer-bar">
-    <button class="buyer-btn" id="btnDownload" type="button">Save Evite as PNG</button>
+    <button class="buyer-btn" id="btnDownload" type="button">Save Digital Invitation</button>
   </div>
   <p class="buyer-hint">
-    Type into the fields, then „Save Evite as PNG" — the image lands in your Downloads folder (1080 × 1920 px, ideal for WhatsApp, iMessage, Instagram Stories).
+    Type into the fields, then „Save Digital Invitation" — the image lands in your Downloads folder (1080 × 1920 px, ideal for WhatsApp, iMessage, Instagram Stories).
   </p>
 </div>
 
@@ -298,7 +298,7 @@ input.field { line-height: 1.2; }
   btn.addEventListener('click', async () => {
     btn.disabled = true;
     const original = btn.textContent;
-    btn.textContent = 'Creating evite …';
+    btn.textContent = 'Creating invitation …';
     card.classList.add('is-capturing');
 
     try {
@@ -316,7 +316,7 @@ input.field { line-height: 1.2; }
       const link = document.createElement('a');
       const name1 = (document.getElementById('fName1').value || 'Elizabeth').trim();
       const name2 = (document.getElementById('fName2').value || 'Thomas').trim();
-      link.download = `Silver-Anniversary-Evite-${name1}-${name2}.png`;
+      link.download = `Silver-Anniversary-Digital-Invitation-${name1}-${name2}.png`;
       link.href = canvas.toDataURL('image/png');
       link.click();
     } catch (err) {
