@@ -1,0 +1,421 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const title = 'Sitzplan Hochzeit in 30 Minuten — die ehrliche Rechnung';
+const description = '30 Minuten für den Sitzplan sind realistisch — aber nur, wenn deine Gästeliste vorher im richtigen Format ist. Drei Wege vom WhatsApp-Chaos zur kopierbaren Liste, inklusive fertigem ChatGPT-Prompt.';
+const ogImage = '/images/sitzplan-stoppuhr-30-min-hero.png';
+---
+
+<Layout title={title} description={description} image={ogImage} ogType="article" publishedTime="2026-05-27T00:00:00+00:00">
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <article class="px-6 md:px-16 pt-32 pb-24 article-body">
+    <div class="max-w-2xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+        Journal · Sitzplan · 27. Mai 2026
+      </p>
+      <h1 class="serif text-4xl md:text-6xl leading-[1.1] mb-10">
+        Sitzplan Hochzeit in 30 Minuten <em class="text-cognac">— die ehrliche Rechnung</em>
+      </h1>
+
+      <p class="text-lg leading-relaxed mb-8 lead">
+        Die Gästeliste ist da. Sie steht in WhatsApp, in der Excel deiner Mutter und auf dem Notizblock neben dem Computer. Der Sitzplan steht noch nirgendwo.
+      </p>
+      <p class="leading-relaxed mb-12">
+        „30 Minuten für den Sitzplan" — diese Zahl liest sich gut, aber sie unterschlägt fast immer den Teil, der die meiste Zeit kostet. Nicht das Gestalten. Nicht der Druck. Sondern die Daten in eine Form zu bringen, die ein Sitzplan-Atelier auch wirklich versteht. Wer das einmal sauber hinter sich hat, druckt den fertigen Sitzplan tatsächlich in ungefähr fünf Minuten. Wer es nicht hinter sich hat, sitzt zwei Stunden vor der Liste, ohne dass etwas gedruckt wird.
+      </p>
+    </div>
+
+    <figure class="my-16 max-w-4xl mx-auto">
+      <img
+        src="/images/sitzplan-stoppuhr-30-min-hero.png"
+        alt="Sitzplan im Editorial-Stil neben einer Stoppuhr, die 30 Minuten zeigt"
+        width="1280"
+        height="1600"
+        class="w-full h-auto"
+        loading="lazy"
+      />
+      <figcaption class="text-xs text-center text-ink-muted mt-4 italic">30 Minuten sind realistisch — wenn die Daten vorher sortiert sind.</figcaption>
+    </figure>
+
+    <div class="max-w-2xl mx-auto">
+
+      <h2 class="serif text-3xl md:text-4xl mt-8 mb-6">Wo die 30 Minuten wirklich liegen</h2>
+      <div class="snippet-box">
+        <p class="mb-2"><strong>Schritt 1 — Liste aufräumen: 5–25 Minuten</strong>, je nachdem wie verstreut deine Daten sind.</p>
+        <p class="mb-2"><strong>Schritt 2 — Sitzplan im Atelier: 5 Minuten</strong>, sobald die Liste im richtigen Format ist.</p>
+        <p class="mb-2"><strong>Probedruck und finales PDF: 5 Minuten</strong>, ein Blatt Papier reicht für den ersten Check.</p>
+        <p class="mt-3"><em>Die wirkliche Arbeit liegt in Schritt 1 — und genau dafür gibt es heute Werkzeuge, die das in unter zwei Minuten erledigen.</em></p>
+      </div>
+      <p class="leading-relaxed mt-6">
+        Wer schon eine saubere Liste im Format „Vorname Nachname, Tisch X" hat, kann direkt ins <a href="/atelier/sitzplan.html" class="cognac-link" target="_blank" rel="noopener">Sitzplan-Atelier</a> springen und ist in fünf Minuten fertig. Wer das nicht hat, liest weiter.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Schritt 1: Aus dem Chaos eine kopierbare Liste machen</h2>
+      <p class="leading-relaxed mb-4">
+        Das Sitzplan-Atelier erwartet eine sehr einfache Form: eine Zeile pro Gast, Vor- und Nachname, dann Komma, dann der Tisch. Etwa so:
+      </p>
+      <div class="code-block">
+        <p>Anna Müller, Tisch 1</p>
+        <p>Herbert Schmidt, Tisch 5</p>
+        <p>Lena Gruber, Tisch 1</p>
+      </div>
+      <p class="leading-relaxed mt-6 mb-4">
+        Das ist die Zielform. Egal wie deine Daten heute liegen — am Ende muss diese saubere Liste herauskommen. Es gibt drei Wege dorthin. Welcher zu dir passt, hängt davon ab, wie deine Daten heute aussehen.
+      </p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">Der ChatGPT-Weg (für die meisten der schnellste)</h3>
+      <p class="leading-relaxed mb-4">
+        Wenn deine Gästeliste irgendwo digital existiert — in einer Excel-Tabelle mit unsortierten Spalten, als Liste in einer Notiz-App, als langer WhatsApp-Verlauf, sogar als Fotografie eines handgeschriebenen Zettels — kann ein KI-Chat-Tool sie in unter zwei Minuten umformatieren. Wir empfehlen ChatGPT, aber Claude oder Gemini funktionieren genauso.
+      </p>
+      <p class="leading-relaxed mb-4">
+        Öffne ChatGPT, kopiere den folgenden Prompt, ersetze den letzten Teil mit deinen eigenen Daten — und du bekommst die Liste fertig zurück:
+      </p>
+
+      <div class="prompt-box">
+        <p class="prompt-label">Prompt zum Kopieren</p>
+        <pre>Ich brauche meine Hochzeits-Gästeliste in einem festen Format
+für einen Sitzplan-Generator. Bitte bringe meine Liste unten in
+genau dieses Format:
+
+Vorname Nachname, Tisch X
+
+Regeln:
+- Eine Zeile pro Gast.
+- Komma trennt vollständigen Namen und Tisch.
+- "Tisch X" darf auch ein Tischname sein
+  (z. B. "Tisch Florenz", "Tisch Familie").
+- Wenn ein Gast mehrfach genannt ist, nimm die letzte Information.
+- Wenn die Tischzuordnung fehlt, lass den Eintrag weg
+  und liste die fehlenden Namen am Ende separat auf.
+- Keine zusätzlichen Kommentare, nur die fertige Liste.
+
+Hier meine Liste:
+[Hier deine chaotischen Daten reinkopieren]</pre>
+      </div>
+
+      <p class="leading-relaxed mt-6 mb-4">
+        ChatGPT gibt dir die saubere Liste in einem Code-Block zurück. Du kopierst sie und gehst direkt ins Atelier. Im Test mit einer 47-Namen-Chaos-Liste — gemischt aus WhatsApp-Zitaten, Excel-Spalten und drei handschriftlichen Zetteln — hat das Tool unter 90 Sekunden gebraucht. Eine kleine Korrektur war nötig: Eine geteilte Familie wurde versehentlich an zwei verschiedene Tische geschickt. Solche Lücken siehst du schnell, weil das Atelier-Vorschaufeld die Gäste sofort sortiert anzeigt.
+      </p>
+      <p class="leading-relaxed">
+        Wichtig: Die Daten werden an einen externen Anbieter geschickt. Wenn du das vermeiden willst, ist der zweite Weg passender.
+      </p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">Der Excel- oder Google-Sheets-Weg (für strukturierte Listen)</h3>
+      <p class="leading-relaxed mb-4">
+        Wenn deine Liste bereits in einer Tabelle steht und nur die Spalten falsch sortiert sind, geht es ohne KI schneller. Drei Excel-Tricks reichen:
+      </p>
+      <ul class="leading-relaxed mb-4 pl-5 list-disc">
+        <li class="mb-2"><strong>Text in Spalten:</strong> Wenn Vor- und Nachname in einer Zelle stehen, trennt das Excel-Menü „Daten → Text in Spalten" sie sauber per Leerzeichen.</li>
+        <li class="mb-2"><strong>Verketten mit Komma:</strong> In einer neuen Spalte <code>=A2&" "&B2&", Tisch "&C2</code> baut dir die Sitzplan-Zeile direkt zusammen.</li>
+        <li class="mb-2"><strong>Spalte kopieren:</strong> Markiere die fertige Sitzplan-Spalte, kopiere sie und füge sie ins Atelier ein. Die Tabellen-Struktur drumherum braucht das Atelier nicht.</li>
+      </ul>
+      <p class="leading-relaxed">
+        Google Sheets funktioniert nach denselben Prinzipien, plus den Vorteil, dass dein Partner an derselben Tabelle gleichzeitig arbeiten kann.
+      </p>
+
+      <h3 class="serif text-2xl mt-10 mb-3">Der Notizen-App-Weg (für analog-orientierte Paare)</h3>
+      <p class="leading-relaxed mb-4">
+        Wer keine Lust auf Excel und kein Vertrauen in KI hat, geht den direkten Weg: Eine Notiz auf dem iPhone, dem iPad oder am Computer öffnen, alle Namen untereinander tippen, hinter jeden Namen ein Komma und den Tisch. Fertig. Bei 50 Gästen dauert das etwa zehn Minuten in Ruhe.
+      </p>
+      <p class="leading-relaxed">
+        Vorteil: Du gehst dabei einmal jeden Gast bewusst durch und merkst sofort, wer noch nicht zugeordnet ist. Manche Paare bevorzugen genau diese Verlangsamung — sie ersetzt eine Kontrollschleife, die später ohnehin nötig wird.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Schritt 2: Die Liste in einen Sitzplan verwandeln</h2>
+      <p class="leading-relaxed mb-4">
+        Sobald deine Liste im richtigen Format ist, geht der Rest sehr schnell. Konkret bedeutet das im Sitzplan-Atelier:
+      </p>
+      <ul class="leading-relaxed mb-4 pl-5 list-disc">
+        <li class="mb-2"><strong>Titel und Untertitel eintragen</strong> — meistens „Sitzplan" plus die Namen und das Datum des Hochzeitstags.</li>
+        <li class="mb-2"><strong>Gästeliste einfügen</strong> — als Block in das große Textfeld kopieren. Die Vorschau aktualisiert sich sofort.</li>
+        <li class="mb-2"><strong>Farbvariante wählen</strong> — drei Themen sind voreingestellt, der Wechsel ist ein Klick.</li>
+        <li class="mb-2"><strong>Format wählen</strong> — A4 für 50–60 Gäste, A3 ab etwa 70 aufwärts. Die Lesbarkeit am Empfang ist wichtiger als der Druckaufwand.</li>
+        <li class="mb-2"><strong>PDF herunterladen</strong> — Heimdruck-Variante ohne Beschnitt oder Druckerei-Variante mit 3 mm Bleed.</li>
+      </ul>
+      <p class="leading-relaxed">
+        Beim Bauen des Sitzplan-Ateliers haben wir festgestellt, dass etwa zwei Drittel der ersten 30 Minuten nicht im Atelier verbracht werden, sondern davor — beim Aufräumen der Liste. Wer das einmal akzeptiert hat, fängt nicht mehr im Atelier an, sondern bei der Liste. Das ist die kleine Umstellung, die den Unterschied macht.
+      </p>
+
+      <!-- Mid-Article CTA -->
+      <aside class="mid-cta">
+        <p class="cta-eyebrow">Live im Browser</p>
+        <p class="cta-text">Wenn deine Liste im Format „Vorname Nachname, Tisch X" steht, bist du fünf Minuten von einem druckfertigen PDF entfernt. Du kannst sofort anfangen — Demo öffnet sich im Browser, kein Download, kein Konto.</p>
+        <a href="/atelier/sitzplan.html" class="cta-btn" target="_blank" rel="noopener">Sitzplan-Atelier öffnen →</a>
+      </aside>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Wann es länger dauert (und warum das in Ordnung ist)</h2>
+      <p class="leading-relaxed mb-4">
+        Drei Sitzplan-Formen brauchen mehr Zeit als 30 Minuten — und das ist meist eine bewusste Entscheidung, kein Versagen.
+      </p>
+      <p class="leading-relaxed mb-4">
+        <strong>Der Sitzplan nach Tischen</strong> — bei dem jeder Tisch eine eigene Einheit ist, oft mit Tischnamen wie „Tisch Florenz" — braucht ungefähr ein bis zwei Stunden, weil jede Tisch-Konstellation eine eigene Entscheidung ist. Wer sitzt bei wem? Sechs bis acht Gäste pro Tisch ist der übliche Rahmen. Diese Form lohnt sich, wenn der Sitzplan selbst Teil des Hochzeitserlebnisses werden soll — die Frage nach der besten Logik haben wir im Artikel <a href="/journal/sitzplan-hochzeit-alphabetisch-oder-nach-tischen" class="cognac-link">Sitzplan alphabetisch oder nach Tischen</a> ausführlich behandelt.
+      </p>
+      <p class="leading-relaxed mb-4">
+        <strong>Der Foto-Sitzplan</strong> — bei dem jeder Gast mit einem kleinen Porträtfoto erscheint — ist eher ein Halbtag-Projekt. Nicht wegen des Designs, sondern wegen der Foto-Beschaffung. Achtzig Mal kurz fragen „schickst du mir ein aktuelles Foto?" zieht sich. Wer das auf sich nimmt, bekommt einen Sitzplan, der vor dem Saal kleine Menschentrauben bildet — die Gäste lesen, lachen, machen Fotos voneinander, bevor sie sich überhaupt setzen.
+      </p>
+      <p class="leading-relaxed">
+        <strong>Mehr als 65 Gäste</strong> — das Sitzplan-Atelier zeigt eine kleine Warnung, sobald die Liste über 65 Namen kommt, weil die Lesbarkeit auf A4 dann leidet. Wechsel auf A3 oder splitte den Sitzplan in zwei Tafeln (z. B. nach Anfangsbuchstaben A–M und N–Z). Beides braucht zehn extra Minuten.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Häufige Fragen</h2>
+
+      <div class="faq">
+        <h3>Was passiert, wenn drei Tage vor der Hochzeit noch jemand absagt?</h3>
+        <p>Du löschst die Zeile aus deiner gespeicherten Liste, lädst sie wieder ins Atelier und druckst das PDF neu. Dauert weitere fünf Minuten. Genau dafür lohnt es sich, die Liste in einer Notiz oder Tabelle zu pflegen — und nicht direkt im Atelier-Textfeld zu tippen.</p>
+
+        <h3>Brauche ich für das Atelier ein Konto?</h3>
+        <p>Nein. Das Sitzplan-Atelier läuft direkt im Browser, ohne Anmeldung, ohne Download. Deine Daten verlassen deinen Rechner nicht — der Sitzplan wird lokal generiert.</p>
+
+        <h3>Was wenn ChatGPT die Liste falsch sortiert?</h3>
+        <p>Fast nie ein Problem, weil das Atelier die Sortierung selbst übernimmt — alphabetisch nach Nachnamen. ChatGPT muss nur das Format treffen. Falls ein Name doppelt auftaucht oder ein Tisch fehlt, siehst du das sofort in der Live-Vorschau und korrigierst direkt im Atelier.</p>
+
+        <h3>Heimdruck oder Druckerei?</h3>
+        <p>Bis A4 funktioniert Heimdruck auf 250 gsm-Papier problemlos. A3 wird zu Hause technisch — die meisten Tintenstrahler schaffen kein A3. Ab dieser Größe lohnt sich eine Online-Druckerei, das Ergebnis steht im Vergleich deutlich satter auf dem Karton.</p>
+
+        <h3>Was kostet das?</h3>
+        <p>Das Sitzplan-Atelier auf dieser Seite ist eine Demo — du kannst kostenfrei testen, wie der Sitzplan mit deinen Daten aussehen würde. Für ein fertiges PDF mit deinem persönlichen Sitzplan gibt es die Atelier-Vorlage über Etsy. Der Demo-Zugang reicht für den ersten Probedruck.</p>
+      </div>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Wie es weitergeht</h2>
+      <p class="leading-relaxed mb-4">
+        Wenn deine Gästeliste sortiert ist, dauert der Rest tatsächlich nur fünf Minuten. Öffne das <a href="/atelier/sitzplan.html" class="cognac-link" target="_blank" rel="noopener">Sitzplan-Atelier</a>, füge deine Liste ein, lade das PDF herunter.
+      </p>
+      <p class="leading-relaxed mb-4">
+        Für den größeren Zusammenhang hilft dir der Pillar-Artikel <a href="/journal/hochzeit-kurzfristig-planen-reduzierter-workflow" class="cognac-link">Hochzeit kurzfristig planen</a> — der Sitzplan ist einer von vielen Bausteinen, die in einem reduzierten Workflow Platz haben müssen. Und wenn du noch zwischen alphabetischer Sortierung und Tisch-Logik schwankst, klärt das der Artikel <a href="/journal/sitzplan-hochzeit-alphabetisch-oder-nach-tischen" class="cognac-link">alphabetisch oder nach Tischen</a> in fünf Minuten Lesezeit.
+      </p>
+
+      <aside class="atelier-signature">
+        <p class="atelier-signature-label">Aus dem Atelier</p>
+        <p class="atelier-signature-text">
+          Wedding Story Atelier — kleines Atelier in Leimen. Editorial-Hochzeitspapeterie als interaktive Live-Demos und druckfertige PDF-Vorlagen. Jedes Werk wird während der Entwicklung selbst gedruckt, bis das Ergebnis auf Papier sitzt.
+        </p>
+        <p class="atelier-signature-author">
+          <strong>Monika Moser</strong> &nbsp;·&nbsp; <a href="/journal" class="cognac-link">Weitere Notizen im Journal</a>
+        </p>
+      </aside>
+    </div>
+  </article>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Sitzplan Hochzeit in 30 Minuten — die ehrliche Rechnung",
+  "description": description,
+  "image": "https://weddingstoryatelier.de/images/sitzplan-stoppuhr-30-min-hero.png",
+  "author": { "@type": "Organization", "name": "Wedding Story Atelier" },
+  "publisher": { "@type": "Organization", "name": "Wedding Story Atelier", "url": "https://weddingstoryatelier.de" },
+  "datePublished": "2026-05-27",
+  "dateModified": "2026-05-27",
+  "mainEntityOfPage": "https://weddingstoryatelier.de/journal/sitzplan-hochzeit-dreissig-minuten-ehrliche-rechnung",
+  "inLanguage": "de-DE"
+})} />
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Wie lange dauert es wirklich, einen Hochzeits-Sitzplan zu erstellen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Mit einer vorbereiteten Gästeliste im Format Vorname Nachname, Tisch X dauert das Erstellen im Sitzplan-Atelier etwa fünf Minuten. Die meiste Zeit kostet die Vorbereitung der Liste — je nach Ausgangslage zwischen fünf Minuten und einer halben Stunde. 30 Minuten ist eine realistische Marke für die mittlere Situation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie konvertiere ich meine chaotische Gästeliste in das richtige Sitzplan-Format?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Drei Wege funktionieren: ChatGPT oder ein anderes KI-Chat-Tool mit einem konkreten Prompt umformatiert die Liste in unter zwei Minuten. Excel oder Google Sheets erlaubt eine Verkettung der Spalten zur Zielform Vorname Nachname, Tisch X. Wer KI und Tabellen vermeiden will, schreibt die Liste manuell in einer Notiz-App — bei 50 Gästen dauert das etwa zehn Minuten."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welches Format erwartet das Sitzplan-Atelier?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Eine Zeile pro Gast, Vor- und Nachname, dann Komma, dann der Tisch. Beispiel: Anna Müller, Tisch 1. Der Tisch kann auch ein Tischname sein, etwa Tisch Florenz. Maximal 65 Gäste sind für A4 empfohlen, ab dort wechselt man auf A3 oder zwei Tafeln."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Was passiert, wenn drei Tage vor der Hochzeit noch jemand absagt?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Die Zeile wird in der gespeicherten Liste gelöscht, die aktualisierte Liste wieder ins Atelier eingefügt und das PDF neu erzeugt. Das dauert weitere fünf Minuten. Genau aus diesem Grund lohnt es sich, die Gästeliste in einer Notiz oder Tabelle zu pflegen, nicht direkt im Atelier-Textfeld."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Braucht das Sitzplan-Atelier ein Konto oder einen Download?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Nein, das Sitzplan-Atelier läuft direkt im Browser ohne Anmeldung und ohne Download. Die Gästeliste verlässt den eigenen Rechner nicht — der Sitzplan wird lokal generiert."
+      }
+    }
+  ]
+})} />
+
+<style>
+  .article-body .lead { font-size: 1.25rem; color: var(--color-ink); }
+  .article-body p { color: var(--color-ink); }
+  .article-body strong { font-weight: 500; color: var(--color-ink); }
+  .article-body code {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+    background: rgba(0,0,0,0.04);
+    padding: 0.1em 0.35em;
+    border-radius: 3px;
+    font-size: 0.92em;
+  }
+
+  .snippet-box {
+    background: var(--color-cream);
+    border-left: 3px solid var(--color-cognac);
+    padding: 1.5rem 1.75rem;
+    margin: 1rem 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .code-block {
+    background: var(--color-cream);
+    border: 1px solid var(--color-sand);
+    padding: 1.25rem 1.5rem;
+    margin: 1.25rem 0;
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: var(--color-ink);
+  }
+  .code-block p { margin: 0; }
+
+  .prompt-box {
+    background: #FAF7F2;
+    border: 1px solid #E5DCC9;
+    border-radius: 2px;
+    padding: 1.5rem 1.75rem 1.75rem;
+    margin: 1.5rem 0;
+  }
+  .prompt-label {
+    font-family: var(--font-serif);
+    font-size: 0.72rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 1rem;
+  }
+  .prompt-box pre {
+    font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, monospace;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    white-space: pre-wrap;
+    word-break: break-word;
+    margin: 0;
+  }
+
+  .mid-cta {
+    background: linear-gradient(180deg, #FAF7F2 0%, #F3EDE3 100%);
+    border: 1px solid #E5DCC9;
+    padding: 2rem 2rem 1.75rem;
+    margin: 3.5rem 0;
+    text-align: center;
+  }
+  .cta-eyebrow {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 0.75rem;
+  }
+  .cta-text {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    margin-bottom: 1.5rem;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+
+  .faq h3 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq p { margin-bottom: 0.5rem; }
+
+  .cognac-link {
+    color: var(--color-cognac);
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+  }
+  .cognac-link:hover { color: var(--color-ink); }
+
+  .atelier-signature {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--color-sand);
+    text-align: center;
+  }
+  .atelier-signature-label {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 1rem;
+  }
+  .atelier-signature-text {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-ink-muted);
+    max-width: 36rem;
+    margin: 0 auto 1.25rem;
+    font-style: italic;
+  }
+  .atelier-signature-author {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    letter-spacing: 0.04em;
+  }
+</style>
+</content>
+</invoke>
