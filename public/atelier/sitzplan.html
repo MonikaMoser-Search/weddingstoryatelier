@@ -11,6 +11,16 @@
     .guest-count.warn { color: #c0392b; font-weight: 500; }
     .panel-form textarea { min-height: 200px; flex: 1; }
 
+    /* ── CLS-Schutz: reserviert vor JS-Scaling den korrekten Platz für das Poster.
+       Ohne diese Regeln springt #preview-scaler von ungescalter (~1123px hoch)
+       auf gescalte Höhe und löst CLS auf html>body aus. */
+    #preview-scaler {
+      width: min(100%, 210mm);
+      aspect-ratio: 210 / 297;
+    }
+    #preview-scaler:not(.wsa-ready) { transition: none !important; }
+    #preview-scaler:not(.wsa-ready) #poster { visibility: hidden; }
+
     /* ══ POSTER ══════════════════════════════════ */
     #poster {
       width: 210mm; height: 297mm;
@@ -413,6 +423,7 @@ function scalePreview() {
   const scale    = Math.min(avail / posterEl.offsetWidth, 1);
   scaler.style.transform = `scale(${scale})`;
   scaler.style.height    = (posterEl.offsetHeight * scale) + 'px';
+  scaler.classList.add('wsa-ready');
 }
 
 // ── Demo laden ────────────────────────────────────────
