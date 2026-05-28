@@ -312,7 +312,9 @@ input.field { line-height: 1.2; }
       const oInp = origInputs[i];
       const text = oInp.value.trim(); // Don't carry placeholder (same as print)
       const cs   = window.getComputedStyle(oInp);
-      const rect = oInp.getBoundingClientRect();
+      // offsetHeight instead of BCR.height: card uses transform:scale, BCR
+      // returns scaled values → span box collapses in the clone.
+      const srcHeight = oInp.offsetHeight;
 
       const span = document.createElement('div');
       span.className = cInp.className;
@@ -326,7 +328,7 @@ input.field { line-height: 1.2; }
       span.style.alignItems    = 'center';
       span.style.justifyContent= cs.textAlign === 'center' ? 'center' :
                                   cs.textAlign === 'right'  ? 'flex-end' : 'flex-start';
-      span.style.height        = rect.height + 'px';
+      span.style.height        = srcHeight + 'px';
       span.style.lineHeight    = '1';
       span.style.whiteSpace    = 'nowrap';
 
