@@ -70,6 +70,19 @@ body {
   transition: all .15s ease;
 }
 .buyer-btn:hover { background: var(--mushroom); border-color: var(--mushroom); }
+.buyer-back {
+  display: block;
+  text-align: center;
+  margin-bottom: 16px;
+  font-family: 'Cinzel', serif;
+  font-size: 9pt;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  text-decoration: none;
+  transition: opacity .15s ease;
+}
+.buyer-back:hover { opacity: 0.6; }
 .buyer-hint {
   text-align: center;
   font-family: 'Cinzel', serif;
@@ -226,6 +239,7 @@ input.field { line-height: 1.2; }
 <body>
 
 <div class="buyer-only">
+  <a class="buyer-back" href="./">← Back to Overview</a>
   <div class="buyer-bar">
     <button class="buyer-btn" id="btnDownload" type="button">Save Digital Invitation</button>
   </div>
