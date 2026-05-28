@@ -1,0 +1,376 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const etsyUrl = 'https://weddingstoryatelier.etsy.com/de/listing/4485180237/tischkarten-fur-die-hochzeit-old-money-o';
+const demoUrl = '/atelier/platzkarten.html';
+
+const faq = [
+  {
+    q: 'Brauche ich Designkenntnisse?',
+    a: 'Nein. Gästeliste einfügen — eine Zeile pro Person — und 6 Platzkarten erscheinen pro A4 quer, automatisch personalisiert. Drei Farbwelten zur Wahl, Schneidmarken bereits drin.',
+  },
+  {
+    q: 'Für wie viele Gäste kann ich Platzkarten erstellen?',
+    a: 'Beliebig viele. 60 Gäste pro Durchgang — bei größerer Hochzeit machst du einfach mehrere Durchgänge nacheinander. Der Workflow bleibt identisch.',
+  },
+  {
+    q: 'Kann ich die Gästeliste aus Excel übernehmen?',
+    a: 'Eine Spalte mit Vor- und Nachnamen aus Excel markieren und in die Liste einfügen — jede Zeile wird zu einer eigenen Karte, da bei der Hochzeit jeder Gast seinen eigenen Platz bekommt.',
+  },
+  {
+    q: 'Welche Druckformate sind dabei?',
+    a: 'Heimdruck-Modus (6 Karten pro A4 quer mit Schneidmarken) und Druckerei-Modus (1 Karte pro Seite, 136 × 59 mm + 3 mm Beschnitt, randlos). Beides in der Vollversion enthalten — du wählst beim Export.',
+  },
+  {
+    q: 'Was bekomme ich nach dem Kauf?',
+    a: 'Direkt nach der Etsy-Bestellung einen Link ins Atelier — Browser-Tool, kein Download, keine Software-Installation. Eure Gästedaten bleiben lokal im Browser, nichts wird hochgeladen.',
+  },
+];
+---
+
+<Layout
+  title="Platzkarten Hochzeit — Aus Gästeliste, in 2 Minuten · Wedding Story Atelier"
+  description="Platzkarten für eure Hochzeit: Gästeliste einfügen, 6 Karten pro A4 quer. Old Money Edition in Burgund, Cognac oder Forest. Heimdruck oder Druckerei-Modus. Made in Heidelberg."
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero — Foto links, Text rechts -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-20">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+      <div class="order-2 md:order-1">
+        <img
+          src="/images/Platzkarten.jpg"
+          alt="Platzkarten Hochzeit — Old Money Edition, im Atelier gedruckt"
+          loading="eager"
+          fetchpriority="high"
+          class="w-full"
+        />
+      </div>
+      <div class="order-1 md:order-2 text-center md:text-left">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+          Aus dem Atelier
+        </p>
+        <h1 class="serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8">
+          Platzkarten Hochzeit —<br />
+          <em class="text-cognac">Gästeliste einfügen,<br />fertig.</em>
+        </h1>
+        <p class="serif text-lg md:text-xl italic text-ink-muted leading-relaxed mb-10">
+          Eine Zeile pro Gast — und 6 Karten pro A4 quer, perfekt formatiert, mit Schneidmarken. Drei Farbwelten Old Money: Burgund, Cognac oder Forest.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 items-center md:items-start text-sm tracking-wider">
+          <a
+            href="#demo"
+            class="bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+          >
+            Demo öffnen →
+          </a>
+          <a
+            href={etsyUrl}
+            target="_blank"
+            rel="noopener"
+            data-conversion="platzkarten-etsy"
+            class="text-ink-muted border-b border-ink-muted pb-1 hover:text-cognac hover:border-cognac transition-colors uppercase tracking-[0.2em] text-xs"
+          >
+            Auf Etsy holen — 5,26 €
+          </a>
+        </div>
+        <p class="text-xs text-ink-muted mt-8 italic">
+          Sofortiger Atelier-Zugang nach Kauf · Heimdruck und Druckerei · Daten bleiben bei euch
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drei Versprechen -->
+  <section id="format" class="px-8 md:px-16 py-20 bg-cream">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-12">
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">I.</p>
+        <h3 class="serif text-xl mb-3">Liste rein, Karten fertig</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Eine Zeile pro Gast aus Excel — Spalte markieren, einfügen. 6 Karten je A4 quer, jede individuell personalisiert.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">II.</p>
+        <h3 class="serif text-xl mb-3">Heimdruck oder Druckerei</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Heimdruck-Modus: 6 Karten / A4 quer mit Schneidmarken. Druckerei-Modus: 136 × 59 mm + 3 mm Beschnitt, randlos.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">III.</p>
+        <h3 class="serif text-xl mb-3">Old Money Linie</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Burgund, Cognac oder Forest — drei zurückhaltende Farbwelten, Cormorant-Italic-Namen, ruhige Ornamente. Im Atelier in Heidelberg gedruckt und getestet.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="px-4 md:px-16 py-24">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Direkt ausprobieren
+        </p>
+        <h2 class="serif text-4xl md:text-5xl mb-6">
+          So sehen eure Karten aus.
+        </h2>
+        <p class="serif text-lg italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+          Demo läuft mit Beispieldaten. Eure Namen links einfügen oder einfach den Demo-Button klicken, Farbe wechseln — die Karten reagieren live. PDF-Export ist hier nicht möglich; die Vollversion ist das Werk im Etsy-Shop.
+        </p>
+      </div>
+
+      <!-- Desktop: Live-Demo per iframe -->
+      <div class="hidden md:block border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
+        <iframe
+          src={demoUrl}
+          title="Platzkarten Hochzeit — Live-Demo"
+          loading="lazy"
+          class="w-full"
+          style="height: 900px; border: 0; display: block;"
+        ></iframe>
+      </div>
+
+      <!-- Mobile: Fallback mit Foto + Hinweis (Demo ist für Desktop gemacht) -->
+      <div class="md:hidden border border-sand bg-cream">
+        <img
+          src="/images/Platzkarten.jpg"
+          alt="Platzkarten — Atelier-Nahaufnahme"
+          loading="lazy"
+          class="w-full"
+        />
+        <div class="px-6 py-8 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-cognac mb-3">Demo am Desktop</p>
+          <p class="serif italic text-lg leading-relaxed text-ink-muted">
+            Die Live-Demo ist für den Laptop oder größere Bildschirme gemacht — dort lässt sich die Gästeliste komfortabel einfügen und das Layout in Echtzeit ausprobieren.
+          </p>
+          <p class="text-sm text-ink-muted mt-4">
+            Öffne <span class="serif italic">weddingstoryatelier.de/platzkarten-hochzeit</span> später am Desktop.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-xs text-ink-muted text-center mt-6 italic">
+        Demo ohne PDF-Export · Vollversion mit Heimdruck und Druckerei-Modus im Etsy-Werk
+      </p>
+
+      <div class="text-center mt-12">
+        <a
+          href={etsyUrl}
+          target="_blank"
+          rel="noopener"
+          data-conversion="platzkarten-etsy"
+          class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+        >
+          Vollversion auf Etsy holen →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- So funktioniert es -->
+  <section class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        So funktioniert es
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        In vier Schritten zum Tellergedeck.
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt eins</p>
+          <h3 class="serif text-xl mb-3">Link aus Etsy öffnen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Direkt nach dem Kauf landet ein privater Atelier-Link in der Etsy-Nachricht. Ein Klick — ihr seid drin.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt zwei</p>
+          <h3 class="serif text-xl mb-3">Gästeliste einfügen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Aus Excel oder Word: eine Zeile pro Person, Vorname Nachname. Spalte markieren, einfügen — fertig.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt drei</p>
+          <h3 class="serif text-xl mb-3">Farbe & Modus wählen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Burgund, Cognac oder Forest. Heimdruck (6 Karten / A4 quer) oder Druckerei (136 × 59 mm + 3 mm Bleed).
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt vier</p>
+          <h3 class="serif text-xl mb-3">PDF mitnehmen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Druckfertiges PDF — beliebig oft exportieren. Schneidmarken im Heimdruck, randlos im Druckerei-Modus.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Was im Werk steckt — Foto rechts -->
+  <section id="werk" class="px-8 md:px-16 py-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div>
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Im Werk enthalten
+        </p>
+        <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+          Ein Werk — und alles,<br />was zum Tellergedeck gehört.
+        </h2>
+        <ul class="space-y-4 text-sm text-ink-muted leading-relaxed">
+          <li class="flex gap-3"><span class="text-cognac">·</span> Atelier-Zugang als Browser-Tool — kein Download, kein Konto</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Drei Farbwelten Old Money: Burgund, Cognac, Forest</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Bis zu 60 Gäste pro Durchgang — Cormorant-Italic-Namen, optional mit Datum oder Motto</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Heimdruck-Modus: 6 Karten / A4 quer mit Schneidmarken</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Druckerei-Modus: 136 × 59 mm + 3 mm Beschnitt, randlos</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Anleitung zweisprachig DE + EN, mit Druckempfehlung</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Unbegrenzte Bearbeitung — Daten bleiben lokal</li>
+        </ul>
+      </div>
+      <div>
+        <img
+          src="/images/Platzkarten.jpg"
+          alt="Platzkarten — Atelier-Nahaufnahme, Old Money Design"
+          loading="lazy"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        Häufige Fragen
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Was Brautpaare oft fragen.
+      </h2>
+      <div class="space-y-8">
+        {faq.map((item) => (
+          <details class="group border-b border-sand pb-6">
+            <summary class="cursor-pointer flex justify-between items-start gap-6 list-none">
+              <h3 class="serif text-xl group-open:text-cognac transition-colors">{item.q}</h3>
+              <span class="serif text-2xl text-cognac mt-[-4px] group-open:rotate-45 transition-transform inline-block">+</span>
+            </summary>
+            <p class="text-sm text-ink-muted leading-relaxed mt-4 max-w-2xl">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Schluss-CTA -->
+  <section class="px-8 md:px-16 py-32 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Bereit für eure Platzkarten
+    </p>
+    <h2 class="serif text-4xl md:text-6xl mb-10 max-w-3xl mx-auto leading-tight">
+      Heute Gästeliste,<br />
+      <em class="text-cognac">morgen am Tellergedeck.</em>
+    </h2>
+    <a
+      href={etsyUrl}
+      target="_blank"
+      rel="noopener"
+      data-conversion="platzkarten-etsy"
+      class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+    >
+      Platzkarten auf Etsy holen — 5,26 € →
+    </a>
+    <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
+      Sofortiger Atelier-Zugang · Heimdruck und Druckerei · Beliebig oft bearbeiten
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- FAQ Schema für Rich Results -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  })} />
+
+  <!-- Product Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Platzkarten Hochzeit Vorlage — Old Money Design",
+    "description": "Platzkarten Hochzeit aus Gästeliste, 6 Karten pro A4 quer in Burgund, Cognac oder Forest. Heimdruck-Modus mit Schneidmarken oder Druckerei-Modus 136 mal 59 mm plus 3 mm Beschnitt. Cormorant-Italic, im Atelier in Heidelberg gedruckt.",
+    "image": "https://weddingstoryatelier.de/images/Platzkarten.jpg",
+    "brand": { "@type": "Brand", "name": "Wedding Story Atelier" },
+    "offers": {
+      "@type": "Offer",
+      "url": etsyUrl,
+      "priceCurrency": "EUR",
+      "price": "5.26",
+      "availability": "https://schema.org/InStock"
+    }
+  })} />
+
+  <!-- Google Ads Conversion Trigger — feuert beim Etsy-Outbound-Klick, sofern Cookie-Consent granted -->
+  <!-- TODO: Eigene Conversion-Aktion "Etsy-Klick Platzkarten" in Google Ads anlegen,
+              neuen AW-Label hier ersetzen. Bis dahin teilt sich Platzkarten die Sitzplan-ID. -->
+  <script is:inline>
+    (function () {
+      const SEND_TO = 'AW-18181056795/Kr2cCPOdp7EcEJvSs91D';
+
+      function fireConversion() {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('event', 'conversion', {
+          send_to: SEND_TO,
+          value: 5.26,
+          currency: 'EUR',
+        });
+      }
+
+      function attach() {
+        const els = document.querySelectorAll('a[data-conversion="platzkarten-etsy"]');
+        els.forEach(function (el) {
+          if (el.dataset.wsaWired === '1') return;
+          el.dataset.wsaWired = '1';
+          el.addEventListener('click', fireConversion);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+      } else {
+        attach();
+      }
+      // Falls Consent erst nach DOM-Load erteilt wird, Handler nochmal hängen
+      window.addEventListener('wsa:ads-ready', attach);
+    })();
+  </script>
+</Layout>

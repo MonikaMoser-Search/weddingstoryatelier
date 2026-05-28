@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <title>Platzkarten — Old Money Line · Demo</title>
+  <meta name="description" content="Platzkarten Hochzeit — Demo: Gästeliste einfügen, 6 Karten pro A4 quer in Burgund, Cognac oder Forest. Vollversion im Atelier-Shop.">
+  <link rel="stylesheet" href="/atelier/fonts.css">
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    .opt-tag    { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
+
+    .guest-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 2px; margin-bottom: 2px; min-height: 16px; }
+    .guest-count { font-size: 9px; color: #aaa; }
+    .guest-warn  { font-size: 8.5px; color: #c07040; font-style: italic; }
+
+    /* ══ RIGHT PANEL ═══════════════════════════════════ */
+    .panel-preview { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #EAE6DF; align-items: stretch; padding: 0; justify-content: flex-start; }
+
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 12px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+      color: #555; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ══ A4 LANDSCAPE ══════════════════════════════════ */
+    .a4-landscape {
+      width: 297mm; height: 210mm;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6mm 5mm;
+      padding: 10mm;
+      box-sizing: border-box;
+      position: relative;
+    }
+    .letter-landscape {
+      width: 279.4mm; height: 215.9mm;
+      background: #fff;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr 1fr;
+      gap: 6mm 5mm;
+      padding: 10mm;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    /* ══ PLACE CARD ════════════════════════════════════ */
+    .place-card {
+      position: relative;
+      overflow: visible;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .place-card.empty { visibility: hidden; }
+
+    /* ── Hint-Karte: nimmt 2 Spalten in Reihe 2 ein, ruhige Editorial-Linie ── */
+    .a4-landscape > .hint-row,
+    .letter-landscape > .hint-row {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0 12mm;
+      font-family: 'Cormorant Garamond', Cormorant, Garamond, serif;
+      font-style: italic;
+      font-size: 5.2mm;
+      line-height: 1.5;
+      color: rgba(60,50,40,0.55);
+      letter-spacing: 0.02em;
+    }
+
+    /* ── Burgund ── */
+    .place-card.burgund {
+      background: #FEF8F7; color: #8B1A35;
+      border: 8px solid #8B1A35;
+      --accent: #C9A96E;
+      --frame:  rgba(139,26,53,0.30);
+      --rule:   rgba(139,26,53,0.18);
+      --label:  rgba(139,26,53,0.82);
+    }
+    /* ── Cognac ── */
+    .place-card.cognac {
+      background: #FEF9F5; color: #7B4718;
+      border: 8px solid #7B4718;
+      --accent: #C9A96E;
+      --frame:  rgba(123,71,24,0.30);
+      --rule:   rgba(123,71,24,0.18);
+      --label:  rgba(123,71,24,0.82);
+    }
+    /* ── Forest ── */
+    .place-card.forest {
+      background: #F7FAF7; color: #1F4A32;
+      border: 8px solid #1F4A32;
+      --accent: #C9A96E;
+      --frame:  rgba(31,74,50,0.30);
+      --rule:   rgba(31,74,50,0.18);
+      --label:  rgba(31,74,50,0.82);
+    }
+
+    /* ── Frames ── */
+    .pcard-frame-outer, .pcard-frame-inner { display: none; pointer-events: none; position: absolute; z-index: 1; }
+
+    .place-card.burgund .pcard-frame-inner,
+    .place-card.cognac  .pcard-frame-inner,
+    .place-card.forest  .pcard-frame-inner {
+      display: block; inset: 4mm;
+      border: 0.5px solid var(--frame);
+    }
+
+    /* ── Card content ── */
+    .pcard-content {
+      position: relative; z-index: 2;
+      width: 100%; padding: 0 7mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 2mm;
+    }
+    .pcard-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400;
+      font-size: 7mm;
+      text-align: center; line-height: 1.2;
+      color: inherit;
+    }
+    .pcard-motto {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: normal; font-weight: 300;
+      font-size: 2.6mm; letter-spacing: 0.20em;
+      text-transform: uppercase;
+      color: var(--label);
+      text-align: center;
+      margin-top: 0.5mm;
+    }
+
+    /* ── Ornament ── */
+    .orn-sep {
+      display: flex; align-items: center; gap: 5px;
+      width: 68%; margin-bottom: 1mm;
+    }
+    .orn-line { flex: 1; height: 0.5px; background: var(--rule); }
+    .orn-dot  { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+    /* ── Cut marks ── */
+    .cut { position: absolute; background: rgba(110,110,110,0.40); pointer-events: none; z-index: 20; }
+    .cut.h { height: 0.4px; width: 4mm; }
+    .cut.v { width:  0.4px; height: 4mm; }
+    .cut.tl.h { top: 0;       left:  -5mm; }
+    .cut.tl.v { top: -5mm;    left:  0;    }
+    .cut.tr.h { top: 0;       right: -5mm; }
+    .cut.tr.v { top: -5mm;    right: 0;    }
+    .cut.bl.h { bottom: 0;    left:  -5mm; }
+    .cut.bl.v { bottom: -5mm; left:  0;    }
+    .cut.br.h { bottom: 0;    right: -5mm; }
+    .cut.br.v { bottom: -5mm; right: 0;    }
+
+    /* ── Atelier-Back-Link ── */
+    .atelier-back {
+      display: block;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #888;
+      text-decoration: none;
+      margin-bottom: 12px;
+    }
+    .atelier-back:hover { color: #1A1A1A; }
+
+    /* ── Shop-Button als Link (Demo-CTA) ── */
+    .btn-shop {
+      flex: 2; padding: 10px; background: #1A1A1A; color: #fff; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 9px; text-transform: uppercase;
+      letter-spacing: 1.5px; cursor: pointer; transition: background 0.15s;
+      text-decoration: none; display: flex; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    .btn-shop:hover { background: #2e2e2e; }
+
+    /* ── Demo-Watermark über der Vorschau ── */
+    .demo-watermark {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      pointer-events: none; z-index: 15;
+    }
+    .demo-watermark span {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 72pt; font-weight: 600; letter-spacing: 18px; text-transform: uppercase;
+      transform: rotate(-35deg);
+      opacity: 0.10;
+      color: #1A1A1A;
+      white-space: nowrap; user-select: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <a href="/" class="atelier-back">← Wedding Story Atelier</a>
+  <div class="panel-logo" id="lbl-logo">Platzkarten</div>
+  <div class="panel-tagline">Old Money Line · Demo · bis 60 Gäste</div>
+
+  <!-- Sprache / Language -->
+  <span class="section-label" id="lbl-lang">Sprache</span>
+  <div class="btn-group" style="margin-bottom:10px;">
+    <button class="ui-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <!-- Stil / Style -->
+  <span class="section-label" id="lbl-style">Stil</span>
+  <div class="btn-group">
+    <button class="ui-btn active" onclick="setTheme('burgund',this)">Burgund</button>
+    <button class="ui-btn"        onclick="setTheme('cognac',this)">Cognac</button>
+    <button class="ui-btn"        onclick="setTheme('forest',this)">Forest</button>
+  </div>
+
+  <hr class="divider">
+
+  <!-- Zusatzzeile / Subtitle -->
+  <span class="section-label" id="lbl-subtitle">Zusatzzeile <span class="opt-tag" id="lbl-opt">optional</span></span>
+  <input type="text" id="inp-motto" placeholder="z. B. 15. August 2026" oninput="render()">
+  <p class="hint" id="hint-subtitle">Erscheint klein unter dem Namen — auf allen Karten gleich.</p>
+
+  <hr class="divider">
+
+  <!-- Gästeliste / Guest List -->
+  <span class="section-label" id="lbl-guests">Gästeliste</span>
+  <p class="hint" id="hint-guests">Ein Name pro Zeile — max. 60 Gäste. Oder Demo-Button drücken.</p>
+  <textarea id="inp-guests" rows="16"
+    placeholder="Maria Müller&#10;Jonas Weber&#10;Anna &amp; Peter Schmidt&#10;..."
+    oninput="render()"></textarea>
+  <div class="guest-meta">
+    <span class="guest-count" id="guest-count"></span>
+    <span class="guest-warn"  id="guest-warn"></span>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-demo" id="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <a class="btn-shop" href="https://weddingstoryatelier.etsy.com/de/listing/4485180237/tischkarten-fur-die-hochzeit-old-money-o" target="_blank" rel="noopener">Im Shop bestellen →</a>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="changePage(-1)" disabled>&#8592;</button>
+    <span id="page-info" style="min-width:80px;text-align:center;"></span>
+    <button class="nav-btn" id="btn-next" onclick="changePage(1)"  disabled>&#8594;</button>
+  </div>
+
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-landscape" id="preview-grid"></div>
+    </div>
+    <div class="demo-watermark"><span>Demo</span></div>
+  </div>
+
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────
+  var currentTheme  = 'burgund';
+  var currentLang   = 'de';
+  var currentPage   = 0;
+  var MAX      = 60;
+  var PER_PAGE = 6;
+
+  // ── TRANSLATIONS ───────────────────────────────────
+  var T = {
+    de: {
+      logo:          'Platzkarten',
+      lang:          'Sprache',
+      style:         'Stil',
+      subtitle:      'Zusatzzeile',
+      opt:           'optional',
+      hintSubtitle:  'Erscheint klein unter dem Namen — auf allen Karten gleich.',
+      guests:        'Gästeliste',
+      hintGuests:    'Ein Name pro Zeile. Oder Beispiel laden.',
+      mottoPlaceholder: 'z. B. 15. August 2026',
+      guestsPlaceholder:'Maria Müller\nJonas Weber\nSophie Hoffmann\n...',
+      singular:      ' Gast',
+      plural:        ' Gäste',
+      limitWarn:     'Maximum erreicht (60)',
+      pageOf:        function(cur,tot){ return 'Seite ' + cur + ' von ' + tot; },
+      previewHint:   'weitere Karten entstehen mit jedem Namen — oder Beispiel laden',
+      starterNames:  ['Maria Müller', 'Jonas Weber'],
+      demoNames: [
+        'Maria Müller', 'Jonas Weber', 'Sophie Hoffmann',
+        'Lena Braun', 'Maximilian Koch', 'Emma Fischer',
+        'Paul Richter', 'Klara Becker', 'Thomas Schäfer',
+        'Laura Klein', 'Florian Bauer', 'Hannah Wagner'
+      ],
+      demoMotto: '15. August 2026'
+    },
+    en: {
+      logo:          'Place Cards',
+      lang:          'Language',
+      style:         'Style',
+      subtitle:      'Subtitle',
+      opt:           'optional',
+      hintSubtitle:  'Appears in small print below each name — same on all cards.',
+      guests:        'Guest List',
+      hintGuests:    'One name per line. Or load the example.',
+      mottoPlaceholder: 'e.g. August 15, 2026',
+      guestsPlaceholder:'Emily Johnson\nOlivia Brown\nWilliam Taylor\n...',
+      singular:      ' guest',
+      plural:        ' guests',
+      limitWarn:     'Limit reached (60)',
+      pageOf:        function(cur,tot){ return 'Page ' + cur + ' of ' + tot; },
+      previewHint:   'more cards appear with every name — or load the example',
+      starterNames:  ['Emily Johnson', 'Olivia Brown'],
+      demoNames: [
+        'Emily Johnson', 'Olivia Brown', 'William Taylor',
+        'Charlotte Davis', 'Henry Wilson', 'Amelia Moore',
+        'George Anderson', 'Isabella Thomas', 'Alexander White',
+        'Sophia Harris', 'Oliver Martin', 'Grace Robinson'
+      ],
+      demoMotto: 'August 15, 2026'
+    }
+  };
+
+  // ── HELPERS ────────────────────────────────────────
+  function ge(id)  { return document.getElementById(id); }
+  function gv(id)  { return ge(id).value; }
+  function t()     { return T[currentLang]; }
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function parseGuests(raw) {
+    return raw.split('\n').map(function(l){ return l.trim(); })
+              .filter(Boolean).slice(0, MAX);
+  }
+
+  // ── LANGUAGE ───────────────────────────────────────
+  function setLang(lang, btn) {
+    currentLang = lang;
+    document.querySelectorAll('#btn-de, #btn-en').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    applyLang();
+    render();
+  }
+
+  function applyLang() {
+    var l = t();
+    ge('lbl-logo').textContent        = l.logo;
+    ge('lbl-lang').textContent        = l.lang;
+    ge('lbl-style').textContent       = l.style;
+    ge('lbl-subtitle').innerHTML      = l.subtitle + ' <span class="opt-tag">' + l.opt + '</span>';
+    ge('hint-subtitle').textContent   = l.hintSubtitle;
+    ge('lbl-guests').textContent      = l.guests;
+    ge('hint-guests').textContent     = l.hintGuests;
+    ge('inp-motto').placeholder       = l.mottoPlaceholder;
+    ge('inp-guests').placeholder      = l.guestsPlaceholder;
+    document.documentElement.lang     = currentLang;
+  }
+
+  // ── THEME ──────────────────────────────────────────
+  function setTheme(th, btn) {
+    currentTheme = th;
+    document.querySelectorAll('.btn-group .ui-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    ge('btn-' + currentLang).classList.add('active');
+    render();
+  }
+
+  // ── PAGE NAV ───────────────────────────────────────
+  function changePage(dir) {
+    var guests = parseGuests(gv('inp-guests'));
+    var pages  = Math.max(1, Math.ceil(guests.length / PER_PAGE));
+    currentPage = Math.max(0, Math.min(currentPage + dir, pages - 1));
+    render();
+  }
+
+  // ── CARD HTML ──────────────────────────────────────
+  function cardHTML(name, motto) {
+    var mottoLine = motto
+      ? '<div class="pcard-motto">' + esc(motto) + '</div>'
+      : '';
+    return '<div class="place-card ' + currentTheme + '">'
+      + '<div class="pcard-frame-outer"></div>'
+      + '<div class="pcard-frame-inner"></div>'
+      + '<div class="pcard-content">'
+        + '<div class="orn-sep"><span class="orn-line"></span><span class="orn-dot"></span><span class="orn-line"></span></div>'
+        + '<div class="pcard-name">' + esc(name) + '</div>'
+        + mottoLine
+      + '</div>'
+      + '<div class="cut tl h"></div><div class="cut tl v"></div>'
+      + '<div class="cut tr h"></div><div class="cut tr v"></div>'
+      + '<div class="cut bl h"></div><div class="cut bl v"></div>'
+      + '<div class="cut br h"></div><div class="cut br v"></div>'
+      + '</div>';
+  }
+
+  function pageHTML(pageGuests, motto, showHint) {
+    var html = '';
+    if (showHint) {
+      // Reihe 1: bis zu 2 echte Karten + ggf. eine leere Karte als Platzhalter
+      for (var i = 0; i < 2; i++) {
+        html += i < pageGuests.length
+          ? cardHTML(pageGuests[i], motto)
+          : '<div class="place-card empty ' + currentTheme + '"></div>';
+      }
+      // Reihe 2: Hint-Zeile über beide Spalten
+      html += '<div class="hint-row">' + esc(t().previewHint) + '</div>';
+      // Reihe 3: zwei leere Karten
+      html += '<div class="place-card empty ' + currentTheme + '"></div>';
+      html += '<div class="place-card empty ' + currentTheme + '"></div>';
+      return html;
+    }
+    for (var j = 0; j < PER_PAGE; j++) {
+      html += j < pageGuests.length
+        ? cardHTML(pageGuests[j], motto)
+        : '<div class="place-card empty ' + currentTheme + '"></div>';
+    }
+    return html;
+  }
+
+  // ── RENDER ─────────────────────────────────────────
+  function render() {
+    var l      = t();
+    var guests = parseGuests(gv('inp-guests'));
+    var motto  = gv('inp-motto').trim();
+
+    var n = guests.length;
+    ge('guest-count').textContent = n > 0 ? n + (n === 1 ? l.singular : l.plural) : '';
+    ge('guest-warn').textContent  = n >= MAX ? l.limitWarn : '';
+
+    var grid = ge('preview-grid');
+
+    var pages = Math.max(1, Math.ceil(guests.length / PER_PAGE));
+    currentPage = Math.min(currentPage, pages - 1);
+    var showNav = pages > 1;
+    ge('page-info').textContent = showNav ? l.pageOf(currentPage + 1, pages) : '';
+    ge('btn-prev').disabled = currentPage === 0;
+    ge('btn-next').disabled = currentPage === pages - 1;
+    grid.style.cssText = '';
+    grid.className = 'a4-landscape';
+    var pageGuests = guests.slice(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE);
+    var showHint = currentPage === 0 && pageGuests.length > 0 && pageGuests.length <= 2;
+    grid.innerHTML = pageHTML(pageGuests, motto, showHint);
+
+    scalePreview();
+  }
+
+  // ── SCALE PREVIEW ──────────────────────────────────
+  function scalePreview() {
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var pgWmm = 297;
+    var pgHmm = 210;
+
+    var pxW = pgWmm * 3.7795;
+    var pxH = pgHmm * 3.7795;
+    var scale = Math.min(avW / pxW, avH / pxH, 1);
+
+    var wrap = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - pxW * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - pxH * scale) / 2) + 'px';
+  }
+
+  // ── DEMO ───────────────────────────────────────────
+  function loadDemo() {
+    var l = t();
+    ge('inp-guests').value = l.demoNames.join('\n');
+    ge('inp-motto').value  = l.demoMotto;
+    currentPage = 0;
+    render();
+  }
+
+  // ── INIT ───────────────────────────────────────────
+  window.addEventListener('resize', scalePreview);
+  applyLang();
+  // Starter: 2 Beispielnamen, leeres Motto — der Aha-Moment liegt im "weitere Karten entstehen"-Hinweis,
+  // nicht im fertigen 12-Karten-Bogen. Demo-Button füllt auf Wunsch eine volle Liste.
+  (function initStarter() {
+    var l = t();
+    ge('inp-guests').value = l.starterNames.join('\n');
+    ge('inp-motto').value  = '';
+    currentPage = 0;
+    render();
+  })();
+</script>
+</body>
+</html>
