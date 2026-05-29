@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200">
+  <title>Tischschild · Demo — Wedding Story Atelier</title>
+  <meta name="description" content="Live-Demo: Foto-Tischschilder & Tischnummern für die Hochzeit. Burgund, Cognac oder Forest, mit individuellem Foto und automatischer Schriftanpassung.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    /* ── Theme Dots ── */
+    .theme-dots { display: flex; gap: 8px; margin: 6px 0 2px; }
+    .theme-dot {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 2.5px solid transparent; cursor: pointer;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+    .theme-dot.active { border-color: #1A1A1A; }
+    .theme-dot:hover  { transform: scale(1.12); }
+
+    /* ── Tisch-Zeilen ── */
+    .table-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
+    .table-row  { display: flex; align-items: center; gap: 6px; }
+    .row-num {
+      width: 16px; flex-shrink: 0; text-align: right;
+      font-size: 9px; color: #bbb; font-family: 'DM Sans', sans-serif;
+    }
+    .row-input {
+      flex: 1; border: 1px solid #eee; padding: 5px 7px;
+      font-size: 11px; font-family: 'DM Sans', sans-serif;
+      background: #fafafa; color: #333; outline: none;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .row-input:focus,
+    .row-input.is-active { border-color: #8B1A35; background: #fff; }
+
+    .btn-photo {
+      flex-shrink: 0; height: 28px; padding: 0 8px;
+      border: 1px solid #eee; background: #fafafa;
+      cursor: pointer; font-size: 9px;
+      display: flex; align-items: center; gap: 4px;
+      position: relative; transition: border-color 0.15s, background 0.15s;
+      color: #aaa; white-space: nowrap; letter-spacing: 0.5px;
+      font-family: 'DM Sans', sans-serif; text-transform: uppercase;
+    }
+    .btn-photo:hover     { border-color: #aaa; color: #555; background: #f5f5f5; }
+    .btn-photo.has-photo { border-color: #8B1A35; background: #fef8f7; color: #8B1A35; }
+    .btn-photo input[type="file"] {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+    }
+    .btn-rm {
+      flex-shrink: 0; width: 16px; height: 16px;
+      border: none; background: none; cursor: pointer;
+      font-size: 14px; color: #d0ccc8; padding: 0; line-height: 1;
+      transition: color 0.12s;
+    }
+    .btn-rm:hover { color: #999; }
+
+    /* Foto Y-Regler */
+    .photo-y-wrap {
+      flex-shrink: 0; display: flex; align-items: center;
+    }
+    .photo-y-slider {
+      width: 58px; height: 4px; cursor: pointer;
+      accent-color: #8B1A35;
+    }
+
+    /* ── Preview ── */
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+    }
+    .page-nav {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; gap: 14px;
+      font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 1.5px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .nav-btn {
+      width: 26px; height: 26px; border: 1px solid #d0cdc8;
+      background: #fff; cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      color: #666; transition: all 0.15s; flex-shrink: 0;
+    }
+    .nav-btn:hover:not(:disabled) { border-color: #1A1A1A; color: #1A1A1A; }
+    .nav-btn:disabled { opacity: 0.25; cursor: default; }
+
+    .preview-area { flex: 1; position: relative; overflow: hidden; width: 100%; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── Karte ── */
+    .tisch-card {
+      position: relative; overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.20);
+      box-sizing: border-box;
+      display: flex; flex-direction: column;
+      width: 148mm; height: 210mm;
+    }
+    .tisch-card.burgund {
+      background: #FEF8F7; border: 5.5mm solid #8B1A35; color: #8B1A35;
+      --tc-r: 142; --tc-g: 27; --tc-b: 48;
+    }
+    .tisch-card.cognac {
+      background: #FEF9F5; border: 5.5mm solid #7B4718; color: #7B4718;
+      --tc-r: 123; --tc-g: 71; --tc-b: 24;
+    }
+    .tisch-card.forest {
+      background: #F7FAF7; border: 5.5mm solid #1F4A32; color: #1F4A32;
+      --tc-r: 31; --tc-g: 74; --tc-b: 50;
+    }
+
+    .card-inner-frame {
+      position: absolute; inset: 3.5mm; pointer-events: none; z-index: 1;
+      border: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.32);
+    }
+    .card-body {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; position: relative; z-index: 2;
+      padding: 9mm 0;
+    }
+    .card-text {
+      flex: 1; width: 100%; padding: 0 9mm;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+    }
+    .card-prefix {
+      font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-size: 10pt;
+      letter-spacing: 1.5px; opacity: 0.72;
+      text-align: center; line-height: 1.3;
+    }
+    .card-orn {
+      width: 36mm; height: 6mm;
+      display: flex; align-items: center;
+      margin: 7mm 0 5mm; opacity: 0.75;
+    }
+    .card-orn svg { width: 100%; height: 100%; }
+    .card-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.2em;
+      text-align: center; line-height: 1.2;
+    }
+    .card-name.len-xs  { font-size: 52pt; }
+    .card-name.len-s   { font-size: 36pt; }
+    .card-name.len-m   { font-size: 28pt; }
+    .card-name.len-l   { font-size: 22pt; }
+
+    .card-photo-wrap {
+      position: relative;
+      width: 95mm; height: 127mm;
+      margin: 0 auto 3.5mm;
+      flex-shrink: 0;
+      --cm-off: 3mm;
+      --cm-line: 14mm;
+    }
+    .card-photo {
+      width: 100%; height: 100%;
+      overflow: hidden; position: relative; z-index: 1;
+    }
+    .card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-photo-empty {
+      width: 100%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 7px; letter-spacing: 2.5px; text-transform: uppercase;
+      opacity: 0.18;
+      border-top: 1px dashed rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.2);
+    }
+
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off) + var(--cm-line));
+      height: calc(var(--cm-off) + var(--cm-line));
+      pointer-events: none; z-index: 3;
+    }
+    .corner-mark::before,
+    .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line); height: var(--cm-line);
+    }
+    .corner-mark.tr { top: calc(-1 * var(--cm-off)); right: calc(-1 * var(--cm-off)); }
+    .corner-mark.tr::before {
+      top: 0; right: 0;
+      border-top:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-right: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.tr::after {
+      top: var(--cm-off); right: var(--cm-off);
+      border-top:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-right: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.bl { bottom: calc(-1 * var(--cm-off)); left: calc(-1 * var(--cm-off)); }
+    .corner-mark.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-left:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.bl::after {
+      bottom: var(--cm-off); left: var(--cm-off);
+      border-bottom: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-left:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+
+    /* ── Demo-CTA-Karte (statt Export-Block) ── */
+    .demo-cta {
+      margin-top: 14px;
+      background: linear-gradient(165deg, #FBF8F1 0%, #F4EEE2 100%);
+      border: 1px solid #E8DFCB;
+      padding: 14px 14px 12px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .demo-cta .demo-eyebrow {
+      font-size: 8.5px; letter-spacing: 2.2px; text-transform: uppercase;
+      color: #8B7355; margin-bottom: 5px;
+    }
+    .demo-cta .demo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 14px; line-height: 1.35; color: #2A2018;
+      margin-bottom: 11px;
+    }
+    .demo-cta .demo-btn {
+      display: inline-block; width: 100%; box-sizing: border-box;
+      background: #1A1A1A; color: #FBF8F1;
+      text-align: center; text-decoration: none;
+      padding: 10px 12px; font-size: 10.5px; letter-spacing: 2px;
+      text-transform: uppercase; font-weight: 500;
+      transition: background 0.15s;
+    }
+    .demo-cta .demo-btn:hover { background: #8B1A35; }
+    .demo-cta .demo-fine {
+      font-size: 9px; color: #8B7355; margin-top: 7px;
+      text-align: center; letter-spacing: 0.2px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LINKES PANEL -->
+<form class="panel-form" onsubmit="return false">
+  <div class="panel-logo">WSA</div>
+  <div class="panel-tagline" id="lbl-tagline">Tischschild · Demo</div>
+
+  <div class="btn-group" id="lang-btns" style="margin:6px 0 10px">
+    <button type="button" class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button type="button" class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <label class="section-label">1 · Design</label>
+  <div class="theme-dots">
+    <button type="button" class="theme-dot active" data-theme="burgund"
+      style="background:#8B1A35" title="Burgund" onclick="setTheme('burgund')"></button>
+    <button type="button" class="theme-dot" data-theme="cognac"
+      style="background:#7B4718" title="Cognac"  onclick="setTheme('cognac')"></button>
+    <button type="button" class="theme-dot" data-theme="forest"
+      style="background:#1F4A32" title="Forest"  onclick="setTheme('forest')"></button>
+  </div>
+
+  <label class="section-label">2 · Format</label>
+  <select id="sel-format" onchange="onFormatChange()">
+    <option value="a5">A5 — 148 × 210 mm</option>
+    <option value="us57">5×7" — 127 × 178 mm</option>
+  </select>
+
+  <label class="section-label">3 · Prefix
+    <span id="lbl-sec3-note" style="opacity:.38;font-style:italic;font-size:9px;text-transform:none;letter-spacing:0;margin-left:4px">optional — z. B. Tisch, Table, Movie …</span>
+  </label>
+  <input type="text" id="inp-prefix" value="Tisch"
+    placeholder="Tisch / Table / Movie / Zone …" oninput="renderPreview()">
+
+  <hr class="divider">
+
+  <label class="section-label" id="lbl-sec5">5 · Tische — Durchgang 1–10</label>
+  <div class="table-rows" id="table-rows"></div>
+
+  <hr class="divider" style="margin-top:14px">
+
+  <div class="action-row">
+    <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; <span id="lbl-demo">Beispiele laden</span></button>
+  </div>
+
+  <!-- DEMO-CTA -->
+  <div class="demo-cta">
+    <div class="demo-eyebrow" id="demo-eyebrow">Live-Demo · Atelier-Werk</div>
+    <div class="demo-text" id="demo-text">
+      So sieht dein Tischschild aus — gefällt es?<br>
+      Im Atelier exportierst du druckfertige PDFs.
+    </div>
+    <a class="demo-btn" id="demo-btn" href="https://weddingstoryatelier.etsy.com/de/listing/4489746599/foto-tischschilder-hochzeit-finde-deinen" target="_blank" rel="noopener">
+      Zum Atelier-Werk
+    </a>
+    <div class="demo-fine" id="demo-fine">Sofort-Zugang · Heimdruck oder Druckerei</div>
+  </div>
+</form>
+
+<!-- RECHTES PANEL: VORSCHAU -->
+<div class="panel-preview">
+  <div class="page-nav">
+    <button class="nav-btn" id="btn-prev" onclick="navCard(-1)" disabled>‹</button>
+    <span id="nav-label">1 / 10</span>
+    <button class="nav-btn" id="btn-next" onclick="navCard(1)">›</button>
+  </div>
+  <div class="preview-area" id="preview-area">
+    <div id="preview-wrap">
+      <div class="tisch-card burgund" id="card-preview">
+        <div class="card-inner-frame"></div>
+        <div class="card-body">
+          <div class="card-text">
+            <div class="card-prefix" id="prev-prefix">Tisch</div>
+            <div class="card-orn" id="prev-orn">
+              <svg viewBox="0 0 90 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <line x1="6" y1="6" x2="37" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.85"/>
+                <line x1="53" y1="6" x2="84" y2="6" stroke="currentColor" stroke-width="0.8" opacity="0.85"/>
+                <polygon points="45,2.5 48.5,6 45,9.5 41.5,6" fill="currentColor" opacity="0.9"/>
+                <circle cx="6"  cy="6" r="1.4" fill="currentColor" opacity="0.62"/>
+                <circle cx="84" cy="6" r="1.4" fill="currentColor" opacity="0.62"/>
+              </svg>
+            </div>
+            <div class="card-name" id="prev-name">ITALIEN</div>
+          </div>
+          <div class="card-photo-wrap" id="prev-photo-wrap" style="display:none">
+            <div class="card-photo" id="prev-photo">
+              <div class="card-photo-empty">Foto optional</div>
+            </div>
+            <div class="corner-mark tr"></div>
+            <div class="corner-mark bl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+// ÜBERSETZUNGEN
+// ════════════════════════════════════════════════════════
+const T = {
+  de: {
+    tagline:      'Tischschild · Demo',
+    sec3note:     'optional — z. B. Tisch, Table, Movie …',
+    sec5:         '5 · Tische — Durchgang 1–10',
+    prefixDefault: 'Tisch',
+    prefixPH:     'Tisch / Table / Movie / Zone …',
+    rowPH:        'z. B. Italien, 18, Der Pate …',
+    fotoBtnAdd:   '+ Foto',   fotoBtnHas:   '✓ Foto',
+    fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
+    sliderTitle:  'Bildausschnitt vertikal',
+    btnRm:        'Foto entfernen',
+    lblDemo:      'Beispiele laden',
+    demoEyebrow:  'Live-Demo · Atelier-Werk',
+    demoText:     'So sieht dein Tischschild aus — gefällt es?<br>Im Atelier exportierst du druckfertige PDFs.',
+    demoBtn:      'Zum Atelier-Werk',
+    demoFine:     'Sofort-Zugang · Heimdruck oder Druckerei',
+    demo:         ['Italien','Frankreich','Portugal','Griechenland','Spanien','Kroatien','Österreich','Schweiz','Irland','Island'],
+  },
+  en: {
+    tagline:      'Table Sign · Demo',
+    sec3note:     'optional — e. g. Table, Movie, Zone …',
+    sec5:         '5 · Tables — Batch 1–10',
+    prefixDefault: 'Table',
+    prefixPH:     'Table / Movie / Zone …',
+    rowPH:        'e. g. Italy, 18, The Godfather …',
+    fotoBtnAdd:   '+ Photo', fotoBtnHas:   '✓ Photo',
+    fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
+    sliderTitle:  'Vertical crop',
+    btnRm:        'Remove photo',
+    lblDemo:      'Load examples',
+    demoEyebrow:  'Live demo · Atelier piece',
+    demoText:     'This is how your table sign looks — like it?<br>In the atelier you export print-ready PDFs.',
+    demoBtn:      'Open atelier piece',
+    demoFine:     'Instant access · Home print or print shop',
+    demo:         ['Italy','France','Portugal','Greece','Spain','Croatia','Austria','Switzerland','Ireland','Iceland'],
+  },
+};
+function tt() { return T[currentLang]; }
+
+// ════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════
+let currentTheme = 'burgund';
+let currentCard  = 0;
+let currentLang  = 'de';
+
+const tables = Array.from({length: 10}, () => ({
+  name:   '',
+  photo:  null,
+  photoY: 50,
+}));
+
+// ════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  buildTableRows();
+  renderPreview();
+  scalePreview();
+  window.addEventListener('resize', scalePreview);
+});
+
+// ════════════════════════════════════════════════════════
+// FOTO-KOMPRIMIERUNG
+// ════════════════════════════════════════════════════════
+function compressImage(file, maxPx, quality) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// TISCH-ZEILEN
+// ════════════════════════════════════════════════════════
+function buildTableRows() {
+  const container = document.getElementById('table-rows');
+  container.innerHTML = '';
+
+  tables.forEach((t, i) => {
+    const row = document.createElement('div');
+    row.className = 'table-row';
+
+    const num = document.createElement('div');
+    num.className = 'row-num';
+    num.textContent = i + 1;
+    row.appendChild(num);
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.className = 'row-input' + (i === currentCard ? ' is-active' : '');
+    inp.placeholder = tt().rowPH;
+    inp.value = t.name;
+    inp.oninput = (e) => { tables[i].name = e.target.value; if (i === currentCard) renderPreview(); };
+    inp.onfocus = () => {
+      currentCard = i;
+      document.querySelectorAll('.row-input').forEach(el => el.classList.remove('is-active'));
+      inp.classList.add('is-active');
+      renderPreview(); updateNav();
+    };
+    row.appendChild(inp);
+
+    const btnP = document.createElement('div');
+    btnP.className = 'btn-photo' + (t.photo ? ' has-photo' : '');
+    btnP.title = t.photo ? tt().fotoTitleHas : tt().fotoTitleAdd;
+    btnP.innerHTML = t.photo ? tt().fotoBtnHas : tt().fotoBtnAdd;
+    const fi = document.createElement('input');
+    fi.type = 'file'; fi.accept = 'image/*';
+    fi.onchange = async (e) => {
+      if (!e.target.files[0]) return;
+      tables[i].photo = await compressImage(e.target.files[0], 1600, 0.85);
+      currentCard = i;
+      buildTableRows(); renderPreview(); updateNav();
+    };
+    btnP.appendChild(fi);
+    row.appendChild(btnP);
+
+    if (t.photo) {
+      const yWrap = document.createElement('div');
+      yWrap.className = 'photo-y-wrap';
+      const slider = document.createElement('input');
+      slider.type = 'range'; slider.min = '0'; slider.max = '100';
+      slider.value = t.photoY ?? 50;
+      slider.className = 'photo-y-slider';
+      slider.title = tt().sliderTitle;
+      slider.oninput = (e) => {
+        tables[i].photoY = parseInt(e.target.value);
+        if (i === currentCard) renderPreview();
+      };
+      yWrap.appendChild(slider);
+      row.appendChild(yWrap);
+
+      const btnR = document.createElement('button');
+      btnR.type = 'button'; btnR.className = 'btn-rm'; btnR.title = tt().btnRm;
+      btnR.textContent = '×';
+      btnR.onclick = () => {
+        tables[i].photo = null;
+        buildTableRows();
+        if (i === currentCard) renderPreview();
+      };
+      row.appendChild(btnR);
+    }
+
+    container.appendChild(row);
+  });
+}
+
+// ════════════════════════════════════════════════════════
+// SPRACHE
+// ════════════════════════════════════════════════════════
+function setLang(lang, btn) {
+  currentLang = lang;
+  document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const t = tt();
+  document.getElementById('lbl-tagline').textContent    = t.tagline;
+  document.getElementById('lbl-sec3-note').textContent  = t.sec3note;
+  document.getElementById('lbl-sec5').textContent       = t.sec5;
+  document.getElementById('inp-prefix').placeholder     = t.prefixPH;
+  document.getElementById('lbl-demo').textContent       = t.lblDemo;
+  document.getElementById('demo-eyebrow').textContent   = t.demoEyebrow;
+  document.getElementById('demo-text').innerHTML        = t.demoText;
+  document.getElementById('demo-btn').textContent       = t.demoBtn;
+  document.getElementById('demo-fine').textContent      = t.demoFine;
+  buildTableRows();
+}
+
+// ════════════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════════════
+function setTheme(theme) {
+  currentTheme = theme;
+  document.querySelectorAll('.theme-dot').forEach(d =>
+    d.classList.toggle('active', d.dataset.theme === theme));
+  renderPreview();
+}
+
+// ════════════════════════════════════════════════════════
+// FORMAT
+// ════════════════════════════════════════════════════════
+function onFormatChange() { renderPreview(); scalePreview(); }
+
+// ════════════════════════════════════════════════════════
+// VORSCHAU
+// ════════════════════════════════════════════════════════
+function renderPreview() {
+  const card   = document.getElementById('card-preview');
+  const prefix = document.getElementById('inp-prefix').value.trim();
+  const fmt    = document.getElementById('sel-format').value;
+  const t      = tables[currentCard];
+
+  const FMT = { a5:[148,210], us57:[127,178] };
+  const [w, h] = FMT[fmt] || FMT.a5;
+  card.style.width  = w + 'mm';
+  card.style.height = h + 'mm';
+
+  card.className = 'tisch-card ' + currentTheme;
+
+  const prefixEl = document.getElementById('prev-prefix');
+  const ornEl    = document.getElementById('prev-orn');
+  prefixEl.textContent = prefix;
+  prefixEl.style.display = prefix ? '' : 'none';
+  ornEl.style.display    = prefix ? '' : 'none';
+
+  const nameEl = document.getElementById('prev-name');
+  const txt = t.name || '—';
+  nameEl.textContent = txt;
+  const l = txt.replace(/\s/g,'').length;
+  nameEl.className = 'card-name ' + (l <= 2 ? 'len-xs' : l <= 5 ? 'len-s' : l <= 9 ? 'len-m' : 'len-l');
+
+  const photoEl   = document.getElementById('prev-photo');
+  const photoWrap = document.getElementById('prev-photo-wrap');
+  if (t.photo) {
+    const yPos = t.photoY ?? 50;
+    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:center ${yPos}%">`;
+    photoWrap.style.display = '';
+  } else {
+    photoWrap.style.display = 'none';
+  }
+
+  updateNav();
+  scalePreview();
+}
+
+// ════════════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════════════
+function navCard(dir) {
+  currentCard = Math.max(0, Math.min(9, currentCard + dir));
+  renderPreview();
+}
+
+function updateNav() {
+  document.getElementById('btn-prev').disabled = currentCard === 0;
+  document.getElementById('btn-next').disabled = currentCard === 9;
+  const t   = tables[currentCard];
+  const lbl = t.name || ('Slot ' + (currentCard + 1));
+  document.getElementById('nav-label').textContent =
+    lbl + ' · ' + (currentCard + 1) + ' / 10';
+}
+
+// ════════════════════════════════════════════════════════
+// SKALIERUNG
+// ════════════════════════════════════════════════════════
+function scalePreview() {
+  const area = document.getElementById('preview-area');
+  if (!area || area.clientWidth <= 0) {
+    requestAnimationFrame(scalePreview);
+    return;
+  }
+
+  const fmt = document.getElementById('sel-format').value;
+  const FMT = { a5:[148,210], us57:[127,178] };
+  const [wMM, hMM] = FMT[fmt] || FMT.a5;
+  const PX = 96 / 25.4;
+  const cardW = wMM * PX, cardH = hMM * PX;
+
+  const wrap = document.getElementById('preview-wrap');
+  const avW  = area.clientWidth  - 48;
+  const avH  = area.clientHeight - 48;
+  const scale = Math.min(avW / cardW, avH / cardH, 1);
+
+  wrap.style.transform = 'scale(' + scale + ')';
+  wrap.style.left = Math.round((area.clientWidth  - cardW * scale) / 2) + 'px';
+  wrap.style.top  = Math.round((area.clientHeight - cardH * scale) / 2) + 'px';
+}
+
+// ════════════════════════════════════════════════════════
+// DEMO-DATEN LADEN
+// ════════════════════════════════════════════════════════
+function loadDemo() {
+  tt().demo.forEach((n, i) => { tables[i].name = n; });
+  document.getElementById('inp-prefix').value = tt().prefixDefault;
+  currentCard = 0;
+  buildTableRows(); renderPreview();
+}
+
+// Auto-Demo beim ersten Laden (Wow-Effekt für LP-Besucher)
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(loadDemo, 200);
+});
+</script>
+</body>
+</html>

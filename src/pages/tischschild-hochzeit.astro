@@ -1,0 +1,382 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const etsyUrl = 'https://weddingstoryatelier.etsy.com/de/listing/4489746599/foto-tischschilder-hochzeit-finde-deinen';
+const demoUrl = '/atelier/tischschild.html';
+
+const faq = [
+  {
+    q: 'Brauche ich Designkenntnisse?',
+    a: 'Nein. Pro Tisch eine Zeile eintragen — Nummer, Name oder beides — und das Schild ist gesetzt. Schriftgröße passt sich an die Textlänge an, drei Farbwelten zur Wahl, ein Foto pro Tisch optional.',
+  },
+  {
+    q: 'Tischnummer oder Tischname — was ist im Werk?',
+    a: 'Beides. Du wählst pro Tisch: Nummer (1, 2, 3 …), Name (Italien, Toskana, Der Pate …) oder Kombination. Der Prefix („Tisch", „Table", „Movie" …) ist frei wählbar, auch leer.',
+  },
+  {
+    q: 'Wie funktioniert das mit dem Foto?',
+    a: 'Pro Tisch ein eigenes Foto hochladen, vertikalen Bildausschnitt mit dem Y-Regler anpassen — das Foto füllt ein festes 3:4-Fenster im unteren Teil des Schilds. Ohne Foto zentriert sich der Text alleine, beides funktioniert.',
+  },
+  {
+    q: 'Für wie viele Tische?',
+    a: '10 Schilder pro Durchgang. Bei 20 Tischen einfach zwei Durchgänge — Workflow bleibt identisch, am Ende stehen zwei PDFs.',
+  },
+  {
+    q: 'Welche Druckformate sind dabei?',
+    a: 'A5 (148 × 210 mm) und 5×7 Zoll (127 × 178 mm) — beide Formate im Werk. Heimdruck-Modus für eigenen Drucker, Druckerei-Modus mit 3 mm Beschnitt für Online-Druckereien. Du wählst beim Export.',
+  },
+  {
+    q: 'Was bekomme ich nach dem Kauf?',
+    a: 'Direkt nach der Etsy-Bestellung einen Link ins Atelier — Browser-Tool, kein Download, keine Software-Installation. Fotos und Daten bleiben lokal im Browser, nichts wird hochgeladen.',
+  },
+];
+---
+
+<Layout
+  title="Tischschilder Hochzeit mit Foto — Tischnummern Old Money · Wedding Story Atelier"
+  description="Foto-Tischschilder und Tischnummern für die Hochzeit. Burgund, Cognac oder Forest, eigenes Foto pro Tisch, A5 oder 5×7 Zoll. Heimdruck oder Druckerei. Made in Heidelberg."
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero — Foto links, Text rechts -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-20">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+      <div class="order-2 md:order-1">
+        <img
+          src="/images/tischschild-hero.jpg"
+          alt="Tischschild Hochzeit mit Foto — Old Money Edition, Burgund mit Proposal-Foto auf Hochzeitstafel"
+          loading="eager"
+          fetchpriority="high"
+          class="w-full"
+        />
+      </div>
+      <div class="order-1 md:order-2 text-center md:text-left">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+          Aus dem Atelier
+        </p>
+        <h1 class="serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8">
+          Tischschilder mit Foto —<br />
+          <em class="text-cognac">Tischnummern,<br />Tischnamen, beides.</em>
+        </h1>
+        <p class="serif text-lg md:text-xl italic text-ink-muted leading-relaxed mb-10">
+          Pro Tisch ein eigenes Foto, dazu Nummer oder Name — die Schrift passt sich an. Drei Farbwelten Old Money: Burgund, Cognac oder Forest. A5 oder 5×7 Zoll.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 items-center md:items-start text-sm tracking-wider">
+          <a
+            href="#demo"
+            class="bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+          >
+            Demo öffnen →
+          </a>
+          <a
+            href={etsyUrl}
+            target="_blank"
+            rel="noopener"
+            data-conversion="tischschild-etsy"
+            class="text-ink-muted border-b border-ink-muted pb-1 hover:text-cognac hover:border-cognac transition-colors uppercase tracking-[0.2em] text-xs"
+          >
+            Auf Etsy holen — 6,40 €
+          </a>
+        </div>
+        <p class="text-xs text-ink-muted mt-8 italic">
+          Sofortiger Atelier-Zugang nach Kauf · Heimdruck und Druckerei · Daten und Fotos bleiben bei euch
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drei Versprechen -->
+  <section id="format" class="px-8 md:px-16 py-20 bg-cream">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-12">
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">I.</p>
+        <h3 class="serif text-xl mb-3">Nummer, Name oder beides</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Pro Tisch entscheiden: schlichte Zahl, Reiseziel-Name oder Kombination. Frei wählbarer Prefix — „Tisch", „Table", „Movie" — auch leer.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">II.</p>
+        <h3 class="serif text-xl mb-3">Ein Foto pro Tisch</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Hochzeitsfotos, Urlaubsbilder, Lieblingsmomente — pro Tisch ein eigenes Bild, vertikaler Ausschnitt mit Y-Regler. Optional, auch ohne Foto edel.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-cognac italic mb-4">III.</p>
+        <h3 class="serif text-xl mb-3">Old Money Linie</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Burgund, Cognac oder Forest — drei zurückhaltende Farbwelten, Cormorant-Italic-Prefix, ruhige Ornamente. Im Atelier in Heidelberg gedruckt und getestet.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="px-4 md:px-16 py-24">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Direkt ausprobieren
+        </p>
+        <h2 class="serif text-4xl md:text-5xl mb-6">
+          So sieht euer Tischschild aus.
+        </h2>
+        <p class="serif text-lg italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+          Demo läuft mit Reiseziel-Beispielen. Eigene Namen oder Nummern links eingeben, Farbe wechseln, Format wechseln — das Schild reagiert live. PDF-Export ist hier nicht möglich; die Vollversion ist das Werk im Etsy-Shop.
+        </p>
+      </div>
+
+      <!-- Desktop: Live-Demo per iframe -->
+      <div class="hidden md:block border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
+        <iframe
+          src={demoUrl}
+          title="Tischschild Hochzeit — Live-Demo"
+          loading="lazy"
+          class="w-full"
+          style="height: 900px; border: 0; display: block;"
+        ></iframe>
+      </div>
+
+      <!-- Mobile: Fallback mit Foto + Hinweis (Demo ist für Desktop gemacht) -->
+      <div class="md:hidden border border-sand bg-cream">
+        <img
+          src="/images/tischschild-mobile.jpg"
+          alt="Tischschild Forest — Atelier-Nahaufnahme im Garten-Setting"
+          loading="lazy"
+          class="w-full"
+        />
+        <div class="px-6 py-8 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-cognac mb-3">Demo am Desktop</p>
+          <p class="serif italic text-lg leading-relaxed text-ink-muted">
+            Die Live-Demo ist für den Laptop oder größere Bildschirme gemacht — dort lassen sich Fotos hochladen und das Schild in Echtzeit ausprobieren.
+          </p>
+          <p class="text-sm text-ink-muted mt-4">
+            Öffne <span class="serif italic">weddingstoryatelier.de/tischschild-hochzeit</span> später am Desktop.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-xs text-ink-muted text-center mt-6 italic">
+        Demo ohne PDF-Export · Vollversion mit Heimdruck und Druckerei-Modus im Etsy-Werk
+      </p>
+
+      <div class="text-center mt-12">
+        <a
+          href={etsyUrl}
+          target="_blank"
+          rel="noopener"
+          data-conversion="tischschild-etsy"
+          class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+        >
+          Vollversion auf Etsy holen →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- So funktioniert es -->
+  <section class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        So funktioniert es
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        In vier Schritten auf den Tisch.
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt eins</p>
+          <h3 class="serif text-xl mb-3">Link aus Etsy öffnen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Direkt nach dem Kauf landet ein privater Atelier-Link in der Etsy-Nachricht. Ein Klick — ihr seid drin.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt zwei</p>
+          <h3 class="serif text-xl mb-3">Nummer oder Name eintippen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Pro Tisch eine Zeile — Zahl, Name oder Kombination. Schriftgröße passt sich automatisch an die Textlänge an.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt drei</p>
+          <h3 class="serif text-xl mb-3">Foto und Farbe wählen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Pro Tisch ein Foto, Ausschnitt mit Y-Regler. Burgund, Cognac oder Forest. A5 oder 5×7 Zoll.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-cognac mb-3">Schritt vier</p>
+          <h3 class="serif text-xl mb-3">PDF mitnehmen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Druckfertiges PDF mit allen 10 Schildern. Heimdruck oder Druckerei-Modus mit 3 mm Beschnitt — beliebig oft exportieren.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Was im Werk steckt — Foto rechts -->
+  <section id="werk" class="px-8 md:px-16 py-24">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div>
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Im Werk enthalten
+        </p>
+        <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+          Ein Werk — und der Gast<br />
+          findet seinen Tisch.
+        </h2>
+        <ul class="space-y-4 text-sm text-ink-muted leading-relaxed">
+          <li class="flex gap-3"><span class="text-cognac">·</span> Atelier-Zugang als Browser-Tool — kein Download, kein Konto</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Drei Farbwelten Old Money: Burgund, Cognac, Forest</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Nummer, Name oder Kombination — frei wählbarer Prefix</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Ein eigenes Foto pro Tisch, optional, mit vertikalem Bildausschnitt-Regler</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Automatische Schriftanpassung — von 1-stellig bis langer Reiseziel-Name</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> 10 Schilder pro Durchgang, beliebig wiederholbar</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Heimdruck-Modus und Druckerei-Modus mit 3 mm Beschnitt</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Anleitung zweisprachig DE + EN, mit Druckempfehlung</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Unbegrenzte Bearbeitung — Daten bleiben lokal</li>
+        </ul>
+      </div>
+      <div>
+        <img
+          src="/images/tischschild-werk.jpg"
+          alt="Vier Tischschilder Cognac als Beziehungs-Stages: First Date, First Trip, Our Home, Proposal"
+          loading="lazy"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        Häufige Fragen
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Was Brautpaare oft fragen.
+      </h2>
+      <div class="space-y-8">
+        {faq.map((item) => (
+          <details class="group border-b border-sand pb-6">
+            <summary class="cursor-pointer flex justify-between items-start gap-6 list-none">
+              <h3 class="serif text-xl group-open:text-cognac transition-colors">{item.q}</h3>
+              <span class="serif text-2xl text-cognac mt-[-4px] group-open:rotate-45 transition-transform inline-block">+</span>
+            </summary>
+            <p class="text-sm text-ink-muted leading-relaxed mt-4 max-w-2xl">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Schluss-CTA -->
+  <section class="px-8 md:px-16 py-32 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Bereit für eure Tischschilder
+    </p>
+    <h2 class="serif text-4xl md:text-6xl mb-10 max-w-3xl mx-auto leading-tight">
+      Heute Tischordnung,<br />
+      <em class="text-cognac">morgen findet jeder Gast seinen Tisch.</em>
+    </h2>
+    <a
+      href={etsyUrl}
+      target="_blank"
+      rel="noopener"
+      data-conversion="tischschild-etsy"
+      class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
+    >
+      Tischschilder auf Etsy holen — 6,40 € →
+    </a>
+    <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
+      Sofortiger Atelier-Zugang · Heimdruck und Druckerei · Beliebig oft bearbeiten
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- FAQ Schema für Rich Results -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  })} />
+
+  <!-- Product Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Tischschilder Hochzeit mit Foto — Old Money Design",
+    "description": "Foto-Tischschilder und Tischnummern für die Hochzeit. Burgund, Cognac oder Forest, eigenes Foto pro Tisch, A5 oder 5x7 Zoll. Heimdruck oder Druckerei-Modus mit 3 mm Beschnitt. Cormorant Garamond, im Atelier in Heidelberg gedruckt.",
+    "image": "https://weddingstoryatelier.de/images/tischschild-hero.jpg",
+    "brand": { "@type": "Brand", "name": "Wedding Story Atelier" },
+    "offers": {
+      "@type": "Offer",
+      "url": etsyUrl,
+      "priceCurrency": "EUR",
+      "price": "6.40",
+      "availability": "https://schema.org/InStock"
+    }
+  })} />
+
+  <!-- Google Ads Conversion Trigger — feuert beim Etsy-Outbound-Klick, sofern Cookie-Consent granted -->
+  <!-- TODO: Eigene Conversion-Aktion "Etsy-Klick Tischschild" in Google Ads anlegen,
+              neuen AW-Label hier ersetzen. Bis dahin teilt sich Tischschild die Sitzplan-ID. -->
+  <script is:inline>
+    (function () {
+      const SEND_TO = 'AW-18181056795/Kr2cCPOdp7EcEJvSs91D';
+
+      function fireConversion() {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('event', 'conversion', {
+          send_to: SEND_TO,
+          value: 6.40,
+          currency: 'EUR',
+        });
+      }
+
+      function attach() {
+        const els = document.querySelectorAll('a[data-conversion="tischschild-etsy"]');
+        els.forEach(function (el) {
+          if (el.dataset.wsaWired === '1') return;
+          el.dataset.wsaWired = '1';
+          el.addEventListener('click', fireConversion);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+      } else {
+        attach();
+      }
+      window.addEventListener('wsa:ads-ready', attach);
+    })();
+  </script>
+</Layout>
