@@ -1,0 +1,422 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const etsyUrl = 'https://weddingstoryatelier.etsy.com/de/listing/4510587510/goldene-hochzeit-einladung-zum-ausfullen';
+const demoUrl = '/atelier/goldene-hochzeit-einladung.html';
+
+const faq = [
+  {
+    q: 'Bekomme ich gedruckte Karten geschickt?',
+    a: 'Nein — du bekommst eine digitale Vorlage zum Selbst-Ausfüllen und Drucken. Nach dem Kauf kommt ein Link ins Atelier samt Passwort, du füllst die Einladung direkt im Browser aus und druckst sie selbst oder im Copyshop. Kein physischer Versand, kein Warten auf die Post.',
+  },
+  {
+    q: 'Geht das wirklich komplett am Handy?',
+    a: 'Ja. Ausfüllen, Vorschau und PDF speichern funktionieren direkt am Smartphone — ohne PC, ohne App, ohne Editor-Programm. Gedacht für die Tochter oder den Sohn, die die Feier organisieren: auf dem Sofa, im Café, im Zug.',
+  },
+  {
+    q: 'Gedruckt und digital verschicken — beides?',
+    a: 'Beides aus einem Werk. Die gedruckte Karte (A5 oder 5×7 in) als Erinnerungsstück für die engste Familie, dazu eine digitale Version als Bild (1080×1920) für WhatsApp, iMessage oder die Instagram-Story — ideal für Gäste, die weiter weg wohnen.',
+  },
+  {
+    q: 'Welche Formate und Sprachen sind dabei?',
+    a: 'A5 (148 × 210 mm, Deutsch) und 5×7 Zoll (English) für den Druck — beide Sprachen im selben Atelier-Zugang. Heimdruck am eigenen Drucker oder Druckerei und Copyshop. Empfohlen: 200–250 g/m² mattes Papier.',
+  },
+  {
+    q: 'Brauche ich Designkenntnisse?',
+    a: 'Nein. Namen, Datum, Ort und Antwort-Bitte in die Felder eintragen — die Karte aktualisiert sich live. Champagne-Gold und das ruhige Atelier-Layout bleiben dabei immer stilsicher, ganz ohne Gestaltungsarbeit.',
+  },
+  {
+    q: 'Was bekomme ich nach dem Kauf?',
+    a: 'Sofort nach der Etsy-Bestellung eine PDF-Anleitung mit deinem privaten Atelier-Link und Passwort. Ein Klick — du bist drin. Deine Eingaben bleiben lokal auf deinem Gerät, nichts wird hochgeladen.',
+  },
+];
+---
+
+<Layout
+  title="Einladung Goldene Hochzeit zum Ausfüllen — am Handy, Champagne-Gold · Wedding Story Atelier"
+  description="Einladung zur Goldenen Hochzeit selbst gestalten: im Browser ausfüllen, am Smartphone, drucken oder digital per WhatsApp senden. Champagne-Gold, A5 + 5×7 in, Deutsch & English. 4,55 €."
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero — Foto links, Text rechts -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-20">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-20 items-center">
+      <div class="order-2 md:order-1">
+        <img
+          src="/images/goldene-hochzeit-hero.jpg"
+          alt="Einladung zur Goldenen Hochzeit in Champagne-Gold — gedruckte Karte mit Umschlag und Füller"
+          loading="eager"
+          fetchpriority="high"
+          class="w-full"
+        />
+      </div>
+      <div class="order-1 md:order-2 text-center md:text-left">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+          Aus dem Atelier · 50 Jahre
+        </p>
+        <h1 class="serif text-5xl md:text-6xl lg:text-7xl leading-[1.05] mb-8">
+          Einladung zur Goldenen Hochzeit —<br />
+          <em class="text-[#9C7B1A]">zum Ausfüllen, in Minuten.</em>
+        </h1>
+        <p class="serif text-lg md:text-xl italic text-ink-muted leading-relaxed mb-10">
+          Direkt im Browser ausfüllen — auch komplett am Handy. Champagne-Gold, Atelier Bodoni. Drucken für die Familie oder digital per WhatsApp senden. A5 und 5×7 Zoll, Deutsch und English.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-6 items-center md:items-start text-sm tracking-wider">
+          <a
+            href="#demo"
+            class="bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+          >
+            Demo öffnen →
+          </a>
+          <a
+            href={etsyUrl}
+            target="_blank"
+            rel="noopener"
+            data-conversion="goldene-hochzeit-etsy"
+            class="text-ink-muted border-b border-ink-muted pb-1 hover:text-[#9C7B1A] hover:border-[#9C7B1A] transition-colors uppercase tracking-[0.2em] text-xs"
+          >
+            Auf Etsy holen — 4,55 €
+          </a>
+        </div>
+        <p class="text-xs text-ink-muted mt-8 italic">
+          Sofortiger Atelier-Zugang nach Kauf · am Handy oder Desktop · Daten bleiben bei euch
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Einmal ausfüllen, zwei Wege -->
+  <section class="px-6 md:px-16 py-20 bg-cream border-t border-sand">
+    <div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div class="order-2 md:order-1">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Einmal ausfüllen, zwei Wege
+        </p>
+        <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+          Gedruckt für die Familie,<br />
+          <em class="text-[#9C7B1A]">digital für alle anderen.</em>
+        </h2>
+        <div class="space-y-6 text-sm text-ink-muted leading-relaxed">
+          <div>
+            <h3 class="serif text-xl text-ink mb-2">Die gedruckte Karte</h3>
+            <p>Für die engste Familie und Nachbarn — ein Erinnerungsstück zum Anfassen. A5 oder 5×7 Zoll, Heimdruck oder Copyshop, auf schönem mattem Papier.</p>
+          </div>
+          <div>
+            <h3 class="serif text-xl text-ink mb-2">Die digitale Einladung</h3>
+            <p>Für entfernte Verwandte und Kollegen — als Bild (1080 × 1920) direkt per WhatsApp, iMessage oder Instagram-Story. Kein Porto, in Sekunden verschickt.</p>
+          </div>
+        </div>
+      </div>
+      <div class="order-1 md:order-2">
+        <img
+          src="/images/goldene-hochzeit-zwei-wege.webp"
+          alt="Goldene-Hochzeit-Einladung gedruckt neben Smartphone mit derselben digitalen Einladung"
+          loading="lazy"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- Drei Versprechen -->
+  <section id="format" class="px-8 md:px-16 py-20">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-3 gap-12">
+      <div class="text-center">
+        <p class="serif text-4xl text-[#9C7B1A] italic mb-4">I.</p>
+        <h3 class="serif text-xl mb-3">In Minuten ausgefüllt</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Namen, Datum, Ort und Antwort-Bitte eintragen — die Karte aktualisiert sich live. Keine Software, kein Konto, keine Gestaltungsarbeit.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-[#9C7B1A] italic mb-4">II.</p>
+        <h3 class="serif text-xl mb-3">Am Handy bedienbar</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Anders als die meisten Vorlagen läuft dieses Werk komplett am Smartphone — ausfüllen, Vorschau, PDF. Ideal für die organisierende Tochter oder den Sohn.
+        </p>
+      </div>
+      <div class="text-center">
+        <p class="serif text-4xl text-[#9C7B1A] italic mb-4">III.</p>
+        <h3 class="serif text-xl mb-3">Champagne-Gold, editorial</h3>
+        <p class="text-sm text-ink-muted leading-relaxed">
+          Warmes Champagne-Gold mit leisem Mushroom-Akzent, Atelier Bodoni. Zweisprachig Deutsch und English. Im Atelier gedruckt und getestet.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="px-4 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Direkt ausprobieren
+        </p>
+        <h2 class="serif text-4xl md:text-5xl mb-6">
+          So füllt ihr eure Einladung aus.
+        </h2>
+        <p class="serif text-lg italic text-ink-muted max-w-2xl mx-auto leading-relaxed">
+          Demo läuft mit Beispiel-Angaben. Eigene Namen, Datum und Ort eintragen, Sprache wechseln — die Karte reagiert live. Drucken und PDF-Speichern sind hier gesperrt; die Vollversion ist das Werk im Etsy-Shop.
+        </p>
+      </div>
+
+      <!-- Desktop: Live-Demo per iframe -->
+      <div class="hidden md:block border border-sand bg-paper shadow-[0_24px_64px_rgba(0,0,0,0.08)]">
+        <iframe
+          src={demoUrl}
+          title="Goldene Hochzeit Einladung — Live-Demo"
+          loading="lazy"
+          class="w-full"
+          style="height: 1150px; border: 0; display: block;"
+        ></iframe>
+      </div>
+
+      <!-- Mobile: Demo ist mobil bedienbar — im neuen Tab öffnen -->
+      <div class="md:hidden border border-sand bg-paper">
+        <img
+          src="/images/goldene-hochzeit-zwei-wege.webp"
+          alt="Goldene-Hochzeit-Einladung gedruckt und auf dem Smartphone"
+          loading="lazy"
+          class="w-full"
+        />
+        <div class="px-6 py-8 text-center">
+          <p class="text-xs tracking-[0.3em] uppercase text-[#9C7B1A] mb-3">Demo am Handy</p>
+          <p class="serif italic text-lg leading-relaxed text-ink-muted mb-6">
+            Diese Vorlage funktioniert direkt am Smartphone — tippe unten und probiere das Ausfüllen gleich hier aus.
+          </p>
+          <a
+            href={demoUrl}
+            target="_blank"
+            rel="noopener"
+            class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+          >
+            Demo am Handy öffnen →
+          </a>
+        </div>
+      </div>
+
+      <p class="text-xs text-ink-muted text-center mt-6 italic">
+        Vorschau ohne Druck und PDF · die ausfüllbare Vollversion gibt es im Etsy-Werk
+      </p>
+
+      <div class="text-center mt-12">
+        <a
+          href={etsyUrl}
+          target="_blank"
+          rel="noopener"
+          data-conversion="goldene-hochzeit-etsy"
+          class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+        >
+          Vollversion auf Etsy holen →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- So funktioniert es -->
+  <section class="px-8 md:px-16 py-24 border-t border-sand">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        So funktioniert es
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        In vier Schritten zur Einladung.
+      </h2>
+      <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-10">
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-[#9C7B1A] mb-3">Schritt eins</p>
+          <h3 class="serif text-xl mb-3">Link aus Etsy öffnen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Direkt nach dem Kauf liegt ein privater Atelier-Link mit Passwort in der Etsy-Nachricht. Am Handy, Tablet oder Laptop öffnen.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-[#9C7B1A] mb-3">Schritt zwei</p>
+          <h3 class="serif text-xl mb-3">Sprache & Felder ausfüllen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Deutsch oder English wählen, dann Namen, Datum, Ort und Antwort-Bitte eintragen.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-[#9C7B1A] mb-3">Schritt drei</p>
+          <h3 class="serif text-xl mb-3">Live-Vorschau prüfen</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Die Karte aktualisiert sich beim Tippen. Alles sitzt? Weiter zum letzten Schritt.
+          </p>
+        </div>
+        <div>
+          <p class="text-xs tracking-[0.2em] uppercase text-[#9C7B1A] mb-3">Schritt vier</p>
+          <h3 class="serif text-xl mb-3">Drucken oder digital senden</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            „Drucken / PDF" für die gedruckte Karte oder die digitale Einladung speichern — fertig zum Verschicken.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Was im Werk steckt — Foto rechts -->
+  <section id="werk" class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+      <div>
+        <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+          Im Werk enthalten
+        </p>
+        <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+          Ein Werk — und die<br />
+          Einladung steht.
+        </h2>
+        <ul class="space-y-4 text-sm text-ink-muted leading-relaxed">
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Atelier-Zugang als Browser-Tool — kein Download, kein Konto</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Gedruckte Einladung als PDF — A5 (Deutsch) und 5×7 Zoll (English)</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Digitale Einladung als Bild (1080 × 1920) für WhatsApp und Instagram-Story</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Beide Sprachen im selben Zugang — Deutsch und English</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Komplett am Smartphone bedienbar — ausfüllen, Vorschau, PDF</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Champagne-Gold mit Mushroom-Akzent, Atelier Bodoni</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Heimdruck und Copyshop, mit Druckempfehlung in der Anleitung</li>
+          <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> Unbegrenzte Bearbeitung — Daten bleiben lokal</li>
+        </ul>
+        <p class="text-sm text-ink-muted leading-relaxed mt-8 italic border-l-2 border-[#9C7B1A] pl-4">
+          Für den vollen Auftritt: Im Atelier gibt es parallel das Anniversary Golden Kit — Einladung, Tagesablauf und Platzkarten als aufeinander abgestimmtes Set.
+        </p>
+      </div>
+      <div>
+        <img
+          src="/images/goldene-hochzeit-werk.jpg"
+          alt="Goldene-Hochzeit-Einladung, deutsche Info-Seite mit Eukalyptus"
+          loading="lazy"
+          class="w-full"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="px-8 md:px-16 py-24 border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        Häufige Fragen
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Was Familien oft fragen.
+      </h2>
+      <div class="space-y-8">
+        {faq.map((item) => (
+          <details class="group border-b border-sand pb-6">
+            <summary class="cursor-pointer flex justify-between items-start gap-6 list-none">
+              <h3 class="serif text-xl group-open:text-[#9C7B1A] transition-colors">{item.q}</h3>
+              <span class="serif text-2xl text-[#9C7B1A] mt-[-4px] group-open:rotate-45 transition-transform inline-block">+</span>
+            </summary>
+            <p class="text-sm text-ink-muted leading-relaxed mt-4 max-w-2xl">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Schluss-CTA -->
+  <section class="px-8 md:px-16 py-32 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Bereit für eure Einladung
+    </p>
+    <h2 class="serif text-4xl md:text-6xl mb-10 max-w-3xl mx-auto leading-tight">
+      50 Jahre — und alle<br />
+      <em class="text-[#9C7B1A]">sind dabei.</em>
+    </h2>
+    <a
+      href={etsyUrl}
+      target="_blank"
+      rel="noopener"
+      data-conversion="goldene-hochzeit-etsy"
+      class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+    >
+      Einladung auf Etsy holen — 4,55 € →
+    </a>
+    <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
+      Sofortiger Atelier-Zugang · am Handy oder Desktop · gedruckt und digital · beliebig oft bearbeiten
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- FAQ Schema für Rich Results -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  })} />
+
+  <!-- Product Schema -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "Goldene Hochzeit Einladung zum Ausfüllen — Champagne-Gold",
+    "description": "Einladung zur Goldenen Hochzeit zum Selbst-Ausfüllen im Browser, komplett am Smartphone. Champagne-Gold, Atelier Bodoni. Gedruckt (A5 und 5×7 in) oder digital per Messenger. Deutsch und English im selben Zugang.",
+    "image": "https://weddingstoryatelier.de/images/goldene-hochzeit-hero.jpg",
+    "brand": { "@type": "Brand", "name": "Wedding Story Atelier" },
+    "offers": {
+      "@type": "Offer",
+      "url": etsyUrl,
+      "priceCurrency": "EUR",
+      "price": "4.55",
+      "availability": "https://schema.org/InStock"
+    }
+  })} />
+
+  <!-- Google Ads Conversion Trigger — feuert beim Etsy-Outbound-Klick, sofern Cookie-Consent granted -->
+  <!-- TODO: Eigene Conversion-Aktion "Etsy-Klick Goldene Hochzeit" in Google Ads anlegen,
+              neuen AW-Label hier ersetzen. Bis dahin teilt sich die Seite die Sitzplan-ID. -->
+  <script is:inline>
+    (function () {
+      const SEND_TO = 'AW-18181056795/Kr2cCPOdp7EcEJvSs91D';
+
+      function fireConversion() {
+        if (typeof window.gtag !== 'function') return;
+        window.gtag('event', 'conversion', {
+          send_to: SEND_TO,
+          value: 4.55,
+          currency: 'EUR',
+        });
+      }
+
+      function attach() {
+        const els = document.querySelectorAll('a[data-conversion="goldene-hochzeit-etsy"]');
+        els.forEach(function (el) {
+          if (el.dataset.wsaWired === '1') return;
+          el.dataset.wsaWired = '1';
+          el.addEventListener('click', fireConversion);
+        });
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', attach);
+      } else {
+        attach();
+      }
+      window.addEventListener('wsa:ads-ready', attach);
+    })();
+  </script>
+</Layout>
