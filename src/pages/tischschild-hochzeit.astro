@@ -7,7 +7,7 @@ const demoUrl = '/atelier/tischschild.html';
 const faq = [
   {
     q: 'Brauche ich Designkenntnisse?',
-    a: 'Nein. Pro Tisch eine Zeile eintragen — Nummer, Name oder beides — und das Schild ist gesetzt. Schriftgröße passt sich an die Textlänge an, drei Farbwelten zur Wahl, ein Foto pro Tisch optional.',
+    a: 'Nein. Pro Tisch eine Zeile eintragen — Nummer, Name oder beides — und das Schild ist gesetzt. Schriftgröße passt sich an die Textlänge an, drei Farbwelten zur Wahl, ein eigenes Foto pro Tisch.',
   },
   {
     q: 'Tischnummer oder Tischname — was ist im Werk?',
@@ -15,7 +15,7 @@ const faq = [
   },
   {
     q: 'Wie funktioniert das mit dem Foto?',
-    a: 'Pro Tisch ein eigenes Foto hochladen, vertikalen Bildausschnitt mit dem Y-Regler anpassen — das Foto füllt ein festes 3:4-Fenster im unteren Teil des Schilds. Ohne Foto zentriert sich der Text alleine, beides funktioniert.',
+    a: 'Pro Tisch ein eigenes Foto hochladen, vertikalen Bildausschnitt mit dem Y-Regler anpassen — das Foto füllt ein festes 3:4-Fenster im unteren Teil des Schilds. Am besten eignen sich Hochformat-Fotos, sie füllen das Fenster ohne Beschnitt.',
   },
   {
     q: 'Für wie viele Tische?',
@@ -85,7 +85,7 @@ const faq = [
             data-conversion="tischschild-etsy"
             class="text-ink-muted border-b border-ink-muted pb-1 hover:text-cognac hover:border-cognac transition-colors uppercase tracking-[0.2em] text-xs"
           >
-            Auf Etsy holen — 6,40 €
+            Auf Etsy holen — 5,26 €
           </a>
         </div>
         <p class="text-xs text-ink-muted mt-8 italic">
@@ -109,14 +109,14 @@ const faq = [
         <p class="serif text-4xl text-cognac italic mb-4">II.</p>
         <h3 class="serif text-xl mb-3">Ein Foto pro Tisch</h3>
         <p class="text-sm text-ink-muted leading-relaxed">
-          Hochzeitsfotos, Urlaubsbilder, Lieblingsmomente — pro Tisch ein eigenes Bild, vertikaler Ausschnitt mit Y-Regler. Optional, auch ohne Foto edel.
+          Hochzeitsfotos, Urlaubsbilder, Lieblingsmomente — pro Tisch ein eigenes Bild, vertikaler Ausschnitt mit Y-Regler. Am besten im Hochformat, dann sitzt das Bild ohne Beschnitt.
         </p>
       </div>
       <div class="text-center">
         <p class="serif text-4xl text-cognac italic mb-4">III.</p>
         <h3 class="serif text-xl mb-3">Old Money Linie</h3>
         <p class="text-sm text-ink-muted leading-relaxed">
-          Burgund, Cognac oder Forest — drei zurückhaltende Farbwelten, Cormorant-Italic-Prefix, ruhige Ornamente. Im Atelier in Heidelberg gedruckt und getestet.
+          Burgund, Cognac oder Forest — drei zurückhaltende Farbwelten, klassische Serifenschrift, ruhige Ornamente. Im Atelier in Heidelberg gedruckt und getestet.
         </p>
       </div>
     </div>
@@ -242,7 +242,7 @@ const faq = [
           <li class="flex gap-3"><span class="text-cognac">·</span> Atelier-Zugang als Browser-Tool — kein Download, kein Konto</li>
           <li class="flex gap-3"><span class="text-cognac">·</span> Drei Farbwelten Old Money: Burgund, Cognac, Forest</li>
           <li class="flex gap-3"><span class="text-cognac">·</span> Nummer, Name oder Kombination — frei wählbarer Prefix</li>
-          <li class="flex gap-3"><span class="text-cognac">·</span> Ein eigenes Foto pro Tisch, optional, mit vertikalem Bildausschnitt-Regler</li>
+          <li class="flex gap-3"><span class="text-cognac">·</span> Ein eigenes Foto pro Tisch, am besten im Hochformat, mit vertikalem Bildausschnitt-Regler</li>
           <li class="flex gap-3"><span class="text-cognac">·</span> Automatische Schriftanpassung — von 1-stellig bis langer Reiseziel-Name</li>
           <li class="flex gap-3"><span class="text-cognac">·</span> 10 Schilder pro Durchgang, beliebig wiederholbar</li>
           <li class="flex gap-3"><span class="text-cognac">·</span> Heimdruck-Modus und Druckerei-Modus mit 3 mm Beschnitt</li>
@@ -300,7 +300,7 @@ const faq = [
       data-conversion="tischschild-etsy"
       class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-cognac transition-colors"
     >
-      Tischschilder auf Etsy holen — 6,40 € →
+      Tischschilder auf Etsy holen — 5,26 € →
     </a>
     <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
       Sofortiger Atelier-Zugang · Heimdruck und Druckerei · Beliebig oft bearbeiten
@@ -341,7 +341,7 @@ const faq = [
       "@type": "Offer",
       "url": etsyUrl,
       "priceCurrency": "EUR",
-      "price": "6.40",
+      "price": "5.26",
       "availability": "https://schema.org/InStock"
     }
   })} />
@@ -357,7 +357,7 @@ const faq = [
         if (typeof window.gtag !== 'function') return;
         window.gtag('event', 'conversion', {
           send_to: SEND_TO,
-          value: 6.40,
+          value: 5.26,
           currency: 'EUR',
         });
       }

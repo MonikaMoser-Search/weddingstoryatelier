@@ -35,16 +35,16 @@
     .row-input.is-active { border-color: #8B1A35; background: #fff; }
 
     .btn-photo {
-      flex-shrink: 0; height: 28px; padding: 0 8px;
-      border: 1px solid #eee; background: #fafafa;
-      cursor: pointer; font-size: 9px;
+      flex-shrink: 0; height: 28px; padding: 0 9px;
+      border: 1px solid #8B1A35; background: #8B1A35;
+      cursor: pointer; font-size: 9px; font-weight: 500;
       display: flex; align-items: center; gap: 4px;
-      position: relative; transition: border-color 0.15s, background 0.15s;
-      color: #aaa; white-space: nowrap; letter-spacing: 0.5px;
+      position: relative; transition: border-color 0.15s, background 0.15s, color 0.15s;
+      color: #fff; white-space: nowrap; letter-spacing: 0.5px;
       font-family: 'DM Sans', sans-serif; text-transform: uppercase;
     }
-    .btn-photo:hover     { border-color: #aaa; color: #555; background: #f5f5f5; }
-    .btn-photo.has-photo { border-color: #8B1A35; background: #fef8f7; color: #8B1A35; }
+    .btn-photo:hover     { border-color: #731529; color: #fff; background: #731529; }
+    .btn-photo.has-photo { border-color: #8B1A35; background: #fef8f7; color: #8B1A35; font-weight: 400; }
     .btn-photo input[type="file"] {
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
