@@ -17,6 +17,10 @@
     }
     .theme-dot.active { border-color: #1A1A1A; }
     .theme-dot:hover  { transform: scale(1.12); }
+    .design-hint {
+      font-size: 9px; font-style: italic; color: #8B1A35;
+      opacity: 0.85; line-height: 1.3; margin: 4px 0 2px;
+    }
 
     /* ── Tisch-Zeilen ── */
     .table-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
@@ -255,6 +259,7 @@
     <button type="button" class="theme-dot" data-theme="forest"
       style="background:#1F4A32" title="Forest"  onclick="setTheme('forest')"></button>
   </div>
+  <div class="design-hint" id="lbl-sec1-note">Burgund passt nicht zu jedem Bild — finde hier deine Farbe.</div>
 
   <label class="section-label">2 · Format</label>
   <select id="sel-format" onchange="onFormatChange()">
@@ -320,7 +325,7 @@
           </div>
           <div class="card-photo-wrap" id="prev-photo-wrap" style="display:none">
             <div class="card-photo" id="prev-photo">
-              <div class="card-photo-empty">Foto optional</div>
+              <div class="card-photo-empty">Dein Foto</div>
             </div>
             <div class="corner-mark tr"></div>
             <div class="corner-mark bl"></div>
@@ -338,6 +343,8 @@
 const T = {
   de: {
     tagline:      'Tischschild · Demo',
+    sec1note:     'Burgund passt nicht zu jedem Bild — finde hier deine Farbe.',
+    fotoEmpty:    'Dein Foto',
     sec3note:     'optional — z. B. Tisch, Table, Movie …',
     sec5:         '5 · Tische — Durchgang 1–10',
     prefixDefault: 'Tisch',
@@ -356,6 +363,8 @@ const T = {
   },
   en: {
     tagline:      'Table Sign · Demo',
+    sec1note:     'Burgundy does not suit every photo — find your colour here.',
+    fotoEmpty:    'Your photo',
     sec3note:     'optional — e. g. Table, Movie, Zone …',
     sec5:         '5 · Tables — Batch 1–10',
     prefixDefault: 'Table',
@@ -507,6 +516,7 @@ function setLang(lang, btn) {
   btn.classList.add('active');
   const t = tt();
   document.getElementById('lbl-tagline').textContent    = t.tagline;
+  document.getElementById('lbl-sec1-note').textContent  = t.sec1note;
   document.getElementById('lbl-sec3-note').textContent  = t.sec3note;
   document.getElementById('lbl-sec5').textContent       = t.sec5;
   document.getElementById('inp-prefix').placeholder     = t.prefixPH;
@@ -516,6 +526,7 @@ function setLang(lang, btn) {
   document.getElementById('demo-btn').textContent       = t.demoBtn;
   document.getElementById('demo-fine').textContent      = t.demoFine;
   buildTableRows();
+  renderPreview();
 }
 
 // ════════════════════════════════════════════════════════
@@ -566,10 +577,10 @@ function renderPreview() {
   if (t.photo) {
     const yPos = t.photoY ?? 50;
     photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:center ${yPos}%">`;
-    photoWrap.style.display = '';
   } else {
-    photoWrap.style.display = 'none';
+    photoEl.innerHTML = `<div class="card-photo-empty">${tt().fotoEmpty}</div>`;
   }
+  photoWrap.style.display = '';
 
   updateNav();
   scalePreview();
@@ -622,7 +633,12 @@ function scalePreview() {
 // DEMO-DATEN LADEN
 // ════════════════════════════════════════════════════════
 function loadDemo() {
-  tt().demo.forEach((n, i) => { tables[i].name = n; });
+  // Karte 1 = themed Schaukarte (Name + Foto als Ideal), Rest schlicht nummeriert
+  tables.forEach((t, i) => {
+    t.name   = i === 0 ? tt().demo[0] : String(i + 1);
+    t.photo  = i === 0 ? 'demo-foto-italien.jpg' : null;
+    t.photoY = 50;
+  });
   document.getElementById('inp-prefix').value = tt().prefixDefault;
   currentCard = 0;
   buildTableRows(); renderPreview();
