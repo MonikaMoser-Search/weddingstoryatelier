@@ -1,0 +1,281 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const demoUrl = '/einladung-goldene-hochzeit#demo';
+const produktUrl = '/einladung-goldene-hochzeit';
+
+const faq = [
+  {
+    q: 'Was schreibt man auf eine Einladung zur Goldenen Hochzeit?',
+    a: 'Auf die Einladung gehören: der Anlass (50 Jahre Ehe / Goldene Hochzeit), die Namen des Jubelpaars, wer einlädt (oft die Kinder), Datum und Uhrzeit, der Ort, ein kurzer Hinweis auf das Programm (z. B. „Essen und Feier") sowie eine Antwort-Bitte mit Frist. In der Atelier-Vorlage ist dieser Text bereits vorformuliert — Sie tragen nur Namen, Datum und Ort ein.',
+  },
+  {
+    q: 'Wie früh verschickt man die Einladungen?',
+    a: 'Als Faustregel etwa sechs bis acht Wochen vor dem Fest. Bei einer größeren Feier mit Gästen, die anreisen, dürfen es auch zwei bis drei Monate sein — dann können sich alle den Termin in Ruhe freihalten.',
+  },
+  {
+    q: 'Wie bekomme ich die Einladung gedruckt, wenn ich keinen Drucker habe?',
+    a: 'Ganz ohne eigenen Drucker: Speichern Sie die fertige Einladung als PDF und bringen Sie sie zu einem Drogeriemarkt wie dm oder Rossmann — dort hilft das freundliche Personal beim Ausdruck gern weiter. Oder laden Sie die Datei bei einer Online-Druckerei hoch und lassen sie auf schönes, festes Papier drucken.',
+  },
+  {
+    q: 'Brauche ich Computerkenntnisse, um die Vorlage auszufüllen?',
+    a: 'Nein. Alles läuft direkt im Browser — am Handy, Tablet oder Computer, ohne Programm und ohne Konto. Sie tippen Ihren Text in vorbereitete Felder, das Design bleibt dabei immer stilsicher. Wer eine Nachricht auf dem Handy schreiben kann, schafft auch diese Einladung.',
+  },
+];
+
+const beispiele = [
+  {
+    label: 'Klassisch & festlich',
+    text: 'Wir feiern Goldene Hochzeit. Vor fünfzig Jahren haben wir uns das Ja-Wort gegeben — und möchten diesen Tag mit Ihnen feiern. Wir laden Sie herzlich ein am [Datum] um [Uhrzeit] in [Ort]. Über Ihre Zusage bis zum [Datum] freuen wir uns. — [Namen]',
+  },
+  {
+    label: 'Herzlich & persönlich',
+    text: '50 Jahre — und noch immer Hand in Hand. Das möchten wir mit euch feiern, mit den Menschen, die unseren Weg begleitet haben. Kommt am [Datum] um [Uhrzeit] zu uns nach [Ort]. Bitte sagt uns bis zum [Datum] Bescheid. — Eure [Namen]',
+  },
+  {
+    label: 'Im Namen der Kinder',
+    text: 'Unsere Eltern [Namen] feiern Goldene Hochzeit. Fünfzig gemeinsame Jahre sind ein Grund zu feiern — und dazu möchten wir Sie herzlich einladen. Am [Datum] um [Uhrzeit] in [Ort]. Um Antwort wird gebeten bis zum [Datum]. — [Namen der Kinder]',
+  },
+];
+---
+
+<Layout
+  title="Einladung zur Goldenen Hochzeit: Text, Beispiele & der einfache Weg · Wedding Story Atelier"
+  description="Was schreibt man auf eine Einladung zur Goldenen Hochzeit? Checkliste, drei Beispiel-Formulierungen und wie ihr sie einfach selbst gestaltet — am Handy, ohne Computerkenntnisse, drucken ohne eigenen Drucker."
+  image="/images/goldene-hochzeit-hero.webp"
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-16">
+    <div class="max-w-3xl mx-auto text-center">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+        Ratgeber · 50 Jahre Ehe
+      </p>
+      <h1 class="serif text-4xl md:text-6xl leading-[1.08] mb-8">
+        Einladung zur Goldenen Hochzeit —<br />
+        <em class="text-[#9C7B1A]">was reinkommt, wie sie klingt.</em>
+      </h1>
+      <p class="serif text-lg md:text-xl italic text-ink-muted leading-relaxed mb-10">
+        Fünfzig gemeinsame Jahre — und plötzlich die Frage: Was schreibt man eigentlich auf so eine Einladung, und wie wird sie schön, ohne dass man sich mit Computern auskennen muss? Hier kommt beides: der passende Text und der einfache Weg dorthin.
+      </p>
+      <a
+        href={demoUrl}
+        class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+      >
+        Vorlage ansehen & ausprobieren →
+      </a>
+    </div>
+  </section>
+
+  <!-- Was gehört drauf -->
+  <section class="px-6 md:px-16 py-20 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+        Die Checkliste
+      </p>
+      <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+        Was auf die Einladung gehört.
+      </h2>
+      <ul class="space-y-4 text-base text-ink-muted leading-relaxed">
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Der Anlass</strong> — Goldene Hochzeit, 50 Jahre Ehe.</span></li>
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Die Namen des Jubelpaars</strong> — und, wenn die Kinder einladen, auch ihre.</span></li>
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Datum und Uhrzeit</strong> — klar und gut lesbar.</span></li>
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Der Ort</strong> — Name der Location und Adresse.</span></li>
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Ein Hinweis aufs Programm</strong> — etwa „Essen und Feier" oder „Kaffee und Kuchen".</span></li>
+        <li class="flex gap-3"><span class="text-[#9C7B1A]">·</span> <span><strong class="text-ink font-medium">Die Antwort-Bitte</strong> — mit Frist, damit ihr planen könnt.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Wie sie klingt -->
+  <section class="px-6 md:px-16 py-20 border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+        Wie sie klingt
+      </p>
+      <h2 class="serif text-3xl md:text-4xl mb-4 leading-tight">
+        Drei Formulierungen zum Abschauen.
+      </h2>
+      <p class="text-base text-ink-muted leading-relaxed mb-10">
+        Jede Familie hat ihren eigenen Ton. Drei Beispiele — von festlich bis herzlich — als Anregung. Die Platzhalter in eckigen Klammern ersetzt ihr durch eure Angaben.
+      </p>
+      <div class="space-y-6">
+        {beispiele.map((b) => (
+          <div class="bg-cream border-l-2 border-[#9C7B1A] pl-5 pr-4 py-5">
+            <p class="text-xs tracking-[0.2em] uppercase text-[#9C7B1A] mb-3">{b.label}</p>
+            <p class="serif text-lg italic text-ink leading-relaxed">{b.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Mid-CTA: Text steckt schon drin -->
+  <section class="px-6 md:px-16 py-16 bg-cream border-t border-sand">
+    <div class="max-w-2xl mx-auto text-center">
+      <p class="serif text-xl md:text-2xl italic text-ink leading-relaxed mb-8">
+        Das Schöne: Den Text müsst ihr nicht selbst basteln. In der Atelier-Vorlage steht er schon — ihr tragt nur Namen, Datum und Ort ein, und die Karte aktualisiert sich live.
+      </p>
+      <a
+        href={demoUrl}
+        class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+      >
+        Einfach mal ausprobieren →
+      </a>
+    </div>
+  </section>
+
+  <!-- Leichter als gedacht -->
+  <section class="px-8 md:px-16 py-20 border-t border-sand">
+    <div class="max-w-5xl mx-auto">
+      <h2 class="serif text-3xl md:text-4xl text-center mb-14 leading-tight">
+        Gestalten ist leichter, als viele denken.
+      </h2>
+      <div class="grid md:grid-cols-3 gap-12">
+        <div class="text-center">
+          <p class="serif text-4xl text-[#9C7B1A] italic mb-4">I.</p>
+          <h3 class="serif text-xl mb-3">Auch ohne PC-Kenntnisse</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Kein Programm, kein Konto, keine Gestaltungsarbeit. Wer eine Nachricht tippen kann, kann diese Einladung ausfüllen.
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="serif text-4xl text-[#9C7B1A] italic mb-4">II.</p>
+          <h3 class="serif text-xl mb-3">Bequem am Handy</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Alles läuft direkt am Smartphone — ausfüllen, Vorschau, speichern. Auf dem Sofa, im Café, ganz in Ruhe.
+          </p>
+        </div>
+        <div class="text-center">
+          <p class="serif text-4xl text-[#9C7B1A] italic mb-4">III.</p>
+          <h3 class="serif text-xl mb-3">Immer stilsicher</h3>
+          <p class="text-sm text-ink-muted leading-relaxed">
+            Champagne-Gold und das ruhige Atelier-Layout bleiben automatisch schön — egal, was ihr eintragt.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Drucken ohne eigenen Drucker -->
+  <section class="px-6 md:px-16 py-20 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-4">
+        Der letzte Schritt
+      </p>
+      <h2 class="serif text-3xl md:text-4xl mb-8 leading-tight">
+        Drucken — auch ganz ohne eigenen Drucker.
+      </h2>
+      <div class="space-y-6 text-base text-ink-muted leading-relaxed">
+        <p>
+          Sie speichern die fertige Einladung als PDF — und für den Druck haben Sie mehrere bequeme Wege:
+        </p>
+        <div>
+          <h3 class="serif text-xl text-ink mb-2">Im Drogeriemarkt</h3>
+          <p>Bringen Sie die Datei einfach zu <strong class="text-ink font-medium">dm</strong> oder <strong class="text-ink font-medium">Rossmann</strong>. Fast jeder hat einen in der Nähe, und das freundliche Personal hilft beim Ausdruck gern weiter.</p>
+        </div>
+        <div>
+          <h3 class="serif text-xl text-ink mb-2">Bei einer Online-Druckerei</h3>
+          <p>Datei hochladen, schönes festes Papier wählen, nach Hause liefern lassen. Empfohlen: 200–250 g/m² mattes Papier.</p>
+        </div>
+        <div>
+          <h3 class="serif text-xl text-ink mb-2">Zu Hause</h3>
+          <p>Wer einen Drucker hat, druckt direkt selbst — A5 passt auf normales Druckerpapier.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Digital verschicken -->
+  <section class="px-6 md:px-16 py-20 border-t border-sand">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="serif text-3xl md:text-4xl mb-6 leading-tight">
+        Und für alle, die weiter weg wohnen.
+      </h2>
+      <p class="text-base text-ink-muted leading-relaxed max-w-2xl mx-auto">
+        Zur gedruckten Karte gehört in der Vollversion auch eine digitale Einladung im Hochformat (9:16) — fertig zum Verschicken per WhatsApp, iMessage oder Instagram-Story. Ein Anlass, zwei Wege, kein Porto.
+      </p>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="px-8 md:px-16 py-24 bg-cream border-t border-sand">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted text-center mb-4">
+        Häufige Fragen
+      </p>
+      <h2 class="serif text-4xl md:text-5xl text-center mb-16">
+        Was Familien oft fragen.
+      </h2>
+      <div class="space-y-8">
+        {faq.map((item) => (
+          <details class="group border-b border-sand pb-6">
+            <summary class="cursor-pointer flex justify-between items-start gap-6 list-none">
+              <h3 class="serif text-xl group-open:text-[#9C7B1A] transition-colors">{item.q}</h3>
+              <span class="serif text-2xl text-[#9C7B1A] mt-[-4px] group-open:rotate-45 transition-transform inline-block">+</span>
+            </summary>
+            <p class="text-sm text-ink-muted leading-relaxed mt-4 max-w-2xl">{item.a}</p>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Schluss-CTA -->
+  <section class="px-8 md:px-16 py-32 text-center border-t border-sand">
+    <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+      Probieren Sie es einfach aus
+    </p>
+    <h2 class="serif text-4xl md:text-6xl mb-10 max-w-3xl mx-auto leading-tight">
+      Sehen Sie selbst, wie<br />
+      <em class="text-[#9C7B1A]">einfach das geht.</em>
+    </h2>
+    <a
+      href={demoUrl}
+      class="inline-block bg-ink text-paper px-10 py-5 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors"
+    >
+      Einladung ausprobieren →
+    </a>
+    <p class="text-xs text-ink-muted mt-8 italic max-w-md mx-auto">
+      Unverbindlich · am Handy oder Desktop · der Text ist schon vorbereitet
+    </p>
+    <p class="text-sm text-ink-muted mt-10">
+      <a href={produktUrl} class="border-b border-ink-muted pb-1 hover:text-[#9C7B1A] hover:border-[#9C7B1A] transition-colors">
+        Mehr zur Einladung & zum Atelier-Werk →
+      </a>
+    </p>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+
+  <!-- FAQ Schema für Rich Results -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faq.map(item => ({
+      "@type": "Question",
+      "name": item.q,
+      "acceptedAnswer": { "@type": "Answer", "text": item.a }
+    }))
+  })} />
+</Layout>
