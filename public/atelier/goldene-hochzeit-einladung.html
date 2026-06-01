@@ -465,5 +465,16 @@ input.field { line-height: 1.2; }
 <p class="demo-cta-url">weddingstoryatelier.de/einladung-goldene-hochzeit</p>
 </div>
 <script>document.querySelectorAll('input.field').forEach(function(i){i.addEventListener('focus',function(){ setTimeout(function(){ i.select(); }, 0); });});</script>
+<!-- Microsoft Clarity — nur mit Zustimmung (auf der LP erteilt, gleiche Origin → localStorage). Eingaben maskiert Clarity standardmäßig. -->
+<script>
+  (function () {
+    try { if (localStorage.getItem('wsa_consent') !== 'granted') return; } catch (e) { return; }
+    (function (c, l, a, r, i, t, y) {
+      c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments); };
+      t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
+      y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+    })(window, document, 'clarity', 'script', 'x0475iv4fu');
+  })();
+</script>
 </body>
 </html>

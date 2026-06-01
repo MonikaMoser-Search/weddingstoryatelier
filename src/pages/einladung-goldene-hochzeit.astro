@@ -421,7 +421,12 @@ const faq = [
     (function () {
       const SEND_TO = 'AW-18181056795/Kr2cCPOdp7EcEJvSs91D';
 
+      function clarityEvent(name) {
+        if (typeof window.clarity === 'function') window.clarity('event', name);
+      }
+
       function fireConversion() {
+        clarityEvent('etsy_klick');
         if (typeof window.gtag !== 'function') return;
         window.gtag('event', 'conversion', {
           send_to: SEND_TO,
@@ -431,11 +436,15 @@ const faq = [
       }
 
       function attach() {
-        const els = document.querySelectorAll('a[data-conversion="goldene-hochzeit-etsy"]');
-        els.forEach(function (el) {
+        document.querySelectorAll('a[data-conversion="goldene-hochzeit-etsy"]').forEach(function (el) {
           if (el.dataset.wsaWired === '1') return;
           el.dataset.wsaWired = '1';
           el.addEventListener('click', fireConversion);
+        });
+        document.querySelectorAll('a[href="#demo"], a[href$="goldene-hochzeit-einladung.html"]').forEach(function (el) {
+          if (el.dataset.wsaDemoWired === '1') return;
+          el.dataset.wsaDemoWired = '1';
+          el.addEventListener('click', function () { clarityEvent('demo_geoeffnet'); });
         });
       }
 
