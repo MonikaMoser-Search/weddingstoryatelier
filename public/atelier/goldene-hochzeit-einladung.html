@@ -293,6 +293,12 @@ input.field { line-height: 1.2; }
 .buyer-back{display:none !important}
 .demo-watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16vw;letter-spacing:.18em;color:rgba(201,162,74,0.16);transform:rotate(-24deg);user-select:none}
 .demo-cta{display:none}
+
+/* 65+ / Touch: Hinweis größer & gut lesbar, Felder dauerhaft als "hier tippen" erkennbar */
+.buyer-hint{font-size:12pt !important;color:#2A2826 !important;max-width:148mm;margin-left:auto;margin-right:auto}
+.card .field{background:rgba(201,162,74,0.07);border-radius:3px}
+.datetime .field,.venue .field,.rsvp .field{border-bottom:1px dashed rgba(201,162,74,0.55);padding-top:5px;padding-bottom:5px}
+.card .field:focus{background:rgba(201,162,74,0.16);box-shadow:0 0 0 1px var(--gold)}
 @media print{
  .card,.buyer-only{display:none !important}
  .demo-watermark{display:none !important}
@@ -313,7 +319,7 @@ input.field { line-height: 1.2; }
     <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
   </div>
   <p class="buyer-hint">
-    Klicken Sie in die Karte, um Ihre Daten einzutragen. Anschließend „Drucken / PDF" wählen. Tipp: im Druckdialog Hintergrundgrafiken aktivieren. Format: A5.
+    Tippen Sie direkt in die Karte — Namen, Datum und Ort lassen sich sofort ändern. Dies ist eine kostenlose Vorschau zum Ausprobieren; die fertige Karte zum Ausdrucken gibt es im Atelier.
   </p>
 </div>
 
