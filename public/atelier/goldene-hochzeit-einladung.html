@@ -474,6 +474,8 @@ input.field { line-height: 1.2; }
       t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
       y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
     })(window, document, 'clarity', 'script', 'x0475iv4fu');
+    // Einwilligung aktiv signalisieren (EEA-Pflicht seit 31.10.2025), sonst zerfällt die Sitzung.
+    window.clarity('consentv2', { ad_Storage: 'granted', analytics_Storage: 'granted' });
   })();
 </script>
 </body>

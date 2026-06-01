@@ -83,6 +83,11 @@ const CLARITY_ID = 'x0475iv4fu';
         t = l.createElement(r); t.async = 1; t.src = 'https://www.clarity.ms/tag/' + i;
         y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
       })(window, document, 'clarity', 'script', clarityId);
+
+      // EEA/UK/CH-Pflicht seit 31.10.2025: Einwilligung aktiv signalisieren.
+      // Ohne dieses Signal läuft Clarity im No-Consent-Modus (jede Seite = neuer
+      // Nutzer) und die Reise LP → Demo zerfällt. Hier nur erreicht, wenn granted.
+      window.clarity('consentv2', { ad_Storage: 'granted', analytics_Storage: 'granted' });
     }
 
     function loadTracking() {
