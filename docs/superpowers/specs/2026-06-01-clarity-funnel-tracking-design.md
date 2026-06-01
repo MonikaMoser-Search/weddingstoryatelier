@@ -29,9 +29,13 @@ Zwei `clarity('event', …)`-Marker zum Filtern relevanter Sitzungen:
 - `etsy_klick` — am bestehenden `data-conversion`-Link (parallel zur Ads-Conversion)
 
 ## Manuelle Voraussetzungen (Userin, einmalig)
-1. Gratis-Clarity-Konto anlegen → **Projekt-ID** notieren.
-2. In Clarity: **EU-Datenregion** wählen + **AV-Vertrag (DPA)** akzeptieren.
-3. Projekt-ID an Claude geben → wird als Konstante eingsetzt (analog `GTAG_ID`).
+1. Gratis-Clarity-Konto anlegen → **Projekt-ID** notieren (hier: `x0475iv4fu`).
+2. Optional, empfohlen: in Clarity **Settings → Cookie consent** auf „erforderlich" stellen (Clarity respektiert dann das Signal aktiv). **Keine** EU-Region-Auswahl nötig — EU-Kunden kontrahieren automatisch mit Microsoft Ireland (SCCs); DPA ist über die Clarity-Nutzungsbedingungen abgedeckt.
+3. Projekt-ID an Claude → als Konstante gesetzt (analog `GTAG_ID`). **Erledigt.**
+
+## WICHTIG: Consent-Signal (EEA/UK/CH, seit 31.10.2025)
+Skript nur consent-gated zu laden reicht NICHT — Clarity erzwingt für EU/UK/CH ein aktives Signal. Ohne `consentv2` läuft Clarity im No-Consent-Modus (jede Seite = neuer Nutzer → Funnel LP→Demo zerfällt). Daher nach dem Laden (nur im granted-Pfad):
+`window.clarity('consentv2', { ad_Storage: 'granted', analytics_Storage: 'granted' });` (Casing exakt laut Clarity-Doku). Auf LP (CookieBanner) **und** Demo-Seite.
 
 ## Datenschutz-Ergänzung (von Claude eingebaut)
 Neuer Absatz unter „Werbe- und Conversion-Tracking" in `datenschutz.astro`:
