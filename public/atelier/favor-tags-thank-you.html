@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tiny Thank You Favor Tags — Wedding Story Atelier (MVP)</title>
+<style>
+  /* ── Tangerine (OFL) LOKAL eingebunden — kein CDN (Atelier-Standard) ── */
+  @font-face{font-family:"Tangerine";font-weight:400;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Tangerine/Tangerine-Regular.ttf") format("truetype");}
+  @font-face{font-family:"Tangerine";font-weight:700;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Tangerine/Tangerine-Bold.ttf") format("truetype");}
+  /* Body-Serif (Namen/Datum/Zeile) LOKAL — gleiche Optik auf jedem Rechner, beide Sprachen */
+  @font-face{font-family:"Cormorant Garamond";font-weight:400;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-400-normal.woff2") format("woff2");}
+  @font-face{font-family:"Cormorant Garamond";font-weight:400;font-style:italic;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-400-italic.woff2") format("woff2");}
+  @font-face{font-family:"Cormorant Garamond";font-weight:600;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-600-normal.woff2") format("woff2");}
+
+  /* ── Champagner-Wert aus dem Golden-Anniversary-Generator (print-getestet) ── */
+  :root{
+    --champagne:#B8902F;       /* tieferes Champagne-Gold (mehr Kontrast), bleibt warm — NICHT das oliv-kippende #9C7B1A; #C9A24A war heller */
+    --champagne-soft:#B8902F;  /* Akzent */
+    /* Historie: das dunklere Antikgold #9C7B1A kippte im Druck zu Oliv → bewusst NICHT verwendet. */
+    --ink:#2b2b28;            /* fast-schwarz, weicher als reines Schwarz */
+    --cut:#d9d3c5;            /* Schnittlinie hellgrau */
+    --paper:#FCFBF8;          /* gebrochenes Off-White (Bildschirm „papierig“); im Druck → transparent */
+  }
+  /* Schriften: Platzhalter-Serif. FINAL: deine lokalen Cormorant / Cinzel / Great Vibes per @font-face einsetzen. */
+  *{box-sizing:border-box;}
+  body{margin:0;background:#f3eee3;color:var(--ink);
+       font-family:"Cormorant Garamond","EB Garamond",Garamond,Georgia,serif;}
+
+  /* ── Steuerpult: nur für die Käuferin, im Druck ausgeblendet ── */
+  .controls{max-width:680px;margin:0 auto;padding:22px 20px 28px;
+            background:#fff;border-bottom:3px solid var(--champagne);
+            font-family:"Inter",system-ui,sans-serif;}
+  .controls h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;
+               font-size:26px;margin:0 0 2px;color:var(--ink);}
+  .controls p.sub{margin:0 0 16px;color:#777;font-size:13px;}
+  .field{margin:0 0 12px;}
+  .field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+               color:#999;margin-bottom:4px;}
+  .field input,.field select{width:100%;padding:10px 12px;font-size:15px;
+        border:1px solid #d8d8d8;border-radius:7px;font-family:inherit;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--champagne);}
+  .row{display:flex;gap:12px;}.row>*{flex:1;}
+  .tip{font-size:12px;color:#8a7a4a;background:#faf6ea;border:1px solid #ece2c4;
+       border-radius:8px;padding:10px 12px;margin:14px 0 0;line-height:1.5;}
+  .warn{font-size:12.5px;color:#8a2b2b;background:#fbeaea;border:1px solid #e6c3c3;
+        border-radius:8px;padding:11px 13px;margin:0 0 16px;line-height:1.45;}
+  .warn b{color:#7a1f1f;}
+  .btn{display:inline-block;margin-top:16px;width:100%;padding:13px;border:0;border-radius:8px;
+       background:var(--champagne);color:#fff;font-size:15px;letter-spacing:.04em;
+       cursor:pointer;font-family:inherit;}
+  .btn:hover{background:#876a16;}
+
+  /* ── Der Bogen ── */
+  .sheet{display:grid;grid-template-columns:repeat(3,2.46in);gap:.2in;
+         justify-content:center;padding:.4in 0;}
+  body[data-fmt="A4"] .sheet{row-gap:.34in;}   /* A4 ist höher → etwas mehr Luft zwischen den Reihen */
+  .tag{position:relative;width:2.46in;height:2.42in;background:var(--paper);
+       border:1px dashed var(--cut);                 /* Schnittlinie */
+       display:flex;flex-direction:column;align-items:center;justify-content:center;
+       text-align:center;padding:.46in .16in .16in;} /* kompaktes Kopf-Band (Einzelloch-Locher trifft präzise) */
+  .tag .frame{position:absolute;top:.4in;left:.1in;right:.1in;bottom:.1in;
+              border:1px solid var(--champagne);opacity:.45;pointer-events:none;}
+  .hole{position:absolute;top:.13in;left:50%;transform:translateX(-50%);          /* Loch elegant nah am oberen Rand */
+        width:.16in;height:.16in;border:1px solid #c9c2b0;border-radius:50%;}
+  /* „Thank You" — Tangerine (OFL, lokal), editorial-modern */
+  .ty{font-family:"Tangerine",cursive;font-weight:700;
+      font-size:46px;line-height:.8;color:var(--champagne);margin:.03in 0 .04in;}
+  /* Schmuckstrich Linie–Raute–Linie als SVG (Vordergrund → druckt OHNE „Hintergrundgrafiken") */
+  .ornament{color:var(--champagne);margin:.05in 0 .08in;line-height:0;}
+  .ornament svg{display:block;margin:0 auto;}
+  .names{font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink);}
+  .date{font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--champagne-soft);margin-top:.06in;}
+  .msg{font-size:11.5px;font-style:italic;color:#6f685e;margin-top:.07in;line-height:1.3;}
+
+  /* ── Druck ── */
+  @page{size:letter;margin:.3in;}
+  @media print{
+    body{background:#fff;}
+    .buyer-only{display:none !important;}
+    .sheet{padding:0;gap:.2in;}
+    .tag{background:transparent;border:1px dashed #cfcabd;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+<style id="ps"></style><!-- dynamisches Seitenformat (Letter/A4) je nach Sprache -->
+</head>
+<body>
+
+  <!-- ░░ STEUERPULT (im Druck unsichtbar) ░░ -->
+  <div class="controls buyer-only">
+    <h1>Your Tiny Thank-You Tags</h1>
+    <p class="sub">Fill in below — on your phone or computer. Then print as many sheets as you need (12 tags per page).</p>
+
+    <div class="warn" translate="no">⚠ <b>Bitte Browser-Übersetzung ausschalten</b> — sonst wird der Karten-Text verfälscht (aus „Thank You" wird „Danke", aus „&amp;" wird „und"). &nbsp;·&nbsp; <b>Please turn OFF your browser's auto-translate</b>, otherwise the design text gets changed.</div>
+
+    <div class="field">
+      <label>Sprache / Language</label>
+      <select id="i-locale">
+        <option value="en">English &nbsp;(US · Letter)</option>
+        <option value="de">Deutsch &nbsp;(DE · A4)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Couple / Names</label>
+      <input id="i-names" value="Sophia &amp; Lucas" maxlength="28" />
+    </div>
+    <div class="row">
+      <div class="field"><label>Date</label>
+        <input id="i-date" value="12 · 09 · 2026" maxlength="20" /></div>
+      <div class="field"><label>Small message (optional)</label>
+        <input id="i-msg" value="for celebrating with us" maxlength="34" /></div>
+    </div>
+
+    <div class="tip">✦ <b>Luxe look at home:</b> print on <b>satin / pearl (“Seidenglanz”) or champagne shimmer paper</b> — the champagne ink catches the sheen and reads like foil. Plain white/cream cardstock (250–300 gsm) works beautifully too.</div>
+
+    <button class="btn" onclick="window.print()">Print my tags →</button>
+  </div>
+
+  <!-- ░░ DER BOGEN ░░ -->
+  <!-- translate="no" schützt den Karten-Text vor Browser-Übersetzung (Thank You bleibt Thank You) -->
+  <div class="sheet notranslate" id="sheet" translate="no"></div>
+
+<script>
+  // 12 identische Tags (3 × 4) erzeugen
+  const sheet = document.getElementById('sheet');
+  const TAGS = 12;
+  for(let n=0;n<TAGS;n++){
+    sheet.insertAdjacentHTML('beforeend', `
+      <div class="tag">
+        <span class="frame"></span>
+        <span class="hole"></span>
+        <div class="ty">Thank<br>You</div>
+        <div class="ornament" aria-hidden="true">
+          <svg width="74" height="9" viewBox="0 0 74 9" fill="none" stroke="currentColor" stroke-width="1">
+            <line x1="2" y1="4.5" x2="30" y2="4.5"/>
+            <line x1="44" y1="4.5" x2="72" y2="4.5"/>
+            <rect x="34" y="1.5" width="6" height="6" transform="rotate(45 37 4.5)" fill="currentColor" stroke="none"/>
+          </svg>
+        </div>
+        <div class="names t-names"></div>
+        <div class="date t-date"></div>
+        <div class="msg t-msg"></div>
+      </div>`);
+  }
+  // Live-Update aller Tags aus den Eingaben (Werte werden gerendert, nicht die Inputs → sauberer Druck)
+  function sync(){
+    const names = document.getElementById('i-names').value || '';
+    const date  = document.getElementById('i-date').value  || '';
+    const msg   = document.getElementById('i-msg').value   || '';
+    document.querySelectorAll('.t-names').forEach(e=>e.textContent=names);
+    document.querySelectorAll('.t-date').forEach(e=>e.textContent=date);
+    document.querySelectorAll('.t-msg').forEach(e=>e.textContent=msg);
+  }
+  ['i-names','i-date','i-msg'].forEach(id=>
+    document.getElementById(id).addEventListener('input',sync));
+
+  // Locale-Demo-Defaults (Käuferin überschreibt jederzeit) + Seitenformat
+  const locales = {
+    en:{names:"Grace & Henry",          date:"09 · 12 · 2026", msg:"for celebrating with us",       page:"letter"},
+    de:{names:"Charlotte & Maximilian", date:"12 · 09 · 2026", msg:"Für diesen gemeinsamen Moment", page:"A4"}
+  };
+  const ps = document.getElementById('ps');
+  function applyLocale(loc){
+    const L = locales[loc] || locales.en;
+    document.getElementById('i-names').value = L.names;
+    document.getElementById('i-date').value  = L.date;
+    document.getElementById('i-msg').value   = L.msg;
+    ps.textContent = '@page{size:'+L.page+';margin:.3in;}';
+    document.body.dataset.fmt = L.page;   // A4 bekommt etwas mehr Zeilen-Luft
+    sync();
+  }
+  document.getElementById('i-locale').addEventListener('change', e=>applyLocale(e.target.value));
+  applyLocale('en');   // US-primär als Start
+</script>
+</body>
+</html>
