@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Bridal Shower Favor Tags — Burgundy &amp; Gold — Wedding Story Atelier</title>
+<style>
+  /* ── Belleza (OFL) LOKAL — Spine „THANKS / DANKE", aufrecht gestapelt ── */
+  @font-face{font-family:"Belleza";font-weight:400;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Belleza/Belleza-Regular.ttf") format("truetype");}
+  /* ── Cormorant Garamond (OFL) LOKAL — ruhige Botschaft rechts ── */
+  @font-face{font-family:"Cormorant Garamond";font-weight:400;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-400-normal.woff2") format("woff2");}
+  @font-face{font-family:"Cormorant Garamond";font-weight:400;font-style:italic;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-400-italic.woff2") format("woff2");}
+  @font-face{font-family:"Cormorant Garamond";font-weight:600;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Cormorant/cormorant-garamond-latin-600-normal.woff2") format("woff2");}
+  /* ── Tangerine (OFL) LOKAL — warmer Namens-Akzent, WAAGERECHT (nie senkrecht!) ── */
+  @font-face{font-family:"Tangerine";font-weight:400;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Tangerine/Tangerine-Regular.ttf") format("truetype");}
+  @font-face{font-family:"Tangerine";font-weight:700;font-style:normal;font-display:swap;
+    src:url("Schriftarten/Tangerine/Tangerine-Bold.ttf") format("truetype");}
+
+  :root{
+    --burgundy:#8B1A35;        /* MARKEN-BURGUND (Old-Money-Linie) — Spine, Namen, Innenrahmen */
+    --burgundy-soft:#A8324C;   /* helleres Burgund — feine Akzente/Hover */
+    --gold:#B8902F;            /* Champagne-Gold, print-getestet (kippt NICHT ins Oliv wie #9C7B1A) */
+    --ink:#2A2826;             /* fast-schwarz, weich */
+    --ink-soft:#6B635B;        /* warmes Grau — Botschaft */
+    --cut:#d9d3c5;             /* Schnittlinie hellgrau */
+    --paper:#FFFFFF;           /* im Druck → transparent */
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:#EAE3DF;color:var(--ink);
+       font-family:"Cormorant Garamond","EB Garamond",Garamond,Georgia,serif;}
+
+  /* ── Steuerpult: nur für die Käuferin, im Druck ausgeblendet ── */
+  .controls{max-width:680px;margin:0 auto;padding:22px 20px 28px;
+            background:#fff;border-bottom:3px solid var(--burgundy);
+            font-family:"Inter",system-ui,sans-serif;}
+  .controls h1{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;
+               font-size:26px;margin:0 0 2px;color:var(--burgundy);}
+  .controls p.sub{margin:0 0 16px;color:#777;font-size:13px;}
+  .field{margin:0 0 12px;}
+  .field label{display:block;font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+               color:#999;margin-bottom:4px;}
+  .field input,.field select{width:100%;padding:10px 12px;font-size:15px;
+        border:1px solid #d8d8d8;border-radius:7px;font-family:inherit;}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--burgundy);}
+  .tip{font-size:12px;color:#7a5b1f;background:#faf6ea;border:1px solid #ece2c4;
+       border-radius:8px;padding:10px 12px;margin:14px 0 0;line-height:1.5;}
+  .warn{font-size:12.5px;color:#8a2b2b;background:#fbeaea;border:1px solid #e6c3c3;
+        border-radius:8px;padding:11px 13px;margin:0 0 16px;line-height:1.45;}
+  .warn b{color:#7a1f1f;}
+  .btn{display:inline-block;margin-top:16px;width:100%;padding:13px;border:0;border-radius:8px;
+       background:var(--burgundy);color:#fff;font-size:15px;letter-spacing:.04em;
+       cursor:pointer;font-family:inherit;}
+  .btn:hover{background:#73132b;}
+
+  /* ── Der Bogen ── */
+  .sheet{display:grid;grid-template-columns:repeat(3,2.46in);gap:.2in;
+         justify-content:center;padding:.4in 0;}
+  body[data-fmt="A4"] .sheet{row-gap:.3in;}
+
+  .tag{position:relative;width:2.46in;height:2.42in;background:var(--paper);
+       border:1px dashed var(--cut);                 /* Schnittlinie */
+       padding:.16in;}
+  /* dünner Gold-Innenrahmen → „Mini-Atelier-Werk" nach dem Ausschneiden */
+  .frame{position:absolute;top:.1in;left:.1in;right:.1in;bottom:.1in;
+         border:.7px solid var(--gold);opacity:.6;pointer-events:none;}
+  /* Loch oben mittig — etwas tiefer, damit das Lochen den Gold-Rahmen nicht anschneidet */
+  .hole{position:absolute;top:.2in;left:50%;transform:translateX(-50%);
+        width:.15in;height:.15in;border:1px solid #c9c2b0;border-radius:50%;}
+
+  /* Innerer Aufbau: Spine | Goldlinie | Botschaft */
+  .inner{display:flex;align-items:stretch;height:100%;padding:.26in .04in .06in;}
+
+  /* ── Spine: aufrecht gestapelte Versalien (Belleza) ── */
+  .spine{flex:0 0 .6in;display:flex;flex-direction:column;
+         align-items:center;justify-content:center;gap:.07in;}  /* mehr Tracking → liest als Säule */
+  .sp-l{font-family:"Belleza",sans-serif;font-size:23px;line-height:.9;
+        color:var(--burgundy);text-transform:uppercase;}
+  body[data-fmt="A4"] .sp-l{font-size:24px;}   /* DANKE = 5 Buchstaben → darf einen Tick größer */
+
+  /* ── Gold-Haarlinie als Trenner ── */
+  .divider{flex:0 0 1px;align-self:center;height:64%;background:var(--gold);opacity:.85;}
+
+  /* ── Rechts: ruhige Botschaft ── */
+  .content{flex:1;display:flex;flex-direction:column;
+           align-items:center;justify-content:center;text-align:center;
+           padding:0 .04in 0 .14in;gap:.07in;}
+  /* Botschaft = HELD — Burgund, mit EINEM großen goldenen Wort = der Gast.
+     Gold bekommt damit endlich MASSE und kippt nicht gegen das Burgund weg. */
+  .msg{display:flex;flex-direction:column;align-items:center;text-align:center;
+       font-family:"Cormorant Garamond",Georgia,serif;font-style:italic;
+       color:var(--burgundy);line-height:1.04;max-width:1.4in;}
+  .msg .m-pre,.msg .m-post{font-size:18px;}
+  .msg .m-hero{font-size:52px;line-height:.98;color:var(--gold);margin:.02in 0;}
+  /* Gold-Ornament Linie–Raute–Linie (Vordergrund-SVG → druckt ohne „Hintergrundgrafiken") */
+  .ornament{color:var(--gold);line-height:0;margin:.03in 0;}
+  .ornament svg{display:block;margin:0 auto;}
+  /* Namen = leise Unterschrift — klein, Gold, tritt bewusst zurück */
+  .names{font-family:"Tangerine",cursive;font-weight:700;font-size:18px;
+         line-height:.92;color:var(--gold);}
+
+  /* ── Druck ── */
+  @page{size:letter;margin:.3in;}
+  @media print{
+    body{background:#fff;}
+    .buyer-only{display:none !important;}
+    .sheet{padding:0;gap:.2in;}
+    .tag{background:transparent;border:1px dashed #cfcabd;
+         -webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+</style>
+<style id="ps"></style><!-- dynamisches Seitenformat (Letter/A4) je nach Sprache -->
+</head>
+<body>
+
+  <!-- ░░ STEUERPULT (im Druck unsichtbar) ░░ -->
+  <div class="controls buyer-only">
+    <h1>Your Bridal Shower Thank-You Tags</h1>
+    <p class="sub">Fill in below — on your phone or computer. Then print as many sheets as you like (12 tags per page).</p>
+
+    <div class="warn" translate="no">⚠ <b>Please turn OFF your browser's auto-translate</b> — otherwise the card text gets changed (“Thanks” → “Danke”, “&amp;” → “und”). &nbsp;·&nbsp; <b>Bitte Browser-Übersetzung ausschalten</b>, sonst wird der Karten-Text verfälscht.</div>
+
+    <div class="field">
+      <label>Sprache / Language</label>
+      <select id="i-locale">
+        <option value="en">English &nbsp;(US · Letter)</option>
+        <option value="de">Deutsch &nbsp;(DE · A4)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Names · Namen</label>
+      <input id="i-names" value="Grace &amp; Henry" maxlength="26" />
+    </div>
+
+    <div class="tip">✦ <b>Luxe look at home:</b> print on <b>satin / pearl or champagne-shimmer paper</b> — the gold catches the sheen and reads like foil. Plain ivory cardstock (250–300 gsm) works beautifully too.</div>
+
+    <button class="btn" onclick="window.print()">Print my tags →</button>
+  </div>
+
+  <!-- ░░ DER BOGEN ░░ -->
+  <div class="sheet notranslate" id="sheet" translate="no"></div>
+
+<script>
+  // 12 identische Tags (3 × 4) erzeugen
+  const sheet = document.getElementById('sheet');
+  const TAGS = 12;
+  for(let n=0;n<TAGS;n++){
+    sheet.insertAdjacentHTML('beforeend', `
+      <div class="tag">
+        <span class="frame"></span>
+        <span class="hole"></span>
+        <div class="inner">
+          <div class="spine"></div>
+          <div class="divider"></div>
+          <div class="content">
+            <div class="msg">
+              <span class="m-pre t-pre"></span>
+              <span class="m-hero t-hero"></span>
+              <span class="m-post t-post"></span>
+            </div>
+            <!-- Herz-mit-Schwüngen — übernommen aus Anniversary Golden (gleiche Atelier-Handschrift, print-validiert) -->
+            <div class="ornament" aria-hidden="true">
+              <svg width="60" height="22" viewBox="0 0 60 22" fill="none" stroke="currentColor" stroke-width="0.9">
+                <path d="M2 8 Q 12 18 22 8" />
+                <path d="M38 8 Q 48 18 58 8" />
+                <path d="M28 11 C 28 8, 32 8, 32 11 C 32 8, 36 8, 36 11 C 36 15, 32 18, 32 18 C 32 18, 28 15, 28 11 Z" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="names t-names"></div>
+          </div>
+        </div>
+      </div>`);
+  }
+
+  // Spine aus dem Wort aufbauen (ein Buchstabe je Zeile, aufrecht)
+  function buildSpines(word){
+    document.querySelectorAll('.spine').forEach(s=>{
+      s.innerHTML='';
+      [...word.toUpperCase()].forEach(ch=>{
+        const d=document.createElement('span');
+        d.className='sp-l'; d.textContent=ch;
+        s.appendChild(d);
+      });
+    });
+  }
+
+  // Live-Update (Werte werden gerendert, nicht die Inputs → sauberer Druck)
+  function sync(){
+    const names = document.getElementById('i-names').value || '';
+    document.querySelectorAll('.t-names').forEach(e=>e.textContent=names);
+  }
+  document.getElementById('i-names').addEventListener('input',sync);
+
+  // Locale-Demo-Defaults (Käuferin überschreibt jederzeit) + Spine-Wort + Seitenformat
+  const locales = {
+    en:{word:"THANKS", names:"Grace & Henry",          pre:"so glad",     hero:"you're", post:"here",    page:"letter"},
+    de:{word:"DANKE",  names:"Charlotte & Maximilian", pre:"schön, dass", hero:"du",     post:"da bist", page:"A4"}
+  };
+  const ps = document.getElementById('ps');
+  function applyLocale(loc){
+    const L = locales[loc] || locales.en;
+    document.getElementById('i-names').value = L.names;
+    document.querySelectorAll('.t-pre').forEach(e=>e.textContent=L.pre);
+    document.querySelectorAll('.t-hero').forEach(e=>e.textContent=L.hero);
+    document.querySelectorAll('.t-post').forEach(e=>e.textContent=L.post);
+    ps.textContent = '@page{size:'+L.page+';margin:.3in;}';
+    document.body.dataset.fmt = L.page;
+    buildSpines(L.word);
+    sync();
+  }
+  document.getElementById('i-locale').addEventListener('change', e=>applyLocale(e.target.value));
+  applyLocale('en');   // US-primär als Start
+</script>
+</body>
+</html>
