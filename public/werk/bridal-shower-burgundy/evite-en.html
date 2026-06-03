@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bridal Shower · Digital Invitation · Wedding Story Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+@font-face { font-family: 'Great Vibes'; src: url('/Schriftarten/Great_Vibes/GreatVibes-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: 'Cinzel'; src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype-variations'); font-weight: 400 700; font-style: normal; font-display: block; }
+@font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations'); font-weight: 300 700; font-style: italic; font-display: block; }
+
+/* ===== Palette = Marken-Burgund (identisch zur Druckkarte) ===== */
+:root {
+  --accent:        #A8324C;
+  --accent-deep:   #8B1A35;   /* Marken-Burgund */
+  --accent-soft:   rgba(139,26,53,0.70);
+  --accent-faint:  rgba(139,26,53,0.55);
+  --accent2:       #804C56;
+  --accent2-soft:  #92616A;
+  --ink:           #2A2826;
+  --ink-soft:      #6B635B;
+  --paper:         #FFFFFF;
+  --bg:            #EAE3DF;
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { background: var(--bg); font-family: 'Cinzel', serif; color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 24px 16px 64px; }
+
+.buyer-only { width: 100%; max-width: 540px; }
+.buyer-bar { display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 18px; flex-wrap: wrap; }
+.buyer-btn { font-family: 'Cinzel', serif; font-size: 11pt; letter-spacing: 0.12em; text-transform: uppercase; padding: 10px 22px; background: var(--ink); border: 1px solid var(--ink); color: #fff; cursor: pointer; transition: all .15s ease; }
+.buyer-btn:hover { background: var(--accent); border-color: var(--accent); }
+.buyer-btn:disabled { opacity: 0.55; cursor: default; }
+.buyer-back { display: block; text-align: center; margin-bottom: 16px; font-family: 'Cinzel', serif; font-size: 9pt; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); text-decoration: none; transition: opacity .15s ease; }
+.buyer-back:hover { opacity: 0.6; }
+.buyer-hint { text-align: center; font-family: 'Cinzel', serif; font-size: 9.5pt; letter-spacing: 0.08em; color: var(--ink-soft); margin: 0 0 22px; line-height: 1.6; }
+
+/* ===== Digital card 360 × 640 (9:16) — exported ×3 → 1080 × 1920 ===== */
+.card { width: 360px; height: 640px; background: var(--paper); position: relative; padding: 54px 34px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,0.14); }
+
+/* ornamental frame */
+.frame-rule { position: absolute; pointer-events: none; }
+.frame-rule.outer { inset: 22px;   border: 1px solid var(--accent-deep); }
+.frame-rule.inner { inset: 26px;   border: 0.5px solid var(--accent-faint); }
+.corner { position: absolute; width: 58px; height: 58px; color: var(--accent-deep); pointer-events: none; }
+.corner.tl { top: 15px;  left: 15px;  }
+.corner.tr { top: 15px;  right: 15px;  transform: scaleX(-1); }
+.corner.bl { bottom: 15px; left: 15px;  transform: scaleY(-1); }
+.corner.br { bottom: 15px; right: 15px; transform: scale(-1,-1); }
+.corner svg, .crest svg { display: block; }
+.crest { color: var(--accent-deep); margin: 0 0 10px; line-height: 0; }
+.spine { position: absolute; left: 14px; top: 50%; transform: translateY(-50%) rotate(180deg); writing-mode: vertical-rl; font-family: 'Cinzel', serif; font-size: 8px; letter-spacing: 0.30em; text-transform: uppercase; color: var(--accent2-soft); pointer-events: none; }
+
+.kicker { font-family: 'Cinzel', serif; font-weight: 600; font-size: 13px; letter-spacing: 0.30em; text-transform: uppercase; color: var(--accent2); margin: 0 0 5px; padding-left: 0.30em; }
+.inhonor { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400; font-size: 17px; color: var(--ink-soft); margin: 0 0 2px; }
+
+.name-wrap { width: 270px; margin: 0 auto 4px; }
+.name-input { font-family: 'Great Vibes', cursive !important; font-style: normal !important; font-weight: 400 !important; color: var(--accent-deep) !important; font-size: 62px !important; line-height: 1.04; text-align: center; width: 100%; }
+
+.dateband { margin: 10px auto 0; width: 220px; border-top: 0.6px solid var(--accent-deep); border-bottom: 0.6px solid var(--accent-deep); padding: 7px 0; }
+.dateband .field { font-family: 'Cinzel', serif; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent2); text-align: center; }
+
+.venue { margin-top: 16px; display: flex; flex-direction: column; gap: 4px; font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent2); line-height: 1.5; width: 100%; }
+.venue .field.addr { color: var(--accent2-soft); font-size: 10px; }
+.hosted { margin-top: 16px; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 16px; color: var(--ink-soft); width: 100%; }
+.rsvp { margin-top: 16px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent2-soft); line-height: 1.6; width: 100%; }
+
+/* inputs */
+.field { background: transparent; border: none; outline: none; font: inherit; color: inherit; text-align: inherit; padding: 1px 3px; width: 100%; transition: background .12s ease, box-shadow .12s ease; border-radius: 2px; }
+.field:hover { background: rgba(139,26,53,0.05); }
+.field:focus { background: rgba(139,26,53,0.10); box-shadow: 0 0 0 1px var(--accent-faint); }
+.field::placeholder { color: var(--accent-soft); font-style: inherit; opacity: 1; }
+.name-input::placeholder { color: rgba(139,26,53,0.40); }
+input.field { line-height: 1.2; }
+input.field:-webkit-autofill, input.field:-webkit-autofill:hover, input.field:-webkit-autofill:focus {
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-box-shadow: 0 0 0 1000px var(--paper) inset !important; box-shadow: 0 0 0 1000px var(--paper) inset !important;
+  transition: background-color 99999s ease-in-out 0s !important; caret-color: var(--ink);
+}
+</style>
+</head>
+<body>
+
+<div class="buyer-only">
+  <a class="buyer-back" href="./">← Back to Overview</a>
+  <div class="buyer-bar">
+    <button class="buyer-btn" id="btnDownload" type="button">Save digital invitation</button>
+  </div>
+  <p class="buyer-hint">
+    Click into the card to type your details (the demo text is selected — just start typing). Then „Save digital invitation" — the image lands in your Downloads (1080 × 1920 px, ideal for WhatsApp, iMessage &amp; Instagram Stories).
+  </p>
+</div>
+
+<article class="card" id="card">
+  <span class="frame-rule outer" aria-hidden="true"></span>
+  <span class="frame-rule inner" aria-hidden="true"></span>
+  <span class="corner tl" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner tr" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner bl" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner br" aria-hidden="true">CORNER_SVG</span>
+  <span class="spine" aria-hidden="true">Her next chapter begins</span>
+
+  <div class="crest" aria-hidden="true">
+    <svg width="58" height="30" viewBox="0 0 58 30" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round">
+      <path d="M29 29 C29 20 29 12 29 4"/>
+      <path d="M29 10 C22 7 16 8 11 3"/><path d="M29 10 C36 7 42 8 47 3"/>
+      <path d="M29 17 C24 15 19 16 15 11"/><path d="M29 17 C34 15 39 16 43 11"/>
+      <ellipse cx="29" cy="3" rx="2.4" ry="3.6" fill="currentColor" stroke="none"/>
+      <circle cx="11" cy="3" r="1.1" fill="currentColor" stroke="none"/><circle cx="47" cy="3" r="1.1" fill="currentColor" stroke="none"/>
+    </svg>
+  </div>
+
+  <p class="kicker">Bridal Shower</p>
+  <p class="inhonor">in honor of</p>
+
+  <div class="name-wrap">
+    <input class="field name-input" type="text" id="fBride" value="Anna" placeholder="Anna">
+  </div>
+
+  <div class="dateband">
+    <input class="field" type="text" id="fDate" value="Saturday, July 12, 2026 · 2 PM" placeholder="Saturday, July 12, 2026 · 2 PM">
+  </div>
+
+  <div class="venue">
+    <input class="field" type="text" id="fVenueName"   value="The Rosewood Garden" placeholder="The Rosewood Garden">
+    <input class="field addr" type="text" id="fVenueStreet" value="24 Maple Avenue" placeholder="24 Maple Avenue">
+    <input class="field addr" type="text" id="fVenueCity"   value="Boston, MA 02118" placeholder="Boston, MA 02118">
+  </div>
+
+  <div class="hosted">
+    <input class="field" type="text" id="fHosted" value="Hosted with love by Grace &amp; Mia" placeholder="Hosted with love by Grace &amp; Mia">
+  </div>
+
+  <div class="rsvp">
+    <input class="field" type="text" id="fRsvp" value="Kindly RSVP by July 1 · grace@email.com" placeholder="Kindly RSVP by July 1 · grace@email.com">
+  </div>
+</article>
+
+<script>
+  const CORNER = `<svg width="100%" height="100%" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+      <path d="M4 56 C4 30 4 16 16 8 C26 1 36 4 40 12"/>
+      <path d="M40 12 C34 19 24 17 24 26 C24 31 31 31 31 26"/>
+      <path d="M4 40 C4 30 9 25 16 24"/>
+      <circle cx="40" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+      <path d="M13 20 C18 18 20 13 20 8 C24 12 23 19 18 22 C15 23 13 22 13 20Z" fill="currentColor" stroke="none"/>
+    </svg>`;
+  document.querySelectorAll('.corner').forEach(c => c.innerHTML = CORNER);
+
+  document.querySelectorAll('input.field').forEach(i => {
+    i.setAttribute('autocomplete', 'off'); i.setAttribute('autocorrect', 'off');
+    i.setAttribute('autocapitalize', 'off'); i.setAttribute('spellcheck', 'false');
+    i.setAttribute('name', 'wsa_' + (i.id || 'f') + '_' + Math.random().toString(36).slice(2, 7));
+    i.addEventListener('focus', () => { const el = i; setTimeout(() => el.select(), 0); });
+  });
+
+  // ===== localStorage-Sync (gleicher Key wie Druck → einmal ausfüllen genügt) =====
+  const STORAGE_KEY = 'wsa_bridal_shower_burgundy_data';
+  function loadFromStorage() {
+    try { const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return;
+      Object.entries(JSON.parse(raw)).forEach(([id, val]) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.value = val; });
+    } catch (err) {}
+  }
+  function saveToStorage() {
+    try { const data = {}; document.querySelectorAll('input.field').forEach(inp => { if (inp.id) data[inp.id] = inp.value; }); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (err) {}
+  }
+  document.querySelectorAll('input.field').forEach(inp => inp.addEventListener('input', saveToStorage));
+
+  // ===== Autofit ========================================================
+  const _measureCtx = document.createElement('canvas').getContext('2d');
+  function autofitField(input, maxPx, minPx, swashSafety = 1.0) {
+    function fit() {
+      const cs = getComputedStyle(input);
+      const family = cs.fontFamily, style = cs.fontStyle || 'normal', weight = cs.fontWeight || '400';
+      const text = input.value || input.placeholder || '';
+      const lsPx = parseFloat(cs.letterSpacing), fsPx = parseFloat(cs.fontSize);
+      const lsEm = (!isNaN(lsPx) && fsPx) ? lsPx / fsPx : 0;
+      function widthAt(px) { _measureCtx.font = `${style} ${weight} ${px.toFixed(2)}px ${family}`; let w = _measureCtx.measureText(text).width; if (lsEm && text.length > 1) w += lsEm * px * (text.length - 1); return w; }
+      const available = (input.clientWidth - 3) / swashSafety;
+      let px = maxPx; const needed = widthAt(maxPx);
+      if (needed > available) px = Math.max(minPx, maxPx * (available / needed));
+      input.style.fontSize = px.toFixed(1) + 'px';
+    }
+    input.addEventListener('input', fit); return fit;
+  }
+  function setup() {
+    loadFromStorage();
+    [ ['fBride',62,26,1.10], ['fDate',12,8,1.15], ['fVenueName',11,8,1.15],
+      ['fVenueStreet',10,8,1.15], ['fVenueCity',10,8,1.15], ['fHosted',16,11,1.10], ['fRsvp',10,7.5,1.15]
+    ].forEach(([id,mx,mn,s]) => autofitField(document.getElementById(id), mx, mn, s)());
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setup); else window.addEventListener('load', setup);
+
+  // ===== Export PNG 1080×1920 via html2canvas (Input→Span-Klon) =========
+  const card = document.getElementById('card');
+  const btn  = document.getElementById('btnDownload');
+
+  function buildCaptureClone() {
+    const clone = card.cloneNode(true);
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:fixed;left:-99999px;top:0;background:#FFFFFF;';
+    wrapper.appendChild(clone);
+    document.body.appendChild(wrapper);
+    const origInputs  = Array.from(card.querySelectorAll('input.field'));
+    const cloneInputs = Array.from(clone.querySelectorAll('input.field'));
+    cloneInputs.forEach((cInp, i) => {
+      const oInp = origInputs[i];
+      const cs = window.getComputedStyle(oInp);
+      const srcHeight = oInp.offsetHeight;   // transform-independent
+      const span = document.createElement('div');
+      span.className = cInp.className;
+      span.textContent = oInp.value.trim();
+      ['fontFamily','fontSize','fontStyle','fontWeight','color','textAlign','textTransform','letterSpacing','padding','boxSizing','width'].forEach(k => span.style[k] = cs[k]);
+      span.style.display = 'flex'; span.style.alignItems = 'center';
+      span.style.justifyContent = cs.textAlign === 'center' ? 'center' : cs.textAlign === 'right' ? 'flex-end' : 'flex-start';
+      span.style.height = srcHeight + 'px'; span.style.lineHeight = '1'; span.style.whiteSpace = 'nowrap';
+      cInp.parentNode.replaceChild(span, cInp);
+    });
+    return { clone, wrapper };
+  }
+
+  btn.addEventListener('click', async () => {
+    btn.disabled = true; const original = btn.textContent; btn.textContent = 'Creating image …';
+    let wrapper = null;
+    try {
+      if (document.fonts && document.fonts.ready) await document.fonts.ready;
+      const built = buildCaptureClone(); wrapper = built.wrapper;
+      const canvas = await html2canvas(built.clone, { scale: 3, backgroundColor: '#FFFFFF', useCORS: true, logging: false, width: 360, height: 640 });
+      const link = document.createElement('a');
+      const bride = (document.getElementById('fBride').value || 'Bride').trim().replace(/\s+/g, '-');
+      link.download = `Bridal-Shower-Digital-Invitation-${bride}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    } catch (err) {
+      alert('An error occurred — please reload the page and try again.'); console.error(err);
+    } finally {
+      if (wrapper && wrapper.parentNode) wrapper.parentNode.removeChild(wrapper);
+      btn.disabled = false; btn.textContent = original;
+    }
+  });
+</script>
+
+</body>
+</html>

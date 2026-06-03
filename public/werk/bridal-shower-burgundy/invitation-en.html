@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Bridal Shower · Invitation · Wedding Story Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== Local OFL fonts ================================================== */
+@font-face {
+  font-family: 'Great Vibes';
+  src: url('/Schriftarten/Great_Vibes/GreatVibes-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Cinzel';
+  src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype-variations');
+  font-weight: 400 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700; font-style: italic; font-display: block;
+}
+
+/* ===== Palette — RECOLOR HERE for a new colour edition (Sage, Terracotta, Wine …) =====
+   Druck-Regel: alle Töne bewusst PIGMENTIERT halten — zarte Tints verschwinden im
+   normalen Heimdruck (ohne Foto-Modus). Lieber satt-rosé als blass-rosa. */
+:root {
+  --accent:        #A8324C;   /* helleres Burgund — Akzente, Hover */
+  --accent-deep:   #8B1A35;   /* MARKEN-BURGUND (Old-Money-Linie: Aufstellkärtchen/Dankeskarte/Einladungsset) — Name, Rahmen, Ornamente, Crest */
+  --accent-soft:   rgba(139,26,53,0.70);
+  --accent-faint:  rgba(139,26,53,0.55);   /* innere Rahmenlinie */
+  --accent2:       #804C56;   /* gedämpftes Wein-Mauve (gleiche Hue-Familie) — Detail-Versalien, Plain-Druck-lesbar */
+  --accent2-soft:  #92616A;   /* etwas ruhiger als Venue — Adresse/RSVP */
+  --ink:           #2A2826;
+  --ink-soft:      #6B635B;   /* weicher warmes Grau für „in honor of" / „Hosted with love" (war #4A433E = etwas hart) */
+  --paper:         #FFFFFF;
+  --bg:            #EAE3DF;
+}
+
+/* ===== Screen frame ===================================================== */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  font-family: 'Cinzel', serif;
+  color: var(--ink);
+  min-height: 100vh;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 32px 16px 64px;
+}
+
+/* ===== Buyer UI (hidden on print) ====================================== */
+.buyer-only { width: 100%; max-width: 600px; }
+.buyer-bar { display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 24px; flex-wrap: wrap; }
+.buyer-btn {
+  font-family: 'Cinzel', serif; font-size: 11pt; letter-spacing: 0.12em; text-transform: uppercase;
+  padding: 10px 22px; background: var(--ink); border: 1px solid var(--ink); color: #fff; cursor: pointer;
+  transition: all .15s ease;
+}
+.buyer-btn:hover { background: var(--accent); border-color: var(--accent); }
+.buyer-select {
+  font-family: 'Cinzel', serif; font-size: 9.5pt; letter-spacing: 0.04em;
+  padding: 9px 14px; background: #fff; border: 1px solid var(--ink); color: var(--ink); cursor: pointer;
+}
+.buyer-back {
+  display: block; text-align: center; margin-bottom: 16px;
+  font-family: 'Cinzel', serif; font-size: 9pt; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent); text-decoration: none; transition: opacity .15s ease;
+}
+.buyer-back:hover { opacity: 0.6; }
+.buyer-hint {
+  text-align: center; font-family: 'Cinzel', serif; font-size: 10pt; letter-spacing: 0.08em;
+  color: var(--ink-soft); margin: 0 0 28px; line-height: 1.6;
+}
+
+/* ===== The card (5 × 7 in) ============================================= */
+.card {
+  width: 127mm; height: 178mm; background: var(--paper); position: relative;
+  padding: 20mm 18mm; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; text-align: center;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+}
+
+/* ===== Ornamental frame (engraved double rule + corner flourishes) ===== */
+.frame-rule { position: absolute; pointer-events: none; }
+.frame-rule.outer { inset: 10mm;   border: 1px solid var(--accent-deep); }
+.frame-rule.inner { inset: 11.4mm; border: 0.5px solid var(--accent-faint); }
+.corner { position: absolute; width: 21mm; height: 21mm; color: var(--accent-deep); pointer-events: none; }
+.corner.tl { top: 7.2mm;  left: 7.2mm;  }
+.corner.tr { top: 7.2mm;  right: 7.2mm;  transform: scaleX(-1); }
+.corner.bl { bottom: 7.2mm; left: 7.2mm;  transform: scaleY(-1); }
+.corner.br { bottom: 7.2mm; right: 7.2mm; transform: scale(-1,-1); }
+.crest { color: var(--accent-deep); margin: 0 0 3mm; line-height: 0; }
+.crest svg, .corner svg { display: block; }
+
+/* vertical side legend (like the bestseller's spine text) — pulled inward, trim-safe */
+.spine {
+  position: absolute; left: 6.5mm; top: 50%; transform: translateY(-50%) rotate(180deg);
+  writing-mode: vertical-rl; font-family: 'Cinzel', serif; font-size: 7pt;
+  letter-spacing: 0.30em; text-transform: uppercase; color: var(--accent2-soft); pointer-events: none;
+}
+
+/* ===== Kicker: quiet label — the bride's name is the hero, not this ==== */
+.kicker {
+  font-family: 'Cinzel', serif; font-weight: 600; font-size: 11.5pt;
+  letter-spacing: 0.30em; text-transform: uppercase; color: var(--accent2);
+  margin: 0 0 1.5mm; padding-left: 0.30em;
+}
+.inhonor {
+  font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 400;
+  font-size: 14pt; color: var(--ink-soft); margin: 0 0 1mm;
+}
+
+/* ===== Hero: bride's name (Great Vibes) ================================ */
+.name-wrap { width: 96mm; margin: 0 auto 1mm; }
+.name-input {
+  font-family: 'Great Vibes', cursive !important; font-style: normal !important; font-weight: 400 !important;
+  color: var(--accent-deep) !important; font-size: 64pt !important; line-height: 1.04; text-align: center; width: 100%;
+  /* satte Vollfarbe, KEINE Kontur — text-stroke franst im Druck aus. Bei 64pt ist die Schrift kräftig genug. */
+}
+
+/* ===== Framed date block ============================================== */
+.dateband {
+  margin: 3mm auto 0; width: 74mm; border-top: 0.6px solid var(--accent-deep);
+  border-bottom: 0.6px solid var(--accent-deep); padding: 2mm 0;
+}
+.dateband .field {
+  font-family: 'Cinzel', serif; font-size: 10.5pt; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent2); text-align: center;
+}
+
+/* ===== Detail blocks (Cinzel small-caps) =============================== */
+.venue {
+  margin-top: 5mm; display: flex; flex-direction: column; gap: 1.4mm;
+  font-family: 'Cinzel', serif; font-size: 9.5pt; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent2); line-height: 1.6; width: 100%;
+}
+/* address lines deliberately a touch quieter than the venue name (colour, not opacity) */
+.venue .field.addr { color: var(--accent2-soft); font-size: 9pt; }
+.hosted {
+  margin-top: 5mm; font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 13pt;
+  color: var(--ink-soft); width: 100%;
+}
+.rsvp {
+  margin-top: 5mm; font-family: 'Cinzel', serif; font-size: 8.5pt; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--accent2-soft); line-height: 1.7; width: 100%;
+}
+
+/* ===== Input styling =================================================== */
+.field {
+  background: transparent; border: none; outline: none; font: inherit; color: inherit; text-align: inherit;
+  padding: 2px 4px; width: 100%; transition: background .12s ease, box-shadow .12s ease; border-radius: 2px;
+}
+.field:hover  { background: rgba(192,134,126,0.05); }
+.field:focus  { background: rgba(192,134,126,0.10); box-shadow: 0 0 0 1px var(--accent-faint); }
+.field::placeholder { color: var(--accent-soft); font-style: inherit; opacity: 1; }
+.name-input::placeholder { color: rgba(164,95,87,0.55); }
+input.field { line-height: 1.2; }
+
+/* ===== Kill Chrome autofill (blue background + forced black text) ====== */
+input.field:-webkit-autofill,
+input.field:-webkit-autofill:hover,
+input.field:-webkit-autofill:focus,
+input.field:-webkit-autofill:active {
+  -webkit-text-fill-color: currentColor !important;   /* keep our rose/taupe, not black */
+  -webkit-box-shadow: 0 0 0 1000px var(--paper) inset !important;  /* paint over the blue */
+          box-shadow: 0 0 0 1000px var(--paper) inset !important;
+  transition: background-color 99999s ease-in-out 0s !important;   /* defer the autofill paint */
+  caret-color: var(--ink);
+}
+
+/* ===== Cut guides — shown only in 'sheet' print mode (Mode B) ========== */
+/* continuous dashed trim line: cut straight along it, no guessing between corners */
+.cutline { position: absolute; inset: 0; border: 0.3mm dashed #b6b6b6; display: none; pointer-events: none; z-index: 5; }
+/* trim guide lines: extend from each card corner OUT to the sheet edges, collinear
+   with the trim — so on a paper trimmer you align the blade to the mark at the sheet edge.
+   Lengths fit the Letter margin (card 127×178 centred on 215.9×279.4, ~3.5mm safe inset). */
+.crop { position: absolute; width: 0; height: 0; display: none; pointer-events: none; z-index: 6; }
+.crop::before, .crop::after { content: ''; position: absolute; background: #9b9b9b; }
+.crop::before { width: 41mm;  height: 0.3mm; }   /* horizontal — reaches the left/right sheet edge */
+.crop::after  { width: 0.3mm; height: 47mm; }    /* vertical — reaches the top/bottom sheet edge */
+.crop.tl { top: 0; left: 0; }     .crop.tl::before { top: 0; left: -41mm; }      .crop.tl::after { top: -47mm; left: 0; }
+.crop.tr { top: 0; right: 0; }    .crop.tr::before { top: 0; right: -41mm; }     .crop.tr::after { top: -47mm; right: 0; }
+.crop.bl { bottom: 0; left: 0; }  .crop.bl::before { bottom: 0; left: -41mm; }   .crop.bl::after { bottom: -47mm; left: 0; }
+.crop.br { bottom: 0; right: 0; } .crop.br::before { bottom: 0; right: -41mm; }  .crop.br::after { bottom: -47mm; right: 0; }
+
+/* ===== Print =========================================================== */
+@media print {
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
+  .buyer-only { display: none !important; }
+  .field { background: transparent !important; box-shadow: none !important; }
+  .field::placeholder { color: transparent !important; }
+  input.field:-webkit-autofill { -webkit-text-fill-color: currentColor !important; -webkit-box-shadow: none !important; box-shadow: none !important; background: transparent !important; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  /* Mode A — straight onto 5×7 card stock: card = page, no marks, no trimming */
+  body[data-print="card"] { display: block !important; min-height: 0 !important; }
+  body[data-print="card"] .card { width: 5in; height: 7in; margin: 0; box-shadow: none !important; overflow: hidden; page-break-inside: avoid; }
+
+  /* Mode B — centred on an A4/Letter sheet with corner crop marks to trim */
+  body[data-print="sheet"] { display: flex !important; align-items: center; justify-content: center; min-height: 100vh; }
+  body[data-print="sheet"] .card { width: 127mm; height: 178mm; margin: 0; box-shadow: none !important; overflow: visible; page-break-inside: avoid; }
+  body[data-print="sheet"] .crop { display: block; }
+  body[data-print="sheet"] .cutline { display: block; }
+}
+</style>
+<style id="ps"></style><!-- dynamic @page size (set by print-target toggle) -->
+</head>
+<body>
+
+<div class="buyer-only">
+  <a class="buyer-back" href="./">← Back to Overview</a>
+  <div class="buyer-bar">
+    <select class="buyer-select" id="printTarget" aria-label="Print format">
+      <option value="sheet">A4 / Letter sheet · trim to size</option>
+      <option value="card">5 × 7 in card stock · no trimming</option>
+    </select>
+    <button class="buyer-btn" id="btnPrint" type="button">Print / PDF</button>
+  </div>
+  <p class="buyer-hint">
+    Click into the card to type your details (the demo text is selected — just start typing). Then choose „Print / PDF". Tip: enable background graphics in the print dialog. On an A4/Letter sheet, faint corner marks show where to trim to 5 × 7 in.
+  </p>
+</div>
+
+<article class="card">
+
+  <!-- ornamental engraved frame -->
+  <span class="frame-rule outer" aria-hidden="true"></span>
+  <span class="frame-rule inner" aria-hidden="true"></span>
+  <span class="corner tl" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner tr" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner bl" aria-hidden="true">CORNER_SVG</span>
+  <span class="corner br" aria-hidden="true">CORNER_SVG</span>
+  <span class="spine" aria-hidden="true">Her next chapter begins</span>
+
+  <!-- cut guides (visible only when printing on an A4/Letter sheet) -->
+  <span class="cutline" aria-hidden="true"></span>
+  <span class="crop tl" aria-hidden="true"></span>
+  <span class="crop tr" aria-hidden="true"></span>
+  <span class="crop bl" aria-hidden="true"></span>
+  <span class="crop br" aria-hidden="true"></span>
+
+  <div class="crest" aria-hidden="true">
+    <svg width="58" height="30" viewBox="0 0 58 30" fill="none" stroke="currentColor" stroke-width="0.9" stroke-linecap="round">
+      <path d="M29 29 C29 20 29 12 29 4"/>
+      <path d="M29 10 C22 7 16 8 11 3"/><path d="M29 10 C36 7 42 8 47 3"/>
+      <path d="M29 17 C24 15 19 16 15 11"/><path d="M29 17 C34 15 39 16 43 11"/>
+      <ellipse cx="29" cy="3" rx="2.4" ry="3.6" fill="currentColor" stroke="none"/>
+      <circle cx="11" cy="3" r="1.1" fill="currentColor" stroke="none"/><circle cx="47" cy="3" r="1.1" fill="currentColor" stroke="none"/>
+    </svg>
+  </div>
+
+  <p class="kicker">Bridal Shower</p>
+  <p class="inhonor">in honor of</p>
+
+  <div class="name-wrap">
+    <input class="field name-input" type="text" id="fBride" value="Anna" placeholder="Anna">
+  </div>
+
+  <div class="dateband">
+    <input class="field" type="text" id="fDate" value="Saturday, July 12, 2026 · 2 PM" placeholder="Saturday, July 12, 2026 · 2 PM">
+  </div>
+
+  <div class="venue">
+    <input class="field" type="text" id="fVenueName"   value="The Rosewood Garden" placeholder="The Rosewood Garden">
+    <input class="field addr" type="text" id="fVenueStreet" value="24 Maple Avenue" placeholder="24 Maple Avenue">
+    <input class="field addr" type="text" id="fVenueCity"   value="Boston, MA 02118" placeholder="Boston, MA 02118">
+  </div>
+
+  <div class="hosted">
+    <input class="field" type="text" id="fHosted" value="Hosted with love by Grace &amp; Mia" placeholder="Hosted with love by Grace &amp; Mia">
+  </div>
+
+  <div class="rsvp">
+    <input class="field" type="text" id="fRsvp" value="Kindly RSVP by July 1 · grace@email.com" placeholder="Kindly RSVP by July 1 · grace@email.com">
+  </div>
+
+</article>
+
+<script>
+  // ===== Inject corner flourish SVG into all four corners ===============
+  const CORNER = `<svg width="100%" height="100%" viewBox="0 0 60 60" fill="none" stroke="currentColor" stroke-width="1.1" stroke-linecap="round">
+      <path d="M4 56 C4 30 4 16 16 8 C26 1 36 4 40 12"/>
+      <path d="M40 12 C34 19 24 17 24 26 C24 31 31 31 31 26"/>
+      <path d="M4 40 C4 30 9 25 16 24"/>
+      <circle cx="40" cy="12" r="1.5" fill="currentColor" stroke="none"/>
+      <path d="M13 20 C18 18 20 13 20 8 C24 12 23 19 18 22 C15 23 13 22 13 20Z" fill="currentColor" stroke="none"/>
+    </svg>`;
+  document.querySelectorAll('.corner').forEach(c => c.innerHTML = CORNER);
+
+  // discourage Chrome autofill (fields look like name/address → Chrome fills them blue + black)
+  // + click-to-select-all so the demo text is replaced by simply typing
+  document.querySelectorAll('input.field').forEach(i => {
+    i.setAttribute('autocomplete', 'off');
+    i.setAttribute('autocorrect', 'off');
+    i.setAttribute('autocapitalize', 'off');
+    i.setAttribute('spellcheck', 'false');
+    i.setAttribute('name', 'wsa_' + (i.id || 'f') + '_' + Math.random().toString(36).slice(2, 7));
+    // first click into a field selects everything → just start typing to replace the demo.
+    // setTimeout fires after the click's mouseup so the selection sticks; a 2nd click inside
+    // still places a cursor for fine edits (focus doesn't re-fire while already focused).
+    i.addEventListener('focus', () => { const el = i; setTimeout(() => el.select(), 0); });
+  });
+
+  document.getElementById('btnPrint').addEventListener('click', () => window.print());
+
+  // ===== Print target: 5×7 card stock (no trim) vs A4/Letter sheet (crop marks) =====
+  const psEl = document.getElementById('ps');
+  function applyPrintTarget(t) {
+    document.body.dataset.print = t;
+    psEl.textContent = (t === 'card')
+      ? '@page { size: 5in 7in; margin: 0; }'
+      : '@page { size: letter; margin: 0; }';
+  }
+  document.getElementById('printTarget').addEventListener('change', e => applyPrintTarget(e.target.value));
+  applyPrintTarget('sheet');   // default: full sheet + crop marks (most home printers)
+
+  // ===== localStorage-Sync zwischen Druck- und Digitalkarte derselben Edition =====
+  const STORAGE_KEY = 'wsa_bridal_shower_burgundy_data';
+  function loadFromStorage() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return;
+      const data = JSON.parse(raw);
+      Object.entries(data).forEach(([id, val]) => { const el = document.getElementById(id); if (el && typeof val === 'string') el.value = val; });
+    } catch (err) {}
+  }
+  function saveToStorage() {
+    try { const data = {}; document.querySelectorAll('input.field').forEach(inp => { if (inp.id) data[inp.id] = inp.value; }); localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch (err) {}
+  }
+  document.querySelectorAll('input.field').forEach(inp => inp.addEventListener('input', saveToStorage));
+
+  // ===== Autofit: deterministic canvas measurement ======================
+  const _measureCtx = document.createElement('canvas').getContext('2d');
+  function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
+    function fit() {
+      const cs = getComputedStyle(input);
+      const family = cs.fontFamily, style = cs.fontStyle || 'normal', weight = cs.fontWeight || '400';
+      const text = input.value || input.placeholder || '';
+      // CSS letter-spacing is ignored by canvas measureText — fold it in (em-stable ratio)
+      const lsPx = parseFloat(cs.letterSpacing), fsPx = parseFloat(cs.fontSize);
+      const lsEm = (!isNaN(lsPx) && fsPx) ? lsPx / fsPx : 0;
+      function widthAt(pt) {
+        const px = pt * 4 / 3;
+        _measureCtx.font = `${style} ${weight} ${px.toFixed(2)}px ${family}`;
+        let w = _measureCtx.measureText(text).width;
+        if (lsEm && text.length > 1) w += lsEm * px * (text.length - 1);
+        return w;
+      }
+      const available = (input.clientWidth - 4) / swashSafety;
+      let pt = maxPt; const needed = widthAt(maxPt);
+      if (needed > available) pt = Math.max(minPt, maxPt * (available / needed));
+      input.style.fontSize = pt.toFixed(1) + 'pt';
+    }
+    input.addEventListener('input', fit); return fit;
+  }
+  const fits = [];
+  function setup() {
+    loadFromStorage();
+    fits.push(autofitField(document.getElementById('fBride'),       64, 30, 1.10));
+    fits.push(autofitField(document.getElementById('fDate'),        10.5, 7, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueName'),    9.5, 7, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueStreet'),  9,   7, 1.15));
+    fits.push(autofitField(document.getElementById('fVenueCity'),    9,   7, 1.15));
+    fits.push(autofitField(document.getElementById('fHosted'),      13,   9, 1.10));
+    fits.push(autofitField(document.getElementById('fRsvp'),         8.5, 6.5, 1.15));
+    fits.forEach(f => f());
+  }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(setup);
+  else window.addEventListener('load', setup);
+</script>
+
+</body>
+</html>
