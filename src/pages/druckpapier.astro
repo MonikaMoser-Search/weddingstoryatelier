@@ -1,0 +1,225 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Zentraler Druckmaterial-Guide für alle Werke. Wird aus den Druckanleitungen
+// verlinkt (eigene, pflegbare Seite → keine toten Amazon-Links in PDFs).
+// Foto-Slots: sobald `bild` gesetzt ist, wird das Bild gerendert.
+
+const tipps = [
+  {
+    titel: 'Immer „Foto“ wählen',
+    text: 'Im Druckdialog „Foto“ bzw. beste Qualität einstellen — sonst kippt Gold und Metallic ins Gelbliche, und Farben wirken flau.',
+  },
+  {
+    titel: 'Satin wirkt dunkler als matt',
+    text: 'Seidenglanz/Satin gibt Farben dunkler wieder als Mattpapier. Bei Stücken, die nebeneinander liegen (z. B. Menü- + Wein- oder Cocktailkarte) oder bei Vorder- und Rückseite deshalb ein Finish durchziehen — alles matt oder alles satin.',
+  },
+  {
+    titel: 'Beidseitig? Beidseitig beschichtet kaufen',
+    text: 'Für beidseitigen Druck nur Papier verwenden, das wirklich beidseitig beschichtet ist. Es gibt einseitig beschichtetes Papier — bedruckt man dort die Rückseite, sieht es nicht gut aus. Beim Kauf auf „doppelseitig“ achten.',
+  },
+];
+
+const gruppen = [
+  {
+    titel: 'Karten & Einladungen — Tintenstrahldrucker',
+    hinweis: 'Für Gold- und Silber-Werke: Seidenglanz/Satin — das bringt das Metallic zum Strahlen.',
+    materialien: [
+      {
+        name: 'Koala A5 Premium Photo Paper, Satin',
+        spec: 'A5 · 250 g · ~12 €/100',
+        ideen: 'Das deutsche A5-Hauptformat (z. B. die Goldene-Hochzeit-Einladung). Seidenglanz in A5 ist selten — dieses hat sich bewährt.',
+        bild: null,
+      },
+      {
+        name: 'PPD Premium Plus Fotopapier, Satin',
+        spec: '5×7″ (13×18 cm) · 280 g · ~12 €/100 · PPD-86-100',
+        ideen: 'Gold-/Silber-Einladungen im 5×7″-Format (English) — fertige Kartengröße, kein Schneiden nötig.',
+        bild: null,
+      },
+      {
+        name: 'PPD Profi Fotopapier, Satin',
+        spec: '4×6″ (≈ A6) · 280 g · PPD-67-100',
+        ideen: 'Kleinere Karten und Anhänger in A6 — etwa Save-the-Date oder Dankeskärtchen.',
+        bild: null,
+      },
+      {
+        name: 'Koala Fotopapier, doppelseitig matt',
+        spec: 'A4 · 230 g · ~15 €/100',
+        ideen: 'Ruhige, editoriale Werke und alles Beidseitige — Programme, Menükarten, Dankeskarten mit Text auf der Rückseite.',
+        bild: null,
+      },
+      {
+        name: 'Koala Fotopapier, Hochglanz',
+        spec: 'A3 · 240 g · ~25 €/100',
+        ideen: 'Große Formate — Sitzpläne, Empfangsmappen, Poster.',
+        bild: null,
+      },
+    ],
+  },
+  {
+    titel: 'Karten & Einladungen — Laserdrucker',
+    hinweis: 'Im Laserdrucker gibt es kein Satin — für den schönsten Gold-Look bleibt Tintenstrahl mit Satin die erste Wahl.',
+    materialien: [
+      {
+        name: 'Koala Fotopapier für Laser, doppelseitig matt',
+        spec: 'A4 · 250 g · ~15 €/100',
+        ideen: 'Beidseitige Werke auf dem Laserdrucker — Programme, Menüs.',
+        bild: null,
+      },
+      {
+        name: 'Mondi ColorCopy',
+        spec: 'A5 · 250 g · ~21 €/250',
+        ideen: 'Gold-Karten auf dem Laserdrucker — die Notlösung, wenn kein Tintenstrahler zur Hand ist.',
+        bild: null,
+      },
+    ],
+  },
+  {
+    titel: 'Aufkleber · Etiketten · Magnete — Tintenstrahldrucker',
+    hinweis: 'Vielseitig: direkt aufkleben oder ausschneiden und mit Band befestigen.',
+    materialien: [
+      {
+        name: 'Koala Klebepapier / Sticker, glänzend',
+        spec: 'A4 · selbstklebend · ~17 €/100',
+        ideen: 'Geschenkanhänger zum direkt Aufkleben · Etiketten für Gläser und Tütchen · eine Allergenkarte auf das Süßigkeiten-Tütchen geklebt (z. B. „Cookie“ mit Allergenen, hübsch auf den Folienbeutel) · oder ausschneiden und mit Band befestigen.',
+        bild: null,
+      },
+      {
+        name: 'PPD Vinyl-Aufkleberfolie, glänzend',
+        spec: 'A4 · selbstklebend · ~8 €/10 · PPD-36-10',
+        ideen: 'Robuste Etiketten für Flaschen, Gläser oder die Candy-Bar.',
+        bild: null,
+      },
+      {
+        name: 'PPD Fotopapier, magnetisch matt',
+        spec: 'A4 · bedruck- & schneidbar · ~10 €/5 · PPD-32-5',
+        ideen: 'Save-the-Date- oder kleine Foto-Magnete für den Kühlschrank.',
+        bild: null,
+      },
+    ],
+  },
+  {
+    titel: 'Farbiges Papier',
+    hinweis: 'Für Tinten- und Laserdrucker geeignet.',
+    materialien: [
+      {
+        name: 'Tonpapier bunt',
+        spec: '220 g · ~10 €/50',
+        ideen: 'Farbige Unterlagen, Layering hinter der Karte, kleine Bastel-Akzente.',
+        bild: null,
+      },
+    ],
+  },
+];
+---
+
+<Layout
+  title="Druckpapier & Materialien — getestete Empfehlungen · Wedding Story Atelier"
+  description="Welches Papier für Einladungen, Karten, Aufkleber und Etiketten? Im Atelier getestete Empfehlungen für Tinten- und Laserdrucker — mit Profi-Tipps zu Gold, Satin und beidseitigem Druck."
+>
+  <!-- Navigation -->
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- Intro -->
+  <section class="px-6 md:px-16 pt-32 md:pt-40 pb-16 text-center">
+    <div class="max-w-3xl mx-auto">
+      <p class="text-sm tracking-[0.3em] uppercase text-ink-muted mb-6">Aus dem Atelier</p>
+      <h1 class="serif text-4xl md:text-6xl leading-[1.1] mb-8">
+        Druckpapier &amp; Materialien
+      </h1>
+      <p class="serif text-lg md:text-xl italic text-ink leading-relaxed">
+        Welches Papier wofür — getestet im Atelier. Damit eure Werke auf Papier genauso schön aussehen wie auf dem Bildschirm.
+      </p>
+    </div>
+  </section>
+
+  <!-- Der einfachste Weg -->
+  <section class="px-6 md:px-16 pb-8">
+    <div class="max-w-3xl mx-auto bg-cream border border-sand px-6 md:px-10 py-8 text-center">
+      <p class="serif text-2xl mb-3">Keinen (guten) Drucker?</p>
+      <p class="text-base text-ink-muted leading-relaxed">
+        Am einfachsten zum Foto-Terminal bei dm oder Rossmann (Handy anstecken, der Bildschirm führt Schritt für Schritt — das Personal hilft gern) oder in den Copyshop ums Eck, dort druckt man es direkt für euch. So braucht ihr weder Drucker noch Papier.
+      </p>
+    </div>
+  </section>
+
+  <!-- Gut zu wissen — drei Regeln -->
+  <section class="px-6 md:px-16 py-16">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-sm tracking-[0.3em] uppercase text-ink-muted text-center mb-4">Gut zu wissen</p>
+      <h2 class="serif text-3xl md:text-4xl text-center mb-14">Drei Regeln für einen schönen Druck.</h2>
+      <div class="grid md:grid-cols-3 gap-12">
+        {tipps.map((t, i) => (
+          <div>
+            <p class="serif text-4xl text-[#9C7B1A] italic mb-4">{['I.', 'II.', 'III.'][i]}</p>
+            <h3 class="serif text-xl mb-3">{t.titel}</h3>
+            <p class="text-base text-ink-muted leading-relaxed">{t.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Materialien -->
+  {gruppen.map((g, gi) => (
+    <section class={`px-6 md:px-16 py-16 border-t border-sand ${gi % 2 === 0 ? 'bg-cream' : ''}`}>
+      <div class="max-w-4xl mx-auto">
+        <h2 class="serif text-2xl md:text-3xl mb-2">{g.titel}</h2>
+        <p class="text-base text-ink-muted italic mb-10">{g.hinweis}</p>
+        <div class="space-y-8">
+          {g.materialien.map((m) => (
+            <div class="border-b border-sand pb-8 grid md:grid-cols-3 gap-6 md:gap-8">
+              <div class="md:col-span-2">
+                <h3 class="serif text-xl mb-1">{m.name}</h3>
+                <p class="text-sm tracking-wide text-[#7B6115] mb-3">{m.spec}</p>
+                <p class="text-base text-ink-muted leading-relaxed"><span class="italic text-ink">Ideen:</span> {m.ideen}</p>
+              </div>
+              <div>
+                {m.bild ? (
+                  <img src={m.bild} alt={m.name} loading="lazy" class="w-full border border-sand" />
+                ) : (
+                  <div class="w-full aspect-[4/3] bg-paper border border-dashed border-sand flex items-center justify-center text-xs tracking-[0.2em] uppercase text-ink-muted/60">
+                    Foto folgt
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  ))}
+
+  <!-- Umschläge — Faustregel -->
+  <section class="px-6 md:px-16 py-16 border-t border-sand">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="serif text-2xl md:text-3xl mb-4">Passende Umschläge</h2>
+      <p class="text-base text-ink-muted leading-relaxed">
+        Einfach zur Kartengröße passend kaufen — gibt es als Standardgrößen überall:
+        <br class="hidden md:block" />
+        <span class="text-ink">A6 → C6 · A5 → C5 · 5×7″ → Fotokuvert.</span>
+      </p>
+    </div>
+  </section>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand bg-cream">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-sm tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
