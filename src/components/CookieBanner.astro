@@ -64,6 +64,15 @@ const CLARITY_ID = 'x0475iv4fu';
     const acceptBtn = document.getElementById('wsa-consent-accept');
     const denyBtn = document.getElementById('wsa-consent-deny');
 
+    // Tracking nur auf der Produktions-Domain laden. Verhindert, dass lokale
+    // Tests (localhost) oder Preview-Deploys (*.pages.dev) echte Conversions
+    // und Clarity-Sitzungen auslösen und die Analytics verfälschen.
+    const PROD_HOSTS = ['weddingstoryatelier.de', 'www.weddingstoryatelier.de'];
+    if (!PROD_HOSTS.includes(location.hostname)) {
+      if (banner) banner.style.display = 'none';
+      return;
+    }
+
     function showBanner() {
       if (banner) banner.style.display = 'block';
     }
