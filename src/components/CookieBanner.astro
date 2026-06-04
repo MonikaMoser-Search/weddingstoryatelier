@@ -46,6 +46,20 @@ const CLARITY_ID = 'x0475iv4fu';
 <script is:inline define:vars={{ gtagId: GTAG_ID, clarityId: CLARITY_ID }}>
   (function () {
     const STORAGE_KEY = 'wsa_consent';
+
+    // ── Consent-Modus ────────────────────────────────────────────────
+    // 'advanced' : Google-Tag lädt IMMER. Ohne Einwilligung werden nur
+    //              cookielose Pings (keine Cookies, keine IDs, gclid
+    //              redigiert) gesendet — Google MODELLIERT daraus die
+    //              fehlenden Conversions. Nötig, weil unsere 65+/mobile
+    //              Zielgruppe überdurchschnittlich oft ablehnt und sonst
+    //              komplett unsichtbar bliebe. Google-empfohlen, EEA-tauglich.
+    // 'basic'    : konservativer — Tag lädt erst nach „Akzeptieren",
+    //              vor der Einwilligung passiert gar nichts (= keine
+    //              Modellierung, dafür kein Tag-Load vor Consent).
+    // Umschalten = nur dieser eine String.
+    const CONSENT_MODE = 'advanced';
+
     const banner = document.getElementById('wsa-cookie-banner');
     const acceptBtn = document.getElementById('wsa-consent-accept');
     const denyBtn = document.getElementById('wsa-consent-deny');
@@ -57,6 +71,19 @@ const CLARITY_ID = 'x0475iv4fu';
       if (banner) banner.style.display = 'none';
     }
 
+    // gtag-Stub sofort bereitstellen, damit consent-Befehle vor dem
+    // Script-Load in die dataLayer-Queue laufen.
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { window.dataLayer.push(arguments); }
+    window.gtag = gtag;
+
+    const GRANTED = {
+      ad_storage: 'granted',
+      ad_user_data: 'granted',
+      ad_personalization: 'granted',
+      analytics_storage: 'granted',
+    };
+
     function loadGtag() {
       if (window.wsaGtagLoaded) return;
       window.wsaGtagLoaded = true;
@@ -66,16 +93,16 @@ const CLARITY_ID = 'x0475iv4fu';
       s.src = 'https://www.googletagmanager.com/gtag/js?id=' + gtagId;
       document.head.appendChild(s);
 
-      window.dataLayer = window.dataLayer || [];
-      window.gtag = function () { window.dataLayer.push(arguments); };
-      window.gtag('js', new Date());
-      window.gtag('config', gtagId);
+      gtag('js', new Date());
+      gtag('config', gtagId);
 
       // Signal an seitenspezifische Conversion-Handler
       window.dispatchEvent(new Event('wsa:ads-ready'));
     }
 
     function loadClarity() {
+      // Clarity (Session-Recording) bleibt STRENG einwilligungspflichtig —
+      // wird nie ohne „Akzeptieren" geladen.
       if (window.wsaClarityLoaded || !clarityId) return;
       window.wsaClarityLoaded = true;
       (function (c, l, a, r, i, t, y) {
@@ -85,35 +112,52 @@ const CLARITY_ID = 'x0475iv4fu';
       })(window, document, 'clarity', 'script', clarityId);
 
       // EEA/UK/CH-Pflicht seit 31.10.2025: Einwilligung aktiv signalisieren.
-      // Ohne dieses Signal läuft Clarity im No-Consent-Modus (jede Seite = neuer
-      // Nutzer) und die Reise LP → Demo zerfällt. Hier nur erreicht, wenn granted.
       window.clarity('consentv2', { ad_Storage: 'granted', analytics_Storage: 'granted' });
     }
 
-    function loadTracking() {
-      loadGtag();
-      loadClarity();
-    }
+    let stored = null;
+    try { stored = localStorage.getItem(STORAGE_KEY); } catch (e) {}
+    const isGranted = stored === 'granted';
 
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored === 'granted') {
-      loadTracking();
-    } else if (stored !== 'denied') {
-      showBanner();
-    }
+    // 1) Default-Consent: alles abgelehnt — IMMER vor dem Tag-Load setzen.
+    gtag('consent', 'default', Object.assign({
+      ad_storage: 'denied',
+      ad_user_data: 'denied',
+      ad_personalization: 'denied',
+      analytics_storage: 'denied',
+      wait_for_update: 500,
+    }, {}));
+    // Datenschutz-Härtung: bei fehlender Ad-Einwilligung Klick-IDs redigieren,
+    // gclid trotzdem per URL durchreichen (bessere Modellierung ohne Cookies).
+    gtag('set', 'ads_data_redaction', true);
+    gtag('set', 'url_passthrough', true);
+
+    // 2) Frühere Zustimmung sofort hochstufen.
+    if (isGranted) gtag('consent', 'update', GRANTED);
+
+    // 3) Tag laden — im Advanced-Modus immer, im Basic-Modus nur bei Zustimmung.
+    if (CONSENT_MODE === 'advanced' || isGranted) loadGtag();
+    if (isGranted) loadClarity();
+
+    // 4) Banner nur zeigen, wenn noch keine Entscheidung getroffen wurde.
+    if (!stored) showBanner();
 
     if (acceptBtn) {
       acceptBtn.addEventListener('click', function () {
-        localStorage.setItem(STORAGE_KEY, 'granted');
+        try { localStorage.setItem(STORAGE_KEY, 'granted'); } catch (e) {}
         hideBanner();
-        loadTracking();
+        gtag('consent', 'update', GRANTED);
+        loadGtag();   // Basic-Modus: jetzt erstmals laden. Advanced: no-op (Guard).
+        loadClarity();
       });
     }
 
     if (denyBtn) {
       denyBtn.addEventListener('click', function () {
-        localStorage.setItem(STORAGE_KEY, 'denied');
+        try { localStorage.setItem(STORAGE_KEY, 'denied'); } catch (e) {}
         hideBanner();
+        // Consent bleibt default-denied. Im Advanced-Modus sendet der bereits
+        // geladene Tag weiter cookielose Pings → modellierte Conversions.
       });
     }
   })();
