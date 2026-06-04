@@ -293,6 +293,9 @@ input.field { line-height: 1.2; }
 .buyer-back{display:none !important}
 .demo-watermark{position:fixed;inset:0;z-index:9999;pointer-events:none;display:flex;align-items:center;justify-content:center;font-family:'Cinzel',serif;font-size:16vw;letter-spacing:.18em;color:rgba(201,162,74,0.16);transform:rotate(-24deg);user-select:none}
 .demo-cta{display:none}
+.buyer-bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center}
+.buyer-btn--buy{background:var(--gold);color:#fff !important;border-color:var(--gold) !important;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.buyer-btn--buy:hover{filter:brightness(1.06)}
 
 /* 65+ / Touch: Hinweis größer & gut lesbar, Felder dauerhaft als "hier tippen" erkennbar */
 .buyer-hint{font-size:12pt !important;color:#2A2826 !important;max-width:148mm;margin-left:auto;margin-right:auto}
@@ -317,9 +320,10 @@ input.field { line-height: 1.2; }
   <a class="buyer-back" href="./">← Zur Auswahl</a>
   <div class="buyer-bar">
     <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
+    <a class="buyer-btn buyer-btn--buy" id="btnBuy" href="https://weddingstoryatelier.etsy.com/de/listing/4510587510/goldene-hochzeit-einladung-zum-ausfullen" target="_blank" rel="noopener" onclick="if(window.clarity){try{window.clarity('event','etsy_klick');}catch(e){}}">Fertige Karte kaufen – 4,55 € →</a>
   </div>
   <p class="buyer-hint">
-    Tippen Sie direkt in die Karte — Namen, Datum und Ort lassen sich sofort ändern. Dies ist eine kostenlose Vorschau zum Ausprobieren; die fertige Karte zum Ausdrucken gibt es im Atelier.
+    Tippen Sie direkt in die Karte und ändern Sie Namen, Datum und Ort. Das hier ist eine kostenlose Vorschau — die fertige Karte zum Ausdrucken erhalten Sie über „Fertige Karte kaufen“.
   </p>
 </div>
 
@@ -369,7 +373,7 @@ input.field { line-height: 1.2; }
 </article>
 
 <script>
-  document.getElementById('btnPrint').addEventListener('click', () => window.print());
+  document.getElementById('btnPrint').addEventListener('click', () => { if (window.clarity) { try { window.clarity('event', 'druck_klick'); } catch (e) {} } window.print(); });
 
   // ===== Autofit: Schriftgröße schrumpfen wenn Text zu breit ===========
   // Misst via verstecktem Span (1:1 Font-Eigenschaften) und reduziert pt
@@ -460,8 +464,8 @@ input.field { line-height: 1.2; }
 
 <div class="demo-cta" aria-hidden="true">
 <p class="demo-cta-k">Wedding Story Atelier</p>
-<h2>Diese Einladung gibt es im Atelier</h2>
-<p>Die Vorschau ist zum Ausprobieren gedacht. Die druckfertige Vorlage zum Ausf&uuml;llen &mdash; A5, Deutsch und English, gedruckt und digital &mdash; gibt es im Atelier.</p>
+<h2>Die fertige Karte zum Drucken</h2>
+<p>Diese Vorschau l&auml;sst sich nicht direkt drucken. Die fertige, ausf&uuml;llbare Karte &mdash; A5, Deutsch und English &mdash; gibt es online zum Kauf:</p>
 <p class="demo-cta-url">weddingstoryatelier.de/einladung-goldene-hochzeit</p>
 </div>
 <script>document.querySelectorAll('input.field').forEach(function(i){i.addEventListener('focus',function(){ setTimeout(function(){ i.select(); }, 0); });});</script>
