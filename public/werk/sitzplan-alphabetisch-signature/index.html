@@ -335,7 +335,7 @@ function parseGuests(raw) {
 function onGuestsInput() {
   const n  = parseGuests(document.getElementById('inp-guests').value).length;
   const el = document.getElementById('guest-count');
-  el.textContent = n + ' Gäste' + (n > 65 ? ' — max. 65 empfohlen' : '');
+  el.textContent = n + ' Einträge' + (n > 65 ? ' — max. 65 Einträge empfohlen' : '');
   el.className   = 'guest-count' + (n > 65 ? ' warn' : '');
   renderPoster();
 }

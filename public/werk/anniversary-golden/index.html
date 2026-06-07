@@ -9,7 +9,7 @@
   <!--
     PHASE-1-BUILD · 2026-05-18
     Fokus: 3-Karten-Set (Einladung + Tagesablauf + Platzkarten), beide Druckvarianten.
-    Schrift: Bodoni Moda (Hero) + Cinzel (ANLASS) + Cormorant Garamond (Body) + DM Sans (UI) + Prata (Canvas-Fallback) — alle lokal aus /Schriftarten/ unter OFL-Lizenz.
+    Schrift: Bodoni Moda (Hero) + Cinzel (ANLASS) + Cormorant Garamond (Body) + DM Sans (UI) + Prata (Canvas-Fallback) — alle lokal aus Schriftarten/ unter OFL-Lizenz.
     Farben: Heimdruck Cream + Antikgold, Druckerei mit 3mm Bleed.
   -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -283,9 +283,9 @@
     /* Tagesablauf nutzt fragmentierten Rahmen wie VS (gleiche .anv-corner/.anv-edge/.anv-gem Klassen) */
     /* Header */
     .anv-sched-anlass {
-      font-family: 'Cormorant Garamond', serif;
-      font-weight: 400; font-size: 10px;
-      letter-spacing: 0.34em; text-transform: uppercase;
+      font-family: 'Cinzel', serif;
+      font-weight: 500; font-size: 9.5px;
+      letter-spacing: 0.28em; text-transform: uppercase;
       color: var(--gold);
       text-align: center;
       margin-bottom: 2px;
@@ -617,10 +617,10 @@
 
     /* Subline "GOLDENE HOCHZEIT" — klein, gespaced */
     .anv-anlass {
-      font-family:'Cormorant Garamond', serif;
-      font-weight: 400;
-      font-size: 11px;
-      letter-spacing: 0.36em;
+      font-family:'Cinzel', serif;
+      font-weight: 500;
+      font-size: 10px;
+      letter-spacing: 0.28em;
       text-transform: uppercase;
       color: var(--gold);
       margin: 6px 0 0;
@@ -1721,7 +1721,7 @@ async function drawHeroNumber() {
   if (!c) return;
   try {
     if (document.fonts && document.fonts.load) {
-      await document.fonts.load(HERO_FONT);
+      await document.fonts.load(HERO_FONT, '50');
     } else if (document.fonts && document.fonts.ready) {
       await document.fonts.ready;
     }
