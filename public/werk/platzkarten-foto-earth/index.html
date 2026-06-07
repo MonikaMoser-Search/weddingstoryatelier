@@ -37,6 +37,15 @@
       border: none; cursor: pointer; padding: 0;
       letter-spacing: 0.04em; flex-shrink: 0;
     }
+    .photo-pos-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 4px;
+    }
+    .photo-pos-label {
+      font-size: 9px; color: #888; letter-spacing: 0.04em; flex-shrink: 0;
+    }
+    .photo-pos-slider {
+      flex: 1; height: 4px; cursor: pointer; accent-color: #A0522D;
+    }
 
     /* ══ RIGHT PANEL ═══════════════════════════════════ */
     .panel-preview { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #ECEAE4; align-items: stretch; padding: 0; justify-content: flex-start; }
@@ -276,6 +285,10 @@
     <span class="photo-filename" id="photo-filename"></span>
     <button class="btn-remove-photo" id="btn-remove-photo" onclick="removePhoto()" style="display:none;">✕ entfernen</button>
   </div>
+  <div class="photo-pos-row" id="photo-pos-row" style="display:none;">
+    <span class="photo-pos-label" id="photo-pos-label"></span>
+    <input type="range" min="0" max="100" value="50" id="photo-pos-slider" class="photo-pos-slider" oninput="setPhotoOffset(this.value)">
+  </div>
 
   <hr class="divider">
 
@@ -363,6 +376,10 @@
   var currentPage   = 0;
   var photoDataURL  = null;
   var photoFileName = '';
+  var photoOriginal = null;       // voll, nur herunterskaliert (kein Crop)
+  var photoAspect   = null;       // Breite/Höhe des Originals
+  var photoOffset   = 50;         // Verschiebung der wirksamen Achse (0–100)
+  var PCARD_R       = 560 / 810;  // Foto-Fenster 2:3 hoch
   var MAX      = 60;
   var PER_PAGE = 6;
 
@@ -379,6 +396,8 @@
       photo:            'Foto',
       photoBtn:         'Foto auswählen …',
       photoRemove:      '✕ entfernen',
+      photoPosH:        'Bildausschnitt horizontal',
+      photoPosV:        'Bildausschnitt vertikal',
       subtitle:         'Zusatzzeile',
       opt:              'optional',
       hintSubtitle:     'Erscheint in Montserrat unter dem Namen — auf allen Karten gleich.',
@@ -415,6 +434,8 @@
       photo:            'Photo',
       photoBtn:         'Choose photo …',
       photoRemove:      '✕ remove',
+      photoPosH:        'Horizontal crop',
+      photoPosV:        'Vertical crop',
       subtitle:         'Subtitle',
       opt:              'optional',
       hintSubtitle:     'Appears in Montserrat below each name — same on all cards.',
@@ -471,39 +492,86 @@
     if (!file) return;
     var reader = new FileReader();
     reader.onload = function(e) {
-      compressPhoto(e.target.result, function(compressed) {
-        photoDataURL  = compressed;
+      downscalePhoto(e.target.result, function(full, aspect) {
+        photoOriginal = full;
+        photoAspect   = aspect;
+        photoOffset   = 50;
         photoFileName = file.name;
         ge('photo-filename').textContent = file.name;
         ge('btn-remove-photo').style.display = '';
-        render();
+        buildPhotoSlider();
+        cropToCard();   // setzt photoDataURL und ruft render()
       });
     };
     reader.readAsDataURL(file);
   }
 
-  function compressPhoto(dataURL, callback) {
+  // Original nur herunterskalieren (kein Crop) — Original bleibt erhalten,
+  // damit der Ausschnitt per Slider verschiebbar ist.
+  function downscalePhoto(dataURL, callback) {
     var img = new Image();
     img.onload = function() {
-      var tW = 560, tH = 810;
-      var srcRatio = img.width / img.height;
-      var tgtRatio = tW / tH;
-      var sx = 0, sy = 0, sw = img.width, sh = img.height;
-      if (srcRatio > tgtRatio) { sw = img.height * tgtRatio; sx = (img.width - sw) / 2; }
-      else                     { sh = img.width / tgtRatio;  sy = (img.height - sh) / 2; }
+      var maxPx = 1400, w = img.width, h = img.height;
+      if (w > maxPx || h > maxPx) {
+        if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+        else        { w = Math.round(w * maxPx / h); h = maxPx; }
+      }
       var c = document.createElement('canvas');
-      c.width = tW; c.height = tH;
-      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, tW, tH);
-      callback(c.toDataURL('image/jpeg', 0.82));
+      c.width = w; c.height = h;
+      c.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(c.toDataURL('image/jpeg', 0.85), img.width / img.height);
     };
     img.src = dataURL;
   }
 
+  // Pre-Crop aufs 2:3-Fenster mit Offset auf der wirksamen Achse
+  // (Querformat → horizontal, Hochformat → vertikal). Kein object-position,
+  // damit html2canvas-Export 1:1 zum Editor passt.
+  function cropToCard() {
+    if (!photoOriginal) { photoDataURL = null; render(); return; }
+    var img = new Image();
+    img.onload = function() {
+      var tW = 560, tH = 810, tgt = tW / tH;
+      var srcR = img.width / img.height;
+      var sx, sy, sw, sh;
+      if (srcR > tgt) {
+        sh = img.height; sw = sh * tgt; sy = 0;
+        sx = (img.width - sw) * (photoOffset / 100);
+      } else {
+        sw = img.width; sh = sw / tgt; sx = 0;
+        sy = (img.height - sh) * (photoOffset / 100);
+      }
+      var c = document.createElement('canvas');
+      c.width = tW; c.height = tH;
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, tW, tH);
+      photoDataURL = c.toDataURL('image/jpeg', 0.82);
+      render();
+    };
+    img.src = photoOriginal;
+  }
+
+  // Nur den Slider zeigen, der mathematisch wirkt: Querformat im
+  // 2:3-Hochfenster → Breite wird beschnitten → horizontal; sonst vertikal.
+  function buildPhotoSlider() {
+    if (photoAspect == null) { ge('photo-pos-row').style.display = 'none'; return; }
+    var horiz = photoAspect > PCARD_R;
+    ge('photo-pos-label').textContent = horiz ? t().photoPosH : t().photoPosV;
+    ge('photo-pos-slider').value = photoOffset;
+    ge('photo-pos-row').style.display = '';
+  }
+
+  function setPhotoOffset(v) {
+    photoOffset = parseInt(v, 10);
+    cropToCard();
+  }
+
   function removePhoto() {
     photoDataURL = null; photoFileName = '';
+    photoOriginal = null; photoAspect = null; photoOffset = 50;
     ge('inp-photo').value = '';
     ge('photo-filename').textContent = '';
     ge('btn-remove-photo').style.display = 'none';
+    ge('photo-pos-row').style.display = 'none';
     render();
   }
 
@@ -529,6 +597,7 @@
     ge('inp-guests').placeholder     = l.guestsPlaceholder;
     ge('photo-btn-text').textContent = l.photoBtn;
     ge('btn-remove-photo').textContent = l.photoRemove;
+    if (photoAspect != null) buildPhotoSlider();
     ge('lbl-output').textContent     = l.outputLabel;
     ge('btn-out-home').textContent   = l.outBtnHome;
     ge('btn-out-print').textContent  = l.outBtnPrint;

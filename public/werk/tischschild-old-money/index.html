@@ -18,6 +18,10 @@
     }
     .theme-dot.active { border-color: #1A1A1A; }
     .theme-dot:hover  { transform: scale(1.12); }
+    .design-hint {
+      font-size: 9px; font-style: italic; color: #8B1A35;
+      opacity: 0.85; line-height: 1.3; margin: 4px 0 2px;
+    }
 
     /* ── Tisch-Zeilen ── */
     .table-rows { display: flex; flex-direction: column; gap: 5px; margin-top: 4px; }
@@ -66,7 +70,7 @@
     .photo-y-wrap {
       flex-shrink: 0; display: flex; align-items: center;
     }
-    .photo-y-slider {
+    .photo-y-slider, .photo-x-slider {
       width: 58px; height: 4px; cursor: pointer;
       accent-color: #8B1A35;
     }
@@ -153,11 +157,18 @@
     .card-name.len-m   { font-size: 28pt; } /* 6–9 Zeichen */
     .card-name.len-l   { font-size: 22pt; } /* 10+ Zeichen */
 
-    /* Foto — 3:4 Fenster, zentriert, unten */
-    .card-photo {
-      width: 95mm; height: 127mm;   /* festes 3:4-Fenster */
+    /* Foto — 3:4 Fenster, zentriert, unten — Wrapper für Schmuckecken */
+    .card-photo-wrap {
+      position: relative;
+      width: 95mm; height: 127mm;
       margin: 0 auto 3.5mm;
-      flex-shrink: 0; overflow: hidden;
+      flex-shrink: 0;
+      --cm-off: 3mm;
+      --cm-line: 14mm;
+    }
+    .card-photo {
+      width: 100%; height: 100%;
+      overflow: hidden; position: relative; z-index: 1;
     }
     .card-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
     .card-photo-empty {
@@ -167,6 +178,41 @@
       font-size: 7px; letter-spacing: 2.5px; text-transform: uppercase;
       opacity: 0.18;
       border-top: 1px dashed rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.2);
+    }
+
+    /* Doppel-L Schmuckecken — oben-rechts + unten-links, in Themenfarbe */
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off) + var(--cm-line));
+      height: calc(var(--cm-off) + var(--cm-line));
+      pointer-events: none; z-index: 3;
+    }
+    .corner-mark::before,
+    .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line); height: var(--cm-line);
+    }
+    .corner-mark.tr { top: calc(-1 * var(--cm-off)); right: calc(-1 * var(--cm-off)); }
+    .corner-mark.tr::before {
+      top: 0; right: 0;
+      border-top:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-right: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.tr::after {
+      top: var(--cm-off); right: var(--cm-off);
+      border-top:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-right: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.bl { bottom: calc(-1 * var(--cm-off)); left: calc(-1 * var(--cm-off)); }
+    .corner-mark.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-left:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+    }
+    .corner-mark.bl::after {
+      bottom: var(--cm-off); left: var(--cm-off);
+      border-bottom: 0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
+      border-left:   0.4px solid rgba(var(--tc-r), var(--tc-g), var(--tc-b), 0.40);
     }
   </style>
 </head>
@@ -191,6 +237,7 @@
     <button type="button" class="theme-dot" data-theme="forest"
       style="background:#1F4A32" title="Forest"  onclick="setTheme('forest')"></button>
   </div>
+  <div class="design-hint" id="lbl-sec1-note">Burgund passt nicht zu jedem Bild — finde hier deine Farbe.</div>
 
   <label class="section-label">2 · Format</label>
   <select id="sel-format" onchange="onFormatChange()">
@@ -256,8 +303,12 @@
             </div>
             <div class="card-name" id="prev-name">ITALIEN</div>
           </div>
-          <div class="card-photo" id="prev-photo" style="display:none">
-            <div class="card-photo-empty">Foto optional</div>
+          <div class="card-photo-wrap" id="prev-photo-wrap" style="display:none">
+            <div class="card-photo" id="prev-photo">
+              <div class="card-photo-empty">Foto optional</div>
+            </div>
+            <div class="corner-mark tr"></div>
+            <div class="corner-mark bl"></div>
           </div>
         </div>
       </div>
@@ -272,6 +323,7 @@
 const T = {
   de: {
     tagline:      'Tischschild · Old Money Line',
+    sec1note:     'Burgund passt nicht zu jedem Bild — finde hier deine Farbe.',
     sec3note:     'optional — z. B. Tisch, Table, Movie …',
     sec5:         '5 · Tische — Durchgang 1–10',
     prefixDefault: 'Tisch',
@@ -280,6 +332,7 @@ const T = {
     fotoBtnAdd:   '+ Foto',   fotoBtnHas:   '✓ Foto',
     fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
     sliderTitle:  'Bildausschnitt vertikal',
+    sliderTitleH: 'Bildausschnitt horizontal',
     btnRm:        'Foto entfernen',
     btnExport:    'PDF exportieren',
     outputLabel:  'Modus',
@@ -290,6 +343,7 @@ const T = {
   },
   en: {
     tagline:      'Table Sign · Old Money Line',
+    sec1note:     'Burgundy does not suit every photo — find your colour here.',
     sec3note:     'optional — e. g. Table, Movie, Zone …',
     sec5:         '5 · Tables — Batch 1–10',
     prefixDefault: 'Table',
@@ -298,6 +352,7 @@ const T = {
     fotoBtnAdd:   '+ Photo', fotoBtnHas:   '✓ Photo',
     fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
     sliderTitle:  'Vertical crop',
+    sliderTitleH: 'Horizontal crop',
     btnRm:        'Remove photo',
     btnExport:    'Export PDF',
     outputLabel:  'Mode',
@@ -316,10 +371,14 @@ let currentTheme = 'burgund';
 let currentCard  = 0;
 let currentLang  = 'de';
 
+const FRAME_R = 95 / 127;   // Foto-Fenster 95×127 mm (3:4 hoch)
+
 const tables = Array.from({length: 10}, () => ({
   name:   '',
   photo:  null,   // base64-String oder null
   photoY: 50,     // 0–100: vertikaler Fokus (0 = oben, 100 = unten)
+  photoX: 50,     // 0–100: horizontaler Fokus (0 = links, 100 = rechts)
+  photoAspect: null,
 }));
 
 // ════════════════════════════════════════════════════════
@@ -398,24 +457,30 @@ function buildTableRows() {
     fi.type = 'file'; fi.accept = 'image/*';
     fi.onchange = async (e) => {
       if (!e.target.files[0]) return;
-      tables[i].photo = await compressImage(e.target.files[0], 1600, 0.85);
+      const data = await compressImage(e.target.files[0], 1600, 0.85);
+      tables[i].photo = data;
+      tables[i].photoAspect = await imgAspect(data);
       currentCard = i;
       buildTableRows(); renderPreview(); updateNav();
     };
     btnP.appendChild(fi);
     row.appendChild(btnP);
 
-    // Entfernen-Button + Y-Regler (nur wenn Foto vorhanden)
+    // Entfernen-Button + Regler (nur wenn Foto vorhanden).
+    // Nur den Slider zeigen, der mathematisch wirkt: Querformat im
+    // 3:4-Hochrahmen → Breite wird beschnitten → X; sonst Y.
     if (t.photo) {
+      const horiz = (t.photoAspect != null) && (t.photoAspect > FRAME_R);
       const yWrap = document.createElement('div');
       yWrap.className = 'photo-y-wrap';
       const slider = document.createElement('input');
       slider.type = 'range'; slider.min = '0'; slider.max = '100';
-      slider.value = t.photoY ?? 50;
-      slider.className = 'photo-y-slider';
-      slider.title = tt().sliderTitle;
+      slider.value = horiz ? (t.photoX ?? 50) : (t.photoY ?? 50);
+      slider.className = horiz ? 'photo-x-slider' : 'photo-y-slider';
+      slider.title = horiz ? tt().sliderTitleH : tt().sliderTitle;
       slider.oninput = (e) => {
-        tables[i].photoY = parseInt(e.target.value);
+        if (horiz) tables[i].photoX = parseInt(e.target.value);
+        else       tables[i].photoY = parseInt(e.target.value);
         if (i === currentCard) renderPreview();
       };
       yWrap.appendChild(slider);
@@ -445,6 +510,7 @@ function setLang(lang, btn) {
   btn.classList.add('active');
   const t = tt();
   document.getElementById('lbl-tagline').textContent    = t.tagline;
+  document.getElementById('lbl-sec1-note').textContent  = t.sec1note;
   document.getElementById('lbl-sec3-note').textContent  = t.sec3note;
   document.getElementById('lbl-sec5').textContent       = t.sec5;
   document.getElementById('inp-prefix').placeholder     = t.prefixPH;
@@ -516,13 +582,15 @@ function renderPreview() {
   nameEl.className = 'card-name ' + (l <= 2 ? 'len-xs' : l <= 5 ? 'len-s' : l <= 9 ? 'len-m' : 'len-l');
 
   // Foto — nur anzeigen wenn vorhanden (sonst zentriert sich Text im ganzen Bereich)
-  const photoEl = document.getElementById('prev-photo');
+  const photoEl   = document.getElementById('prev-photo');
+  const photoWrap = document.getElementById('prev-photo-wrap');
   if (t.photo) {
     const yPos = t.photoY ?? 50;
-    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:center ${yPos}%">`;
-    photoEl.style.display = '';
+    const xPos = t.photoX ?? 50;
+    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:${xPos}% ${yPos}%">`;
+    photoWrap.style.display = '';
   } else {
-    photoEl.style.display = 'none';
+    photoWrap.style.display = 'none';
   }
 
   updateNav();
@@ -590,7 +658,15 @@ function exportPDF() {
 }
 
 // Foto auf Ziel-Seitenverhältnis zuschneiden (canvas-basiert)
-function cropPhoto(base64, targetW, targetH, yPercent) {
+function imgAspect(base64) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img.width / img.height);
+    img.src = base64;
+  });
+}
+
+function cropPhoto(base64, targetW, targetH, yPercent, xPercent) {
   return new Promise(resolve => {
     const img = new Image();
     img.onload = () => {
@@ -598,9 +674,11 @@ function cropPhoto(base64, targetW, targetH, yPercent) {
       const tgtR = targetW / targetH;
       let sx, sy, sw, sh;
       if (srcR > tgtR) {
-        // Bild breiter als Fenster → links/rechts abschneiden, horizontal zentriert
+        // Bild breiter als Fenster → links/rechts nach xPercent schneiden
         sh = img.height; sw = sh * tgtR;
-        sx = (img.width - sw) / 2; sy = 0;
+        sy = 0;
+        const maxX = img.width - sw;
+        sx = maxX * ((xPercent ?? 50) / 100);
       } else {
         // Bild höher als Fenster → vertikal nach yPercent schneiden
         sw = img.width; sh = sw / tgtR;
@@ -787,8 +865,26 @@ async function exportPDF_vector() {
 
     // ── Foto (zugeschnitten nach Position) ──
     if (t.photo) {
-      const cropped = await cropPhoto(t.photo, photoW, photoH, t.photoY ?? 50);
+      const cropped = await cropPhoto(t.photo, photoW, photoH, t.photoY ?? 50, t.photoX ?? 50);
       pdf.addImage(cropped, 'JPEG', photoX, photoY, photoW, photoH);
+
+      // ── Schmuckecken: Doppel-L oben-rechts + unten-links ──
+      const cmOff  = 3  * fS;
+      const cmLine = 14 * fS;
+      sd(bl(tc, 0.40));
+      pdf.setLineWidth(Math.max(0.15 * fS, 0.08));
+      // oben-rechts: äußeres L
+      pdf.line(photoX + photoW + cmOff - cmLine, photoY - cmOff, photoX + photoW + cmOff, photoY - cmOff);
+      pdf.line(photoX + photoW + cmOff,          photoY - cmOff, photoX + photoW + cmOff, photoY - cmOff + cmLine);
+      // oben-rechts: inneres L
+      pdf.line(photoX + photoW - cmLine, photoY, photoX + photoW, photoY);
+      pdf.line(photoX + photoW,          photoY, photoX + photoW, photoY + cmLine);
+      // unten-links: äußeres L
+      pdf.line(photoX - cmOff, photoY + photoH + cmOff,          photoX - cmOff + cmLine, photoY + photoH + cmOff);
+      pdf.line(photoX - cmOff, photoY + photoH + cmOff,          photoX - cmOff,          photoY + photoH + cmOff - cmLine);
+      // unten-links: inneres L
+      pdf.line(photoX, photoY + photoH, photoX + cmLine, photoY + photoH);
+      pdf.line(photoX, photoY + photoH, photoX,          photoY + photoH - cmLine);
     }
   }
 

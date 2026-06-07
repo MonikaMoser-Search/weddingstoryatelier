@@ -58,7 +58,7 @@
       position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
     }
     .photo-y-wrap { flex-shrink: 0; display: flex; align-items: center; }
-    .photo-y-slider {
+    .photo-y-slider, .photo-x-slider {
       width: 52px; height: 4px; cursor: pointer; accent-color: #A0522D;
     }
     .btn-rm {
@@ -418,6 +418,7 @@ var T = {
     fotoBtnAdd: '+ Foto',  fotoBtnHas: '✓ Foto',
     fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
     sliderTitle: 'Bildausschnitt vertikal',
+    sliderTitleH: 'Bildausschnitt horizontal',
     btnRm:      'Foto entfernen',
     btnSort:    'A–Z',
     btnDel:     'entfernen',
@@ -448,6 +449,7 @@ var T = {
     fotoBtnAdd: '+ Photo', fotoBtnHas: '✓ Photo',
     fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
     sliderTitle: 'Vertical crop',
+    sliderTitleH: 'Horizontal crop',
     btnRm:      'Remove photo',
     btnSort:    'A–Z',
     btnDel:     'remove',
@@ -486,7 +488,7 @@ var MAX_TABLES   = 8;
 var tables = [];
 
 function makeTable() {
-  return { name: '', photo: null, photoY: 50, names: '', sorted: false };
+  return { name: '', photo: null, photoY: 50, photoX: 50, photoAspect: null, names: '', sorted: false };
 }
 
 // ════════════════════════════════════════════════════════════
@@ -593,26 +595,34 @@ function buildTableBlocks() {
     fi.onchange = (function(idx){ return function(e){
       if (!e.target.files[0]) return;
       compressImage(e.target.files[0], 1600, 0.85).then(function(data){
-        tables[idx].photo = data;
-        setCurrentCard(idx);
-        buildTableBlocks(); renderPreview();
+        return imgAspect(data).then(function(asp){
+          tables[idx].photo = data;
+          tables[idx].photoAspect = asp;
+          setCurrentCard(idx);
+          buildTableBlocks(); renderPreview();
+        });
       });
     }; })(i);
     btnP.appendChild(fi);
     head.appendChild(btnP);
 
     if (t.photo) {
+      // Nur den Slider zeigen, der mathematisch wirkt: Querformat im
+      // 93:102-Fenster → Breite wird beschnitten → X; sonst Y.
+      var horiz = (t.photoAspect != null) && (t.photoAspect > FRAME_R);
       var yWrap = document.createElement('div');
       yWrap.className = 'photo-y-wrap';
       var slider = document.createElement('input');
       slider.type = 'range'; slider.min = '0'; slider.max = '100';
-      slider.value = t.photoY != null ? t.photoY : 50;
-      slider.className = 'photo-y-slider';
-      slider.title = tt().sliderTitle;
-      slider.oninput = (function(idx){ return function(e){
-        tables[idx].photoY = parseInt(e.target.value);
+      slider.value = horiz ? (t.photoX != null ? t.photoX : 50)
+                           : (t.photoY != null ? t.photoY : 50);
+      slider.className = horiz ? 'photo-x-slider' : 'photo-y-slider';
+      slider.title = horiz ? tt().sliderTitleH : tt().sliderTitle;
+      slider.oninput = (function(idx, isH){ return function(e){
+        if (isH) tables[idx].photoX = parseInt(e.target.value);
+        else     tables[idx].photoY = parseInt(e.target.value);
         if (idx === currentCard) renderPreview();
-      }; })(i);
+      }; })(i, horiz);
       yWrap.appendChild(slider);
       head.appendChild(yWrap);
 
@@ -620,7 +630,7 @@ function buildTableBlocks() {
       btnR.type = 'button'; btnR.className = 'btn-rm'; btnR.title = tt().btnRm;
       btnR.textContent = '×';
       btnR.onclick = (function(idx){ return function(){
-        tables[idx].photo = null; tables[idx].photoY = 50;
+        tables[idx].photo = null; tables[idx].photoY = 50; tables[idx].photoX = 50; tables[idx].photoAspect = null;
         buildTableBlocks();
         if (idx === currentCard) renderPreview();
       }; })(i);
@@ -820,7 +830,8 @@ function renderPreview() {
 
   if (t.photo) {
     var yPos = t.photoY != null ? t.photoY : 50;
-    photoEl.innerHTML = '<img src="' + t.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;object-position:center ' + yPos + '%">';
+    var xPos = t.photoX != null ? t.photoX : 50;
+    photoEl.innerHTML = '<img src="' + t.photo + '" alt="" style="width:100%;height:100%;object-fit:cover;display:block;object-position:' + xPos + '% ' + yPos + '%">';
   } else {
     photoEl.innerHTML = '<div class="photo-placeholder"><span id="lbl-photo-ph">' + esc(tt().photoPH) + '</span></div>';
   }
@@ -892,7 +903,17 @@ function loadDemo() {
 // ════════════════════════════════════════════════════════════
 // FOTO ZUSCHNEIDEN
 // ════════════════════════════════════════════════════════════
-function cropPhoto(base64, targetW, targetH, yPercent) {
+var FRAME_R = 93 / 102;   // Foto-Fenster 93×102 mm (near-square)
+
+function imgAspect(base64) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() { resolve(img.width / img.height); };
+    img.src = base64;
+  });
+}
+
+function cropPhoto(base64, targetW, targetH, yPercent, xPercent) {
   return new Promise(function(resolve) {
     var img = new Image();
     img.onload = function() {
@@ -901,7 +922,9 @@ function cropPhoto(base64, targetW, targetH, yPercent) {
       var sx, sy, sw, sh;
       if (srcR > tgtR) {
         sh = img.height; sw = sh * tgtR;
-        sx = (img.width - sw) / 2; sy = 0;
+        sy = 0;
+        var maxX = img.width - sw;
+        sx = maxX * ((xPercent != null ? xPercent : 50) / 100);
       } else {
         sw = img.width; sh = sw / tgtR;
         sx = 0;
@@ -1029,7 +1052,7 @@ async function exportPDF_vector() {
       pdf.rect(bx+fi, by+fi, baseW-fi*2, baseH-fi*2, 'S');
 
       // ── Foto ──
-      var cropped = await cropPhoto(t.photo, photoAreaW, photoAreaH, t.photoY != null ? t.photoY : 50);
+      var cropped = await cropPhoto(t.photo, photoAreaW, photoAreaH, t.photoY != null ? t.photoY : 50, t.photoX != null ? t.photoX : 50);
       pdf.addImage(cropped, 'JPEG', photoX, photoTopY, photoAreaW, photoAreaH);
 
       // ── Eckenmarken: doppeltes versetztes Rechteck, TR + BL ──
