@@ -1,0 +1,301 @@
+---
+import Layout from '../../layouts/Layout.astro';
+
+const title = 'Gästeliste Hochzeit verwalten — ohne Excel-Hölle';
+const description = 'WhatsApp, Excel, ein Notizblock — und niemand weiß mehr, wer zusagt hat. Wie du die Gästeliste deiner Hochzeit so führst, dass sie in alles andere weiterfließt, statt dreimal getippt zu werden.';
+const ogImage = '/images/gaesteliste-ohne-excel-hero.png';
+---
+
+<Layout title={title} description={description} image={ogImage} ogType="article" publishedTime="2026-06-07T00:00:00+00:00">
+  <header class="absolute top-0 left-0 right-0 z-10 px-8 py-6 md:px-16">
+    <nav class="flex items-center justify-between text-sm tracking-wide">
+      <a href="/" class="serif text-xl">Wedding Story Atelier</a>
+      <ul class="hidden md:flex gap-10 text-ink-muted">
+        <li><a href="/ueber-das-atelier" class="hover:text-ink transition-colors">Über das Atelier</a></li>
+        <li><a href="/journal" class="hover:text-ink transition-colors">Journal</a></li>
+        <li><a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <article class="px-6 md:px-16 pt-32 pb-24 article-body">
+    <div class="max-w-2xl mx-auto">
+      <p class="text-xs tracking-[0.3em] uppercase text-ink-muted mb-6">
+        Journal · System · 7. Juni 2026
+      </p>
+      <h1 class="serif text-4xl md:text-6xl leading-[1.1] mb-10">
+        Gästeliste verwalten <em class="text-cognac">— ohne Excel-Hölle</em>
+      </h1>
+
+      <p class="text-lg leading-relaxed mb-8 lead">
+        Die Zusage von Tante Renate steht in WhatsApp. Die Adresse der Müllers in einem alten Mail-Anhang. Wer vegetarisch isst, hat dir jemand mündlich gesagt. Und der Excel-Sheet, den du angelegt hast, ist seit drei Wochen nicht mehr aktuell. Das ist nicht zu viel Aufwand — das ist zu wenig System.
+      </p>
+      <p class="leading-relaxed mb-12">
+        Die Gästeliste ist die heimliche Schaltzentrale der ganzen Hochzeit. Aus ihr entstehen die Einladungen, die Tischordnung, der Sitzplan, die Platzkarten, die Catering-Zahlen. Wenn sie an einem Ort sauber steht, läuft alles andere leichter. Wenn sie auf fünf Orte verteilt ist, tippst du dieselben Namen wieder und wieder ein.
+      </p>
+    </div>
+
+    <!-- Hero-Bild -->
+    <figure class="my-16 max-w-4xl mx-auto">
+      <img
+        src="/images/gaesteliste-ohne-excel-hero.png"
+        alt="Handgeschriebene Hochzeits-Gästeliste auf Naturpapier neben Platzkarte und einem skizzierten Sitzplan"
+        width="896"
+        height="1200"
+        class="w-full h-auto"
+        loading="lazy"
+      />
+      <figcaption class="text-xs text-center text-ink-muted mt-4 italic">Eine Liste, viele Werke — die Namen werden einmal eingegeben, nicht fünfmal.</figcaption>
+    </figure>
+
+    <div class="max-w-2xl mx-auto">
+
+      <h2 class="serif text-3xl md:text-4xl mt-8 mb-6">Warum die Excel-Hölle entsteht</h2>
+      <div class="snippet-box">
+        <strong>Eine Gästeliste für die Hochzeit verwaltest du am besten an einem einzigen Ort, mit festen Spalten — und so, dass sie in alle folgenden Schritte weiterfließt, statt überall neu getippt zu werden.</strong> Das Problem ist selten die Liste selbst. Es ist die Verteilung über WhatsApp, Mail, Notizblock und Kopf — und dass jede dieser Quellen einen anderen Stand hat.
+      </div>
+      <p class="leading-relaxed mt-6 mb-4">
+        Klassische Tabellen wachsen wild: eine Spalte hier, eine Notiz da, drei Versionen mit Namen wie „Gästeliste_final_NEU_2". Niemand entscheidet das bewusst — es passiert einfach, weil eine Hochzeit über Monate läuft und an vielen Stellen gleichzeitig Informationen ankommen.
+      </p>
+      <p class="leading-relaxed">
+        Der Ausweg ist kein neues Tool, sondern eine Entscheidung: ein Ort, feste Spalten, und ein Format, das die nächsten Schritte schon mitdenkt.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Die Spalten, die du wirklich brauchst</h2>
+      <p class="leading-relaxed mb-4">
+        Mehr Spalten heißt nicht mehr Überblick. Diese sechs tragen die ganze Hochzeit:
+      </p>
+      <ol class="leading-relaxed mb-4 pl-5 list-decimal">
+        <li class="mb-3"><strong>Name</strong> — so, wie er später auf der Platzkarte stehen soll. Nicht „Müllers", sondern „Anna und Thomas Müller".</li>
+        <li class="mb-3"><strong>Haushalt</strong> — wer bekommt gemeinsam eine Einladung? Diese eine Spalte spart dir später das Sortieren von Hand.</li>
+        <li class="mb-3"><strong>Adresse</strong> — vollständig, einmal sauber. Das ist die Spalte, die du am Ende am dringendsten brauchst und am seltensten gepflegt hast.</li>
+        <li class="mb-3"><strong>Status</strong> — eingeladen / zugesagt / abgesagt. Drei Worte, kein Roman.</li>
+        <li class="mb-3"><strong>Besonderheiten</strong> — vegetarisch, Kinderstuhl, Rollstuhl. Alles, was Catering und Tischordnung wissen müssen.</li>
+        <li class="mb-3"><strong>Tisch</strong> — bleibt am Anfang leer und füllt sich später fast von selbst, wenn der Rest stimmt.</li>
+      </ol>
+      <p class="leading-relaxed">
+        Beim Testen mit einer Demo-Gästeliste aus dreißig Namen ist uns aufgefallen, wie viel die Spalte „Haushalt" allein bewirkt. Sobald klar ist, wer zusammengehört, ordnet sich die halbe Tischlogik von selbst — und die Einladungen lassen sich in einem Rutsch adressieren, statt Paar für Paar zusammengesucht zu werden.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Einmal eingeben, überall genutzt</h2>
+      <p class="leading-relaxed mb-4">
+        Der eigentliche Hebel liegt nicht im Führen der Liste, sondern in dem, was danach kommt. Aus denselben Namen entstehen nacheinander:
+      </p>
+      <p class="leading-relaxed mb-4">
+        die <strong>Adressen</strong> für die Einladungen, der <strong>Sitzplan</strong> für den Eingang, die <strong>Platzkarten</strong> für die Tische, die <strong>Zahlen</strong> fürs Catering. Wer die Liste sauber führt, gibt jeden Namen genau einmal ein. Wer sie verteilt führt, tippt „Familie Müller" am Ende viermal — und macht beim dritten Mal den Tippfehler, der auf der Platzkarte landet.
+      </p>
+      <p class="leading-relaxed">
+        Während wir die Atelier-Werke entwickelt haben, war das die wiederkehrende Beobachtung: Nicht das Gestalten kostet die meiste Zeit, sondern das erneute Eintippen derselben Daten an der nächsten Station. Genau dort entsteht die gefühlte Überforderung — nicht beim Schönmachen.
+      </p>
+
+      <!-- Mid-Article CTA -->
+      <aside class="mid-cta">
+        <p class="cta-eyebrow">Live im Browser</p>
+        <p class="cta-text">Wie aus einer Liste ein fertiges Werk wird, siehst du am schnellsten am <strong>Sitzplan</strong> im Atelier — eine Live-Demo direkt im Browser. Namen rein, und du siehst sofort, wie der fertige Plan aussieht. Keine Anmeldung, kein Download.</p>
+        <a href="/atelier/sitzplan.html" class="cta-btn" target="_blank" rel="noopener">Live Preview öffnen →</a>
+      </aside>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">In drei Schritten aus dem Chaos</h2>
+      <ol class="leading-relaxed mb-4 pl-5 list-decimal">
+        <li class="mb-3"><strong>Sammle an einem Ort.</strong> Eine Tabelle, sechs Spalten. Trag einmal alles ein, was du an verschiedenen Stellen hast — WhatsApp, Mail, Kopf. Eine Stunde, die du nie wieder doppelt machst.</li>
+        <li class="mb-3"><strong>Pflege den Status sofort.</strong> Eine Zusage kommt rein? Direkt in die Liste, nicht „später". „Später" ist der Anfang der Excel-Hölle.</li>
+        <li class="mb-3"><strong>Lass die Liste arbeiten.</strong> Wenn Adressen, Sitzplan und Platzkarten gebraucht werden, ist die Vorarbeit schon getan — du überträgst, statt neu zu sammeln.</li>
+      </ol>
+      <p class="leading-relaxed">
+        Das ist die ganze Idee hinter einem Hochzeitssystem: einmal eingeben, überall nutzen. Genau daran arbeiten wir gerade für die Zukunft des Ateliers — eine Stelle, an der die Gästeliste lebt und in jedes Werk weiterfließt. Bis dahin bringt schon eine sauber geführte Tabelle den größten Teil dieses Effekts.
+      </p>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Häufige Fragen</h2>
+
+      <div class="faq">
+        <h3>Wie verwalte ich die Gästeliste für meine Hochzeit am besten?</h3>
+        <p>An einem einzigen Ort mit festen Spalten: Name, Haushalt, Adresse, Status, Besonderheiten und Tisch. Entscheidend ist, jede Information sofort einzutragen statt sie über WhatsApp, Mail und Notizblock zu verteilen — und ein Format zu wählen, aus dem später Einladungen, Sitzplan und Platzkarten direkt entstehen können.</p>
+
+        <h3>Welche Spalten braucht eine Gästeliste für die Hochzeit?</h3>
+        <p>Sechs reichen: Name (so wie er auf der Platzkarte stehen soll), Haushalt (wer gemeinsam eingeladen wird), vollständige Adresse, Status (eingeladen / zugesagt / abgesagt), Besonderheiten (vegetarisch, Kinderstuhl, Barrierefreiheit) und Tisch. Mehr Spalten schaffen selten mehr Überblick.</p>
+
+        <h3>Excel oder App für die Hochzeits-Gästeliste?</h3>
+        <p>Eine saubere Tabelle reicht für den Anfang vollkommen, solange sie an einem Ort steht und konsequent gepflegt wird. Der eigentliche Gewinn entsteht, wenn die Liste in die nächsten Schritte weiterfließt — Adressen, Sitzplan, Platzkarten — ohne dass die Namen erneut eingetippt werden müssen. Genau das ist der Unterschied zwischen einer Tabelle und einem System.</p>
+
+        <h3>Wie vermeide ich, dieselben Namen mehrfach einzutippen?</h3>
+        <p>Indem die Gästeliste das Quellformat für alle weiteren Werke ist. Wer Namen, Haushalt und Adresse einmal sauber erfasst, überträgt sie für Einladungen, Sitzplan und Platzkarten nur noch, statt sie neu zu sammeln. Das spart nicht nur Zeit, sondern verhindert auch die Tippfehler, die sonst auf der gedruckten Karte landen.</p>
+      </div>
+
+      <h2 class="serif text-3xl md:text-4xl mt-16 mb-6">Zum Atelier</h2>
+      <p class="leading-relaxed mb-6">
+        Wenn du sehen willst, wie aus deiner Liste ein fertiges Werk wird: das <a href="/" class="cognac-link">Wedding Story Atelier</a> zeigt seine Werke als Live-Demos im Browser. Wie du dich beim Sitzplan zwischen den Logiken entscheidest, zeigt <a href="/journal/sitzplan-hochzeit-alphabetisch-oder-nach-tischen" class="cognac-link">Sitzplan Hochzeit: alphabetisch oder nach Tischen?</a>, und das große Bild dahinter zeichnet der Pillar-Artikel <a href="/journal/hochzeit-organisieren-ohne-chaos-system" class="cognac-link">Hochzeit organisieren ohne Chaos</a>.
+      </p>
+      <p class="serif text-xl italic text-ink-muted text-center mt-10">Die Gästeliste ist keine lästige Tabelle. Sie ist das Fundament, auf dem alles andere leichter wird.</p>
+
+      <aside class="atelier-signature">
+        <p class="atelier-signature-label">Aus dem Atelier</p>
+        <p class="atelier-signature-text">
+          Wedding Story Atelier — kleines Atelier in Leimen. Editorial-Hochzeitspapeterie als interaktive Live-Demos und druckfertige PDF-Vorlagen. Jedes Werk wird während der Entwicklung selbst gedruckt, bis das Ergebnis auf Papier sitzt.
+        </p>
+        <p class="atelier-signature-author">
+          <strong>Monika Moser</strong> &nbsp;·&nbsp; <a href="/journal" class="cognac-link">Weitere Notizen im Journal</a>
+        </p>
+      </aside>
+    </div>
+  </article>
+
+  <footer class="px-8 md:px-16 py-12 text-center border-t border-sand">
+    <p class="serif text-xl mb-3">Wedding Story Atelier</p>
+    <p class="text-xs tracking-[0.2em] uppercase text-ink-muted">
+      <a href="/impressum" class="hover:text-ink transition-colors">Impressum</a>
+      <span class="mx-3">·</span>
+      <a href="/datenschutz" class="hover:text-ink transition-colors">Datenschutz</a>
+      <span class="mx-3">·</span>
+      <a href="/kontakt" class="hover:text-ink transition-colors">Kontakt</a>
+    </p>
+  </footer>
+</Layout>
+
+<!-- JSON-LD Article Schema für SEO/GEO -->
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "Gästeliste verwalten ohne Excel-Hölle",
+  "description": description,
+  "image": "https://weddingstoryatelier.de/images/gaesteliste-ohne-excel-hero.png",
+  "author": { "@type": "Organization", "name": "Wedding Story Atelier" },
+  "publisher": { "@type": "Organization", "name": "Wedding Story Atelier", "url": "https://weddingstoryatelier.de" },
+  "datePublished": "2026-06-07",
+  "dateModified": "2026-06-07",
+  "mainEntityOfPage": "https://weddingstoryatelier.de/journal/gaesteliste-hochzeit-verwalten-ohne-excel",
+  "inLanguage": "de-DE"
+})} />
+
+<script type="application/ld+json" set:html={JSON.stringify({
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Wie verwalte ich die Gästeliste für meine Hochzeit am besten?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "An einem einzigen Ort mit festen Spalten: Name, Haushalt, Adresse, Status, Besonderheiten und Tisch. Entscheidend ist, jede Information sofort einzutragen statt sie über WhatsApp, Mail und Notizblock zu verteilen — und ein Format zu wählen, aus dem später Einladungen, Sitzplan und Platzkarten direkt entstehen können."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Welche Spalten braucht eine Gästeliste für die Hochzeit?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sechs reichen: Name (so wie er auf der Platzkarte stehen soll), Haushalt (wer gemeinsam eingeladen wird), vollständige Adresse, Status (eingeladen / zugesagt / abgesagt), Besonderheiten (vegetarisch, Kinderstuhl, Barrierefreiheit) und Tisch. Mehr Spalten schaffen selten mehr Überblick."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Excel oder App für die Hochzeits-Gästeliste?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Eine saubere Tabelle reicht für den Anfang vollkommen, solange sie an einem Ort steht und konsequent gepflegt wird. Der eigentliche Gewinn entsteht, wenn die Liste in die nächsten Schritte weiterfließt — Adressen, Sitzplan, Platzkarten — ohne dass die Namen erneut eingetippt werden müssen. Genau das ist der Unterschied zwischen einer Tabelle und einem System."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Wie vermeide ich, dieselben Namen mehrfach einzutippen?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Indem die Gästeliste das Quellformat für alle weiteren Werke ist. Wer Namen, Haushalt und Adresse einmal sauber erfasst, überträgt sie für Einladungen, Sitzplan und Platzkarten nur noch, statt sie neu zu sammeln. Das spart nicht nur Zeit, sondern verhindert auch die Tippfehler, die sonst auf der gedruckten Karte landen."
+      }
+    }
+  ]
+})} />
+
+<style>
+  .article-body .lead { font-size: 1.25rem; color: var(--color-ink); }
+  .article-body p { color: var(--color-ink); }
+  .article-body strong { font-weight: 500; color: var(--color-ink); }
+
+  .snippet-box {
+    background: var(--color-cream);
+    border-left: 3px solid var(--color-cognac);
+    padding: 1.5rem 1.75rem;
+    margin: 1rem 0;
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+
+  .mid-cta {
+    background: linear-gradient(180deg, #FAF7F2 0%, #F3EDE3 100%);
+    border: 1px solid #E5DCC9;
+    padding: 2rem 2rem 1.75rem;
+    margin: 3.5rem 0;
+    text-align: center;
+  }
+  .cta-eyebrow {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 0.75rem;
+  }
+  .cta-text {
+    font-family: var(--font-serif);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--color-ink);
+    margin-bottom: 1.5rem;
+  }
+  .cta-btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: var(--color-ink);
+    color: var(--color-paper);
+    font-family: var(--font-serif);
+    font-size: 0.85rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+
+  .faq h3 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .faq p { margin-bottom: 0.5rem; }
+
+  .cognac-link {
+    color: var(--color-cognac);
+    border-bottom: 1px solid currentColor;
+    text-decoration: none;
+  }
+  .cognac-link:hover { color: var(--color-ink); }
+
+  .atelier-signature {
+    margin-top: 4rem;
+    padding-top: 2.5rem;
+    border-top: 1px solid var(--color-sand);
+    text-align: center;
+  }
+  .atelier-signature-label {
+    font-family: var(--font-serif);
+    font-size: 0.75rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: #8B7355;
+    margin-bottom: 1rem;
+  }
+  .atelier-signature-text {
+    font-family: var(--font-serif);
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: var(--color-ink-muted);
+    max-width: 36rem;
+    margin: 0 auto 1.25rem;
+    font-style: italic;
+  }
+  .atelier-signature-author {
+    font-size: 0.85rem;
+    color: var(--color-ink-muted);
+    letter-spacing: 0.04em;
+  }
+</style>
