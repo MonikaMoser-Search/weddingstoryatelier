@@ -64,7 +64,7 @@
     .photo-y-wrap {
       flex-shrink: 0; display: flex; align-items: center;
     }
-    .photo-y-slider {
+    .photo-y-slider, .photo-x-slider {
       width: 58px; height: 4px; cursor: pointer;
       accent-color: #8B1A35;
     }
@@ -353,6 +353,7 @@ const T = {
     fotoBtnAdd:   '+ Foto',   fotoBtnHas:   '✓ Foto',
     fotoTitleAdd: 'Foto hochladen', fotoTitleHas: 'Foto ändern',
     sliderTitle:  'Bildausschnitt vertikal',
+    sliderTitleH: 'Bildausschnitt horizontal',
     btnRm:        'Foto entfernen',
     lblDemo:      'Beispiele laden',
     demoEyebrow:  'Live-Demo · Atelier-Werk',
@@ -373,6 +374,7 @@ const T = {
     fotoBtnAdd:   '+ Photo', fotoBtnHas:   '✓ Photo',
     fotoTitleAdd: 'Upload photo', fotoTitleHas: 'Change photo',
     sliderTitle:  'Vertical crop',
+    sliderTitleH: 'Horizontal crop',
     btnRm:        'Remove photo',
     lblDemo:      'Load examples',
     demoEyebrow:  'Live demo · Atelier piece',
@@ -391,11 +393,24 @@ let currentTheme = 'burgund';
 let currentCard  = 0;
 let currentLang  = 'de';
 
+const FRAME_R = 95 / 127;   // Foto-Fenster 95×127 mm (3:4 hoch)
+
 const tables = Array.from({length: 10}, () => ({
   name:   '',
   photo:  null,
   photoY: 50,
+  photoX: 50,
+  photoAspect: null,
 }));
+
+function imgAspect(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload = () => resolve(img.width / img.height);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
+}
 
 // ════════════════════════════════════════════════════════
 // INIT
@@ -470,7 +485,9 @@ function buildTableRows() {
     fi.type = 'file'; fi.accept = 'image/*';
     fi.onchange = async (e) => {
       if (!e.target.files[0]) return;
-      tables[i].photo = await compressImage(e.target.files[0], 1600, 0.85);
+      const data = await compressImage(e.target.files[0], 1600, 0.85);
+      tables[i].photo = data;
+      tables[i].photoAspect = await imgAspect(data);
       currentCard = i;
       buildTableRows(); renderPreview(); updateNav();
     };
@@ -478,15 +495,19 @@ function buildTableRows() {
     row.appendChild(btnP);
 
     if (t.photo) {
+      // Nur den Slider zeigen, der mathematisch wirkt: Querformat im
+      // 3:4-Hochrahmen → Breite wird beschnitten → X; sonst Y.
+      const horiz = (t.photoAspect != null) && (t.photoAspect > FRAME_R);
       const yWrap = document.createElement('div');
       yWrap.className = 'photo-y-wrap';
       const slider = document.createElement('input');
       slider.type = 'range'; slider.min = '0'; slider.max = '100';
-      slider.value = t.photoY ?? 50;
-      slider.className = 'photo-y-slider';
-      slider.title = tt().sliderTitle;
+      slider.value = horiz ? (t.photoX ?? 50) : (t.photoY ?? 50);
+      slider.className = horiz ? 'photo-x-slider' : 'photo-y-slider';
+      slider.title = horiz ? tt().sliderTitleH : tt().sliderTitle;
       slider.oninput = (e) => {
-        tables[i].photoY = parseInt(e.target.value);
+        if (horiz) tables[i].photoX = parseInt(e.target.value);
+        else       tables[i].photoY = parseInt(e.target.value);
         if (i === currentCard) renderPreview();
       };
       yWrap.appendChild(slider);
@@ -497,6 +518,7 @@ function buildTableRows() {
       btnR.textContent = '×';
       btnR.onclick = () => {
         tables[i].photo = null;
+        tables[i].photoX = 50; tables[i].photoY = 50; tables[i].photoAspect = null;
         buildTableRows();
         if (i === currentCard) renderPreview();
       };
@@ -576,7 +598,8 @@ function renderPreview() {
   const photoWrap = document.getElementById('prev-photo-wrap');
   if (t.photo) {
     const yPos = t.photoY ?? 50;
-    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:center ${yPos}%">`;
+    const xPos = t.photoX ?? 50;
+    photoEl.innerHTML = `<img src="${t.photo}" alt="" style="object-position:${xPos}% ${yPos}%">`;
   } else {
     photoEl.innerHTML = `<div class="card-photo-empty">${tt().fotoEmpty}</div>`;
   }
@@ -638,6 +661,8 @@ function loadDemo() {
     t.name   = i === 0 ? tt().demo[0] : String(i + 1);
     t.photo  = i === 0 ? 'demo-foto-italien.jpg' : null;
     t.photoY = 50;
+    t.photoX = 50;
+    t.photoAspect = null;
   });
   document.getElementById('inp-prefix').value = tt().prefixDefault;
   currentCard = 0;
