@@ -9,8 +9,14 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="willkommensmappe.js?v=20260610"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
+    /* Abschnitts-Überschriften prominenter — nur in dieser Demo (überschreibt wsa_panel.css) */
+    .panel-form .section-label {
+      font-size: 10px; font-weight: 700; color: #0D3D2A;
+      letter-spacing: 1.2px; margin-top: 16px;
+    }
     .panel-preview {
       flex: 1; display: flex; flex-direction: column;
       overflow: hidden; background: #EAE6DF;
@@ -237,25 +243,27 @@
   <hr class="divider">
 
   <span class="section-label" id="lbl-spruch">Spruch wählen</span>
-  <p class="hint" id="hint-spruch">Klicke einen Spruch — er erscheint im Textfeld unten und kann frei angepasst werden.</p>
+  <p class="hint" id="hint-spruch">Klicke einen Spruch — er erscheint direkt auf der Karte.</p>
   <div class="spruch-grid" id="spruch-grid"></div>
 
-  <span class="sub-label" id="lbl-detail" style="margin-top:10px;">Detail einsetzen (optional)</span>
-  <p class="hint" id="hint-detail">Wird im Spruch für „[Ort]" oder „[Wunsch]" eingesetzt — z. B. „Toskana", „neues Sofa".</p>
-  <input type="text" id="inp-detail" maxlength="40" oninput="onDetailChange()">
+  <!-- versteckter Zustandsspeicher: Spruch-Picker schreibt hier rein, Vorschau liest daraus -->
+  <span class="sub-label" id="lbl-message" style="display:none;">Spruch-Text</span>
+  <textarea id="inp-message" rows="6" style="display:none;"></textarea>
+  <div class="char-row" style="display:none;"><span class="char-count" id="char-count"></span></div>
 
-  <span class="sub-label" id="lbl-message" style="margin-top:10px;">Spruch-Text (anpassbar)</span>
-  <textarea id="inp-message" rows="6" oninput="updateCharCounter();render()"></textarea>
-  <div class="char-row">
-    <span class="char-count" id="char-count"></span>
-  </div>
-
-  <span class="sub-label" id="lbl-signoff" style="margin-top:8px;">Abschluss</span>
+  <span class="section-label" id="lbl-signoff" style="margin-top:8px;">Abschluss</span>
   <input type="text" id="inp-signoff" maxlength="40" oninput="render()">
 
   <div class="action-row">
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Demo</button>
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
+  </div>
+
+  <div id="gift-reveal" style="margin-top:14px; border:1px solid #C9A84C; background:rgba(201,168,76,0.10); border-radius:4px; padding:18px 18px 16px; text-align:center;">
+    <p id="gr-eyebrow" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:#9c7b1a; margin:0 0 5px;"></p>
+    <p id="gr-headline" style="font-family:'Playfair Display',serif; font-size:23px; color:#0D3D2A; line-height:1.1; margin:0 0 7px;"></p>
+    <p id="gr-text" style="font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:#1C1408; margin:0 0 13px;"></p>
+    <button id="gr-btn" onclick="downloadWillkommensmappe()" style="width:100%; padding:12px; background:#0D3D2A; color:#fff; border:none; border-radius:2px; cursor:pointer; font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:0.14em; text-transform:uppercase;"></button>
   </div>
 
   <div class="cta-block">
@@ -297,56 +305,56 @@
   var SPRUECHE = {
     de: [
       {
-        key: 'dezent',
-        label: 'Dezent · klassisch',
-        text: 'Das Wertvollste ist für uns, dass ihr unseren Tag mit uns teilt.\nSolltet ihr uns dennoch eine Freude machen wollen, freuen wir uns über einen Beitrag zu unserer Hochzeitsreise.'
+        key: 'traeume',
+        label: 'Träume & Pläne',
+        text: 'Das größte Geschenk ist, diesen Tag mit euch zu teilen.\nWenn ihr uns darüber hinaus eine Freude machen möchtet, freuen wir uns über einen Beitrag zu unseren gemeinsamen Träumen und Plänen.'
+      },
+      {
+        key: 'modern',
+        label: 'Modern',
+        text: 'Eure Anwesenheit bedeutet uns alles.\nFalls ihr uns darüber hinaus etwas schenken möchtet, freuen wir uns über einen Beitrag zu unseren gemeinsamen Plänen.'
+      },
+      {
+        key: 'oldmoney',
+        label: 'Old Money',
+        text: 'Eure guten Wünsche sind für uns das wertvollste Geschenk.\nWer uns darüber hinaus eine Freude machen möchte, unterstützt unsere gemeinsame Zukunft mit einem kleinen Beitrag.'
       },
       {
         key: 'reise',
-        label: 'Reiseziel konkret',
-        text: 'Wir wünschen uns nichts sehnlicher als gemeinsame Erinnerungen.\nStatt Geschenken freuen wir uns über einen Beitrag zu unseren Flitterwochen in [Ort].'
+        label: 'Reisefokus',
+        text: 'Statt vieler schöner Dinge sammeln wir Erinnerungen.\nWer uns eine Freude machen möchte, unterstützt unsere nächste Reise.'
       },
       {
-        key: 'humorvoll',
-        label: 'Humorvoll',
-        text: 'Geschirr haben wir, Toaster auch.\nWas uns noch fehlt? Ein Honeymoon-Hauch.\nÜber einen kleinen Reisebeitrag freuen wir uns sehr.'
-      },
-      {
-        key: 'eigenheim',
-        label: 'Eigenheim · Möbelstück',
-        text: 'Unser Zuhause füllt sich langsam mit Leben — falls ihr uns eine Freude machen möchtet, hilft uns ein Beitrag für [Wunsch].'
-      },
-      {
-        key: 'frei',
-        label: 'Frei · ganz kurz',
-        text: 'Über alles, was uns gemeinsam wachsen lässt, freuen wir uns sehr.\nVon Herzen danke.'
+        key: 'haus',
+        label: 'Haus & Zukunft',
+        text: 'Wir sind bereits reich beschenkt.\nWer uns dennoch eine Freude machen möchte, unterstützt unsere gemeinsamen Zukunftspläne.'
       }
     ],
     en: [
       {
-        key: 'dezent',
-        label: 'Gentle · classic',
-        text: 'What matters most to us is sharing this day with you.\nIf you would still like to give us something, we would be delighted by a contribution toward our honeymoon.'
+        key: 'traeume',
+        label: 'Dreams & plans',
+        text: 'The greatest gift is sharing this day with you.\nIf you would like to give us something more, we would be delighted by a contribution toward our shared dreams and plans.'
+      },
+      {
+        key: 'modern',
+        label: 'Modern',
+        text: 'Your presence means everything to us.\nIf you would still like to give us something, we would be delighted by a contribution toward our shared plans.'
+      },
+      {
+        key: 'oldmoney',
+        label: 'Understated',
+        text: 'Your good wishes are the most precious gift of all.\nIf you would like to give us something more, a small contribution would support our future together.'
       },
       {
         key: 'reise',
-        label: 'Specific destination',
-        text: 'There is nothing we wish for more than shared memories.\nIn lieu of gifts, we would be grateful for a contribution toward our honeymoon in [Place].'
+        label: 'Travel focus',
+        text: 'Rather than many beautiful things, we are collecting memories.\nIf you would like to give us something, you could support our next journey.'
       },
       {
-        key: 'humorvoll',
-        label: 'With a smile',
-        text: 'Plates, we have. A toaster, too.\nWhat\'s missing? A honeymoon view.\nA small travel contribution would mean the world.'
-      },
-      {
-        key: 'eigenheim',
-        label: 'New home',
-        text: 'Our home is slowly filling with life — if you would like to give us something, a contribution toward [Wish] would touch us deeply.'
-      },
-      {
-        key: 'frei',
-        label: 'Free · very short',
-        text: 'Anything that helps us grow together would mean the world.\nThank you, with all our hearts.'
+        key: 'haus',
+        label: 'Home & future',
+        text: 'We are already richly blessed.\nIf you would still like to give us something, you could support our plans for the future.'
       }
     ]
   };
@@ -361,12 +369,12 @@
       logo:         'Anstatt Geschenke',
       tagline:      'Gratis-Beilegkarte · 4 pro A4',
       eyebrow:      'Anstatt Geschenke',
-      lang:         'Sprache', style: 'Stil',
+      lang:         'Sprache', style: 'Stil – Farbe auswählen',
       couple:       'Brautpaar',
       initials:     'Initialen',
       names:        'Namen (klein unter Initialen)',
       spruch:       'Spruch wählen',
-      hintSpruch:   'Klicke einen Spruch — er erscheint im Textfeld unten und kann frei angepasst werden.',
+      hintSpruch:   'Klicke einen Spruch — er erscheint direkt auf der Karte.',
       detail:       'Detail einsetzen (optional)',
       hintDetail:   'Wird im Spruch für „[Ort]" oder „[Wunsch]" eingesetzt — z. B. „Toskana", „neues Sofa".',
       message:      'Spruch-Text (anpassbar)',
@@ -387,18 +395,22 @@
       pdfBtn:       'Gratis-PDF laden',
       ctaTagline:   '<strong>Passt zur Einladung?</strong> Das komplette Atelier-Einladungsset (Einladung · RSVP · Beilegkarten) gibt\'s als druckerei-fertiges Werk mit Bleed und Format-Auswahl.',
       ctaEtsy:      '✦ Einladungsset im Atelier',
-      pdfFooter:    'Gratis-Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+      pdfFooter:    'Gratis-Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com',
+      grEyebrow:    'Frühstarter-Vorteil · für die ersten Paare',
+      grHeadline:   '20 % Atelier-Rabatt',
+      grText:       'Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.',
+      grBtn:        'Rabattcode sichern'
     },
     en: {
       logo:         'In lieu of gifts',
       tagline:      'Free insert card · 4 per A4',
       eyebrow:      'In lieu of gifts',
-      lang:         'Language', style: 'Style',
+      lang:         'Language', style: 'Style – choose your colour',
       couple:       'The couple',
       initials:     'Initials',
       names:        'Names (small, under initials)',
       spruch:       'Choose a wording',
-      hintSpruch:   'Click a wording — it appears in the text field below and can be edited freely.',
+      hintSpruch:   'Click a wording — it appears right on the card.',
       detail:       'Insert detail (optional)',
       hintDetail:   'Replaces „[Place]" or „[Wish]" in the wording — e. g. „Tuscany", „a new sofa".',
       message:      'Wording (editable)',
@@ -419,7 +431,11 @@
       pdfBtn:       'Download free PDF',
       ctaTagline:   '<strong>Pairs with the invitation?</strong> The full atelier invitation set (invitation · RSVP · insert cards) comes print-ready with bleed and format options.',
       ctaEtsy:      '✦ Invitation set in the atelier',
-      pdfFooter:    'Free demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
+      pdfFooter:    'Free demo · Wedding Story Atelier · weddingstoryatelier.etsy.com',
+      grEyebrow:    'Early-bird perk · for our first couples',
+      grHeadline:   '20% atelier discount',
+      grText:       "We're a young atelier — grab your welcome code for your first order.",
+      grBtn:        'Get your discount code'
     }
   };
 
@@ -452,18 +468,19 @@
     ge('lbl-names').textContent      = l.names;
     ge('lbl-spruch').textContent     = l.spruch;
     ge('hint-spruch').textContent    = l.hintSpruch;
-    ge('lbl-detail').textContent     = l.detail;
-    ge('hint-detail').textContent    = l.hintDetail;
     ge('lbl-message').textContent    = l.message;
     ge('lbl-signoff').textContent    = l.signoff;
     ge('inp-initials').placeholder   = l.initialsPH;
     ge('inp-names').placeholder      = l.namesPH;
     ge('inp-signoff').placeholder    = l.signoffPH;
-    ge('inp-detail').placeholder     = l.detailPH;
     ge('demo-badge').textContent     = l.demoBadge;
     ge('btn-export').textContent     = l.pdfBtn;
     ge('cta-tagline').innerHTML      = l.ctaTagline;
     ge('cta-etsy').textContent       = l.ctaEtsy;
+    ge('gr-eyebrow').textContent     = l.grEyebrow;
+    ge('gr-headline').textContent    = l.grHeadline;
+    ge('gr-text').innerHTML          = l.grText;
+    ge('gr-btn').textContent         = l.grBtn;
     document.documentElement.lang    = currentLang;
     updateCharCounter();
   }
@@ -481,12 +498,11 @@
     var list = SPRUECHE[currentLang];
     for (var i = 0; i < list.length; i++) {
       var s = list[i];
-      var preview = s.text.split('\n')[0];
-      if (preview.length > 70) preview = preview.slice(0, 67) + '…';
+      var fullText = esc(s.text).replace(/\n/g, '<br>');
       var btn = document.createElement('button');
       btn.className = 'spruch-btn' + (s.key === currentSpruchKey ? ' active' : '');
       btn.setAttribute('data-key', s.key);
-      btn.innerHTML = '<span class="spruch-label">' + esc(s.label) + '</span>' + esc(preview);
+      btn.innerHTML = '<span class="spruch-label">' + esc(s.label) + '</span>' + fullText;
       btn.addEventListener('click', (function(key){
         return function(){ applySpruch(key, true); };
       })(s.key));
@@ -502,25 +518,7 @@
     document.querySelectorAll('.spruch-btn').forEach(function(b){
       b.classList.toggle('active', b.getAttribute('data-key') === key);
     });
-    onDetailChange();
     updateCharCounter();
-    render();
-    if (focus) ge('inp-message').focus();
-  }
-
-  function onDetailChange() {
-    var detail = gv('inp-detail').trim();
-    if (!detail) { render(); return; }
-    var current = ge('inp-message').value;
-    var replaced = current
-      .replace(/\[Ort\]/g, detail)
-      .replace(/\[Place\]/g, detail)
-      .replace(/\[Wunsch\]/g, detail)
-      .replace(/\[Wish\]/g, detail);
-    if (replaced !== current) {
-      ge('inp-message').value = replaced;
-      updateCharCounter();
-    }
     render();
   }
 
@@ -597,7 +595,6 @@
     ge('inp-initials').value = l.demoInitials;
     ge('inp-names').value    = l.demoNames;
     ge('inp-signoff').value  = l.demoSignoff;
-    ge('inp-detail').value   = l.demoDetail;
     applySpruch('reise', false);
   }
 
@@ -641,7 +638,7 @@
   window.addEventListener('resize', scalePreview);
   rebuildSpruchButtons();
   applyLang();
-  applySpruch('dezent', false);
+  applySpruch('traeume', false);
 </script>
 </body>
 </html>
