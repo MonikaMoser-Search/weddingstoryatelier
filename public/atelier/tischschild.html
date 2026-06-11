@@ -6,6 +6,7 @@
   <title>Tischschild · Demo — Wedding Story Atelier</title>
   <meta name="description" content="Live-Demo: Foto-Tischschilder & Tischnummern für die Hochzeit. Burgund, Cognac oder Forest, mit individuellem Foto und automatischer Schriftanpassung.">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="frueh_rabatt.js?v=20260611"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
     /* ── Theme Dots ── */
@@ -284,6 +285,8 @@
     <button type="button" class="btn-demo" onclick="loadDemo()">&#9655; <span id="lbl-demo">Beispiele laden</span></button>
   </div>
 
+  <div id="frueh-rabatt" data-lang="de"></div>
+
   <!-- DEMO-CTA -->
   <div class="demo-cta">
     <div class="demo-eyebrow" id="demo-eyebrow">Live-Demo · Atelier-Werk</div>
@@ -533,6 +536,7 @@ function buildTableRows() {
 // SPRACHE
 // ════════════════════════════════════════════════════════
 function setLang(lang, btn) {
+  if (window.setRabattLang) window.setRabattLang(lang);
   currentLang = lang;
   document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');

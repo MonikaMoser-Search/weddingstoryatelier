@@ -9,6 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="willkommensmappe.js?v=20260611d"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
     .opt-tag     { color: #ccc; font-style: italic; font-size: 9px; text-transform: none; letter-spacing: 0; }
@@ -264,6 +265,13 @@
     <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
   </div>
 
+  <div id="gift-reveal" style="margin-top:14px; border:1px solid #C9A84C; background:rgba(201,168,76,0.10); border-radius:4px; padding:18px 18px 16px; text-align:center;">
+    <p id="gr-eyebrow" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:#9c7b1a; margin:0 0 5px;"></p>
+    <p id="gr-headline" style="font-family:'Playfair Display',serif; font-size:23px; color:#0D3D2A; line-height:1.1; margin:0 0 7px;"></p>
+    <p id="gr-text" style="font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:#1C1408; margin:0 0 13px;"></p>
+    <button id="gr-btn" onclick="downloadWillkommensmappe()" style="width:100%; padding:12px; background:#0D3D2A; color:#fff; border:none; border-radius:2px; cursor:pointer; font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:0.14em; text-transform:uppercase;"></button>
+  </div>
+
   <div class="cta-block">
     <p class="cta-tagline" id="cta-tagline">
       <strong>Mehr Gäste?</strong> Die Vollversion im Atelier macht 60 Karten pro Durchgang — beliebig oft wiederholbar — plus 3 Formate (A6, 70×140mm, 4×6"), 30 Gemeinschafts-Aufgaben und Druckerei-PDF.
@@ -373,6 +381,10 @@
       pdfBtn:       'Gratis-PDF laden',
       ctaTagline:   '<strong>Mehr Gäste?</strong> Die Vollversion im Atelier macht 60 Karten pro Durchgang — beliebig oft wiederholbar — plus 3 Formate (A6, 70×140mm, 4×6"), 30 Gemeinschafts-Aufgaben und Druckerei-PDF.',
       ctaEtsy:      '✦ Vollversion im Atelier',
+      grEyebrow:    'Frühstarter-Vorteil · für die ersten Paare',
+      grHeadline:   '20 % Atelier-Rabatt',
+      grText:       'Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.',
+      grBtn:        'Rabattcode sichern',
       pdfFooter:    'Gratis-Demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
     },
     en: {
@@ -418,6 +430,10 @@
       pdfBtn:       'Download free PDF',
       ctaTagline:   '<strong>More guests?</strong> The full atelier version handles 60 cards per run — repeat as often as you like — plus 3 formats (A6, 70×140mm, 4×6"), 30 community tasks and a print-ready PDF.',
       ctaEtsy:      '✦ Full version in the atelier',
+      grEyebrow:    'Early-bird perk · for our first couples',
+      grHeadline:   '20 % atelier discount',
+      grText:       "We're a young atelier — grab your welcome code for your first order.",
+      grBtn:        'Get your discount code',
       pdfFooter:    'Free demo · Wedding Story Atelier · weddingstoryatelier.etsy.com'
     }
   };
@@ -492,6 +508,10 @@
     ge('btn-export').textContent     = l.pdfBtn;
     ge('cta-tagline').innerHTML      = l.ctaTagline;
     ge('cta-etsy').textContent       = l.ctaEtsy;
+    ge('gr-eyebrow').textContent     = l.grEyebrow;
+    ge('gr-headline').textContent    = l.grHeadline;
+    ge('gr-text').innerHTML          = l.grText;
+    ge('gr-btn').textContent         = l.grBtn;
     document.documentElement.lang    = currentLang;
     updateCharCounter();
   }

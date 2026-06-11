@@ -7,6 +7,7 @@
   <title>Wedding Magazin — Live-Demo · Old Money Line</title>
   <meta name="description" content="Live-Demo unseres Wedding-Magazins in der Old Money Line — probiere es direkt im Browser aus. Vollversion im Atelier.">
   <link rel="stylesheet" href="/atelier/fonts.css">
+  <script src="frueh_rabatt.js?v=20260611"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
     :root {
@@ -1221,6 +1222,8 @@
       </div>
     </div>
 
+    <div id="frueh-rabatt" data-lang="de"></div>
+
     <div class="demo-cta">
       <div class="demo-cta-eyebrow" id="demo-eyebrow">LIVE-DEMO</div>
       <p class="demo-cta-text" id="demo-text">Du siehst gerade die Live-Vorschau. Das fertige Wedding-Magazin mit PDF-Download (randloser Druck, 3 mm Beschnitt, A4 + US Letter, bilingual) gibt es im Atelier.</p>
@@ -1454,6 +1457,7 @@ function updatePanelLabels(isDE) {
 }
 
 function switchLang(lang, btn) {
+  if (window.setRabattLang) window.setRabattLang(lang);
   var oldLang = currentLang;
   currentLang = lang;
   document.querySelectorAll('.lang-btn').forEach(function(b) { b.classList.remove('active'); });

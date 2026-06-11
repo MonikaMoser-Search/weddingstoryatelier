@@ -7,6 +7,7 @@
 <title>Allergenkarten — Atelier-Geschenk · 3 Karten · Wedding Story Atelier</title>
 <meta name="description" content="3 Candy-Bar-Allergenkarten als Atelier-Geschenk als PDF — direkt im Browser gestalten, sofort drucken. Keine Anmeldung, keine E-Mail.">
 <link rel="stylesheet" href="/atelier/fonts.css">
+<script src="/atelier/frueh_rabatt.js?v=20260611"></script>
 <link rel="stylesheet" href="/atelier/wsa_panel.css">
 <style>
   :root {
@@ -317,6 +318,8 @@
       </div>
     </div>
 
+    <div id="frueh-rabatt" data-lang="de"></div>
+
     <div class="cta-block">
       <p class="cta-tagline" id="ctaTagline">
         Im Atelier leben weitere Werke und kleine Geschenke — alle aus derselben Welt.
@@ -474,6 +477,7 @@ const halalRow    = document.getElementById('halalRow');
 function t(key) { return UI[lang][key]; }
 
 function setLang(l) {
+  if (window.setRabattLang) window.setRabattLang(l);
   lang = l;
   document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent === l.toUpperCase()));
   applyUI(); buildAllergenGrid(); buildVorlagen(); renderAll();
