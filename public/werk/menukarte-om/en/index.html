@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="de" translate="no">
+<html lang="en" translate="no">
 <head>
 <meta charset="UTF-8">
 <meta name="robots" content="noindex,nofollow">
-<title>Menü · Old Money · Wedding Story Atelier</title>
+<title>Menu · Old Money · Wedding Story Atelier</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 /* ===== Schriften — lokal, OFL ========================================== */
@@ -188,20 +188,20 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
 
 <div class="buyer-only">
   <div class="buyer-bar">
-    <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
-    <button class="buyer-btn" id="btnMode" type="button" data-mode="heim">Modus: Heimdruck</button>
+    <button class="buyer-btn" id="btnPrint" type="button">Print / PDF</button>
+    <button class="buyer-btn" id="btnMode" type="button" data-mode="heim">Mode: Home printing</button>
   </div>
-  <p style="text-align:center;margin:0 0 18px;"><a href="/werk/menukarte-om/en/" style="color:#8B1A35;font-size:10.5pt;letter-spacing:0.08em;text-decoration:none;border-bottom:1px solid rgba(139,26,53,0.35);padding-bottom:1px;">English version ↗</a></p>
+  <p style="text-align:center;margin:0 0 18px;"><a href="/werk/menukarte-om/" style="color:#8B1A35;font-size:10.5pt;letter-spacing:0.08em;text-decoration:none;border-bottom:1px solid rgba(139,26,53,0.35);padding-bottom:1px;">Deutsche Version ↗</a></p>
   <p class="buyer-hint">
-    <strong>Vorderseite:</strong> Menü eintragen. <strong>Rückseite:</strong> je Gericht „Allergene wählen"
-    antippen — die Allergen-Liste entsteht von selbst. Danach „Drucken / PDF". Tipp: im Druckdialog
-    Hintergrundgrafiken aktivieren. Format: DL (99 × 210 mm), beidseitig.
+    <strong>Front:</strong> enter your menu. <strong>Back:</strong> tap „Choose allergens"
+    for each dish — the allergen list builds itself. Then „Print / PDF". Tip: enable
+    background graphics in the print dialog. Size: DL (99 × 210 mm), double-sided.
   </p>
 </div>
 
 <!-- ===== Vorderseite ===== -->
 <div class="card-wrap" id="wrapFront">
-<p class="card-label">Vorderseite — Menü</p>
+<p class="card-label">Front — Menu</p>
 <article class="card" id="cardFront">
   <div class="band band-top">
     <div class="crest"><input class="field crest-input" id="fInitials" type="text" maxlength="5" placeholder="A&amp;T"></div>
@@ -209,17 +209,17 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
   <div class="band-hair"></div>
 
   <div class="front-body">
-    <h1 class="menu-title">MENÜ</h1>
-    <p class="menu-date"><input class="field" id="fDate" type="text" placeholder="12. SEPTEMBER 2026"></p>
+    <h1 class="menu-title">MENU</h1>
+    <p class="menu-date"><input class="field" id="fDate" type="text" placeholder="12 SEPTEMBER 2026"></p>
     <div class="rule" aria-hidden="true"><span class="rule-line"></span><span class="rule-gem"></span><span class="rule-line"></span></div>
 
     <div id="sections">
       <div class="section" data-sec="vorspeise">
-        <p class="section-title"><input class="field sec-title" type="text" value="Vorspeise"></p>
+        <p class="section-title"><input class="field sec-title" type="text" value="Starter"></p>
         <div class="dishes"></div>
       </div>
       <div class="section" data-sec="hauptgang">
-        <p class="section-title"><input class="field sec-title" type="text" value="Hauptgang"></p>
+        <p class="section-title"><input class="field sec-title" type="text" value="Main Course"></p>
         <div class="dishes"></div>
       </div>
       <div class="section" data-sec="dessert">
@@ -227,11 +227,11 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
         <div class="dishes"></div>
       </div>
       <div class="section" data-sec="frei1">
-        <p class="section-title"><input class="field sec-title" type="text" placeholder="z. B. Kaffee &amp; Kuchen"></p>
+        <p class="section-title"><input class="field sec-title" type="text" placeholder="e.g. Coffee &amp; Cake"></p>
         <div class="dishes"></div>
       </div>
       <div class="section" data-sec="frei2">
-        <p class="section-title"><input class="field sec-title" type="text" placeholder="z. B. Mitternachtssuppe"></p>
+        <p class="section-title"><input class="field sec-title" type="text" placeholder="e.g. Midnight Snack"></p>
         <div class="dishes"></div>
       </div>
     </div>
@@ -246,14 +246,14 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
 
 <!-- ===== Rückseite ===== -->
 <div class="card-wrap" id="wrapBack">
-<p class="card-label">Rückseite — Allergene (hier auswählen)</p>
+<p class="card-label">Back — Allergens (select here)</p>
 <div class="alg-help buyer-edit">
-  <p class="alg-help-title">So tragen Sie die Allergene ein</p>
+  <p class="alg-help-title">How to add the allergens</p>
   <ol>
-    <li>Tragen Sie zuerst auf der <strong>Vorderseite</strong> Ihr Menü ein — jedes Gericht erscheint dann automatisch auf der Karte unten.</li>
-    <li>Tippen Sie bei einem Gericht auf <strong>„Allergene wählen"</strong> — die Auswahl klappt auf. Markieren Sie alle zutreffenden Allergene.</li>
-    <li>Tippen Sie erneut auf <strong>„Allergene"</strong>, um die Auswahl wieder einzuklappen — so sehen Sie die fertige Vorschau.</li>
-    <li>Zum Schluss oben auf <strong>„Drucken / PDF"</strong>. Die Hinweise hier werden nicht mitgedruckt.</li>
+    <li>First fill in your menu on the <strong>front</strong> — each dish then appears automatically on the card below.</li>
+    <li>Tap <strong>Choose allergens</strong> on a dish — the selection opens. Mark every allergen that applies.</li>
+    <li>Tap the <strong>allergens link</strong> again to collapse it — that is how you see the finished preview.</li>
+    <li>Finally click <strong>Print / PDF</strong> at the top. These notes are not printed.</li>
   </ol>
 </div>
 <article class="card" id="cardBack">
@@ -262,10 +262,10 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
   </div>
   <div class="band-hair"></div>
   <div class="back-body">
-    <h2 class="back-title">Allergene</h2>
-    <p class="back-sub">&amp; Zusatzstoffe</p>
+    <h2 class="back-title">Allergens</h2>
+    <p class="back-sub">&amp; additives</p>
     <div class="back-list" id="backList"></div>
-    <p class="back-note">Angaben ohne Gewähr — bitte mit dem Catering abgleichen.</p>
+    <p class="back-note">Information without guarantee — please confirm with your caterer.</p>
   </div>
   <div class="band-hair"></div>
   <div class="band band-bottom">
@@ -277,20 +277,20 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
 <script>
 /* ===== Daten ===== */
 const ALLERGENE = [
-  "Glutenhaltiges Getreide", "Krebstiere", "Eier", "Fische", "Erdnüsse",
-  "Sojabohnen", "Milch (inkl. Laktose)", "Schalenfrüchte (Nüsse)", "Sellerie",
-  "Senf", "Sesamsamen", "Schwefeldioxid und Sulfite", "Lupinen", "Weichtiere"
+  "Cereals containing gluten", "Crustaceans", "Eggs", "Fish", "Peanuts",
+  "Soybeans", "Milk (incl. lactose)", "Tree nuts", "Celery",
+  "Mustard", "Sesame seeds", "Sulphur dioxide and sulphites", "Lupin", "Molluscs"
 ];
 const algByDish = {};                       // dishId -> Set<allergenIndex>
 const DISHES_PER_SECTION = 4;
 const PLACEHOLDERS = {
-  vorspeise: ["Feldsalat mit Ziegenkäse", "Lachstatar auf Avocado", "", ""],
-  hauptgang: ["Rinderfilet, Kräuterbutter", "Wildkräuter-Risotto", "", ""],
-  dessert:   ["Mousse au Chocolat", "", "", ""],
+  vorspeise: ["Burrata with heirloom tomatoes", "Smoked salmon tartare", "", ""],
+  hauptgang: ["Beef fillet, herb butter", "Wild mushroom risotto", "", ""],
+  dessert:   ["Chocolate mousse", "", "", ""],
   frei1:     ["", "", "", ""],
   frei2:     ["", "", "", ""]
 };
-const STORAGE_KEY = 'wsa_menukarte_tellerkarte_de';
+const STORAGE_KEY = 'wsa_menukarte_tellerkarte_en';
 
 /* ===== Helfer ===== */
 function escapeHtml(s) {
@@ -305,7 +305,7 @@ function buildDishes() {
     const wrap = sec.querySelector('.dishes');
     for (let i = 0; i < DISHES_PER_SECTION; i++) {
       const id = 'dish_' + (dishSeq++);
-      const ph = (PLACEHOLDERS[key] && PLACEHOLDERS[key][i]) ? PLACEHOLDERS[key][i] : 'Gericht …';
+      const ph = (PLACEHOLDERS[key] && PLACEHOLDERS[key][i]) ? PLACEHOLDERS[key][i] : 'Dish …';
       const row = document.createElement('div');
       row.className = 'dish-row';
       row.dataset.dishId = id;
@@ -341,12 +341,12 @@ function renderBack() {
   fitCrest(_crestBack);
   list.innerHTML = '';
   const allDishInputs = [...document.querySelectorAll('.dish-input')];
-  // Allergene eines geleerten/geänderten Gerichts verwerfen — sonst „kleben" sie an der Zeile
+  // Allergene eines geleerten/geänderten Gerichts verwerfen — sonst kleben sie an der Zeile
   allDishInputs.forEach(i => { if (!i.value.trim() && algByDish[i.id]) delete algByDish[i.id]; });
   const filled = allDishInputs.filter(i => i.value.trim());
   if (!filled.length) {
-    list.innerHTML = '<p class="back-empty">Noch keine Gerichte eingetragen — '
-      + 'sie erscheinen hier automatisch, sobald Sie vorne Ihr Menü ausfüllen.</p>';
+    list.innerHTML = '<p class="back-empty">No dishes entered yet — '
+      + 'they will appear here automatically once you fill in your menu on the front.</p>';
     return;
   }
   filled.forEach(inp => {
@@ -369,8 +369,8 @@ function renderBack() {
       algEl.textContent = names.length ? names.join(', ') : '';
       item.classList.toggle('no-alg', names.length === 0);
       toggle.innerHTML = names.length
-        ? 'Allergene ändern <span class="count">' + names.length + '</span>'
-        : 'Allergene wählen +';
+        ? 'Change allergens <span class="count">' + names.length + '</span>'
+        : 'Choose allergens +';
     }
     ALLERGENE.forEach((name, idx) => {
       const c = document.createElement('span');
@@ -450,7 +450,7 @@ function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHei
 
 /* ===== Rückseiten-Kreis: Initialen einpassen (kein Stapeln/Überlauf) ===== */
 function fitCrest(el) {
-  let fs = 12;                       // pt — entspricht CSS-Ausgangswert
+  let fs = 12;
   el.style.fontSize = fs + 'pt';
   let guard = 0;
   while (el.scrollWidth > el.clientWidth - 1 && fs > 7 && guard++ < 20) {
@@ -468,7 +468,7 @@ btnMode.addEventListener('click', () => {
   const m = btnMode.dataset.mode === 'heim' ? 'druckerei' : 'heim';
   btnMode.dataset.mode = m;
   document.body.classList.toggle('mode-druckerei', m === 'druckerei');
-  btnMode.textContent = 'Modus: ' + (m === 'heim' ? 'Heimdruck' : 'Druckerei');
+  btnMode.textContent = 'Mode: ' + (m === 'heim' ? 'Home printing' : 'Print shop');
 });
 
 // Vorderseiten-Eingaben: speichern, Sichtbarkeit + Rückseite aktualisieren
