@@ -188,14 +188,19 @@
 <!-- ════ FORM PANEL ════════════════════════════════════ -->
 <div class="panel-form">
 
-  <div class="panel-logo">Mythos oder Wahrheit?</div>
-  <div class="panel-tagline">Gratis-Hochzeitsquiz · 17 Karten + Auflösung</div>
+  <div class="panel-logo" id="lbl-logo">Mythos oder Wahrheit?</div>
+  <div class="panel-tagline" id="lbl-tagline">Gratis-Hochzeitsquiz · 15 Karten + Auflösung</div>
 
-  <span class="section-label">Euer Quiz</span>
+  <div class="lang-buttons" style="margin-top:14px;">
+    <button class="lang-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="lang-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <span class="section-label" id="lbl-section">Euer Quiz</span>
   <span class="sub-label" id="lbl-couple">Namen des Brautpaars</span>
   <input type="text" id="inp-couple" maxlength="40" placeholder="Anna &amp; Peter" oninput="render()">
   <div class="char-row"><span class="char-count" id="char-count"></span></div>
-  <p class="hint">Erscheint klein über dem Titel — „Anna &amp; Peters Hochzeitsquiz". Alles andere ist fertig gestaltet.</p>
+  <p class="hint" id="hint-couple">Erscheint klein über dem Titel — „Anna &amp; Peters Hochzeitsquiz". Alles andere ist fertig gestaltet.</p>
 
   <div class="action-row">
     <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Beispiel</button>
@@ -210,10 +215,10 @@
   </div>
 
   <div class="cta-block">
-    <p class="cta-tagline">
+    <p class="cta-tagline" id="cta-tagline">
       <strong>Lust auf mehr fürs Fest?</strong> Im Atelier findest du weitere Karten, Spiele und Drucksachen für euren großen Tag — abgestimmt aufeinander, druckfertig.
     </p>
-    <a class="cta-etsy" href="https://weddingstoryatelier.etsy.com" target="_blank" rel="noopener">✦ Zum Wedding Story Atelier</a>
+    <a class="cta-etsy" id="cta-etsy" href="https://weddingstoryatelier.etsy.com" target="_blank" rel="noopener">✦ Zum Wedding Story Atelier</a>
   </div>
 
 </div>
@@ -221,7 +226,7 @@
 <!-- ════ PREVIEW PANEL ════════════════════════════════ -->
 <div class="panel-preview">
   <div class="preview-header">
-    <span class="demo-badge">Gratis · Quiz + Auflösung</span>
+    <span class="demo-badge" id="demo-badge">Gratis · Quiz + Auflösung</span>
   </div>
   <div class="preview-area">
     <div id="preview-wrap">
@@ -243,76 +248,209 @@
 </div>
 
 <script>
-  /* ════ INHALT — 17 quellengeprüfte Karten, gemischte Reihenfolge ═══════════ */
-  /* answer: 'W' = Wahrheit · 'M' = Mythos                                       */
+  /* ════ INHALT — 15 quellengeprüfte Karten, gemischte Reihenfolge ═══════════ */
+  /* answer: 'W' = Wahrheit/Truth · 'M' = Mythos/Myth                            */
+  /* Karte 12 ist sprachlokalisiert: DE = Goldflitter-Wortspiel (nicht           */
+  /* übersetzbar), EN = England-Schwert-Mythos. Beide sind Mythos.               */
   var CARDS = [
-    { t: 'Die teuerste Hochzeit der Welt kostete umgerechnet über 130 Millionen Euro.',
-      a: 'W', e: 'Dubai, 1979. Für rund 20.000 Gäste wurde eigens ein Stadion gebaut.' },
-    { t: 'Eine eigene Ader führt vom linken Ringfinger direkt zum Herzen — daher der Ehering.',
-      a: 'M', e: 'Die „vena amoris" ist ein schöner Aberglaube — anatomisch sind alle Finger gleich mit dem Herzen verbunden.' },
-    { t: 'In Schottland wird das Brautpaar vor der Hochzeit manchmal mit Sirup, Ruß und Mehl überschüttet.',
-      a: 'W', e: 'Der Brauch heißt „Blackening" und soll böse Geister abwehren.' },
-    { t: 'Bräute tragen seit jeher Weiß als Zeichen der Reinheit.',
-      a: 'M', e: 'Erst Queen Victoria machte Weiß 1840 populär. Davor heiratete man auch in Rot, Blau oder Gold.' },
-    { t: 'Der „Trauzeuge" war ursprünglich ein bewaffneter Leibwächter.',
-      a: 'W', e: 'Beim germanischen Brautraub half der „Best Man", die Braut zu entführen und zu verteidigen.' },
-    { t: 'Man darf bei Hochzeiten keinen Reis werfen, weil er im Magen der Vögel aufquillt und sie tötet.',
-      a: 'M', e: 'Komplett widerlegt — ungekochter Reis quillt kaum mehr als Vogelfutter. Die Geschichte stammt aus einem Leserbrief von 1988.' },
-    { t: 'Das Wort „Flitterwochen" / „Honeymoon" hängt mit Honigwein zusammen.',
-      a: 'W', e: 'Frischvermählte tranken früher einen Mondzyklus lang täglich Met — „honey" + „moon".' },
-    { t: 'Der Diamant-Verlobungsring ist ein jahrhundertealter Brauch.',
-      a: 'M', e: 'Populär gemacht durch die De-Beers-Kampagne „A Diamond Is Forever" von 1947.' },
-    { t: 'Brautjungfern trugen früher dasselbe wie die Braut — um böse Geister zu verwirren.',
-      a: 'W', e: 'Schon im römischen Recht: gleiche Kleidung sollte Geister verwirren, damit sie die Braut nicht erkennen.' },
-    { t: 'Dass der Bräutigam die Braut vor der Trauung nicht sehen darf, ist ein alter romantischer Liebesbrauch.',
-      a: 'M', e: 'Der Ursprung ist Zwangsehe: Der Bräutigam sollte nicht mehr absagen können — auch der Schleier verbarg ihr Gesicht bis zum „Ja".' },
-    { t: 'Der Brautstrauß wird geworfen, weil Gäste früher Stücke aus dem Brautkleid rissen.',
-      a: 'W', e: 'Im Mittelalter galt das Berühren der Braut als Glücksbringer; der Strauß-Wurf lenkte die Menge ab.' },
-    { t: '„Flitterwochen" kommt daher, dass Paare früher eine Woche lang Goldflitter über sich streuten.',
-      a: 'M', e: '„Flitter" stammt vom mittelhochdeutschen „vlittern" (schmusen/tuscheln), nicht von Glitzer.' },
-    { t: 'Im alten Rom trugen Bräute einen feuerfarbenen Schleier, damit sie wie in Flammen wirkten.',
-      a: 'W', e: 'Der „flammeum" sollte böse Geister erschrecken — die Braut sah aus, als stünde sie in Flammen.' },
-    { t: 'Der Brautstrauß entstand, um im Juni den Körpergeruch der selten badenden Braut zu überdecken.',
-      a: 'M', e: 'Eine von Historikern verworfene Erzählung. Juni-Hochzeiten gehen auf die Göttin Juno zurück, nicht auf den Badeplan.' },
-    { t: '„Den Bund fürs Leben knüpfen" war einmal wörtlich gemeint.',
-      a: 'W', e: 'Beim keltischen „Handfasting" wurden dem Paar die Hände mit einem Band zusammengebunden — daher „tie the knot".' }
+    { a: 'W',
+      de: { t: 'Die teuerste Hochzeit der Welt kostete umgerechnet über 130 Millionen Euro.',
+            e: 'Dubai, 1979. Für rund 20.000 Gäste wurde eigens ein Stadion gebaut.' },
+      en: { t: 'The most expensive wedding in the world cost over 130 million euros.',
+            e: 'Dubai, 1979. A whole stadium was built just for the roughly 20,000 guests.' } },
+    { a: 'M',
+      de: { t: 'Eine eigene Ader führt vom linken Ringfinger direkt zum Herzen — daher der Ehering.',
+            e: 'Die „vena amoris" ist ein schöner Aberglaube — anatomisch sind alle Finger gleich mit dem Herzen verbunden.' },
+      en: { t: 'A special vein runs from the left ring finger straight to the heart — hence the wedding ring.',
+            e: 'The "vena amoris" is a lovely superstition — anatomically, every finger connects to the heart the same way.' } },
+    { a: 'W',
+      de: { t: 'In Schottland wird das Brautpaar vor der Hochzeit manchmal mit Sirup, Ruß und Mehl überschüttet.',
+            e: 'Der Brauch heißt „Blackening" und soll böse Geister abwehren.' },
+      en: { t: 'In Scotland, the couple is sometimes covered in syrup, soot and flour before the wedding.',
+            e: 'The custom is called "Blackening" and is meant to ward off evil spirits.' } },
+    { a: 'M',
+      de: { t: 'Bräute tragen seit jeher Weiß als Zeichen der Reinheit.',
+            e: 'Erst Queen Victoria machte Weiß 1840 populär. Davor heiratete man auch in Rot, Blau oder Gold.' },
+      en: { t: 'Brides have always worn white as a symbol of purity.',
+            e: 'Queen Victoria only made white popular in 1840. Before that, brides also married in red, blue or gold.' } },
+    { a: 'W',
+      de: { t: 'Der „Trauzeuge" war ursprünglich ein bewaffneter Leibwächter.',
+            e: 'Beim germanischen Brautraub half der „Best Man", die Braut zu entführen und zu verteidigen.' },
+      en: { t: 'The "best man" was originally an armed bodyguard.',
+            e: 'In Germanic bride abductions, the best man helped to carry off and defend the bride.' } },
+    { a: 'M',
+      de: { t: 'Man darf bei Hochzeiten keinen Reis werfen, weil er im Magen der Vögel aufquillt und sie tötet.',
+            e: 'Komplett widerlegt — ungekochter Reis quillt kaum mehr als Vogelfutter. Die Geschichte stammt aus einem Leserbrief von 1988.' },
+      en: { t: "You mustn't throw rice at weddings because it swells in the birds' stomachs and kills them.",
+            e: 'Completely debunked — uncooked rice swells little more than birdseed. The story comes from a 1988 letter to the editor.' } },
+    { a: 'W',
+      de: { t: 'Das Wort „Flitterwochen" / „Honeymoon" hängt mit Honigwein zusammen.',
+            e: 'Frischvermählte tranken früher einen Mondzyklus lang täglich Met — „honey" + „moon".' },
+      en: { t: 'The word "honeymoon" is connected to honey wine.',
+            e: 'Newlyweds once drank mead daily for a full moon cycle — "honey" + "moon".' } },
+    { a: 'M',
+      de: { t: 'Der Diamant-Verlobungsring ist ein jahrhundertealter Brauch.',
+            e: 'Populär gemacht durch die De-Beers-Kampagne „A Diamond Is Forever" von 1947.' },
+      en: { t: 'The diamond engagement ring is a centuries-old tradition.',
+            e: 'Made popular by the De Beers campaign "A Diamond Is Forever" in 1947.' } },
+    { a: 'W',
+      de: { t: 'Brautjungfern trugen früher dasselbe wie die Braut — um böse Geister zu verwirren.',
+            e: 'Schon im römischen Recht: gleiche Kleidung sollte Geister verwirren, damit sie die Braut nicht erkennen.' },
+      en: { t: 'Bridesmaids once dressed like the bride — to confuse evil spirits.',
+            e: "Already in Roman law: matching outfits were meant to confuse spirits so they couldn't identify the bride." } },
+    { a: 'M',
+      de: { t: 'Dass der Bräutigam die Braut vor der Trauung nicht sehen darf, ist ein alter romantischer Liebesbrauch.',
+            e: 'Der Ursprung ist Zwangsehe: Der Bräutigam sollte nicht mehr absagen können — auch der Schleier verbarg ihr Gesicht bis zum „Ja".' },
+      en: { t: 'The groom not seeing the bride before the ceremony is an old, romantic love custom.',
+            e: 'The origin is arranged marriage: the groom should not be able to back out — the veil hid her face until the "I do".' } },
+    { a: 'W',
+      de: { t: 'Der Brautstrauß wird geworfen, weil Gäste früher Stücke aus dem Brautkleid rissen.',
+            e: 'Im Mittelalter galt das Berühren der Braut als Glücksbringer; der Strauß-Wurf lenkte die Menge ab.' },
+      en: { t: "The bouquet is thrown because guests used to tear pieces from the bride's dress.",
+            e: 'In the Middle Ages, touching the bride was thought lucky; tossing the bouquet distracted the crowd.' } },
+    { a: 'M',
+      de: { t: '„Flitterwochen" kommt daher, dass Paare früher eine Woche lang Goldflitter über sich streuten.',
+            e: '„Flitter" stammt vom mittelhochdeutschen „vlittern" (schmusen/tuscheln), nicht von Glitzer.' },
+      en: { t: 'In England, the law still requires a sword to be worn at every wedding.',
+            e: 'Swords appear only at military weddings — as a tradition, not by law.' } },
+    { a: 'W',
+      de: { t: 'Im alten Rom trugen Bräute einen feuerfarbenen Schleier, damit sie wie in Flammen wirkten.',
+            e: 'Der „flammeum" sollte böse Geister erschrecken — die Braut sah aus, als stünde sie in Flammen.' },
+      en: { t: 'In ancient Rome, brides wore a flame-coloured veil so they looked as if on fire.',
+            e: 'The "flammeum" was meant to scare off evil spirits — the bride appeared to be ablaze.' } },
+    { a: 'M',
+      de: { t: 'Der Brautstrauß entstand, um im Juni den Körpergeruch der selten badenden Braut zu überdecken.',
+            e: 'Eine von Historikern verworfene Erzählung. Juni-Hochzeiten gehen auf die Göttin Juno zurück, nicht auf den Badeplan.' },
+      en: { t: 'The bridal bouquet began as a way to mask the body odour of the rarely-bathing June bride.',
+            e: 'A tale rejected by historians. June weddings trace back to the goddess Juno, not to bathing schedules.' } },
+    { a: 'W',
+      de: { t: '„Den Bund fürs Leben knüpfen" war einmal wörtlich gemeint.',
+            e: 'Beim keltischen „Handfasting" wurden dem Paar die Hände mit einem Band zusammengebunden — daher „tie the knot".' },
+      en: { t: '"Tying the knot" was once meant literally.',
+            e: 'In the Celtic "handfasting", the couple\'s hands were bound together with a ribbon — hence "tie the knot".' } }
   ];
 
-  var TXT = {
-    intro:    'Wie viele Hochzeitsmythen könnt ihr entlarven?',
-    colAussage:'Aussage',
-    atelier:  'Wedding Story Atelier',
-    solTitle: 'Die Wahrheit',
-    solTitleSub:'hinter den Hochzeitsmythen',
-    solIntro: 'Wer hatte die meisten richtig?',
-    titleMain:'Mythos oder Wahrheit?',
-    mythos:   'Mythos',
-    wahrheit: 'Wahrheit',
-    suffix:   'Hochzeitsquiz',
-    demoCouple:'Anna & Peter'
+  var T = {
+    de: {
+      logo:      'Mythos oder Wahrheit?',
+      tagline:   'Gratis-Hochzeitsquiz · 15 Karten + Auflösung',
+      section:   'Euer Quiz',
+      couple:    'Namen des Brautpaars',
+      couplePH:  'Anna & Peter',
+      hint:      'Erscheint klein über dem Titel — „Anna & Peters Hochzeitsquiz". Alles andere ist fertig gestaltet.',
+      demoBtn:   '▷ Beispiel',
+      exportBtn: 'Gratis-PDF laden',
+      badge:     'Gratis · Quiz + Auflösung',
+      intro:     'Wie viele Hochzeitsmythen könnt ihr entlarven?',
+      colAussage:'Aussage',
+      atelier:   'Wedding Story Atelier',
+      solTitle:  'Die Wahrheit',
+      solTitleSub:'hinter den Hochzeitsmythen',
+      solIntro:  'Wer hatte die meisten richtig?',
+      titleMain: 'Mythos oder Wahrheit?',
+      mythos:    'Mythos',
+      wahrheit:  'Wahrheit',
+      suffix:    'Hochzeitsquiz',
+      demoCouple:'Anna & Peter',
+      spin:      'PDF wird erstellt …',
+      fail:      'Export fehlgeschlagen: ',
+      file:      'Mythos_oder_Wahrheit_Hochzeitsquiz_Gratis_WeddingStoryAtelier.pdf',
+      grEyebrow: 'Frühstarter-Vorteil · für die ersten Paare',
+      grHeadline:'20 % Atelier-Rabatt',
+      grText:    'Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.',
+      grBtn:     'Rabattcode sichern',
+      ctaTagline:'<strong>Lust auf mehr fürs Fest?</strong> Im Atelier findest du weitere Karten, Spiele und Drucksachen für euren großen Tag — abgestimmt aufeinander, druckfertig.',
+      ctaBtn:    '✦ Zum Wedding Story Atelier'
+    },
+    en: {
+      logo:      'Myth or Truth?',
+      tagline:   'Free wedding quiz · 15 cards + answers',
+      section:   'Your quiz',
+      couple:    "The couple's names",
+      couplePH:  'Anna & Peter',
+      hint:      'Appears small above the title — "Anna & Peter\'s Wedding Quiz". Everything else is ready-designed.',
+      demoBtn:   '▷ Example',
+      exportBtn: 'Download free PDF',
+      badge:     'Free · quiz + answers',
+      intro:     'How many wedding myths can you debunk?',
+      colAussage:'Statement',
+      atelier:   'Wedding Story Atelier',
+      solTitle:  'The Truth',
+      solTitleSub:'behind the wedding myths',
+      solIntro:  'Who got the most right?',
+      titleMain: 'Myth or Truth?',
+      mythos:    'Myth',
+      wahrheit:  'Truth',
+      suffix:    'Wedding Quiz',
+      demoCouple:'Anna & Peter',
+      spin:      'Creating PDF …',
+      fail:      'Export failed: ',
+      file:      'Myth_or_Truth_Wedding_Quiz_Free_WeddingStoryAtelier.pdf',
+      grEyebrow: 'Early-bird perk · for our first couples',
+      grHeadline:'20% atelier discount',
+      grText:    "We're a young atelier — grab your welcome code for your first order.",
+      grBtn:     'Get your discount code',
+      ctaTagline:'<strong>Want more for the celebration?</strong> The atelier has more cards, games and stationery for your big day — coordinated and print-ready.',
+      ctaBtn:    '✦ Visit Wedding Story Atelier'
+    }
   };
+
+  var currentLang = 'de';
+  function t(){ return T[currentLang]; }
 
   function ge(id){ return document.getElementById(id); }
   function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
   function coupleValue(){
     var v = ge('inp-couple').value.trim();
-    return v || TXT.demoCouple;
+    return v || t().demoCouple;
   }
   function eyebrowText(){
-    // „Anna & Peters Hochzeitsquiz" — possessives s nur wenn nicht schon auf s endend
+    // „Anna & Peters Hochzeitsquiz" / "Anna & Peter's Wedding Quiz"
     var c = coupleValue();
     var last = c.slice(-1).toLowerCase();
+    if (currentLang === 'en') {
+      return c + (last === 's' ? '’' : '’s') + ' ' + t().suffix;
+    }
     var poss = (last === 's' || last === 'x' || last === 'z') ? '’' : 's';
-    return c + poss + ' ' + TXT.suffix;
+    return c + poss + ' ' + t().suffix;
+  }
+
+  function setLang(lang, btn){
+    currentLang = lang;
+    document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    applyLang();
+    render();
+  }
+
+  function applyLang(){
+    var l = t();
+    ge('lbl-logo').textContent     = l.logo;
+    ge('lbl-tagline').textContent  = l.tagline;
+    ge('lbl-section').textContent  = l.section;
+    ge('lbl-couple').textContent   = l.couple;
+    ge('inp-couple').placeholder   = l.couplePH;
+    ge('hint-couple').textContent  = l.hint;
+    ge('btn-demo').innerHTML       = l.demoBtn;
+    ge('btn-export').textContent   = l.exportBtn;
+    ge('demo-badge').textContent   = l.badge;
+    ge('gr-eyebrow').textContent   = l.grEyebrow;
+    ge('gr-headline').textContent  = l.grHeadline;
+    ge('gr-text').textContent      = l.grText;
+    ge('gr-btn').textContent       = l.grBtn;
+    ge('cta-tagline').innerHTML    = l.ctaTagline;
+    ge('cta-etsy').textContent     = l.ctaBtn;
+    document.documentElement.lang  = currentLang;
   }
 
   /* ── Quiz-Seite ─────────────────────────────────── */
   function quizHTML(){
+    var l = t();
     var rows = CARDS.map(function(card, i){
       return '<div class="mw-item">'
         + '<div class="mw-num">' + (i+1) + '</div>'
-        + '<div class="mw-text">' + esc(card.t) + '</div>'
+        + '<div class="mw-text">' + esc(card[currentLang].t) + '</div>'
         + '<div class="mw-choices">'
           + '<span class="mw-cell"><span class="mw-box"></span></span>'
           + '<span class="mw-cell"><span class="mw-box"></span></span>'
@@ -321,10 +459,10 @@
     }).join('');
 
     var listhead = '<div class="mw-listhead">'
-      + '<span class="col-aussage">' + TXT.colAussage + '</span>'
+      + '<span class="col-aussage">' + l.colAussage + '</span>'
       + '<span class="mw-choices">'
-        + '<span class="mw-cell label">' + TXT.mythos + '</span>'
-        + '<span class="mw-cell label">' + TXT.wahrheit + '</span>'
+        + '<span class="mw-cell label">' + l.mythos + '</span>'
+        + '<span class="mw-cell label">' + l.wahrheit + '</span>'
       + '</span>'
     + '</div>';
 
@@ -332,9 +470,9 @@
       + '<div class="a4-frame"></div>'
       + '<div class="mw-head">'
         + '<div class="mw-eyebrow" id="eyebrow-target">' + esc(eyebrowText()) + '</div>'
-        + '<div class="mw-title">' + TXT.titleMain + '</div>'
+        + '<div class="mw-title">' + l.titleMain + '</div>'
         + '<div class="mw-ornament"><span class="line"></span><span class="diamond">&#9670;</span><span class="line"></span></div>'
-        + '<div class="mw-intro">' + esc(TXT.intro) + '</div>'
+        + '<div class="mw-intro">' + esc(l.intro) + '</div>'
       + '</div>'
       + listhead
       + '<div class="mw-list">' + rows + '</div>'
@@ -344,21 +482,22 @@
   function footHTML(){
     return '<div class="mw-foot">'
       + '<div class="mw-foot-orn"><span class="line"></span><span class="heart">&#9829;</span><span class="line"></span></div>'
-      + '<div class="mw-foot-txt">' + TXT.atelier + '</div>'
+      + '<div class="mw-foot-txt">' + t().atelier + '</div>'
     + '</div>';
   }
 
   /* ── Auflösungs-Seite ───────────────────────────── */
   function solutionsHTML(){
+    var l = t();
     var rows = CARDS.map(function(card, i){
       var verdict = card.a === 'W'
-        ? '<span class="mw-verdict wahr">' + TXT.wahrheit + '</span>'
-        : '<span class="mw-verdict mythos">' + TXT.mythos + '</span>';
+        ? '<span class="mw-verdict wahr">' + l.wahrheit + '</span>'
+        : '<span class="mw-verdict mythos">' + l.mythos + '</span>';
       return '<div class="mw-sol-item">'
         + '<div class="mw-sol-num">' + (i+1) + '</div>'
         + '<div class="mw-sol-body">'
           + verdict
-          + '<div class="mw-expl">' + esc(card.e) + '</div>'
+          + '<div class="mw-expl">' + esc(card[currentLang].e) + '</div>'
         + '</div>'
       + '</div>';
     }).join('');
@@ -367,11 +506,11 @@
       + '<div class="a4-frame"></div>'
       + '<div class="mw-head">'
         + '<div class="mw-eyebrow">' + esc(eyebrowText()) + '</div>'
-        + '<div class="mw-title" style="font-size:9mm;">' + TXT.solTitle
-          + '<span class="mw-title-sub">' + esc(TXT.solTitleSub) + '</span>'
+        + '<div class="mw-title" style="font-size:9mm;">' + l.solTitle
+          + '<span class="mw-title-sub">' + esc(l.solTitleSub) + '</span>'
         + '</div>'
         + '<div class="mw-ornament"><span class="line"></span><span class="diamond">&#9670;</span><span class="line"></span></div>'
-        + '<div class="mw-intro">' + esc(TXT.solIntro) + '</div>'
+        + '<div class="mw-intro">' + esc(l.solIntro) + '</div>'
       + '</div>'
       + '<div class="mw-solutions">' + rows + '</div>'
       + footHTML();
@@ -420,14 +559,15 @@
   }
 
   function loadDemo(){
-    ge('inp-couple').value = TXT.demoCouple;
+    ge('inp-couple').value = t().demoCouple;
     render();
   }
 
   async function exportPDF(){
+    var l = t();
     var spinner = ge('pdf-spinner');
     spinner.style.display = 'flex';
-    ge('spin-msg').textContent = 'PDF wird erstellt …';
+    ge('spin-msg').textContent = l.spin;
 
     try {
       if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
@@ -453,20 +593,21 @@
       var c2 = await html2canvas(solEl, opts);
       pdf.addImage(c2.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
 
-      pdf.save('Mythos_oder_Wahrheit_Hochzeitsquiz_Gratis_WeddingStoryAtelier.pdf');
+      pdf.save(l.file);
 
       // Willkommens-Reveal sichtbar lassen / hervorheben (bereits sichtbar)
       var gr = ge('gift-reveal');
       if (gr) gr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
     } catch(e){
-      alert('Export fehlgeschlagen: ' + e.message);
+      alert(l.fail + e.message);
     } finally {
       spinner.style.display = 'none';
     }
   }
 
   window.addEventListener('resize', scalePreview);
+  applyLang();
   render();
 </script>
 </body>
