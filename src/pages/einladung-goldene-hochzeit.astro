@@ -209,6 +209,25 @@ const faq = [
         Vorschau ohne Druck und PDF · die ausfüllbare Vollversion gibt es im Etsy-Werk
       </p>
 
+      <!-- Frühstarter-Vorteil — gratis Willkommensmappe mit 20-%-Code, lädt die anniversary-Variante -->
+      <div class="max-w-xl mx-auto mt-14 border border-[#C9A84C] bg-[#C9A84C]/[0.08] px-8 py-9 text-center">
+        <p class="serif italic text-xs tracking-[0.18em] uppercase text-[#9C7B1A] mb-3">
+          Frühstarter-Vorteil · für die ersten Paare
+        </p>
+        <p class="serif text-3xl text-[#9C7B1A] mb-3">20 % Atelier-Rabatt</p>
+        <p class="serif text-base text-ink-muted leading-relaxed mb-7 max-w-md mx-auto">
+          Wir sind ein junges Atelier — sichert euch euren Willkommens-Code für eure erste Bestellung. Ihr bekommt ihn in einer kleinen Willkommensmappe als PDF.
+        </p>
+        <button
+          id="frueh-btn"
+          type="button"
+          class="inline-block bg-ink text-paper px-8 py-4 tracking-[0.2em] uppercase text-xs hover:bg-[#9C7B1A] transition-colors disabled:opacity-60 disabled:cursor-default"
+        >
+          Rabattcode sichern →
+        </button>
+        <p class="text-xs text-ink-muted mt-4 italic">Gratis PDF · der Browser fragt kurz nach dem Download</p>
+      </div>
+
       <div class="text-center mt-12">
         <a
           href={etsyUrl}
@@ -454,6 +473,47 @@ const faq = [
       "availability": "https://schema.org/InStock"
     }
   })} />
+
+  <!-- Frühstarter-Rabatt: lädt die Export-Libs + Mappe erst beim Klick (hält die Landing leicht) -->
+  <script is:inline>
+    (function () {
+      var btn = document.getElementById('frueh-btn');
+      if (!btn) return;
+      var label = btn.textContent;
+      var ready = null;
+
+      function loadScript(src) {
+        return new Promise(function (res, rej) {
+          if (document.querySelector('script[data-frueh="' + src + '"]')) { res(); return; }
+          var s = document.createElement('script');
+          s.src = src; s.async = false; s.setAttribute('data-frueh', src);
+          s.onload = res;
+          s.onerror = function () { rej(new Error('Konnte ' + src + ' nicht laden')); };
+          document.head.appendChild(s);
+        });
+      }
+
+      function ensureLibs() {
+        if (ready) return ready;
+        ready = loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js')
+          .then(function () { return loadScript('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js'); })
+          .then(function () { return loadScript('/geschenke/willkommensmappe.js?v=20260611d'); });
+        return ready;
+      }
+
+      btn.addEventListener('click', function () {
+        btn.disabled = true; btn.textContent = 'PDF wird erstellt …';
+        if (typeof window.clarity === 'function') window.clarity('event', 'frueh_mappe_klick');
+        ensureLibs()
+          .then(function () { return window.downloadWillkommensmappe('anniversary'); })
+          .then(function () { btn.disabled = false; btn.textContent = label; })
+          .catch(function () {
+            btn.disabled = false; btn.textContent = label;
+            alert('Der Download hat nicht geklappt — bitte versucht es gleich noch einmal.');
+          });
+      });
+    })();
+  </script>
 
   <!-- Google Ads Conversion Trigger — feuert beim Etsy-Outbound-Klick, sofern Cookie-Consent granted -->
   <!-- Conversion-Aktion "Etsy-Klick Goldene Hochzeit" (angelegt 2026-06-10) -->

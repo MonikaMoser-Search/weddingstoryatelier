@@ -32,7 +32,7 @@
   #wsa-mappe .wordmark { display:flex; align-items:center; justify-content:center; gap:16px; max-width:330px; margin:0 auto 20px; }
   #wsa-mappe .wm-line { flex:1; height:1px; background:var(--gold); opacity:.8; }
   #wsa-mappe .wm-text { font-family:'Cormorant Garamond',serif; font-style:italic; color:var(--gold); font-size:14px; letter-spacing:0.20em; white-space:nowrap; }
-  #wsa-mappe .head h1 { font-family:'Playfair Display',serif; font-weight:400; font-size:31px; letter-spacing:0.07em; line-height:1.16; }
+  #wsa-mappe .head h1 { font-family:'Playfair Display',serif; font-weight:400; font-size:31px; letter-spacing:0.07em; line-height:1.16; padding-left:0.07em; }
   #wsa-mappe .head .thanks { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:16px; color:rgba(255,255,255,0.78); margin-top:9px; }
 
   #wsa-mappe .body { padding:36px 62px 0; }
@@ -47,7 +47,7 @@
   #wsa-mappe .g-code span { color:var(--gold); }
   #wsa-mappe .g-fine { font-family:'Cormorant Garamond',serif; font-style:italic; font-size:13.5px; color:var(--ink-soft); margin-top:6px; }
   #wsa-mappe .g-cta { font-family:'Cormorant Garamond',serif; font-size:15px; color:var(--ink); margin-top:14px; line-height:1.5; }
-  #wsa-mappe .g-cta a { color:var(--green); font-weight:600; text-decoration:none; border-bottom:1px solid var(--gold); }
+  #wsa-mappe .g-cta a { color:var(--green); font-weight:600; text-decoration:none; }
 
   #wsa-mappe .offer-intro { font-family:'Cormorant Garamond',serif; font-size:16px; color:var(--ink); margin-bottom:9px; }
   #wsa-mappe .offer { list-style:none; margin:6px 0 18px; }
@@ -61,7 +61,55 @@
   #wsa-mappe .f-url { font-family:'DM Sans',sans-serif; font-size:11px; letter-spacing:0.10em; color:#9c7b1a; margin-top:4px; }
   `;
 
-  var HTML = `
+  // Textinhalte je Anlass. CSS, Rahmen und PDF-Logik bleiben identisch —
+  // es wechseln nur die Worte (wedding = Default, anniversary = Silber/Gold).
+  var COUPON_URL = 'https://weddingstoryatelier.etsy.com?coupon=FRUEHSTARTER20';
+
+  var CONTENT = {
+    wedding: {
+      headline: 'WELCOME TO<br>THE ATELIER',
+      thanks: 'Vielen Dank f&uuml;r deinen Download.',
+      lead: 'Wedding Story Atelier ist ein junges Designatelier aus der Region Heidelberg. Wir gestalten moderne Hochzeitsvorlagen f&uuml;r Paare, die zeitlose Eleganz und durchdachtes Design sch&auml;tzen.',
+      intro: 'Da unser Atelier noch neu ist, geh&ouml;rst du zu den ersten Paaren, die unsere Designs entdecken. Als Dankesch&ouml;n erh&auml;ltst du unseren Fr&uuml;hstarter-Vorteil:',
+      gEyebrow: 'Dein Fr&uuml;hstarter-Vorteil',
+      gHeadline: '20 % auf deine erste Bestellung',
+      gFine: 'G&uuml;ltig auf deinen gesamten Warenkorb.',
+      gCta: '&rarr; Besuche unseren Etsy-Shop, leg deine Lieblingsvorlagen in den Warenkorb und gib den Code beim Bezahlen ein.',
+      mid: 'Vielleicht planst du gerade erst eure Hochzeit. Vielleicht fehlen nur noch die letzten Details.',
+      offerIntro: 'Im Atelier findest du Vorlagen f&uuml;r viele Momente eurer Feier:',
+      offer: [
+        'Einladungen &amp; Save-the-Date-Karten',
+        'Geld-statt-Geschenke-Karten',
+        'Bridal Shower Vorlagen',
+        'Tischnummern &amp; Papeterie',
+        'Willkommensmappen f&uuml;r G&auml;ste'
+      ],
+      closing: 'Sch&ouml;n, dass du hier bist.'
+    },
+    anniversary: {
+      headline: 'WILLKOMMEN IM ATELIER',
+      thanks: 'Vielen Dank f&uuml;r euren Download.',
+      lead: 'Wedding Story Atelier ist ein junges Designatelier aus der Region Heidelberg. Wir gestalten festliche Papeterie f&uuml;r Menschen, die einen besonderen Anlass mit Stil und W&uuml;rde feiern.',
+      intro: 'Da unser Atelier noch neu ist, geh&ouml;rt ihr zu den Ersten, die unsere Designs entdecken. Als Dankesch&ouml;n erhaltet ihr unseren Fr&uuml;hstarter-Vorteil:',
+      gEyebrow: 'Euer Fr&uuml;hstarter-Vorteil',
+      gHeadline: '20 % auf eure erste Bestellung',
+      gFine: 'G&uuml;ltig auf euren gesamten Warenkorb.',
+      gCta: '&rarr; Besucht unseren Etsy-Shop, legt eure Lieblingsvorlagen in den Warenkorb und gebt den Code beim Bezahlen ein.',
+      mid: 'Vielleicht steht euer Ehejubil&auml;um noch bevor &mdash; vielleicht fehlen nur die letzten Details f&uuml;r den Festtag.',
+      offerIntro: 'Im Atelier findet ihr Vorlagen f&uuml;r euren Ehrentag:',
+      offer: [
+        'Einladungen zur Silbernen &amp; Goldenen Hochzeit &mdash; am Smartphone ausf&uuml;llbar',
+        'Das Festtags-Set: Einladung, Tagesablauf &amp; Platzkarten',
+        'Goldene Gastgeschenk-Anh&auml;nger f&uuml;r eure G&auml;ste'
+      ],
+      closing: 'Sch&ouml;n, dass ihr hier seid.'
+    }
+  };
+
+  function buildHTML(variant) {
+    var c = CONTENT[variant] || CONTENT.wedding;
+    var offerLis = c.offer.map(function (o) { return '<li>' + o + '</li>'; }).join('');
+    return `
   <div id="wsa-mappe">
     <div class="head">
       <div class="wordmark">
@@ -69,38 +117,34 @@
         <span class="wm-text">Wedding Story Atelier</span>
         <span class="wm-line"></span>
       </div>
-      <h1>WELCOME TO<br>THE ATELIER</h1>
-      <div class="thanks">Vielen Dank f&uuml;r deinen Download.</div>
+      <h1>` + c.headline + `</h1>
+      <div class="thanks">` + c.thanks + `</div>
     </div>
     <div class="body">
-      <p class="lead">Wedding Story Atelier ist ein junges Designatelier aus der Region Heidelberg. Wir gestalten moderne Hochzeitsvorlagen f&uuml;r Paare, die zeitlose Eleganz und durchdachtes Design sch&auml;tzen.</p>
-      <p>Da unser Atelier noch neu ist, geh&ouml;rst du zu den ersten Paaren, die unsere Designs entdecken. Als Dankesch&ouml;n erh&auml;ltst du unseren Fr&uuml;hstarter-Vorteil:</p>
+      <p class="lead">` + c.lead + `</p>
+      <p>` + c.intro + `</p>
       <div class="gift">
-        <div class="g-eyebrow">Dein Fr&uuml;hstarter-Vorteil</div>
-        <div class="g-headline">20 % auf deine erste Bestellung</div>
+        <div class="g-eyebrow">` + c.gEyebrow + `</div>
+        <div class="g-headline">` + c.gHeadline + `</div>
         <div class="g-code">Code: <span>FRUEHSTARTER20</span></div>
-        <div class="g-fine">G&uuml;ltig auf deinen gesamten Warenkorb.</div>
-        <div class="g-cta">&rarr; Besuche unseren Etsy-Shop, leg deine Lieblingsvorlagen in den Warenkorb und gib den Code beim Bezahlen ein.<br><a href="https://weddingstoryatelier.etsy.com?coupon=FRUEHSTARTER20">weddingstoryatelier.etsy.com</a></div>
+        <div class="g-fine">` + c.gFine + `</div>
+        <div class="g-cta">` + c.gCta + `<br><a href="` + COUPON_URL + `">weddingstoryatelier.etsy.com</a></div>
       </div>
-      <p>Vielleicht planst du gerade erst eure Hochzeit. Vielleicht fehlen nur noch die letzten Details.</p>
-      <div class="offer-intro">Im Atelier findest du Vorlagen f&uuml;r viele Momente eurer Feier:</div>
-      <ul class="offer">
-        <li>Einladungen &amp; Save-the-Date-Karten</li>
-        <li>Geld-statt-Geschenke-Karten</li>
-        <li>Bridal Shower Vorlagen</li>
-        <li>Tischnummern &amp; Papeterie</li>
-        <li>Willkommensmappen f&uuml;r G&auml;ste</li>
-      </ul>
+      <p>` + c.mid + `</p>
+      <div class="offer-intro">` + c.offerIntro + `</div>
+      <ul class="offer">` + offerLis + `</ul>
       <div class="gold-rule"></div>
-      <p class="closing">Sch&ouml;n, dass du hier bist.</p>
+      <p class="closing">` + c.closing + `</p>
     </div>
     <div class="foot">
       <div class="f-name">Wedding Story Atelier &middot; Heidelberg</div>
       <div class="f-url">weddingstoryatelier.etsy.com</div>
     </div>
   </div>`;
+  }
 
-  function ensure() {
+  function ensure(variant) {
+    variant = (variant === 'anniversary') ? 'anniversary' : 'wedding';
     if (!document.getElementById('wsa-mappe-fonts')) {
       var lk = document.createElement('link');
       lk.id = 'wsa-mappe-fonts';
@@ -114,17 +158,22 @@
       s.textContent = CSS;
       document.head.appendChild(s);
     }
-    if (!document.getElementById('wsa-mappe-root')) {
-      var c = document.createElement('div');
+    var c = document.getElementById('wsa-mappe-root');
+    if (!c) {
+      c = document.createElement('div');
       c.id = 'wsa-mappe-root';
-      c.innerHTML = HTML;
       document.body.appendChild(c);
+    }
+    // Inhalt nur (neu) aufbauen, wenn der Anlass wechselt — erlaubt Umschalten.
+    if (c.getAttribute('data-variant') !== variant) {
+      c.innerHTML = buildHTML(variant);
+      c.setAttribute('data-variant', variant);
     }
     return document.getElementById('wsa-mappe');
   }
 
-  window.downloadWillkommensmappe = async function () {
-    var node = ensure();
+  window.downloadWillkommensmappe = async function (variant) {
+    var node = ensure(variant);
     if (document.fonts && document.fonts.load) {
       try {
         await Promise.all([
@@ -143,12 +192,15 @@
     var jsPDF = window.jspdf.jsPDF;
     var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
     pdf.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
-    pdf.save('Willkommensmappe_Wedding_Story_Atelier.pdf');
+    var file = (variant === 'anniversary')
+      ? 'Willkommensmappe_Jubilaeum_Wedding_Story_Atelier.pdf'
+      : 'Willkommensmappe_Wedding_Story_Atelier.pdf';
+    pdf.save(file);
   };
 
   // Karte sichtbar in ein Zielelement rendern (für die Vorschau-Seite)
-  window.previewWillkommensmappe = function (targetId) {
-    ensure();
+  window.previewWillkommensmappe = function (targetId, variant) {
+    ensure(variant);
     var root = document.getElementById('wsa-mappe-root');
     var tgt = document.getElementById(targetId);
     if (tgt && root) {
