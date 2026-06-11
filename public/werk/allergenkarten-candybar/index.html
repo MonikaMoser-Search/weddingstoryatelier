@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
 <meta charset="UTF-8">
@@ -793,5 +793,6 @@ renderAll();
 
 (function(){var _rc={_id:"CB-Allergenkarten",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
 </script>
+<script>/* WSA Demo-Felder: Beispieltext verschwindet beim ersten Klick in ein Feld */(function(){document.addEventListener("focusin",function(e){var el=e.target;if(!el||!el.matches)return;if(el.dataset.demoTouched)return;if(el.closest&&el.closest("#frueh-rabatt"))return;if(!el.matches('input[type="text"], input:not([type]), textarea'))return;el.dataset.demoTouched="1";if(el.value&&el.value.trim()!==""){el.value="";el.dispatchEvent(new Event("input",{bubbles:true}))}})})();</script>
 </body>
 </html>

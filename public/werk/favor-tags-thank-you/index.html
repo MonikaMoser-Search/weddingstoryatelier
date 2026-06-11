@@ -177,5 +177,6 @@
   document.getElementById('i-locale').addEventListener('change', e=>applyLocale(e.target.value));
   applyLocale('en');   // US-primär als Start
 </script>
+<script>/* WSA Demo-Felder: Beispieltext verschwindet beim ersten Klick in ein Feld */(function(){document.addEventListener("focusin",function(e){var el=e.target;if(!el||!el.matches)return;if(el.dataset.demoTouched)return;if(el.closest&&el.closest("#frueh-rabatt"))return;if(!el.matches('input[type="text"], input:not([type]), textarea'))return;el.dataset.demoTouched="1";if(el.value&&el.value.trim()!==""){el.value="";el.dispatchEvent(new Event("input",{bubbles:true}))}})})();</script>
 </body>
 </html>
