@@ -1,0 +1,494 @@
+﻿<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<title>Menü · Old Money · Wedding Story Atelier</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+/* ===== Schriften — lokal, OFL ========================================== */
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700; font-style: normal; font-display: block;
+}
+@font-face {
+  font-family: 'Cormorant Garamond';
+  src: url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 300 700; font-style: italic; font-display: block;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/Schriftarten/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf') format('truetype-variations');
+  font-weight: 400 900; font-style: normal; font-display: block;
+}
+
+/* ===== Farben — Old Money · Burgund (vollflächig) ====================== */
+:root {
+  --burgund: #8B1A35; --cream: #FEF8F7; --desc: #89314A;
+  --gold: #C9A96E; --gold-dim: rgba(201,169,110,0.55); --gold-light: #E3CB97;
+  --on-band: #FFFFFF; --bg: #DDD8D0; --ink-ui: #1A1A1A;
+  /* Text auf burgundem Grund */
+  --text: #FEF8F7; --text-dim: rgba(254,248,247,0.94);
+  --frame: rgba(201,169,110,0.50);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  background: var(--bg); font-family: 'Cormorant Garamond', serif;
+  color: var(--ink-ui); min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; padding: 32px 16px 64px;
+}
+
+/* ===== Käufer-UI (im Druck ausgeblendet) =============================== */
+.buyer-only { width: 100%; max-width: 600px; }
+.buyer-bar { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+.buyer-btn {
+  font-family: 'Cormorant Garamond', serif; font-size: 11pt; font-weight: 500;
+  letter-spacing: 0.20em; text-transform: uppercase; padding: 10px 22px;
+  background: var(--burgund); border: 1px solid var(--burgund); color: #fff; cursor: pointer;
+}
+.buyer-btn:hover { background: #6E0F26; }
+.buyer-hint { text-align: center; font-size: 11pt; color: #555; margin: 0 0 24px; line-height: 1.6; }
+.card-label { text-align: center; font-size: 9.5pt; letter-spacing: 0.20em; text-transform: uppercase;
+  color: #8a8378; margin: 0 0 6px; }
+
+/* ===== Karte (DL: 99 × 210 mm) ========================================= */
+.card {
+  width: 99mm; height: 210mm; background: var(--burgund);
+  position: relative; overflow: hidden; margin: 0 auto 8px;
+  box-shadow: 0 16px 48px rgba(89,13,40,0.32); display: flex; flex-direction: column;
+}
+/* Feiner Gold-Innenrahmen — wie Tagesprogramm Old Money */
+.card::after {
+  content: ''; position: absolute; inset: 6mm;
+  border: 0.5px solid var(--frame); pointer-events: none; z-index: 5;
+}
+.card-wrap { margin-bottom: 28px; }
+.band { background: transparent; flex-shrink: 0; position: relative; }
+.band-top { padding: 9mm 0 5mm; }
+.band-bottom { padding: 5mm 0 8mm; margin-top: auto; }
+.band-hair { display: none; }
+.crest {
+  width: 13mm; height: 13mm; border: 0.5px solid var(--gold); border-radius: 50%;
+  margin: 0 auto; display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif; font-weight: 500; font-size: 12pt;
+  color: var(--gold-light); letter-spacing: 0.05em;
+  white-space: nowrap; overflow: hidden;
+}
+.front-body { flex: 1; padding: 9mm 11mm; text-align: center; color: var(--text); overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center; }
+.menu-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 30pt; letter-spacing: 0.18em; padding-left: 0.18em; margin: 1mm 0 0; line-height: 1; }
+.menu-date { font-size: 10pt; letter-spacing: 0.30em; text-transform: uppercase; color: var(--gold-light); margin: 3mm 0 0; }
+.rule { display: flex; align-items: center; justify-content: center; gap: 3mm; width: 55mm; margin: 4mm auto 4mm; }
+.rule-line { flex: 1; height: 0.5px; background: var(--gold-dim); }
+.rule-gem { width: 2mm; height: 2mm; border: 0.5px solid var(--gold-dim); transform: rotate(45deg); }
+.footer-orn { display: flex; align-items: center; justify-content: center; gap: 2.5mm; width: 45mm; margin: 0 auto; }
+.footer-orn .l { flex: 1; height: 0.5px; background: var(--gold-dim); }
+.footer-orn .d { width: 1.3mm; height: 1.3mm; border-radius: 50%; background: var(--gold-dim); }
+
+/* ===== Abschnitte / Gänge ============================================== */
+.section { margin: 3mm 0; }
+.section-title { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 12pt;
+  letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold-light); text-align: center; margin: 0; }
+.section-title .field { text-align: center; }
+.dish-row { margin: 1.5mm 0; }
+.dish-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 500;
+  font-size: 13.5pt; color: var(--text); text-align: center; line-height: 1.35; margin: 0; }
+textarea.dish-input { display: block; resize: none; overflow: hidden; white-space: pre-wrap;
+  word-break: break-word; line-height: 1.3; min-height: 1.3em; vertical-align: top; }
+.dish-row.screen-hide { display: none; }
+
+/* ===== Rückseite: Titel + Liste ======================================= */
+.back-body { flex: 1; padding: 10mm 10mm; text-align: center; color: var(--text); overflow: hidden;
+  display: flex; flex-direction: column; justify-content: center; }
+.back-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 19pt; letter-spacing: 0.12em; margin: 0; }
+.back-sub { font-size: 9.5pt; letter-spacing: 0.20em; text-transform: uppercase; color: var(--gold-light); margin: 2mm 0 5mm; }
+.back-list { text-align: left; max-width: 78mm; margin: 0 auto; }
+.back-item { margin: 2.5mm 0; line-height: 1.4; }
+.back-line { font-family: 'Cormorant Garamond', serif; }
+.back-dish { font-style: italic; font-weight: 600; font-size: 12.5pt; color: var(--text); }
+.back-dash { color: var(--gold-light); }
+.back-alg { font-size: 11pt; color: var(--text-dim); }
+.back-empty { font-size: 11.5pt; color: var(--text-dim); font-style: italic; text-align: center; line-height: 1.45; }
+.back-note { font-size: 9pt; color: var(--gold-light); letter-spacing: 0.04em; margin-top: 5mm; line-height: 1.5; text-align: center; }
+.back-hint { font-size: 8.5pt; color: var(--text-dim); font-style: italic; text-align: center; margin: 0 0 4mm; line-height: 1.4; }
+
+/* ===== Anleitungs-Karte Allergene (nur Bildschirm, über der Karte) ===== */
+.alg-help { display: block; width: 99mm; max-width: 99mm; margin: 0 auto 10px;
+  padding: 5mm 7mm 5.5mm; background: var(--cream);
+  border: 0.5px solid var(--gold-dim); border-radius: 2px;
+  box-shadow: 0 6px 20px rgba(89,13,40,0.10); text-align: left; box-sizing: border-box; }
+.alg-help-title { font-family: 'Cormorant Garamond', serif; font-weight: 700; font-size: 11pt;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--burgund);
+  text-align: center; margin: 0 0 4mm; }
+.alg-help ol { margin: 0; padding: 0; list-style: none; counter-reset: step; }
+.alg-help li { position: relative; padding-left: 9mm; margin: 0 0 3mm;
+  font-family: 'Cormorant Garamond', serif; font-size: 11.5pt; line-height: 1.4;
+  color: var(--desc); counter-increment: step; }
+.alg-help li:last-child { margin-bottom: 0; }
+.alg-help li::before { content: counter(step); position: absolute; left: 0; top: -0.2mm;
+  width: 6mm; height: 6mm; border: 0.5px solid var(--burgund);
+  border-radius: 50%; color: var(--burgund); font-family: 'Playfair Display', serif;
+  font-size: 9.5pt; display: flex; align-items: center; justify-content: center; }
+.alg-help strong { color: var(--burgund); font-weight: 600; font-style: normal; }
+
+/* ===== Allergen-Auswahl (nur Bildschirm, auf der Rückseite) ============ */
+.buyer-edit { }                       /* Marker — im Druck ausgeblendet */
+.alg-toggle { font-family: 'Cormorant Garamond', serif; font-size: 8.5pt; letter-spacing: 0.10em;
+  text-transform: uppercase; color: var(--gold); background: none; border: none; cursor: pointer; padding: 0.5mm 0; }
+.alg-toggle:hover { color: var(--gold-light); }
+.alg-toggle .count { color: var(--gold-light); font-weight: 600; }
+.alg-chips { display: none; flex-wrap: wrap; gap: 4px; margin: 1.5mm 0 2mm; }
+.alg-chips.open { display: flex; }
+.chip { font-family: 'Cormorant Garamond', serif; font-size: 8.5pt; letter-spacing: 0.02em;
+  padding: 2px 8px; border: 0.5px solid var(--gold-dim); border-radius: 999px; color: var(--desc);
+  background: #fff; cursor: pointer; user-select: none; line-height: 1.3; }
+.chip.on { background: var(--gold); color: #5a0f22; border-color: var(--gold); font-weight: 600; }
+
+/* ===== Input-Styling =================================================== */
+.field { background: transparent; border: none; outline: none; font: inherit; color: inherit;
+  text-align: inherit; letter-spacing: inherit; text-transform: inherit; padding: 1px 3px;
+  width: 100%; border-radius: 2px; transition: background .12s ease, box-shadow .12s ease; }
+.field:hover { background: rgba(254,248,247,0.08); }
+.field:focus { background: rgba(254,248,247,0.12); box-shadow: 0 0 0 1px var(--gold-dim); }
+.field::placeholder { color: rgba(254,248,247,0.40); opacity: 1; }
+.crest-input { width: 11mm; text-align: center; color: var(--gold-light); font-family: 'Playfair Display', serif;
+  font-size: 11pt; letter-spacing: 0.04em; }
+.crest-input::placeholder { color: rgba(227,203,135,0.45); }
+.crest.is-placeholder { color: rgba(227,203,135,0.45); }
+.menu-date .field { text-align: center; }
+
+/* ===== Druckerei-Modus (Bildschirm-Hinweis) =========================== */
+body.mode-druckerei .card { outline: 3mm solid var(--cream); }
+
+/* ===== Print =========================================================== */
+@media print {
+  @page { size: 99mm 210mm; margin: 0; }
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important;
+    width: 99mm !important; min-height: 0 !important; display: block !important; }
+  .buyer-only, .card-label, .buyer-edit { display: none !important; }
+  .card-wrap { margin: 0 !important; }
+  .card { box-shadow: none !important; width: 99mm; height: 210mm; margin: 0;
+    page-break-after: always; break-after: page; page-break-inside: avoid; }
+  #wrapBack { page-break-after: auto; }
+  #cardBack { page-break-after: auto; break-after: auto; }
+  .dish-row.is-empty, .section.is-empty { display: none !important; }
+  .back-item.no-alg { display: none !important; }   /* ohne Allergen nicht drucken */
+  .field { background: transparent !important; box-shadow: none !important; }
+  .field::placeholder { color: transparent !important; }
+  .crest.is-placeholder { color: transparent !important; }
+  body.mode-druckerei .card { outline: none; }
+  * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="buyer-only">
+  <div class="buyer-bar">
+    <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
+    <button class="buyer-btn" id="btnMode" type="button" data-mode="heim">Modus: Heimdruck</button>
+  </div>
+  <p class="buyer-hint">
+    <strong>Vorderseite:</strong> Menü eintragen. <strong>Rückseite:</strong> je Gericht „Allergene wählen"
+    antippen — die Allergen-Liste entsteht von selbst. Danach „Drucken / PDF". Tipp: im Druckdialog
+    Hintergrundgrafiken aktivieren. Format: DL (99 × 210 mm), beidseitig.
+  </p>
+</div>
+
+<!-- ===== Vorderseite ===== -->
+<div class="card-wrap" id="wrapFront">
+<p class="card-label">Vorderseite — Menü</p>
+<article class="card" id="cardFront">
+  <div class="band band-top">
+    <div class="crest"><input class="field crest-input" id="fInitials" type="text" maxlength="5" placeholder="A&amp;T"></div>
+  </div>
+  <div class="band-hair"></div>
+
+  <div class="front-body">
+    <h1 class="menu-title">MENÜ</h1>
+    <p class="menu-date"><input class="field" id="fDate" type="text" placeholder="12. SEPTEMBER 2026"></p>
+    <div class="rule" aria-hidden="true"><span class="rule-line"></span><span class="rule-gem"></span><span class="rule-line"></span></div>
+
+    <div id="sections">
+      <div class="section" data-sec="vorspeise">
+        <p class="section-title"><input class="field sec-title" type="text" value="Vorspeise"></p>
+        <div class="dishes"></div>
+      </div>
+      <div class="section" data-sec="hauptgang">
+        <p class="section-title"><input class="field sec-title" type="text" value="Hauptgang"></p>
+        <div class="dishes"></div>
+      </div>
+      <div class="section" data-sec="dessert">
+        <p class="section-title"><input class="field sec-title" type="text" value="Dessert"></p>
+        <div class="dishes"></div>
+      </div>
+      <div class="section" data-sec="frei1">
+        <p class="section-title"><input class="field sec-title" type="text" placeholder="z. B. Kaffee &amp; Kuchen"></p>
+        <div class="dishes"></div>
+      </div>
+      <div class="section" data-sec="frei2">
+        <p class="section-title"><input class="field sec-title" type="text" placeholder="z. B. Mitternachtssuppe"></p>
+        <div class="dishes"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="band-hair"></div>
+  <div class="band band-bottom">
+    <div class="footer-orn" aria-hidden="true"><span class="l"></span><span class="d"></span><span class="l"></span></div>
+  </div>
+</article>
+</div>
+
+<!-- ===== Rückseite ===== -->
+<div class="card-wrap" id="wrapBack">
+<p class="card-label">Rückseite — Allergene (hier auswählen)</p>
+<div class="alg-help buyer-edit">
+  <p class="alg-help-title">So tragen Sie die Allergene ein</p>
+  <ol>
+    <li>Tragen Sie zuerst auf der <strong>Vorderseite</strong> Ihr Menü ein — jedes Gericht erscheint dann automatisch auf der Karte unten.</li>
+    <li>Tippen Sie bei einem Gericht auf <strong>„Allergene wählen"</strong> — die Auswahl klappt auf. Markieren Sie alle zutreffenden Allergene.</li>
+    <li>Tippen Sie erneut auf <strong>„Allergene"</strong>, um die Auswahl wieder einzuklappen — so sehen Sie die fertige Vorschau.</li>
+    <li>Zum Schluss oben auf <strong>„Drucken / PDF"</strong>. Die Hinweise hier werden nicht mitgedruckt.</li>
+  </ol>
+</div>
+<article class="card" id="cardBack">
+  <div class="band band-top">
+    <div class="crest" id="crestBack" aria-hidden="true"></div>
+  </div>
+  <div class="band-hair"></div>
+  <div class="back-body">
+    <h2 class="back-title">Allergene</h2>
+    <p class="back-sub">&amp; Zusatzstoffe</p>
+    <div class="back-list" id="backList"></div>
+    <p class="back-note">Angaben ohne Gewähr — bitte mit dem Catering abgleichen.</p>
+  </div>
+  <div class="band-hair"></div>
+  <div class="band band-bottom">
+    <div class="footer-orn" aria-hidden="true"><span class="l"></span><span class="d"></span><span class="l"></span></div>
+  </div>
+</article>
+</div>
+
+<script>
+/* ===== Daten ===== */
+const ALLERGENE = [
+  "Glutenhaltiges Getreide", "Krebstiere", "Eier", "Fische", "Erdnüsse",
+  "Sojabohnen", "Milch (inkl. Laktose)", "Schalenfrüchte (Nüsse)", "Sellerie",
+  "Senf", "Sesamsamen", "Schwefeldioxid und Sulfite", "Lupinen", "Weichtiere"
+];
+const algByDish = {};                       // dishId -> Set<allergenIndex>
+const DISHES_PER_SECTION = 4;
+const PLACEHOLDERS = {
+  vorspeise: ["Feldsalat mit Ziegenkäse", "Lachstatar auf Avocado", "", ""],
+  hauptgang: ["Rinderfilet, Kräuterbutter", "Wildkräuter-Risotto", "", ""],
+  dessert:   ["Mousse au Chocolat", "", "", ""],
+  frei1:     ["", "", "", ""],
+  frei2:     ["", "", "", ""]
+};
+const STORAGE_KEY = 'wsa_menukarte_tellerkarte_de';
+
+/* ===== Helfer ===== */
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ===== Gänge-Zeilen erzeugen (Vorderseite — nur Eingabe, keine Chips) ===== */
+let dishSeq = 0;
+function buildDishes() {
+  document.querySelectorAll('#sections .section').forEach(sec => {
+    const key = sec.dataset.sec;
+    const wrap = sec.querySelector('.dishes');
+    for (let i = 0; i < DISHES_PER_SECTION; i++) {
+      const id = 'dish_' + (dishSeq++);
+      const ph = (PLACEHOLDERS[key] && PLACEHOLDERS[key][i]) ? PLACEHOLDERS[key][i] : 'Gericht …';
+      const row = document.createElement('div');
+      row.className = 'dish-row';
+      row.dataset.dishId = id;
+      row.innerHTML = '<p class="dish-name"><textarea class="field dish-input" id="' + id + '" rows="1" placeholder="' + ph + '"></textarea></p>';
+      wrap.appendChild(row);
+    }
+  });
+}
+
+/* ===== Sichtbarkeit Vorderseite: gefüllte Zeilen + eine leere Folgezeile ===== */
+function updateRowState() {
+  document.querySelectorAll('#sections .section').forEach(sec => {
+    let trailingShown = false, hasContent = false;
+    sec.querySelectorAll('.dish-row').forEach(row => {
+      const empty = !row.querySelector('.dish-input').value.trim();
+      row.classList.toggle('is-empty', empty);          // für den Druck
+      if (!empty) { hasContent = true; row.classList.remove('screen-hide'); }
+      else if (!trailingShown) { row.classList.remove('screen-hide'); trailingShown = true; }
+      else { row.classList.add('screen-hide'); }
+    });
+    sec.classList.toggle('is-empty', !hasContent);       // leerer Abschnitt: im Druck weg
+  });
+}
+
+/* ===== Rückseite bauen — editierbare Allergen-Auswahl je Gericht ===== */
+function renderBack() {
+  const list = document.getElementById('backList');
+  const _ini = document.getElementById('fInitials');
+  const _crestBack = document.getElementById('crestBack');
+  const _iniVal = (_ini.value || '').trim();
+  _crestBack.textContent = _iniVal || _ini.placeholder || '';
+  _crestBack.classList.toggle('is-placeholder', !_iniVal);
+  fitCrest(_crestBack);
+  list.innerHTML = '';
+  const allDishInputs = [...document.querySelectorAll('.dish-input')];
+  // Allergene eines geleerten/geänderten Gerichts verwerfen — sonst „kleben" sie an der Zeile
+  allDishInputs.forEach(i => { if (!i.value.trim() && algByDish[i.id]) delete algByDish[i.id]; });
+  const filled = allDishInputs.filter(i => i.value.trim());
+  if (!filled.length) {
+    list.innerHTML = '<p class="back-empty">Noch keine Gerichte eingetragen — '
+      + 'sie erscheinen hier automatisch, sobald Sie vorne Ihr Menü ausfüllen.</p>';
+    return;
+  }
+  filled.forEach(inp => {
+    const id = inp.id;
+    algByDish[id] = algByDish[id] || new Set();
+    const item = document.createElement('div'); item.className = 'back-item'; item.dataset.dish = id;
+
+    const line = document.createElement('div'); line.className = 'back-line';
+    const dishEl = document.createElement('span'); dishEl.className = 'back-dish'; dishEl.textContent = inp.value.trim();
+    const dashEl = document.createElement('span'); dashEl.className = 'back-dash'; dashEl.textContent = ' — ';
+    const algEl  = document.createElement('span'); algEl.className = 'back-alg';
+    line.appendChild(dishEl); line.appendChild(dashEl); line.appendChild(algEl);
+
+    const toggle = document.createElement('button'); toggle.type = 'button'; toggle.className = 'alg-toggle buyer-edit';
+    const chips  = document.createElement('div'); chips.className = 'alg-chips buyer-edit';
+
+    function refresh() {
+      const set = algByDish[id];
+      const names = [...set].sort((a, b) => a - b).map(i => ALLERGENE[i]);
+      algEl.textContent = names.length ? names.join(', ') : '';
+      item.classList.toggle('no-alg', names.length === 0);
+      toggle.innerHTML = names.length
+        ? 'Allergene ändern <span class="count">' + names.length + '</span>'
+        : 'Allergene wählen +';
+    }
+    ALLERGENE.forEach((name, idx) => {
+      const c = document.createElement('span');
+      c.className = 'chip' + (algByDish[id].has(idx) ? ' on' : '');
+      c.textContent = name; c.dataset.idx = idx;
+      c.addEventListener('click', () => {
+        const set = algByDish[id];
+        if (set.has(idx)) { set.delete(idx); c.classList.remove('on'); }
+        else { set.add(idx); c.classList.add('on'); }
+        refresh(); saveToStorage();
+      });
+      chips.appendChild(c);
+    });
+    toggle.addEventListener('click', () => chips.classList.toggle('open'));
+
+    item.appendChild(line); item.appendChild(toggle); item.appendChild(chips);
+    list.appendChild(item);
+    refresh();
+  });
+}
+
+/* ===== Persistenz ===== */
+function saveToStorage() {
+  try {
+    const data = { fields: {}, sec: [], alg: {} };
+    document.querySelectorAll('.field').forEach(inp => { if (inp.id) data.fields[inp.id] = inp.value; });
+    document.querySelectorAll('.sec-title').forEach(inp => { data.sec.push(inp.value); });
+    Object.entries(algByDish).forEach(([id, set]) => { if (set.size) data.alg[id] = [...set]; });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {}
+}
+function loadFromStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return;
+    const data = JSON.parse(raw);
+    if (data.fields) Object.entries(data.fields).forEach(([id, v]) => {
+      const el = document.getElementById(id); if (el && typeof v === 'string') el.value = v;
+    });
+    if (Array.isArray(data.sec)) {
+      const titles = document.querySelectorAll('.sec-title');
+      data.sec.forEach((v, i) => { if (titles[i] && typeof v === 'string') titles[i].value = v; });
+    }
+    if (data.alg) Object.entries(data.alg).forEach(([id, arr]) => { algByDish[id] = new Set(arr); });
+  } catch (e) {}
+}
+
+/* ===== Autofit (aus save_the_date_editorial_DE übernommen) ===== */
+const _measureCtx = document.createElement('canvas').getContext('2d');
+function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
+  function fit() {
+    const cs = getComputedStyle(input);
+    const family = cs.fontFamily;
+    const style  = cs.fontStyle  || 'normal';
+    const weight = cs.fontWeight || '400';
+    const transform = (cs.textTransform || 'none').toLowerCase();
+    let text = input.value || input.placeholder || '';
+    if (transform === 'uppercase') text = text.toUpperCase();
+    function widthAt(pt) {
+      const px = (pt * 4 / 3).toFixed(2);
+      _measureCtx.font = `${style} ${weight} ${px}px ${family}`;
+      return _measureCtx.measureText(text).width;
+    }
+    const lsPx = parseFloat(cs.letterSpacing) || 0;
+    const trackingPx = lsPx * Math.max(0, text.length - 1);
+    const available = (input.clientWidth - 4) / swashSafety;
+    let pt = maxPt;
+    const needed = widthAt(maxPt) + trackingPx;
+    if (needed > available) { pt = Math.max(minPt, maxPt * (available / needed)); }
+    input.style.fontSize = pt.toFixed(1) + 'pt';
+  }
+  input.addEventListener('input', fit);
+  return fit;
+}
+
+/* ===== Auto-Höhe: Textarea wächst mit dem Inhalt (Zeilenumbruch) ===== */
+function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
+
+/* ===== Rückseiten-Kreis: Initialen einpassen (kein Stapeln/Überlauf) ===== */
+function fitCrest(el) {
+  let fs = 12;                       // pt — entspricht CSS-Ausgangswert
+  el.style.fontSize = fs + 'pt';
+  let guard = 0;
+  while (el.scrollWidth > el.clientWidth - 1 && fs > 7 && guard++ < 20) {
+    fs -= 0.5; el.style.fontSize = fs + 'pt';
+  }
+}
+
+/* ===== Verdrahtung ===== */
+buildDishes();
+
+document.getElementById('btnPrint').addEventListener('click', () => { updateRowState(); window.print(); });
+
+const btnMode = document.getElementById('btnMode');
+btnMode.addEventListener('click', () => {
+  const m = btnMode.dataset.mode === 'heim' ? 'druckerei' : 'heim';
+  btnMode.dataset.mode = m;
+  document.body.classList.toggle('mode-druckerei', m === 'druckerei');
+  btnMode.textContent = 'Modus: ' + (m === 'heim' ? 'Heimdruck' : 'Druckerei');
+});
+
+// Vorderseiten-Eingaben: speichern, Sichtbarkeit + Rückseite aktualisieren
+document.querySelectorAll('.field').forEach(inp => inp.addEventListener('input', saveToStorage));
+document.querySelectorAll('.dish-input').forEach(inp => {
+  inp.addEventListener('input', () => { autoGrow(inp); updateRowState(); renderBack(); });
+});
+document.getElementById('fInitials').addEventListener('input', renderBack);
+window.addEventListener('beforeprint', updateRowState);
+
+function setup() {
+  loadFromStorage();
+  document.querySelectorAll('.dish-input').forEach(autoGrow);
+  updateRowState();
+  renderBack();
+  autofitField(document.getElementById('fDate'), 9, 7, 1.08)();
+  autofitField(document.getElementById('fInitials'), 12, 8, 1.05)();
+}
+if (document.fonts && document.fonts.ready) { document.fonts.ready.then(setup); }
+else { window.addEventListener('load', setup); }
+</script>
+
+</body>
+</html>
