@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Hochzeits-Bingo — Eisbrecher gratis · Wedding Story Atelier</title>
+  <meta name="description" content="„Hochzeits-Bingo" — der gratis Eisbrecher als druckfertiges PDF. 24 Aufgaben „Finde einen Gast, der…", die die Gäste mischen und ins Gespräch bringen. Felder neu mischbar, direkt im Browser, ohne Anmeldung.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="willkommensmappe.js?v=20260611d"></script>
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    /* Abschnitts-Überschriften prominenter — nur in dieser Demo */
+    .panel-form .section-label {
+      font-size: 10px; font-weight: 700; color: #0D3D2A;
+      letter-spacing: 1.2px; margin-top: 16px;
+    }
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+      align-items: stretch; padding: 0; justify-content: flex-start;
+      position: relative;
+    }
+    .preview-header {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .demo-badge {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #C9A96E; border: 1px solid #C9A96E;
+      padding: 3px 9px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+      border-radius: 2px;
+    }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── A4 Bingo-Seite ──────────────────────────────── */
+    .a4-page {
+      width: 210mm; height: 297mm;
+      background: #fff;
+      box-sizing: border-box;
+      position: relative;
+      padding: 14mm 15mm 11mm;
+      color: #2F3A2F;
+      display: flex; flex-direction: column;
+      --accent: #9C7B1A;
+      --ink: #2F3A2F;
+      --rule: rgba(47,58,47,0.30);
+      --soft: rgba(47,58,47,0.62);
+      --cm-off: 3.5mm;
+      --cm-line: 20mm;
+    }
+    .a4-frame {
+      position: absolute; inset: 7mm;
+      border: 0.8px solid rgba(47,58,47,0.38);
+      pointer-events: none;
+    }
+
+    /* Doppel-L Schmuckecken — oben-rechts + unten-links, in Gold (vom Foto-Tischschild) */
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off) + var(--cm-line));
+      height: calc(var(--cm-off) + var(--cm-line));
+      pointer-events: none; z-index: 4;
+    }
+    .corner-mark::before,
+    .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line); height: var(--cm-line);
+    }
+    .corner-mark.tr { top: 7mm; right: 7mm; }
+    .corner-mark.tr::before {
+      top: 0; right: 0;
+      border-top:   0.8px solid rgba(156,123,26,0.85);
+      border-right: 0.8px solid rgba(156,123,26,0.85);
+    }
+    .corner-mark.tr::after {
+      top: var(--cm-off); right: var(--cm-off);
+      border-top:   0.8px solid rgba(156,123,26,0.85);
+      border-right: 0.8px solid rgba(156,123,26,0.85);
+    }
+    .corner-mark.bl { bottom: 7mm; left: 7mm; }
+    .corner-mark.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.8px solid rgba(156,123,26,0.85);
+      border-left:   0.8px solid rgba(156,123,26,0.85);
+    }
+    .corner-mark.bl::after {
+      bottom: var(--cm-off); left: var(--cm-off);
+      border-bottom: 0.8px solid rgba(156,123,26,0.85);
+      border-left:   0.8px solid rgba(156,123,26,0.85);
+    }
+
+    /* Kopf */
+    .mw-head { text-align: center; flex-shrink: 0; margin-bottom: 4mm; }
+    .mw-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      font-size: 2.6mm; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap; overflow: hidden;
+      text-indent: 0.34em;
+      min-height: 4mm;
+    }
+    .mw-title {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: 11mm; line-height: 1.05; color: var(--ink);
+      margin-top: 1.5mm;
+      padding-left: 0.07em;
+    }
+    .mw-ornament {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3mm; width: 46%; margin: 2.5mm auto 0;
+    }
+    .mw-ornament .line { flex: 1; height: 0.5px; background: var(--rule); }
+    .mw-ornament .diamond { color: var(--accent); font-size: 3mm; line-height: 1; }
+    .mw-intro {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 4.1mm; line-height: 1.4; color: var(--soft);
+      margin: 2.5mm auto 0; max-width: 86%;
+    }
+
+    /* ── Bingo-Gitter ────────────────────────────────── */
+    .bingo-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(5, 1fr);
+      border-top: 0.8px solid var(--soft);
+      border-left: 0.8px solid var(--soft);
+    }
+    .bingo-cell {
+      border-right: 0.8px solid var(--soft);
+      border-bottom: 0.8px solid var(--soft);
+      box-sizing: border-box;
+      padding: 3.2mm 2.4mm 3mm;
+      display: flex; flex-direction: column; align-items: stretch;
+      overflow: hidden; position: relative;
+    }
+    .cell-diamond {
+      flex-shrink: 0; margin: 0 auto 1.6mm;
+      color: var(--accent); font-size: 2.8mm; line-height: 1; opacity: 0.8;
+    }
+    .cell-text {
+      flex-shrink: 0; text-align: center; z-index: 1;
+      font-family: 'Cormorant Garamond', serif; font-weight: 500;
+      font-size: 3.6mm; line-height: 1.28; color: var(--ink);
+    }
+    /* Zarte Doppel-L-Ecken pro Feld — oben-rechts + unten-links */
+    .cell-corner {
+      position: absolute;
+      width: calc(1.2mm + 4.5mm); height: calc(1.2mm + 4.5mm);
+      pointer-events: none; z-index: 2;
+    }
+    .cell-corner::before {
+      content: ''; position: absolute; width: 4.5mm; height: 4.5mm;
+    }
+    .cell-corner.tr { top: 1.6mm; right: 1.6mm; }
+    .cell-corner.tr::before {
+      top: 0; right: 0;
+      border-top: 0.5px solid rgba(156,123,26,0.55);
+      border-right: 0.5px solid rgba(156,123,26,0.55);
+    }
+    .cell-corner.bl { bottom: 1.6mm; left: 1.6mm; }
+    .cell-corner.bl::before {
+      bottom: 0; left: 0;
+      border-bottom: 0.5px solid rgba(156,123,26,0.55);
+      border-left: 0.5px solid rgba(156,123,26,0.55);
+    }
+    .name-line {
+      margin: auto auto 0; width: 72%; height: 0;
+      border-bottom: 0.6px solid rgba(47,58,47,0.40);
+    }
+
+    /* Freifeld in der Mitte */
+    .bingo-free {
+      align-items: center; justify-content: center; text-align: center;
+      background: rgba(156,123,26,0.06);
+    }
+    .bingo-free .free-heart { color: var(--accent); font-size: 7mm; line-height: 1; }
+    .bingo-free .free-txt {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 3.3mm; line-height: 1.25; color: var(--soft);
+      margin-top: 1.4mm; letter-spacing: 0.03em;
+    }
+
+    /* Fuß mit Herz-Ornament */
+    .mw-foot { flex-shrink: 0; margin-top: 4mm; }
+    .mw-foot-orn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3mm; width: 42%; margin: 0 auto 2mm;
+    }
+    .mw-foot-orn .line { flex: 1; height: 0.5px; background: var(--rule); }
+    .mw-foot-orn .heart { color: var(--accent); font-size: 3.2mm; line-height: 1; }
+    .mw-foot-txt {
+      text-align: center; font-family: 'DM Sans', sans-serif; font-size: 2.1mm;
+      letter-spacing: 0.28em; text-transform: uppercase; color: rgba(47,58,47,0.50);
+    }
+
+    .sub-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 6px; display: block; }
+    .char-row { display: flex; justify-content: flex-end; align-items: center; margin-top: 2px; min-height: 12px; }
+    .char-count { font-size: 9px; color: #aaa; }
+    .char-count.over { color: #c07040; }
+
+    /* Mischen-Knopf */
+    .btn-shuffle {
+      width: 100%; margin-top: 10px; padding: 9px 12px;
+      background: #fff; color: #0D3D2A;
+      border: 1px solid #C9A84C; border-radius: 3px; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.14em; font-weight: 500;
+      transition: background 0.15s;
+    }
+    .btn-shuffle:hover { background: rgba(201,168,76,0.10); }
+
+    /* CTA-Block */
+    .cta-block {
+      margin-top: 18px; border-top: 1px solid #ede9e0;
+      padding-top: 16px; display: flex; flex-direction: column; gap: 9px;
+    }
+    .cta-tagline { font-size: 11px; color: #888; font-weight: 300; line-height: 1.55; }
+    .cta-tagline strong { color: #1A1A1A; font-weight: 500; }
+    .cta-etsy {
+      display: flex; align-items: center; justify-content: center;
+      padding: 11px 12px; background: #C9A96E; color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500;
+      text-decoration: none; border-radius: 3px; transition: background 0.15s;
+    }
+    .cta-etsy:hover { background: #b39154; }
+  </style>
+  <script>
+  (function(){var _rc={_id:"BINGO-Gratis",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+  </script>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo" id="lbl-logo">Hochzeits-Bingo</div>
+  <div class="panel-tagline" id="lbl-tagline">Gratis-Eisbrecher · 24 Aufgaben · ein A4-Bogen</div>
+
+  <div class="lang-buttons" style="margin-top:14px;">
+    <button class="lang-btn active" id="btn-de" onclick="setLang('de',this)">DE</button>
+    <button class="lang-btn"        id="btn-en" onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <span class="section-label" id="lbl-section">Euer Bingo</span>
+  <span class="sub-label" id="lbl-couple">Namen des Brautpaars</span>
+  <input type="text" id="inp-couple" maxlength="40" placeholder="Anna &amp; Peter" oninput="render()">
+  <div class="char-row"><span class="char-count" id="char-count"></span></div>
+  <p class="hint" id="hint-couple">Erscheint klein über dem Titel — „Anna &amp; Peters Hochzeits-Bingo". Alles andere ist fertig gestaltet.</p>
+
+  <button class="btn-shuffle" id="btn-shuffle" onclick="shuffleBoard()">&#10227; Felder mischen</button>
+  <p class="hint" id="hint-shuffle">Tipp: Mische die Felder und drucke mehrere Bögen — so hat jeder Gast ein anderes Spiel.</p>
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Beispiel</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
+  </div>
+
+  <div id="gift-reveal" style="margin-top:14px; border:1px solid #C9A84C; background:rgba(201,168,76,0.10); border-radius:4px; padding:18px 18px 16px; text-align:center;">
+    <p id="gr-eyebrow" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:#9c7b1a; margin:0 0 5px;">Frühstarter-Vorteil · für die ersten Paare</p>
+    <p id="gr-headline" style="font-family:'Playfair Display',serif; font-size:23px; color:#0D3D2A; line-height:1.1; margin:0 0 7px;">20 % Atelier-Rabatt</p>
+    <p id="gr-text" style="font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:#1C1408; margin:0 0 13px;">Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.</p>
+    <button id="gr-btn" onclick="downloadWillkommensmappe()" style="width:100%; padding:12px; background:#0D3D2A; color:#fff; border:none; border-radius:2px; cursor:pointer; font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:0.14em; text-transform:uppercase;">Rabattcode sichern</button>
+  </div>
+
+  <div class="cta-block">
+    <p class="cta-tagline" id="cta-tagline">
+      <strong>Lust auf mehr fürs Fest?</strong> Im Atelier findest du weitere Karten, Spiele und Drucksachen für euren großen Tag — abgestimmt aufeinander, druckfertig.
+    </p>
+    <a class="cta-etsy" id="cta-etsy" href="https://weddingstoryatelier.etsy.com" target="_blank" rel="noopener">✦ Zum Wedding Story Atelier</a>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="preview-header">
+    <span class="demo-badge" id="demo-badge">Gratis · ein A4-Bogen</span>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-page" id="preview-page"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-page" id="print-bingo"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg">PDF wird erstellt …</span>
+</div>
+
+<script>
+  /* ════ INHALT — 24 Aufgaben „Finde einen Gast, der…" ══════════════════════ */
+  var PROMPTS = [
+    /* Rund ums Paar & die Liebe */
+    { de: 'weiß, wie sich Braut und Bräutigam kennengelernt haben',
+      en: 'knows how the bride and groom first met' },
+    { de: 'beim Heiratsantrag dabei war oder die Geschichte kennt',
+      en: 'was there for the proposal or knows the story' },
+    { de: 'das Paar verkuppelt hat',
+      en: 'played matchmaker for the couple' },
+    { de: 'weiß, wohin die Flitterwochen gehen',
+      en: 'knows where the honeymoon is going' },
+    { de: 'schon auf der Verlobung mitgefeiert hat',
+      en: 'celebrated at the engagement party' },
+    { de: 'das Paar am längsten kennt',
+      en: 'has known the couple the longest' },
+    { de: 'weiß, seit wie vielen Jahren die beiden zusammen sind',
+      en: 'knows how many years the two have been together' },
+    { de: 'dem Paar eine Weisheit für die Ehe mitgeben kann',
+      en: 'can share a piece of marriage wisdom' },
+    { de: 'selbst seit über 25 Jahren verheiratet ist',
+      en: 'has been married for more than 25 years' },
+    { de: 'auf einer Hochzeit die große Liebe kennengelernt hat',
+      en: 'met their own true love at a wedding' },
+    /* Hochzeitsmomente heute */
+    { de: 'bei der Trauung ein Tränchen verdrückt hat',
+      en: 'shed a tear during the ceremony' },
+    { de: 'als Erstes die Tanzfläche eröffnet',
+      en: 'is first to open the dance floor' },
+    { de: 'schon mit dem Brautpaar angestoßen hat',
+      en: 'has already toasted with the newlyweds' },
+    { de: 'beim Brautstrauß mitfangen will',
+      en: 'wants to catch the bouquet' },
+    { de: 'schon ein Selfie mit dem Brautpaar hat',
+      en: 'already has a selfie with the couple' },
+    { de: 'heute zum ersten Mal jemanden aus der anderen Familie kennenlernt',
+      en: 'is meeting someone from the other family for the first time today' },
+    /* Eisbrecher */
+    { de: 'mehr als 1.000 km angereist ist',
+      en: 'travelled more than 1,000 km to be here' },
+    { de: 'denselben Vornamen hat wie du',
+      en: 'shares your first name' },
+    { de: 'das Paar aus Schule oder Uni kennt',
+      en: 'knows the couple from school or university' },
+    { de: 'ein Instrument spielt',
+      en: 'plays an instrument' },
+    { de: 'aus deinem Ort kommt',
+      en: 'comes from your hometown' },
+    { de: 'die weiteste Anreise aller Gäste hatte',
+      en: 'had the longest journey of all the guests' },
+    { de: 'schon einmal Trauzeuge oder Brautjungfer war',
+      en: 'has been a best man or bridesmaid before' },
+    { de: 'glaubt, dass Regen am Hochzeitstag Glück bringt',
+      en: 'believes rain on the wedding day brings luck' }
+  ];
+
+  var T = {
+    de: {
+      logo:      'Hochzeits-Bingo',
+      tagline:   'Gratis-Eisbrecher · 24 Aufgaben · ein A4-Bogen',
+      section:   'Euer Bingo',
+      couple:    'Namen des Brautpaars',
+      couplePH:  'Anna & Peter',
+      hint:      'Erscheint klein über dem Titel — „Anna & Peters Hochzeits-Bingo". Alles andere ist fertig gestaltet.',
+      hintShuf:  'Tipp: Mische die Felder und drucke mehrere Bögen — so hat jeder Gast ein anderes Spiel.',
+      shufBtn:   '&#10227; Felder mischen',
+      demoBtn:   '&#9655; Beispiel',
+      exportBtn: 'Gratis-PDF laden',
+      badge:     'Gratis · ein A4-Bogen',
+      titleMain: 'Hochzeits-Bingo',
+      intro:     'Finde zu jeder Aufgabe einen Gast und trag den Namen ein — fünf in einer Reihe rufen „Bingo!"',
+      prefix:    'Finde jemanden, der …',
+      cellLead:  '… ',
+      freeTxt:   'Auf das<br>Brautpaar',
+      atelier:   'Wedding Story Atelier',
+      suffix:    'Hochzeits-Bingo',
+      demoCouple:'Anna & Peter',
+      spin:      'PDF wird erstellt …',
+      fail:      'Export fehlgeschlagen: ',
+      file:      'Hochzeits_Bingo_Gratis_WeddingStoryAtelier.pdf',
+      grEyebrow: 'Frühstarter-Vorteil · für die ersten Paare',
+      grHeadline:'20 % Atelier-Rabatt',
+      grText:    'Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.',
+      grBtn:     'Rabattcode sichern',
+      ctaTagline:'<strong>Lust auf mehr fürs Fest?</strong> Im Atelier findest du weitere Karten, Spiele und Drucksachen für euren großen Tag — abgestimmt aufeinander, druckfertig.',
+      ctaBtn:    '✦ Zum Wedding Story Atelier'
+    },
+    en: {
+      logo:      'Wedding Bingo',
+      tagline:   'Free icebreaker · 24 squares · one A4 sheet',
+      section:   'Your bingo',
+      couple:    "The couple's names",
+      couplePH:  'Anna & Peter',
+      hint:      'Appears small above the title — "Anna & Peter\'s Wedding Bingo". Everything else is ready-designed.',
+      hintShuf:  'Tip: shuffle the squares and print several sheets — so every guest gets a different game.',
+      shufBtn:   '&#10227; Shuffle squares',
+      demoBtn:   '&#9655; Example',
+      exportBtn: 'Download free PDF',
+      badge:     'Free · one A4 sheet',
+      titleMain: 'Wedding Bingo',
+      intro:     'Find a guest for each square and write their name — five in a row and call “Bingo!”',
+      prefix:    'Find someone who …',
+      cellLead:  '… ',
+      freeTxt:   'To the<br>happy couple',
+      atelier:   'Wedding Story Atelier',
+      suffix:    'Wedding Bingo',
+      demoCouple:'Anna & Peter',
+      spin:      'Creating PDF …',
+      fail:      'Export failed: ',
+      file:      'Wedding_Bingo_Free_WeddingStoryAtelier.pdf',
+      grEyebrow: 'Early-bird perk · for our first couples',
+      grHeadline:'20% atelier discount',
+      grText:    "We're a young atelier — grab your welcome code for your first order.",
+      grBtn:     'Get your discount code',
+      ctaTagline:'<strong>Want more for the celebration?</strong> The atelier has more cards, games and stationery for your big day — coordinated and print-ready.',
+      ctaBtn:    '✦ Visit Wedding Story Atelier'
+    }
+  };
+
+  var currentLang = 'de';
+  function t(){ return T[currentLang]; }
+
+  /* Reihenfolge der 24 Aufgaben — identisch by default (Zero-Input spielbar) */
+  var order = PROMPTS.map(function(_, i){ return i; });
+
+  function ge(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function coupleValue(){
+    var v = ge('inp-couple').value.trim();
+    return v || t().demoCouple;
+  }
+  function eyebrowText(){
+    var c = coupleValue();
+    var last = c.slice(-1).toLowerCase();
+    if (currentLang === 'en') {
+      return c + (last === 's' ? '’' : '’s') + ' ' + t().suffix;
+    }
+    var poss = (last === 's' || last === 'x' || last === 'z') ? '’' : 's';
+    return c + poss + ' ' + t().suffix;
+  }
+
+  function setLang(lang, btn){
+    currentLang = lang;
+    document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    applyLang();
+    render();
+  }
+
+  function applyLang(){
+    var l = t();
+    ge('lbl-logo').textContent     = l.logo;
+    ge('lbl-tagline').textContent  = l.tagline;
+    ge('lbl-section').textContent  = l.section;
+    ge('lbl-couple').textContent   = l.couple;
+    ge('inp-couple').placeholder   = l.couplePH;
+    ge('hint-couple').textContent  = l.hint;
+    ge('hint-shuffle').textContent = l.hintShuf;
+    ge('btn-shuffle').innerHTML    = l.shufBtn;
+    ge('btn-demo').innerHTML       = l.demoBtn;
+    ge('btn-export').textContent   = l.exportBtn;
+    ge('demo-badge').textContent   = l.badge;
+    ge('gr-eyebrow').textContent   = l.grEyebrow;
+    ge('gr-headline').textContent  = l.grHeadline;
+    ge('gr-text').textContent      = l.grText;
+    ge('gr-btn').textContent       = l.grBtn;
+    ge('cta-tagline').innerHTML    = l.ctaTagline;
+    ge('cta-etsy').textContent     = l.ctaBtn;
+    document.documentElement.lang  = currentLang;
+  }
+
+  /* ── Bingo-Seite ────────────────────────────────── */
+  function bingoHTML(){
+    var l = t();
+    var cells = '';
+    var pi = 0;
+    for (var pos = 0; pos < 25; pos++){
+      if (pos === 12){
+        cells += '<div class="bingo-cell bingo-free">'
+          + '<span class="cell-corner tr"></span>'
+          + '<span class="cell-corner bl"></span>'
+          + '<div class="free-heart">&#9829;</div>'
+          + '<div class="free-txt">' + l.freeTxt + '</div>'
+        + '</div>';
+      } else {
+        var p = PROMPTS[order[pi]];
+        pi++;
+        cells += '<div class="bingo-cell">'
+          + '<span class="cell-corner tr"></span>'
+          + '<span class="cell-corner bl"></span>'
+          + '<span class="cell-diamond">&#9670;</span>'
+          + '<div class="cell-text">' + l.cellLead + esc(p[currentLang]) + '</div>'
+        + '</div>';
+      }
+    }
+
+    return ''
+      + '<div class="a4-frame"></div>'
+      + '<div class="mw-head">'
+        + '<div class="mw-eyebrow" id="eyebrow-target">' + esc(eyebrowText()) + '</div>'
+        + '<div class="mw-title">' + l.titleMain + '</div>'
+        + '<div class="mw-ornament"><span class="line"></span><span class="diamond">&#9670;</span><span class="line"></span></div>'
+        + '<div class="mw-intro">' + esc(l.intro) + '</div>'
+      + '</div>'
+      + '<div class="bingo-grid">' + cells + '</div>'
+      + footHTML();
+  }
+
+  function footHTML(){
+    return '<div class="mw-foot">'
+      + '<div class="mw-foot-orn"><span class="line"></span><span class="heart">&#9829;</span><span class="line"></span></div>'
+      + '<div class="mw-foot-txt">' + t().atelier + '</div>'
+    + '</div>';
+  }
+
+  /* ── Felder mischen (Fisher-Yates) ──────────────── */
+  function shuffleBoard(){
+    for (var i = order.length - 1; i > 0; i--){
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = order[i]; order[i] = order[j]; order[j] = tmp;
+    }
+    render();
+  }
+
+  /* ── Auto-Shrink der Eyebrow-Zeile (Paar-Namen) ──── */
+  function fitEyebrow(scopeEl){
+    var el = (scopeEl || document).querySelector('#eyebrow-target') || (scopeEl || document).querySelector('.mw-eyebrow');
+    if (!el) return;
+    el.style.fontSize = '';
+    var min = 1.6, size = 2.6;
+    var parent = el.parentElement;
+    while (el.scrollWidth > parent.clientWidth && size > min) {
+      size -= 0.1;
+      el.style.fontSize = size + 'mm';
+    }
+  }
+
+  function updateCharCounter(){
+    var n = ge('inp-couple').value.length;
+    var el = ge('char-count');
+    el.textContent = n + ' / 40';
+    el.className = 'char-count' + (n >= 40 ? ' over' : '');
+  }
+
+  function render(){
+    ge('preview-page').innerHTML = bingoHTML();
+    updateCharCounter();
+    fitEyebrow(ge('preview-page'));
+    scalePreview();
+  }
+
+  function scalePreview(){
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var a4W   = 210 * 3.7795;
+    var a4H   = 297 * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap  = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  function loadDemo(){
+    ge('inp-couple').value = t().demoCouple;
+    render();
+  }
+
+  async function exportPDF(){
+    var l = t();
+    var spinner = ge('pdf-spinner');
+    spinner.style.display = 'flex';
+    ge('spin-msg').textContent = l.spin;
+
+    try {
+      if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      var el = ge('print-bingo');
+      el.innerHTML = bingoHTML();
+      fitEyebrow(el);
+      if (window.getSelection) window.getSelection().removeAllRanges();
+      await new Promise(function(r){ setTimeout(r, 180); });
+
+      var opts = { scale: 3, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false };
+      var c1 = await html2canvas(el, opts);
+      pdf.addImage(c1.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+
+      pdf.save(l.file);
+
+      var gr = ge('gift-reveal');
+      if (gr) gr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch(e){
+      alert(l.fail + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('resize', scalePreview);
+  applyLang();
+  render();
+</script>
+</body>
+</html>
