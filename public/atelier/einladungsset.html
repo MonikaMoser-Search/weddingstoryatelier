@@ -6,6 +6,7 @@
   <meta name="google" content="notranslate">
   <title>Floral Einladungsset · Wedding Story Atelier</title>
   <link rel="stylesheet" href="/atelier/fonts.css">
+  <script src="frueh_rabatt.js?v=20260612"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
     :root { --wsa-panel-width: 380px; }
@@ -377,6 +378,8 @@
       margin: 10px 0 0 0; line-height: 1.5;
     }
   </style>
+  <div id="frueh-rabatt" data-lang="de"></div>
+
   <div class="demo-cta">
     <div class="demo-cta-eyebrow">Live-Demo</div>
     <p class="demo-cta-text">Du siehst gerade die Live-Vorschau. Das fertige Floral Einladungsset mit PDF-Download (3 Karten, randloser Druck, 3 mm Beschnitt, A5/A6 + US 5×7"/4×6", bilingual) gibt es im Atelier.</p>
@@ -626,6 +629,7 @@ function setBleed(on, btn) {
 }
 
 function setLang(lang, btn) {
+  if (window.setRabattLang) window.setRabattLang(lang);
   currentLang = lang;
   document.querySelectorAll('#lang-btn-de, #lang-btn-en').forEach(function(b) { b.classList.remove('active'); });
   btn.classList.add('active');

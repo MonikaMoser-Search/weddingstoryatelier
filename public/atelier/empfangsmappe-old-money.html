@@ -9,6 +9,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://weddingstoryatelier.de/atelier/empfangsmappe-old-money">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="frueh_rabatt.js?v=20260612"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
@@ -796,6 +797,8 @@ Alle Momente, gute Gespräche, gutes Essen, Musik und ganz viel Zeit miteinander
     </div>
 
     <!-- ══ DEMO CTA ══════════════════════════════════════════════════════════ -->
+    <div id="frueh-rabatt" data-lang="de"></div>
+
     <div class="demo-cta">
       <div class="demo-cta-eyebrow">LIVE-DEMO</div>
       <p class="demo-cta-text">Du siehst die Live-Vorschau. Die fertige Empfangsmappe mit druckfertigem PDF (A3 Halbfalz, 3 mm Beschnitt, drei Farbwelten, bilingual) gibt es im Atelier.</p>
@@ -1289,6 +1292,7 @@ const DAY_DEFAULTS = {
 const t = key => (I18N[currentLang] && I18N[currentLang][key]) || I18N.de[key] || key;
 
 function setLang(newLang, btn) {
+  if (window.setRabattLang) window.setRabattLang(newLang);
   if (newLang === currentLang) return;
   const oldLang = currentLang;
   const oldD = I18N_DEFAULTS[oldLang];

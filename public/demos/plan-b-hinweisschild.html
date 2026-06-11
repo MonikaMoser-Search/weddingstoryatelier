@@ -9,6 +9,7 @@
   <link rel="canonical" href="https://weddingstoryatelier.de/demos/plan-b-hinweisschild">
 
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="/atelier/frueh_rabatt.js?v=20260612"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 
   <style>
@@ -364,6 +365,8 @@
     <button class="btn-demo" onclick="loadDemo()" id="btn-demo">Beispiel laden</button>
   </div>
 
+  <div id="frueh-rabatt" data-lang="de"></div>
+
   <!-- ══ CTA-Karte ══════════════════════════════════════════════════════════ -->
   <div class="demo-cta">
     <div class="demo-cta-eyebrow" id="demo-eyebrow">LIVE-DEMO</div>
@@ -502,6 +505,7 @@ var T = {
 function t() { return T[currentLang]; }
 
 function setLang(lang, btn) {
+  if (window.setRabattLang) window.setRabattLang(lang);
   currentLang = lang;
   document.querySelectorAll('#lang-btns .ui-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');

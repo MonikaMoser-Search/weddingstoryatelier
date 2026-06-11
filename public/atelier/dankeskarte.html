@@ -7,6 +7,7 @@
   <meta name="description" content="Personalisierte Dankeskarte mit automatischer Namensanrede aus deiner Gästeliste — Live-Vorschau im Old Money Stil. Probiere das Wedding Story Atelier vorab in deinem Browser.">
   <title>Dankeskarte personalisiert · Live-Vorschau · Wedding Story Atelier</title>
   <link rel="stylesheet" href="/atelier/fonts.css">
+  <script src="frueh_rabatt.js?v=20260612"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
   <link rel="stylesheet" href="wsa_panel.css">
   <style>
@@ -461,6 +462,8 @@
   </div>
 
   <hr class="divider">
+
+  <div id="frueh-rabatt" data-lang="de"></div>
 
   <div class="demo-cta">
     <span class="demo-eyebrow" id="demo-eyebrow">Diese Edition als Vorlage</span>
@@ -1101,6 +1104,7 @@ async function exportPDF() {
    UI-STEUERUNG
 ══════════════════════════════════════════ */
 function setLang(lang, btn) {
+  if (window.setRabattLang) window.setRabattLang(lang);
   currentLang = lang;
   document.querySelectorAll('#btn-de,#btn-en').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
