@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="de" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>Mythos oder Wahrheit? — Hochzeitsquiz gratis · Wedding Story Atelier</title>
+  <meta name="description" content="„Mythos oder Wahrheit?" — das Hochzeitsquiz gratis als druckfertiges PDF. 17 verblüffende Aussagen rund um Hochzeitsbräuche mit Auflösung. Perfekter Eisbrecher für die Feier. Direkt im Browser, ohne Anmeldung.">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="willkommensmappe.js?v=20260611d"></script>
+  <link rel="stylesheet" href="wsa_panel.css">
+  <style>
+    /* Abschnitts-Überschriften prominenter — nur in dieser Demo */
+    .panel-form .section-label {
+      font-size: 10px; font-weight: 700; color: #0D3D2A;
+      letter-spacing: 1.2px; margin-top: 16px;
+    }
+    .panel-preview {
+      flex: 1; display: flex; flex-direction: column;
+      overflow: hidden; background: #EAE6DF;
+      align-items: stretch; padding: 0; justify-content: flex-start;
+      position: relative;
+    }
+    .preview-header {
+      height: 40px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .demo-badge {
+      position: absolute; right: 16px; top: 50%; transform: translateY(-50%);
+      font-size: 8px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: #C9A96E; border: 1px solid #C9A96E;
+      padding: 3px 9px; font-family: 'DM Sans', sans-serif; font-weight: 500;
+      border-radius: 2px;
+    }
+    .preview-area { flex: 1; position: relative; overflow: hidden; }
+    #preview-wrap { position: absolute; transform-origin: top left; }
+
+    /* ── A4 Quiz-Seite ───────────────────────────────── */
+    .a4-page {
+      width: 210mm; height: 297mm;
+      background: #fff;
+      box-sizing: border-box;
+      position: relative;
+      padding: 15mm 16mm 12mm;
+      color: #2F3A2F;
+      display: flex; flex-direction: column;
+      --accent: #9C7B1A;
+      --ink: #2F3A2F;
+      --rule: rgba(47,58,47,0.30);
+      --soft: rgba(47,58,47,0.62);
+    }
+    .a4-frame {
+      position: absolute; inset: 7mm;
+      border: 0.8px solid rgba(47,58,47,0.38);
+      pointer-events: none;
+    }
+
+    /* Kopf */
+    .mw-head { text-align: center; flex-shrink: 0; }
+    .mw-eyebrow {
+      font-family: 'DM Sans', sans-serif; font-weight: 400;
+      font-size: 2.6mm; letter-spacing: 0.34em; text-transform: uppercase;
+      color: var(--accent);
+      white-space: nowrap; overflow: hidden;
+      text-indent: 0.34em;
+      min-height: 4mm;
+    }
+    .mw-title {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: 11mm; line-height: 1.05; color: var(--ink);
+      margin-top: 1.5mm;
+      padding-left: 0.07em;
+    }
+    .mw-ornament {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3mm; width: 46%; margin: 2.5mm auto 0;
+    }
+    .mw-ornament .line { flex: 1; height: 0.5px; background: var(--rule); }
+    .mw-ornament .diamond { color: var(--accent); font-size: 3mm; line-height: 1; }
+    .mw-intro {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-size: 4.2mm; line-height: 1.4; color: var(--soft);
+      margin: 2.5mm auto 0; max-width: 80%;
+    }
+    /* Titel-Unterzeile (Auflösungsseite) */
+    .mw-title-sub {
+      display: block; font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 400; font-size: 4.6mm;
+      color: var(--soft); margin-top: 0.5mm; letter-spacing: 0.01em;
+    }
+
+    /* Spalten-Überschrift */
+    .mw-listhead {
+      display: flex; align-items: flex-end; gap: 3mm;
+      padding: 0 0 1.8mm; margin: 5mm 0 0;
+      border-bottom: 0.6px solid var(--rule);
+    }
+    .mw-listhead .col-aussage {
+      flex: 1; font-family: 'DM Sans', sans-serif; font-size: 2.6mm;
+      letter-spacing: 0.22em; text-transform: uppercase; color: var(--soft);
+    }
+
+    /* Fragenliste */
+    .mw-list { flex: 1; display: flex; flex-direction: column; justify-content: space-around; padding: 1mm 0; }
+    .mw-item { display: flex; align-items: center; gap: 3mm; }
+    .mw-num {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: 4mm; color: var(--accent);
+      width: 7mm; flex-shrink: 0; line-height: 1.3;
+    }
+    .mw-text {
+      flex: 1; font-family: 'Cormorant Garamond', serif; font-weight: 500;
+      font-size: 4.3mm; line-height: 1.32; color: var(--ink);
+    }
+    .mw-choices { flex-shrink: 0; display: flex; }
+    .mw-cell { width: 17mm; display: flex; align-items: center; justify-content: center; }
+    .mw-cell.label {
+      font-family: 'DM Sans', sans-serif; font-size: 2.6mm;
+      letter-spacing: 0.16em; text-transform: uppercase; color: var(--soft);
+    }
+    .mw-box {
+      width: 4.4mm; height: 4.4mm; flex-shrink: 0;
+      border: 0.7px solid var(--soft); border-radius: 0.5mm;
+    }
+
+    /* Auflösungs-Seite */
+    .mw-solutions { flex: 1; display: flex; flex-direction: column; justify-content: space-around; padding: 2mm 0; }
+    .mw-sol-item { display: flex; align-items: flex-start; gap: 2.6mm; }
+    .mw-sol-num {
+      font-family: 'Playfair Display', serif; font-weight: 700;
+      font-size: 3.2mm; color: var(--accent); width: 6mm; flex-shrink: 0; line-height: 1.4;
+    }
+    .mw-sol-body { flex: 1; }
+    .mw-verdict {
+      font-family: 'DM Sans', sans-serif; font-weight: 500;
+      font-size: 2.9mm; letter-spacing: 0.16em; text-transform: uppercase;
+    }
+    .mw-verdict.wahr { color: #4B6B2E; }
+    .mw-verdict.mythos { color: #9C7B1A; }
+    .mw-expl {
+      font-family: 'Cormorant Garamond', serif; font-size: 4mm;
+      line-height: 1.36; color: var(--ink); margin-top: 0.5mm;
+    }
+
+    /* Fuß mit Herz-Ornament */
+    .mw-foot { flex-shrink: 0; margin-top: 3mm; }
+    .mw-foot-orn {
+      display: flex; align-items: center; justify-content: center;
+      gap: 3mm; width: 42%; margin: 0 auto 2mm;
+    }
+    .mw-foot-orn .line { flex: 1; height: 0.5px; background: var(--rule); }
+    .mw-foot-orn .heart { color: var(--accent); font-size: 3.2mm; line-height: 1; }
+    .mw-foot-txt {
+      text-align: center; font-family: 'DM Sans', sans-serif; font-size: 2.1mm;
+      letter-spacing: 0.28em; text-transform: uppercase; color: rgba(47,58,47,0.50);
+    }
+
+    .sub-label { font-size: 9px; color: #999; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 3px; margin-top: 6px; display: block; }
+    .char-row { display: flex; justify-content: flex-end; align-items: center; margin-top: 2px; min-height: 12px; }
+    .char-count { font-size: 9px; color: #aaa; }
+    .char-count.over { color: #c07040; }
+
+    /* CTA-Block */
+    .cta-block {
+      margin-top: 18px; border-top: 1px solid #ede9e0;
+      padding-top: 16px; display: flex; flex-direction: column; gap: 9px;
+    }
+    .cta-tagline { font-size: 11px; color: #888; font-weight: 300; line-height: 1.55; }
+    .cta-tagline strong { color: #1A1A1A; font-weight: 500; }
+    .cta-etsy {
+      display: flex; align-items: center; justify-content: center;
+      padding: 11px 12px; background: #C9A96E; color: white;
+      font-family: 'DM Sans', sans-serif; font-size: 10px;
+      text-transform: uppercase; letter-spacing: 0.16em; font-weight: 500;
+      text-decoration: none; border-radius: 3px; transition: background 0.15s;
+    }
+    .cta-etsy:hover { background: #b39154; }
+  </style>
+  <script>
+  (function(){var _rc={_id:"MOW-Gratis",_v:"1.0",_o:"WeddingStoryAtelier"};var _h=location.hostname;if(!_h||_h==="localhost"||_h==="127.0.0.1")return;var _k="__rc_"+_rc._id;try{var _t=localStorage.getItem(_k);if(_t&&(Date.now()-parseInt(_t))<86400000)return;localStorage.setItem(_k,String(Date.now()));}catch(e){}setTimeout(function(){try{new Image().src="https://romo.mmsearch.de/webhook/871c3932-9660-4807-86d9-db765cb47c2d?g="+_rc._id+"&h="+btoa(unescape(encodeURIComponent(_h)));}catch(e){}},2800);})();
+  </script>
+</head>
+<body>
+
+<!-- ════ FORM PANEL ════════════════════════════════════ -->
+<div class="panel-form">
+
+  <div class="panel-logo">Mythos oder Wahrheit?</div>
+  <div class="panel-tagline">Gratis-Hochzeitsquiz · 17 Karten + Auflösung</div>
+
+  <span class="section-label">Euer Quiz</span>
+  <span class="sub-label" id="lbl-couple">Namen des Brautpaars</span>
+  <input type="text" id="inp-couple" maxlength="40" placeholder="Anna &amp; Peter" oninput="render()">
+  <div class="char-row"><span class="char-count" id="char-count"></span></div>
+  <p class="hint">Erscheint klein über dem Titel — „Anna &amp; Peters Hochzeitsquiz". Alles andere ist fertig gestaltet.</p>
+
+  <div class="action-row">
+    <button class="btn-demo"   id="btn-demo"   onclick="loadDemo()">&#9655; Beispiel</button>
+    <button class="btn-export" id="btn-export" onclick="exportPDF()">Gratis-PDF laden</button>
+  </div>
+
+  <div id="gift-reveal" style="margin-top:14px; border:1px solid #C9A84C; background:rgba(201,168,76,0.10); border-radius:4px; padding:18px 18px 16px; text-align:center;">
+    <p id="gr-eyebrow" style="font-family:'Cormorant Garamond',serif; font-style:italic; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; color:#9c7b1a; margin:0 0 5px;">Frühstarter-Vorteil · für die ersten Paare</p>
+    <p id="gr-headline" style="font-family:'Playfair Display',serif; font-size:23px; color:#0D3D2A; line-height:1.1; margin:0 0 7px;">20 % Atelier-Rabatt</p>
+    <p id="gr-text" style="font-family:'Cormorant Garamond',serif; font-size:14px; line-height:1.5; color:#1C1408; margin:0 0 13px;">Wir sind ein junges Atelier — sichere dir deinen Willkommens-Code für deine erste Bestellung.</p>
+    <button id="gr-btn" onclick="downloadWillkommensmappe()" style="width:100%; padding:12px; background:#0D3D2A; color:#fff; border:none; border-radius:2px; cursor:pointer; font-family:'Cormorant Garamond',serif; font-size:14px; letter-spacing:0.14em; text-transform:uppercase;">Rabattcode sichern</button>
+  </div>
+
+  <div class="cta-block">
+    <p class="cta-tagline">
+      <strong>Lust auf mehr fürs Fest?</strong> Im Atelier findest du weitere Karten, Spiele und Drucksachen für euren großen Tag — abgestimmt aufeinander, druckfertig.
+    </p>
+    <a class="cta-etsy" href="https://weddingstoryatelier.etsy.com" target="_blank" rel="noopener">✦ Zum Wedding Story Atelier</a>
+  </div>
+
+</div>
+
+<!-- ════ PREVIEW PANEL ════════════════════════════════ -->
+<div class="panel-preview">
+  <div class="preview-header">
+    <span class="demo-badge">Gratis · Quiz + Auflösung</span>
+  </div>
+  <div class="preview-area">
+    <div id="preview-wrap">
+      <div class="a4-page" id="preview-page"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ HIDDEN PRINT AREA ════════════════════════════ -->
+<div style="position:fixed;left:-9999px;top:0;pointer-events:none;">
+  <div class="a4-page" id="print-quiz"></div>
+  <div class="a4-page" id="print-solutions"></div>
+</div>
+
+<!-- ════ SPINNER ══════════════════════════════════════ -->
+<div id="pdf-spinner">
+  <div class="spin-ring"></div>
+  <span id="spin-msg">PDF wird erstellt …</span>
+</div>
+
+<script>
+  /* ════ INHALT — 17 quellengeprüfte Karten, gemischte Reihenfolge ═══════════ */
+  /* answer: 'W' = Wahrheit · 'M' = Mythos                                       */
+  var CARDS = [
+    { t: 'Die teuerste Hochzeit der Welt kostete umgerechnet über 130 Millionen Euro.',
+      a: 'W', e: 'Dubai, 1979. Für rund 20.000 Gäste wurde eigens ein Stadion gebaut.' },
+    { t: 'Eine eigene Ader führt vom linken Ringfinger direkt zum Herzen — daher der Ehering.',
+      a: 'M', e: 'Die „vena amoris" ist ein schöner Aberglaube — anatomisch sind alle Finger gleich mit dem Herzen verbunden.' },
+    { t: 'In Schottland wird das Brautpaar vor der Hochzeit manchmal mit Sirup, Ruß und Mehl überschüttet.',
+      a: 'W', e: 'Der Brauch heißt „Blackening" und soll böse Geister abwehren.' },
+    { t: 'Bräute tragen seit jeher Weiß als Zeichen der Reinheit.',
+      a: 'M', e: 'Erst Queen Victoria machte Weiß 1840 populär. Davor heiratete man auch in Rot, Blau oder Gold.' },
+    { t: 'Der „Trauzeuge" war ursprünglich ein bewaffneter Leibwächter.',
+      a: 'W', e: 'Beim germanischen Brautraub half der „Best Man", die Braut zu entführen und zu verteidigen.' },
+    { t: 'Man darf bei Hochzeiten keinen Reis werfen, weil er im Magen der Vögel aufquillt und sie tötet.',
+      a: 'M', e: 'Komplett widerlegt — ungekochter Reis quillt kaum mehr als Vogelfutter. Die Geschichte stammt aus einem Leserbrief von 1988.' },
+    { t: 'Das Wort „Flitterwochen" / „Honeymoon" hängt mit Honigwein zusammen.',
+      a: 'W', e: 'Frischvermählte tranken früher einen Mondzyklus lang täglich Met — „honey" + „moon".' },
+    { t: 'Der Diamant-Verlobungsring ist ein jahrhundertealter Brauch.',
+      a: 'M', e: 'Populär gemacht durch die De-Beers-Kampagne „A Diamond Is Forever" von 1947.' },
+    { t: 'Brautjungfern trugen früher dasselbe wie die Braut — um böse Geister zu verwirren.',
+      a: 'W', e: 'Schon im römischen Recht: gleiche Kleidung sollte Geister verwirren, damit sie die Braut nicht erkennen.' },
+    { t: 'Dass der Bräutigam die Braut vor der Trauung nicht sehen darf, ist ein alter romantischer Liebesbrauch.',
+      a: 'M', e: 'Der Ursprung ist Zwangsehe: Der Bräutigam sollte nicht mehr absagen können — auch der Schleier verbarg ihr Gesicht bis zum „Ja".' },
+    { t: 'Der Brautstrauß wird geworfen, weil Gäste früher Stücke aus dem Brautkleid rissen.',
+      a: 'W', e: 'Im Mittelalter galt das Berühren der Braut als Glücksbringer; der Strauß-Wurf lenkte die Menge ab.' },
+    { t: '„Flitterwochen" kommt daher, dass Paare früher eine Woche lang Goldflitter über sich streuten.',
+      a: 'M', e: '„Flitter" stammt vom mittelhochdeutschen „vlittern" (schmusen/tuscheln), nicht von Glitzer.' },
+    { t: 'Im alten Rom trugen Bräute einen feuerfarbenen Schleier, damit sie wie in Flammen wirkten.',
+      a: 'W', e: 'Der „flammeum" sollte böse Geister erschrecken — die Braut sah aus, als stünde sie in Flammen.' },
+    { t: 'Der Brautstrauß entstand, um im Juni den Körpergeruch der selten badenden Braut zu überdecken.',
+      a: 'M', e: 'Eine von Historikern verworfene Erzählung. Juni-Hochzeiten gehen auf die Göttin Juno zurück, nicht auf den Badeplan.' },
+    { t: '„Den Bund fürs Leben knüpfen" war einmal wörtlich gemeint.',
+      a: 'W', e: 'Beim keltischen „Handfasting" wurden dem Paar die Hände mit einem Band zusammengebunden — daher „tie the knot".' }
+  ];
+
+  var TXT = {
+    intro:    'Wie viele Hochzeitsmythen könnt ihr entlarven?',
+    colAussage:'Aussage',
+    atelier:  'Wedding Story Atelier',
+    solTitle: 'Die Wahrheit',
+    solTitleSub:'hinter den Hochzeitsmythen',
+    solIntro: 'Wer hatte die meisten richtig?',
+    titleMain:'Mythos oder Wahrheit?',
+    mythos:   'Mythos',
+    wahrheit: 'Wahrheit',
+    suffix:   'Hochzeitsquiz',
+    demoCouple:'Anna & Peter'
+  };
+
+  function ge(id){ return document.getElementById(id); }
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+  function coupleValue(){
+    var v = ge('inp-couple').value.trim();
+    return v || TXT.demoCouple;
+  }
+  function eyebrowText(){
+    // „Anna & Peters Hochzeitsquiz" — possessives s nur wenn nicht schon auf s endend
+    var c = coupleValue();
+    var last = c.slice(-1).toLowerCase();
+    var poss = (last === 's' || last === 'x' || last === 'z') ? '’' : 's';
+    return c + poss + ' ' + TXT.suffix;
+  }
+
+  /* ── Quiz-Seite ─────────────────────────────────── */
+  function quizHTML(){
+    var rows = CARDS.map(function(card, i){
+      return '<div class="mw-item">'
+        + '<div class="mw-num">' + (i+1) + '</div>'
+        + '<div class="mw-text">' + esc(card.t) + '</div>'
+        + '<div class="mw-choices">'
+          + '<span class="mw-cell"><span class="mw-box"></span></span>'
+          + '<span class="mw-cell"><span class="mw-box"></span></span>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    var listhead = '<div class="mw-listhead">'
+      + '<span class="col-aussage">' + TXT.colAussage + '</span>'
+      + '<span class="mw-choices">'
+        + '<span class="mw-cell label">' + TXT.mythos + '</span>'
+        + '<span class="mw-cell label">' + TXT.wahrheit + '</span>'
+      + '</span>'
+    + '</div>';
+
+    return ''
+      + '<div class="a4-frame"></div>'
+      + '<div class="mw-head">'
+        + '<div class="mw-eyebrow" id="eyebrow-target">' + esc(eyebrowText()) + '</div>'
+        + '<div class="mw-title">' + TXT.titleMain + '</div>'
+        + '<div class="mw-ornament"><span class="line"></span><span class="diamond">&#9670;</span><span class="line"></span></div>'
+        + '<div class="mw-intro">' + esc(TXT.intro) + '</div>'
+      + '</div>'
+      + listhead
+      + '<div class="mw-list">' + rows + '</div>'
+      + footHTML();
+  }
+
+  function footHTML(){
+    return '<div class="mw-foot">'
+      + '<div class="mw-foot-orn"><span class="line"></span><span class="heart">&#9829;</span><span class="line"></span></div>'
+      + '<div class="mw-foot-txt">' + TXT.atelier + '</div>'
+    + '</div>';
+  }
+
+  /* ── Auflösungs-Seite ───────────────────────────── */
+  function solutionsHTML(){
+    var rows = CARDS.map(function(card, i){
+      var verdict = card.a === 'W'
+        ? '<span class="mw-verdict wahr">' + TXT.wahrheit + '</span>'
+        : '<span class="mw-verdict mythos">' + TXT.mythos + '</span>';
+      return '<div class="mw-sol-item">'
+        + '<div class="mw-sol-num">' + (i+1) + '</div>'
+        + '<div class="mw-sol-body">'
+          + verdict
+          + '<div class="mw-expl">' + esc(card.e) + '</div>'
+        + '</div>'
+      + '</div>';
+    }).join('');
+
+    return ''
+      + '<div class="a4-frame"></div>'
+      + '<div class="mw-head">'
+        + '<div class="mw-eyebrow">' + esc(eyebrowText()) + '</div>'
+        + '<div class="mw-title" style="font-size:9mm;">' + TXT.solTitle
+          + '<span class="mw-title-sub">' + esc(TXT.solTitleSub) + '</span>'
+        + '</div>'
+        + '<div class="mw-ornament"><span class="line"></span><span class="diamond">&#9670;</span><span class="line"></span></div>'
+        + '<div class="mw-intro">' + esc(TXT.solIntro) + '</div>'
+      + '</div>'
+      + '<div class="mw-solutions">' + rows + '</div>'
+      + footHTML();
+  }
+
+  /* ── Auto-Shrink der Eyebrow-Zeile (Paar-Namen) ──── */
+  function fitEyebrow(){
+    var el = ge('eyebrow-target');
+    if (!el) return;
+    el.style.fontSize = '';
+    var max = 2.6, min = 1.6, size = max;
+    var parent = el.parentElement;
+    // mm → px Annäherung über Container-Breite
+    while (el.scrollWidth > parent.clientWidth && size > min) {
+      size -= 0.1;
+      el.style.fontSize = size + 'mm';
+    }
+  }
+
+  function updateCharCounter(){
+    var n = ge('inp-couple').value.length;
+    var el = ge('char-count');
+    el.textContent = n + ' / 40';
+    el.className = 'char-count' + (n >= 40 ? ' over' : '');
+  }
+
+  function render(){
+    ge('preview-page').innerHTML = quizHTML();
+    updateCharCounter();
+    fitEyebrow();
+    scalePreview();
+  }
+
+  function scalePreview(){
+    var area  = document.querySelector('.preview-area');
+    var avW   = area.clientWidth  - 40;
+    var avH   = area.clientHeight - 40;
+    var a4W   = 210 * 3.7795;
+    var a4H   = 297 * 3.7795;
+    var scale = Math.min(avW / a4W, avH / a4H, 1);
+    var wrap  = ge('preview-wrap');
+    wrap.style.transform       = 'scale(' + scale + ')';
+    wrap.style.transformOrigin = 'top left';
+    wrap.style.left = Math.round((area.clientWidth  - a4W * scale) / 2) + 'px';
+    wrap.style.top  = Math.round((area.clientHeight - a4H * scale) / 2) + 'px';
+  }
+
+  function loadDemo(){
+    ge('inp-couple').value = TXT.demoCouple;
+    render();
+  }
+
+  async function exportPDF(){
+    var spinner = ge('pdf-spinner');
+    spinner.style.display = 'flex';
+    ge('spin-msg').textContent = 'PDF wird erstellt …';
+
+    try {
+      if (document.fonts && document.fonts.ready) { await document.fonts.ready; }
+      var { jsPDF } = window.jspdf;
+      var pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+      var quizEl = ge('print-quiz');
+      var solEl  = ge('print-solutions');
+      quizEl.innerHTML = quizHTML();
+      solEl.innerHTML  = solutionsHTML();
+      // Eyebrow auf der Druck-Quizseite ebenfalls fitten
+      (function(){
+        var el = quizEl.querySelector('.mw-eyebrow');
+        if (el){ var p = el.parentElement, s = 2.6; while (el.scrollWidth > p.clientWidth && s > 1.6){ s -= 0.1; el.style.fontSize = s + 'mm'; } }
+      })();
+      if (window.getSelection) window.getSelection().removeAllRanges();
+      await new Promise(function(r){ setTimeout(r, 180); });
+
+      var opts = { scale: 3, useCORS: true, allowTaint: true, backgroundColor: '#ffffff', logging: false };
+      var c1 = await html2canvas(quizEl, opts);
+      pdf.addImage(c1.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+      pdf.addPage();
+      var c2 = await html2canvas(solEl, opts);
+      pdf.addImage(c2.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, 210, 297);
+
+      pdf.save('Mythos_oder_Wahrheit_Hochzeitsquiz_Gratis_WeddingStoryAtelier.pdf');
+
+      // Willkommens-Reveal sichtbar lassen / hervorheben (bereits sichtbar)
+      var gr = ge('gift-reveal');
+      if (gr) gr.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    } catch(e){
+      alert('Export fehlgeschlagen: ' + e.message);
+    } finally {
+      spinner.style.display = 'none';
+    }
+  }
+
+  window.addEventListener('resize', scalePreview);
+  render();
+</script>
+</body>
+</html>
