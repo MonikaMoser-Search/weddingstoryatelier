@@ -208,36 +208,41 @@
 <!-- LEFT PANEL -->
 <div class="panel-form">
   <a href="/" class="atelier-back">← Wedding Story Atelier</a>
-  <div class="panel-logo">Sitzplan</div>
-  <div class="panel-tagline">Old Money Line · Demo · bis 65 Gäste</div>
+  <div class="panel-logo" id="lbl-logo">Sitzplan</div>
+  <div class="panel-tagline" id="lbl-tagline">Old Money Line · Demo · bis 65 Gäste</div>
 
-  <label class="section-label">1 · Stil</label>
+  <div class="btn-group" id="lang-btns" style="margin-bottom:10px">
+    <button class="ui-btn active" onclick="setLang('de',this)">DE</button>
+    <button class="ui-btn"        onclick="setLang('en',this)">EN</button>
+  </div>
+
+  <label class="section-label" id="lbl-style">1 · Stil</label>
   <div class="btn-group">
-    <button class="ui-btn active" onclick="setTheme('burgund',this)">Burgund</button>
-    <button class="ui-btn"        onclick="setTheme('cognac',this)">Cognac</button>
-    <button class="ui-btn"        onclick="setTheme('forest',this)">Forest</button>
+    <button class="ui-btn active" id="th-burgund" onclick="setTheme('burgund',this)">Burgund</button>
+    <button class="ui-btn"        id="th-cognac"  onclick="setTheme('cognac',this)">Cognac</button>
+    <button class="ui-btn"        id="th-forest"  onclick="setTheme('forest',this)">Forest</button>
   </div>
 
   <hr class="divider">
 
-  <label class="section-label">2 · Titel</label>
+  <label class="section-label" id="lbl-title">2 · Titel</label>
   <input type="text" id="inp-title" placeholder="SITZPLAN" oninput="renderPoster()">
 
-  <label class="section-label">Untertitel</label>
+  <label class="section-label" id="lbl-subtitle">Untertitel</label>
   <input type="text" id="inp-subtitle" placeholder="Anna &amp; Maximilian · 12. Juli 2026" oninput="renderPoster()">
 
   <hr class="divider">
 
-  <label class="section-label">3 · Gästeliste einfügen</label>
-  <p class="hint">Eine Person pro Zeile:<br>Vorname Nachname, Tisch 1<br><br>Namen eingeben oder Demo-Button drücken.</p>
+  <label class="section-label" id="lbl-guests">3 · Gästeliste einfügen</label>
+  <p class="hint" id="hint-guests">Eine Person pro Zeile:<br>Vorname Nachname, Tisch 1<br><br>Namen eingeben oder Demo-Button drücken.</p>
   <textarea id="inp-guests"
     placeholder="Anna Müller, Tisch 1&#10;Herbert Schmidt, Tisch 5&#10;Lena Gruber, Tisch 1"
     oninput="onGuestsInput()"></textarea>
-  <div class="guest-count" id="guest-count">0 Gäste</div>
+  <div class="guest-count" id="guest-count">0 Einträge</div>
 
   <div class="action-row">
-    <button class="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
-    <a class="btn-shop" href="https://weddingstoryatelier.etsy.com/de/listing/4485890320/sitzplan-hochzeit-az-alphabetisch" target="_blank" rel="noopener">Im Shop bestellen →</a>
+    <button class="btn-demo" id="btn-demo" onclick="loadDemo()">&#9655; Demo</button>
+    <a class="btn-shop" id="btn-shop" href="https://weddingstoryatelier.etsy.com/de/listing/4485890320/sitzplan-hochzeit-az-alphabetisch" target="_blank" rel="noopener">Im Shop bestellen →</a>
   </div>
 
   <div id="frueh-rabatt" data-lang="de"></div>
@@ -276,6 +281,173 @@
 
 <script>
 let currentTheme = 'burgund';
+let currentLang  = 'de';
+
+function ge(id){ return document.getElementById(id); }
+
+// ── Sprache (DE/EN) ────────────────────────────────────
+const I18N = {
+  de: {
+    logo:'Sitzplan',
+    tagline:'Old Money Line · Demo · bis 65 Gäste',
+    style:'1 · Stil',
+    burgund:'Burgund', cognac:'Cognac', forest:'Forest',
+    title:'2 · Titel',
+    titlePh:'SITZPLAN',
+    subtitle:'Untertitel',
+    subPh:'Anna & Maximilian · 12. Juli 2026',
+    guests:'3 · Gästeliste einfügen',
+    hint:'Eine Person pro Zeile:<br>Vorname Nachname, Tisch 1<br><br>Namen eingeben oder Demo-Button drücken.',
+    guestsPh:'Anna Müller, Tisch 1\nHerbert Schmidt, Tisch 5\nLena Gruber, Tisch 1',
+    demoBtn:'▷ Demo',
+    shopBtn:'Im Shop bestellen →',
+    titleDefault:'SITZPLAN',
+    entries:'Einträge',
+    warnSuffix:' — max. 65 Einträge empfohlen',
+    demoSubtitle:'Anna & Maximilian · 12. Juli 2026',
+    demoGuests:`Anna Müller, Tisch 1
+Maximilian Becker, Tisch 1
+Ursula Becker, Tisch 1
+Gerhard Becker, Tisch 1
+Peter Braun, Tisch 8
+Sabine Fischer, Tisch 3
+Karl Fischer, Tisch 3
+Lena Gruber, Tisch 9
+Claudia Hoffmann, Tisch 4
+Emma Hoffmann, Tisch 4
+Daniel Krause, Tisch 7
+Stefan Klein, Tisch 4
+Ben Koch, Tisch 5
+Ingrid Lange, Tisch 2
+Werner Lange, Tisch 2
+Brigitte Müller, Tisch 2
+Heinz Müller, Tisch 2
+Sophia Meier, Tisch 3
+Leon Neumann, Tisch 9
+Julia Richter, Tisch 5
+Manfred Roth, Tisch 8
+Elise Roth, Tisch 8
+Petra Schäfer, Tisch 6
+Herbert Schmidt, Tisch 5
+Thomas Schulz, Tisch 7
+Ralf Vogt, Tisch 6
+Marina Bauer, Tisch 7
+Helga Wagner, Tisch 6
+Jonas Weber, Tisch 3
+Mia Zimmermann, Tisch 9
+Christine Arnold, Tisch 2
+Hans-Peter Berger, Tisch 3
+Eva Dörfler, Tisch 5
+Friedrich Eichner, Tisch 6
+Gabi Fink, Tisch 7
+Irene Grunewald, Tisch 8
+Josef Huber, Tisch 1
+Katharina Jakobi, Tisch 4
+Ludwig Kaufmann, Tisch 9
+Monika Lehner, Tisch 2
+Norbert Ott, Tisch 3
+Oskar Pfeiffer, Tisch 5
+Renate Sommer, Tisch 6
+Siegfried Tanner, Tisch 7
+Theresa Unger, Tisch 8
+Viktor Weidner, Tisch 1
+Waltraud Xander, Tisch 4
+Yvonne Ziegler, Tisch 9`
+  },
+  en: {
+    logo:'Seating Chart',
+    tagline:'Old Money Line · Demo · up to 65 guests',
+    style:'1 · Style',
+    burgund:'Burgundy', cognac:'Cognac', forest:'Forest',
+    title:'2 · Title',
+    titlePh:'SEATING CHART',
+    subtitle:'Subtitle',
+    subPh:'Anna & Maximilian · July 12, 2026',
+    guests:'3 · Paste your guest list',
+    hint:'One person per line:<br>First name Last name, Table 1<br><br>Type names or press the Demo button.',
+    guestsPh:'Anna Miller, Table 1\nHerbert Smith, Table 5\nLena Gruber, Table 1',
+    demoBtn:'▷ Demo',
+    shopBtn:'Shop this design →',
+    titleDefault:'SEATING CHART',
+    entries:'entries',
+    warnSuffix:' — max. 65 entries recommended',
+    demoSubtitle:'Anna & Maximilian · July 12, 2026',
+    demoGuests:`Anna Miller, Table 1
+Maximilian Baker, Table 1
+Ursula Baker, Table 1
+George Baker, Table 1
+Peter Brown, Table 8
+Sabrina Fisher, Table 3
+Karl Fisher, Table 3
+Lena Grant, Table 9
+Claudia Hoffman, Table 4
+Emma Hoffman, Table 4
+Daniel Cross, Table 7
+Stefan Klein, Table 4
+Ben Cook, Table 5
+Ingrid Lang, Table 2
+Werner Lang, Table 2
+Brigitte Moore, Table 2
+Henry Moore, Table 2
+Sophia Mayer, Table 3
+Leon Newman, Table 9
+Julia Archer, Table 5
+Manfred Roth, Table 8
+Elise Roth, Table 8
+Petra Shaw, Table 6
+Herbert Smith, Table 5
+Thomas Scholz, Table 7
+Ralph Vogt, Table 6
+Marina Bauer, Table 7
+Helga Wagner, Table 6
+Jonas Weber, Table 3
+Mia Zimmerman, Table 9
+Christine Arnold, Table 2
+Hans Berger, Table 3
+Eva Doyle, Table 5
+Frederick Easton, Table 6
+Gabi Finch, Table 7
+Irene Greenwood, Table 8
+Joseph Hubert, Table 1
+Katharine Jacobs, Table 4
+Ludwig Kaufman, Table 9
+Monica Turner, Table 2
+Norbert Owen, Table 3
+Oscar Palmer, Table 5
+Renate Sommers, Table 6
+Sigfried Tanner, Table 7
+Theresa Unger, Table 8
+Victor Wade, Table 1
+Yvonne Young, Table 9`
+  }
+};
+
+function setLang(lang, btn){
+  currentLang = lang;
+  if (btn) {
+    document.querySelectorAll('#lang-btns .ui-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const t = I18N[lang];
+  ge('lbl-logo').textContent     = t.logo;
+  ge('lbl-tagline').textContent  = t.tagline;
+  ge('lbl-style').textContent    = t.style;
+  ge('th-burgund').textContent   = t.burgund;
+  ge('th-cognac').textContent    = t.cognac;
+  ge('th-forest').textContent    = t.forest;
+  ge('lbl-title').textContent    = t.title;
+  ge('inp-title').placeholder    = t.titlePh;
+  ge('lbl-subtitle').textContent = t.subtitle;
+  ge('inp-subtitle').placeholder = t.subPh;
+  ge('lbl-guests').textContent   = t.guests;
+  ge('hint-guests').innerHTML    = t.hint;
+  ge('inp-guests').placeholder   = t.guestsPh;
+  ge('btn-demo').innerHTML       = t.demoBtn;
+  ge('btn-shop').textContent     = t.shopBtn;
+  document.documentElement.lang  = lang;
+  if (window.setRabattLang) window.setRabattLang(lang);
+  onGuestsInput();
+}
 
 // ── Basisgrößen ────────────────────────────────────────
 const BASE = {
@@ -328,7 +500,8 @@ function parseGuests(raw) {
 function onGuestsInput() {
   const n  = parseGuests(document.getElementById('inp-guests').value).length;
   const el = document.getElementById('guest-count');
-  el.textContent = n + ' Einträge' + (n > 65 ? ' — max. 65 Einträge empfohlen' : '');
+  const t  = I18N[currentLang];
+  el.textContent = n + ' ' + t.entries + (n > 65 ? t.warnSuffix : '');
   el.className   = 'guest-count' + (n > 65 ? ' warn' : '');
   renderPoster();
 }
@@ -375,7 +548,7 @@ function renderPoster() {
   poster.className = currentTheme;
 
   document.getElementById('poster-title').textContent =
-    document.getElementById('inp-title').value.trim() || 'SITZPLAN';
+    document.getElementById('inp-title').value.trim() || I18N[currentLang].titleDefault;
   const sub   = document.getElementById('inp-subtitle').value.trim();
   const subEl = document.getElementById('poster-subtitle');
   subEl.textContent   = sub;
@@ -434,57 +607,10 @@ function scalePreview() {
 
 // ── Demo laden ────────────────────────────────────────
 function loadDemo() {
-  document.getElementById('inp-title').value    = 'SITZPLAN';
-  document.getElementById('inp-subtitle').value = 'Anna & Maximilian · 12. Juli 2026';
-  document.getElementById('inp-guests').value   =
-`Anna Müller, Tisch 1
-Maximilian Becker, Tisch 1
-Ursula Becker, Tisch 1
-Gerhard Becker, Tisch 1
-Peter Braun, Tisch 8
-Sabine Fischer, Tisch 3
-Karl Fischer, Tisch 3
-Lena Gruber, Tisch 9
-Claudia Hoffmann, Tisch 4
-Emma Hoffmann, Tisch 4
-Daniel Krause, Tisch 7
-Stefan Klein, Tisch 4
-Ben Koch, Tisch 5
-Ingrid Lange, Tisch 2
-Werner Lange, Tisch 2
-Brigitte Müller, Tisch 2
-Heinz Müller, Tisch 2
-Sophia Meier, Tisch 3
-Leon Neumann, Tisch 9
-Julia Richter, Tisch 5
-Manfred Roth, Tisch 8
-Elise Roth, Tisch 8
-Petra Schäfer, Tisch 6
-Herbert Schmidt, Tisch 5
-Thomas Schulz, Tisch 7
-Ralf Vogt, Tisch 6
-Marina Bauer, Tisch 7
-Helga Wagner, Tisch 6
-Jonas Weber, Tisch 3
-Mia Zimmermann, Tisch 9
-Christine Arnold, Tisch 2
-Hans-Peter Berger, Tisch 3
-Eva Dörfler, Tisch 5
-Friedrich Eichner, Tisch 6
-Gabi Fink, Tisch 7
-Irene Grunewald, Tisch 8
-Josef Huber, Tisch 1
-Katharina Jakobi, Tisch 4
-Ludwig Kaufmann, Tisch 9
-Monika Lehner, Tisch 2
-Norbert Ott, Tisch 3
-Oskar Pfeiffer, Tisch 5
-Renate Sommer, Tisch 6
-Siegfried Tanner, Tisch 7
-Theresa Unger, Tisch 8
-Viktor Weidner, Tisch 1
-Waltraud Xander, Tisch 4
-Yvonne Ziegler, Tisch 9`;
+  const t = I18N[currentLang];
+  document.getElementById('inp-title').value    = t.titleDefault;
+  document.getElementById('inp-subtitle').value = t.demoSubtitle;
+  document.getElementById('inp-guests').value   = t.demoGuests;
   onGuestsInput();
 }
 
@@ -504,6 +630,19 @@ window.addEventListener('resize', scalePreview);
     // Einwilligung aktiv signalisieren (EEA-Pflicht seit 31.10.2025), sonst zerfällt die Sitzung.
     window.clarity('consentv2', { ad_Storage: 'granted', analytics_Storage: 'granted' });
   })();
+</script>
+<script>
+/* ?lang=en — Pin-Sprache: EN-Umschalter aktivieren (Pinterest EN-Pins). No-op ohne EN-Modus. */
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    if (new URLSearchParams(location.search).get('lang') !== 'en') return;
+    var b = Array.from(document.querySelectorAll('button')).find(function (x) {
+      var oc = x.getAttribute('onclick') || '';
+      return /(setLang|switchLang)\(\s*['"]en['"]/.test(oc) || /toggleLang/.test(oc) || x.textContent.trim().toUpperCase() === 'EN';
+    });
+    if (b) { b.click(); document.documentElement.lang = 'en'; }
+  } catch (e) {}
+});
 </script>
 </body>
 </html>

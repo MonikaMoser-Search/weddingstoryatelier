@@ -611,5 +611,18 @@
   applyLang();
   render();
 </script>
+<script>
+/* ?lang=en — Pin-Sprache: EN-Umschalter aktivieren (Pinterest EN-Pins). No-op ohne EN-Modus. */
+document.addEventListener('DOMContentLoaded', function () {
+  try {
+    if (new URLSearchParams(location.search).get('lang') !== 'en') return;
+    var b = Array.from(document.querySelectorAll('button')).find(function (x) {
+      var oc = x.getAttribute('onclick') || '';
+      return /(setLang|switchLang)\(\s*['"]en['"]/.test(oc) || /toggleLang/.test(oc) || x.textContent.trim().toUpperCase() === 'EN';
+    });
+    if (b) { b.click(); document.documentElement.lang = 'en'; }
+  } catch (e) {}
+});
+</script>
 </body>
 </html>
