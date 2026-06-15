@@ -6,7 +6,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="google" content="notranslate">
   <title>Welcome Letter Generator — Wedding Story Atelier</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    /* Lokale OFL-Schriften — kein Google-Fonts-CDN (Datenschutz/Stabilität/Druck) */
+    @font-face { font-family:'Cormorant Garamond'; src:url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-VariableFont_wght.ttf') format('truetype-variations'); font-weight:300 700; font-style:normal; font-display:block; }
+    @font-face { font-family:'Cormorant Garamond'; src:url('/Schriftarten/Cormorant_Garamond/CormorantGaramond-Italic-VariableFont_wght.ttf') format('truetype-variations'); font-weight:300 700; font-style:italic; font-display:block; }
+    @font-face { font-family:'Playfair Display'; src:url('/Schriftarten/Playfair_Display/PlayfairDisplay-VariableFont_wght.ttf') format('truetype-variations'); font-weight:400 900; font-style:normal; font-display:block; }
+    @font-face { font-family:'DM Sans'; src:url('/Schriftarten/DM_Sans/static/DMSans-Light.ttf') format('truetype'); font-weight:300; font-style:normal; font-display:block; }
+    @font-face { font-family:'DM Sans'; src:url('/Schriftarten/DM_Sans/static/DMSans-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:block; }
+    @font-face { font-family:'DM Sans'; src:url('/Schriftarten/DM_Sans/static/DMSans-Medium.ttf') format('truetype'); font-weight:500; font-style:normal; font-display:block; }
+  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <link rel="stylesheet" href="/atelier/wsa_panel.css">
@@ -123,6 +131,7 @@
       background: #FEFCF7;
       padding: 48px 56px 44px;
       font-family: 'Cormorant Garamond', serif;
+      --accent: 43,74,31;
     }
 
     /* Double frame — outer */
@@ -165,7 +174,7 @@
       display: flex; align-items: center; justify-content: center;
       overflow: hidden;
     }
-    .highland .photo-area img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .highland .photo-area img { width: 100%; height: auto; display: block; }
     .highland .photo-ph {
       font-size: 12px; color: #7AA064; text-align: center; padding: 20px;
       font-family: 'DM Sans', sans-serif; line-height: 1.6;
@@ -222,6 +231,7 @@
       background: #FAFCFE;
       padding: 48px 56px 44px;
       font-family: 'Cormorant Garamond', serif;
+      --accent: 26,74,107;
     }
 
     .coastal::before {
@@ -262,7 +272,7 @@
       display: flex; align-items: center; justify-content: center;
       overflow: hidden;
     }
-    .coastal .photo-area img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .coastal .photo-area img { width: 100%; height: auto; display: block; }
     .coastal .photo-ph {
       font-size: 12px; color: #6A9EB8; text-align: center; padding: 20px;
       font-family: 'DM Sans', sans-serif; line-height: 1.6;
@@ -307,6 +317,40 @@
       font-size: 8.5px; letter-spacing: 0.22em;
       text-transform: uppercase; color: #96B4C6;
     }
+
+    /* ── FOTO-WRAPPER + DOPPEL-L SCHMUCKECKEN (Themenfarbe) ──
+       Wrapper trägt die Ecken (kein overflow), .photo-area ist das
+       beschnittene Fenster. Ecken erben var(--accent) vom Theme.      */
+    .photo-wrap { position: relative; width: 100%; --cm-off: 5px; --cm-line: 20px; }
+    .corner-mark {
+      position: absolute;
+      width: calc(var(--cm-off) + var(--cm-line));
+      height: calc(var(--cm-off) + var(--cm-line));
+      pointer-events: none; z-index: 3;
+    }
+    .corner-mark::before, .corner-mark::after {
+      content: ''; position: absolute;
+      width: var(--cm-line); height: var(--cm-line);
+    }
+    .corner-mark.tr { top: calc(-1 * var(--cm-off)); right: calc(-1 * var(--cm-off)); }
+    .corner-mark.tr::before { top: 0; right: 0;
+      border-top:   0.75px solid rgba(var(--accent), 0.45);
+      border-right: 0.75px solid rgba(var(--accent), 0.45); }
+    .corner-mark.tr::after { top: var(--cm-off); right: var(--cm-off);
+      border-top:   0.75px solid rgba(var(--accent), 0.45);
+      border-right: 0.75px solid rgba(var(--accent), 0.45); }
+    .corner-mark.bl { bottom: calc(-1 * var(--cm-off)); left: calc(-1 * var(--cm-off)); }
+    .corner-mark.bl::before { bottom: 0; left: 0;
+      border-bottom: 0.75px solid rgba(var(--accent), 0.45);
+      border-left:   0.75px solid rgba(var(--accent), 0.45); }
+    .corner-mark.bl::after { bottom: var(--cm-off); left: var(--cm-off);
+      border-bottom: 0.75px solid rgba(var(--accent), 0.45);
+      border-left:   0.75px solid rgba(var(--accent), 0.45); }
+
+    /* ── FOTO X/Y-REGLER (nur der wirksame Slider erscheint) ── */
+    #photoSliderRow { display: none; margin-top: 12px; }
+    #photoSliderRow.show { display: block; }
+    #photoSlider { width: 100%; accent-color: var(--charcoal); cursor: pointer; }
 
     /* ── LOADING ── */
     .loading {
@@ -394,6 +438,11 @@
           <div class="pu-label">Bild auswählen</div>
           <div class="pu-sub">JPG, PNG — bleibt lokal auf Ihrem Gerät</div>
         </div>
+      </div>
+      <div id="photoSliderRow">
+        <label id="photoSliderLabel">Bildausschnitt</label>
+        <input type="range" id="photoSlider" min="0" max="100" value="50"
+               oninput="onPhotoSlider(this.value)">
       </div>
     </div>
 
@@ -485,7 +534,68 @@
 <script>
 var currentTheme = 'highland';
 var currentLang  = 'de';
-var photoDataUrl = null;
+var photoOriginal  = null;   // komprimiertes Vollbild (Quelle für Crop)
+var croppedPhotoUrl = null;  // auf 4:3 vorbeschnitten — was im Brief erscheint
+var photoAspect = null;      // Seitenverhältnis des Originals
+var photoY = 50, photoX = 50;
+var photoHoriz = false;      // true → X-Slider wirkt (Bild breiter als 4:3)
+var FRAME_R = 4 / 3;         // Foto-Fenster: 4:3 quer
+
+/* Skaliert + komprimiert ein File auf max. maxPx Kantenlänge. */
+function compressImage(file, maxPx, quality) {
+  return new Promise(function(resolve) {
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var img = new Image();
+      img.onload = function() {
+        var w = img.width, h = img.height;
+        if (w > maxPx || h > maxPx) {
+          if (w >= h) { h = Math.round(h * maxPx / w); w = maxPx; }
+          else        { w = Math.round(w * maxPx / h); h = maxPx; }
+        }
+        var c = document.createElement('canvas');
+        c.width = w; c.height = h;
+        c.getContext('2d').drawImage(img, 0, 0, w, h);
+        resolve(c.toDataURL('image/jpeg', quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function imgAspect(base64) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() { resolve(img.width / img.height); };
+    img.src = base64;
+  });
+}
+
+/* Schneidet base64 auf targetW×targetH zu — vertikal nach yPercent
+   bzw. horizontal nach xPercent. Verhindert das html2canvas-Strecken. */
+function cropPhoto(base64, targetW, targetH, yPercent, xPercent) {
+  return new Promise(function(resolve) {
+    var img = new Image();
+    img.onload = function() {
+      var srcR = img.width / img.height;
+      var tgtR = targetW / targetH;
+      var sx, sy, sw, sh;
+      if (srcR > tgtR) {
+        sh = img.height; sw = sh * tgtR; sy = 0;
+        sx = (img.width - sw) * ((xPercent == null ? 50 : xPercent) / 100);
+      } else {
+        sw = img.width; sh = sw / tgtR; sx = 0;
+        sy = (img.height - sh) * ((yPercent == null ? 50 : yPercent) / 100);
+      }
+      var c = document.createElement('canvas');
+      c.width = Math.round(sw); c.height = Math.round(sh);
+      c.getContext('2d').drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+      resolve(c.toDataURL('image/jpeg', 0.92));
+    };
+    img.src = base64;
+  });
+}
 
 /* ── Default texts per language ── */
 var defaults = {
@@ -580,21 +690,52 @@ function switchLang(lang, btn) {
     }
   }
 
+  if (photoOriginal) updateSliderLabel();
   update();
 }
 
-function loadPhoto(input) {
+async function loadPhoto(input) {
   if (!input.files || !input.files[0]) return;
-  var reader = new FileReader();
-  reader.onload = function(e) {
-    photoDataUrl = e.target.result;
-    var preview = ge('photoPreview');
-    preview.src = photoDataUrl;
-    preview.style.display = 'block';
-    ge('photoPlaceholderUI').style.display = 'none';
-    update();
-  };
-  reader.readAsDataURL(input.files[0]);
+  photoOriginal = await compressImage(input.files[0], 1600, 0.85);
+  photoAspect   = await imgAspect(photoOriginal);
+  photoY = 50; photoX = 50;
+  var preview = ge('photoPreview');
+  preview.src = photoOriginal;
+  preview.style.display = 'block';
+  ge('photoPlaceholderUI').style.display = 'none';
+  setupSlider();
+  await recrop();
+}
+
+/* Zeigt nur den Slider, der mathematisch wirkt:
+   Bild breiter als 4:3 → Breite wird beschnitten → X; sonst Y. */
+function setupSlider() {
+  var row = ge('photoSliderRow');
+  if (!photoOriginal) { row.classList.remove('show'); return; }
+  photoHoriz = (photoAspect != null) && (photoAspect > FRAME_R);
+  ge('photoSlider').value = photoHoriz ? photoX : photoY;
+  updateSliderLabel();
+  row.classList.add('show');
+}
+
+function updateSliderLabel() {
+  var de = currentLang === 'de';
+  ge('photoSliderLabel').textContent = photoHoriz
+    ? (de ? 'Bildausschnitt — horizontal' : 'Crop — horizontal')
+    : (de ? 'Bildausschnitt — vertikal'   : 'Crop — vertical');
+}
+
+function onPhotoSlider(val) {
+  if (photoHoriz) photoX = parseInt(val, 10);
+  else            photoY = parseInt(val, 10);
+  recrop();
+}
+
+/* Erzeugt das auf 4:3 vorbeschnittene Bild und rendert neu. */
+async function recrop() {
+  if (!photoOriginal) { croppedPhotoUrl = null; update(); return; }
+  croppedPhotoUrl = await cropPhoto(photoOriginal, 1000, 750, photoY, photoX);
+  update();
 }
 
 function update() {
@@ -617,9 +758,10 @@ function update() {
   /* font-size as inline style — applied to body text and each tip row */
   var fss = 'style="font-size:' + fs + 'px"';
 
-  var photoHtml = photoDataUrl
-    ? '<img src="' + photoDataUrl + '" alt="Bild">'
-    : '<div class="photo-ph">[ Euer Bild hier ]<br><small style="font-size:10px;opacity:0.7">Bild links ausw\u00e4hlen</small></div>';
+  var photoInner = croppedPhotoUrl
+    ? '<div class="photo-area"><img src="' + croppedPhotoUrl + '" alt="Bild"></div>' +
+      '<div class="corner-mark tr"></div><div class="corner-mark bl"></div>'
+    : '<div class="photo-area"><div class="photo-ph">[ Euer Bild hier ]<br><small style="font-size:10px;opacity:0.7">Bild links ausw\u00e4hlen</small></div></div>';
 
   var out = ge('welcome-letter');
   out.className = t;
@@ -633,7 +775,7 @@ function update() {
         (letterSubt ? '<div class="letter-subt">' + esc(letterSubt) + '</div>' : '') +
       '</div>' +
       '<div>' +
-        '<div class="photo-area">' + photoHtml + '</div>' +
+        '<div class="photo-wrap">' + photoInner + '</div>' +
       '</div>' +
     '</div>' +
 
