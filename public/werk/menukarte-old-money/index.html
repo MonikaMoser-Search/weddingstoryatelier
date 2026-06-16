@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
   <meta charset="UTF-8">
@@ -1144,9 +1144,20 @@ function drawCardPage(pdf, cardType, baseW, baseH, bleedMM) {
   var totalH = blocks.reduce(function(s,b){ return s+b.height; }, 0);
   var footerH = footerText ? 7*fS : 0;
   var availH  = yEnd - footerH - contentTopY;
-  var gap     = Math.max(2*fS, (availH - totalH) / (blocks.length + 1));
+  var evenGap = (availH - totalH) / (blocks.length + 1);
 
-  var cy = contentTopY + gap;
+  var gap, cy;
+  // Allergenkarte mit wenig Einträgen nicht über die ganze Seite strecken
+  // (sonst klebt der einzelne Eintrag unten) — als kompakte, mittig
+  // platzierte Liste setzen. Andere Karten behalten die luftige Verteilung.
+  if (cardType === 'allergene' && blocks.length <= 4) {
+    gap = Math.min(evenGap, 11*fS);
+    var groupH = totalH + gap * (blocks.length - 1);
+    cy = contentTopY + Math.max(0, (availH - groupH) / 2);
+  } else {
+    gap = Math.max(2*fS, evenGap);
+    cy = contentTopY + gap;
+  }
 
   blocks.forEach(function(block) {
     if (block.type === 'orn') {
