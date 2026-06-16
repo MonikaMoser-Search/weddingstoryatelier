@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" translate="no">
 <head>
 <meta charset="UTF-8">
@@ -79,6 +79,8 @@ body {
 }
 .front-body { flex: 1; padding: 9mm 11mm; text-align: center; color: var(--text); overflow: hidden;
   display: flex; flex-direction: column; justify-content: center; }
+/* Inhalt wird bei zu vollem Menü proportional eingepasst (kein Abschneiden) */
+.fit-inner { width: 100%; transform-origin: center center; }
 .menu-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 30pt; letter-spacing: 0.18em; padding-left: 0.18em; margin: 1mm 0 0; line-height: 1; }
 .menu-date { font-size: 10pt; letter-spacing: 0.30em; text-transform: uppercase; color: var(--gold-light); margin: 3mm 0 0; }
 .rule { display: flex; align-items: center; justify-content: center; gap: 3mm; width: 55mm; margin: 4mm auto 4mm; }
@@ -208,7 +210,7 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
   </div>
   <div class="band-hair"></div>
 
-  <div class="front-body">
+  <div class="front-body"><div class="fit-inner">
     <h1 class="menu-title">MENÜ</h1>
     <p class="menu-date"><input class="field" id="fDate" type="text" placeholder="12. SEPTEMBER 2026"></p>
     <div class="rule" aria-hidden="true"><span class="rule-line"></span><span class="rule-gem"></span><span class="rule-line"></span></div>
@@ -235,7 +237,7 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
         <div class="dishes"></div>
       </div>
     </div>
-  </div>
+  </div></div>
 
   <div class="band-hair"></div>
   <div class="band band-bottom">
@@ -261,12 +263,12 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
     <div class="crest" id="crestBack" aria-hidden="true"></div>
   </div>
   <div class="band-hair"></div>
-  <div class="back-body">
+  <div class="back-body"><div class="fit-inner">
     <h2 class="back-title">Allergene</h2>
     <p class="back-sub">&amp; Zusatzstoffe</p>
     <div class="back-list" id="backList"></div>
     <p class="back-note">Angaben ohne Gewähr — bitte mit dem Catering abgleichen.</p>
-  </div>
+  </div></div>
   <div class="band-hair"></div>
   <div class="band band-bottom">
     <div class="footer-orn" aria-hidden="true"><span class="l"></span><span class="d"></span><span class="l"></span></div>
@@ -390,6 +392,7 @@ function renderBack() {
     list.appendChild(item);
     refresh();
   });
+  fitCard(document.querySelector('#cardBack .back-body'));
 }
 
 /* ===== Persistenz ===== */
@@ -448,6 +451,24 @@ function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
 /* ===== Auto-Höhe: Textarea wächst mit dem Inhalt (Zeilenumbruch) ===== */
 function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
 
+/* ===== Karteninhalt einpassen: bei Überlauf proportional herunterskalieren ===== */
+function fitCard(body) {
+  if (!body) return;
+  const inner = body.querySelector('.fit-inner');
+  if (!inner) return;
+  inner.style.transform = 'none';
+  const cs = getComputedStyle(body);
+  const avail = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const need = inner.offsetHeight;
+  if (need > avail && avail > 0) {
+    inner.style.transform = 'scale(' + (avail / need).toFixed(4) + ')';
+  }
+}
+function refit() {
+  fitCard(document.querySelector('#cardFront .front-body'));
+  fitCard(document.querySelector('#cardBack .back-body'));
+}
+
 /* ===== Rückseiten-Kreis: Initialen einpassen (kein Stapeln/Überlauf) ===== */
 function fitCrest(el) {
   let fs = 12;                       // pt — entspricht CSS-Ausgangswert
@@ -461,7 +482,7 @@ function fitCrest(el) {
 /* ===== Verdrahtung ===== */
 buildDishes();
 
-document.getElementById('btnPrint').addEventListener('click', () => { updateRowState(); window.print(); });
+document.getElementById('btnPrint').addEventListener('click', () => { updateRowState(); refit(); window.print(); });
 
 const btnMode = document.getElementById('btnMode');
 btnMode.addEventListener('click', () => {
@@ -474,10 +495,13 @@ btnMode.addEventListener('click', () => {
 // Vorderseiten-Eingaben: speichern, Sichtbarkeit + Rückseite aktualisieren
 document.querySelectorAll('.field').forEach(inp => inp.addEventListener('input', saveToStorage));
 document.querySelectorAll('.dish-input').forEach(inp => {
-  inp.addEventListener('input', () => { autoGrow(inp); updateRowState(); renderBack(); });
+  inp.addEventListener('input', () => { autoGrow(inp); updateRowState(); renderBack(); fitCard(document.querySelector('#cardFront .front-body')); });
+});
+document.querySelectorAll('.sec-title').forEach(inp => {
+  inp.addEventListener('input', () => fitCard(document.querySelector('#cardFront .front-body')));
 });
 document.getElementById('fInitials').addEventListener('input', renderBack);
-window.addEventListener('beforeprint', updateRowState);
+window.addEventListener('beforeprint', () => { updateRowState(); refit(); });
 
 function setup() {
   loadFromStorage();
@@ -486,6 +510,7 @@ function setup() {
   renderBack();
   autofitField(document.getElementById('fDate'), 9, 7, 1.08)();
   autofitField(document.getElementById('fInitials'), 12, 8, 1.05)();
+  refit();
 }
 if (document.fonts && document.fonts.ready) { document.fonts.ready.then(setup); }
 else { window.addEventListener('load', setup); }
