@@ -71,9 +71,9 @@ body {
 .band-bottom { padding: 5mm 0 8mm; margin-top: auto; }
 .band-hair { display: none; }
 .crest {
-  width: 13mm; height: 13mm; border: 0.5px solid var(--gold); border-radius: 50%;
+  width: 17mm; height: 17mm; border: 0.5px solid var(--gold); border-radius: 50%;
   margin: 0 auto; display: flex; align-items: center; justify-content: center;
-  font-family: 'Playfair Display', serif; font-weight: 500; font-size: 12pt;
+  font-family: 'Playfair Display', serif; font-weight: 500; font-size: 15pt;
   color: var(--gold-light); letter-spacing: 0.05em;
   white-space: nowrap; overflow: hidden;
 }
@@ -81,6 +81,12 @@ body {
   display: flex; flex-direction: column; justify-content: center; }
 /* Inhalt wird bei zu vollem Menü proportional eingepasst (kein Abschneiden) */
 .fit-inner { width: 100%; transform-origin: center center; }
+/* Rückseite wächst beim Bearbeiten am Bildschirm mit (kein Abschneiden, keine
+   Stauchung durch die Bearbeitungs-UI); erst im Druck DL-fix + ggf. eingepasst. */
+#cardBack { height: auto; min-height: 210mm; overflow: visible; }
+#cardBack .fit-inner { transform-origin: top center; }
+body.printing #cardBack { height: 210mm; overflow: hidden; }
+body.printing .buyer-edit { display: none !important; }
 .menu-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 30pt; letter-spacing: 0.18em; padding-left: 0.18em; margin: 1mm 0 0; line-height: 1; }
 .menu-date { font-size: 10pt; letter-spacing: 0.30em; text-transform: uppercase; color: var(--gold-light); margin: 3mm 0 0; }
 .rule { display: flex; align-items: center; justify-content: center; gap: 3mm; width: 55mm; margin: 4mm auto 4mm; }
@@ -103,16 +109,41 @@ textarea.dish-input { display: block; resize: none; overflow: hidden; white-spac
 .dish-row.screen-hide { display: none; }
 
 /* ===== Rückseite: Titel + Liste ======================================= */
-.back-body { flex: 1; padding: 10mm 10mm; text-align: center; color: var(--text); overflow: hidden;
-  display: flex; flex-direction: column; justify-content: center; }
+.back-body { flex: 1; padding: 12mm 10mm; text-align: center; color: var(--text); overflow: hidden;
+  display: flex; flex-direction: column; justify-content: flex-start; }
+/* Allergenliste oben verankert (Briefkopf-Logik) — Monogramm bleibt zentriert */
+body.back-monogramm #cardBack .back-body { justify-content: center; }
 .back-title { font-family: 'Playfair Display', serif; font-weight: 600; font-size: 19pt; letter-spacing: 0.12em; margin: 0; }
 .back-sub { font-size: 9.5pt; letter-spacing: 0.20em; text-transform: uppercase; color: var(--gold-light); margin: 2mm 0 5mm; }
+.back-rule { display: flex; align-items: center; justify-content: center; gap: 3mm; width: 42mm; margin: 0 auto 6mm; }
+.back-rule .l { flex: 1; height: 0.5px; background: var(--gold-dim); }
+.back-rule .g { width: 2mm; height: 2mm; border: 0.5px solid var(--gold-dim); transform: rotate(45deg); }
 .back-list { text-align: left; max-width: 78mm; margin: 0 auto; }
-.back-item { margin: 2.5mm 0; line-height: 1.4; }
+.back-item { margin: 4.2mm 0; line-height: 1.5; }
+.back-item:first-child { margin-top: 0; }
+.back-item:last-child { margin-bottom: 0; }
 .back-line { font-family: 'Cormorant Garamond', serif; }
 .back-dish { font-style: italic; font-weight: 600; font-size: 12.5pt; color: var(--text); }
 .back-dash { color: var(--gold-light); }
 .back-alg { font-size: 11pt; color: var(--text-dim); }
+
+/* ===== Rückseite · Monogramm-Variante (leere Bordeaux-Rückseite) ======== */
+.crest-lg { width: 44mm; height: 44mm; font-size: 34pt; border-width: 0.6px; }
+.back-mono { display: none; flex-direction: column; align-items: center; justify-content: center;
+  gap: 7mm; margin-bottom: 18mm; }   /* margin-bottom rückt das Monogramm etwas nach oben */
+/* Optionale freie Schlusszeile — leer = nichts gedruckt; unten verankert, Gold */
+textarea.back-close { display: block; width: 100%; max-width: 80mm; margin: auto auto 0; padding: 1px 3px;
+  resize: none; overflow: hidden; font-family: 'Cormorant Garamond', serif; font-style: italic;
+  font-weight: 500; font-size: 11pt; line-height: 1.5; letter-spacing: 0.02em;
+  color: var(--gold-light); text-align: center; }
+body.back-monogramm #cardBack .back-close { display: none; }
+body.back-monogramm #cardBack .back-title,
+body.back-monogramm #cardBack .back-sub,
+body.back-monogramm #cardBack .head-rule,
+body.back-monogramm #cardBack #backList { display: none !important; }
+body.back-monogramm #cardBack .back-mono { display: flex; }
+body.back-monogramm #cardBack .band-top .crest { visibility: hidden; }   /* nur das zentrale Monogramm zeigen */
+body.back-monogramm .alg-help { display: none; }                          /* Anleitung irrelevant ohne Allergene */
 .back-empty { font-size: 11.5pt; color: var(--text-dim); font-style: italic; text-align: center; line-height: 1.45; }
 .back-note { font-size: 9pt; color: var(--gold-light); letter-spacing: 0.04em; margin-top: 5mm; line-height: 1.5; text-align: center; }
 .back-hint { font-size: 8.5pt; color: var(--text-dim); font-style: italic; text-align: center; margin: 0 0 4mm; line-height: 1.4; }
@@ -156,33 +187,81 @@ textarea.dish-input { display: block; resize: none; overflow: hidden; white-spac
 .field:hover { background: rgba(254,248,247,0.08); }
 .field:focus { background: rgba(254,248,247,0.12); box-shadow: 0 0 0 1px var(--gold-dim); }
 .field::placeholder { color: rgba(254,248,247,0.40); opacity: 1; }
-.crest-input { width: 11mm; text-align: center; color: var(--gold-light); font-family: 'Playfair Display', serif;
-  font-size: 11pt; letter-spacing: 0.04em; }
+.crest-input { width: 14mm; text-align: center; color: var(--gold-light); font-family: 'Playfair Display', serif;
+  font-size: 14pt; letter-spacing: 0.04em; }
 .crest-input::placeholder { color: rgba(227,203,135,0.45); }
 .crest.is-placeholder { color: rgba(227,203,135,0.45); }
 .menu-date .field { text-align: center; }
 
-/* ===== Druckerei-Modus (Bildschirm-Hinweis) =========================== */
-body.mode-druckerei .card { outline: 3mm solid var(--cream); }
+/* ===== Druckerei-Modus — Bildschirm-Vorschau (echter 3-mm-Bleed in Farbe) === */
+body.mode-druckerei .card { outline: 3mm solid var(--burgund); }   /* Beschnitt in Themenfarbe, nicht weiß */
+body.mode-druckerei .card::before {                                /* Schnittkante sichtbar markieren */
+  content: ''; position: absolute; inset: 0; z-index: 6; pointer-events: none;
+  border: 0.3mm dashed var(--gold-light);
+}
+
+/* ===== Falz-Hilfslinie (nur im Heimdruck-Ausdruck sichtbar) ============ */
+.fold-guide { display: none; }
 
 /* ===== Print =========================================================== */
 @media print {
-  @page { size: 99mm 210mm; margin: 0; }
-  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important;
-    width: 99mm !important; min-height: 0 !important; display: block !important; }
+  /* Seitengröße wird per JS gesetzt: Heimdruck = A4, Druckerei = 105×216 mm.
+     Dieser Default (A4) greift, falls das Skript nicht lief. */
+  @page { size: A4; margin: 0; }
+
+  html, body { background: #fff !important; padding: 0 !important; margin: 0 !important; }
   .buyer-only, .card-label, .buyer-edit { display: none !important; }
-  .card-wrap { margin: 0 !important; }
-  .card { box-shadow: none !important; width: 99mm; height: 210mm; margin: 0;
-    page-break-after: always; break-after: page; page-break-inside: avoid; }
-  #wrapBack { page-break-after: auto; }
-  #cardBack { page-break-after: auto; break-after: auto; }
+  .card { box-shadow: none !important; }
   .dish-row.is-empty, .section.is-empty { display: none !important; }
   .back-item.no-alg { display: none !important; }   /* ohne Allergen nicht drucken */
   .field { background: transparent !important; box-shadow: none !important; }
   .field::placeholder { color: transparent !important; }
   .crest.is-placeholder { color: transparent !important; }
-  body.mode-druckerei .card { outline: none; }
+  #cardBack { height: 210mm; overflow: hidden; }
   * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+
+  /* ---------- HEIMDRUCK: Vorder- + Rückseite nebeneinander auf 1× A4 ---------- */
+  body:not(.mode-druckerei) {
+    display: flex !important; flex-direction: row !important;
+    align-items: center; justify-content: center;
+    width: 210mm; min-height: 297mm;
+  }
+  body:not(.mode-druckerei) .card-wrap { margin: 0 !important; }
+  body:not(.mode-druckerei) .card {
+    width: 99mm; height: 210mm; margin: 0;
+    page-break-after: auto !important; break-after: auto !important; page-break-inside: avoid;
+  }
+  body:not(.mode-druckerei) .card::before { display: none !important; }   /* Schnittkante nicht drucken */
+  /* Falzmarken in den weißen Rändern, exakt auf der Mittelnaht (= Falz) */
+  body:not(.mode-druckerei) .fold-guide { display: block; }
+  body:not(.mode-druckerei) .fold-guide::before,
+  body:not(.mode-druckerei) .fold-guide::after {
+    content: ''; position: fixed; left: 50%; transform: translateX(-50%);
+    border-left: 0.3mm dashed rgba(0,0,0,0.45); height: 34mm;
+  }
+  body:not(.mode-druckerei) .fold-guide::before { top: 5mm; }
+  body:not(.mode-druckerei) .fold-guide::after  { bottom: 5mm; }
+  body:not(.mode-druckerei) .fold-guide span {
+    position: fixed; top: 41mm; left: 50%; transform: translateX(-50%);
+    font-family: 'Cormorant Garamond', serif; font-size: 8pt; letter-spacing: 0.22em;
+    text-transform: uppercase; color: rgba(0,0,0,0.5); background: #fff; padding: 0 2mm; white-space: nowrap;
+  }
+
+  /* ---------- DRUCKEREI: 1 Karte/Seite, 99×210 mittig in 105×216 (3 mm Bleed) ---------- */
+  body.mode-druckerei { display: block !important; }
+  body.mode-druckerei .card-wrap {
+    width: 105mm; height: 216mm; margin: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--burgund);                 /* Burgund läuft bis in den Beschnitt */
+    page-break-after: always; break-after: page; page-break-inside: avoid;
+  }
+  body.mode-druckerei #wrapBack { page-break-after: auto; break-after: auto; }
+  body.mode-druckerei .card {
+    width: 99mm; height: 210mm; margin: 0;
+    outline: none;
+    page-break-after: auto !important; break-after: auto !important;
+  }
+  body.mode-druckerei .card::before { display: none !important; }
 }
 </style>
 </head>
@@ -191,13 +270,17 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
 <div class="buyer-only">
   <div class="buyer-bar">
     <button class="buyer-btn" id="btnPrint" type="button">Drucken / PDF</button>
+    <button class="buyer-btn" id="btnBack" type="button" data-back="allergene">Rückseite: Allergene</button>
     <button class="buyer-btn" id="btnMode" type="button" data-mode="heim">Modus: Heimdruck</button>
   </div>
   <p style="text-align:center;margin:0 0 18px;"><a href="/werk/menukarte-om/en/" style="color:#8B1A35;font-size:10.5pt;letter-spacing:0.08em;text-decoration:none;border-bottom:1px solid rgba(139,26,53,0.35);padding-bottom:1px;">English version ↗</a></p>
   <p class="buyer-hint">
     <strong>Vorderseite:</strong> Menü eintragen. <strong>Rückseite:</strong> je Gericht „Allergene wählen"
     antippen — die Allergen-Liste entsteht von selbst. Danach „Drucken / PDF". Tipp: im Druckdialog
-    Hintergrundgrafiken aktivieren. Format: DL (99 × 210 mm), beidseitig.
+    Hintergrundgrafiken aktivieren.<br>
+    <strong>Heimdruck:</strong> Vorder- und Rückseite kommen nebeneinander auf <em>ein</em> A4-Blatt —
+    an der gestrichelten Mittellinie nach hinten falzen, fertig (DL, 99 × 210 mm).
+    <strong>Druckerei:</strong> randlose DL-Karte mit 3 mm Beschnitt, eine Seite je Karte.
   </p>
 </div>
 
@@ -263,17 +346,26 @@ body.mode-druckerei .card { outline: 3mm solid var(--cream); }
     <div class="crest" id="crestBack" aria-hidden="true"></div>
   </div>
   <div class="band-hair"></div>
-  <div class="back-body"><div class="fit-inner">
-    <h2 class="back-title">Allergene</h2>
-    <p class="back-sub">&amp; Zusatzstoffe</p>
-    <div class="back-list" id="backList"></div>
-  </div></div>
+  <div class="back-body">
+    <div class="fit-inner">
+      <h2 class="back-title">Allergene</h2>
+      <p class="back-sub">&amp; Zusatzstoffe</p>
+      <div class="back-rule head-rule" aria-hidden="true"><span class="l"></span><span class="g"></span><span class="l"></span></div>
+      <div class="back-list" id="backList"></div>
+    </div>
+    <textarea class="field back-close" id="fClose" rows="1" placeholder="Optionale Schlusszeile — leer lassen, wenn nichts gedruckt werden soll"></textarea>
+    <div class="back-mono" aria-hidden="true">
+      <div class="crest crest-lg" id="crestMono"></div>
+    </div>
+  </div>
   <div class="band-hair"></div>
   <div class="band band-bottom">
     <div class="footer-orn" aria-hidden="true"><span class="l"></span><span class="d"></span><span class="l"></span></div>
   </div>
 </article>
 </div>
+
+<div class="fold-guide" aria-hidden="true"><span>Falz</span></div>
 
 <script>
 /* ===== Daten ===== */
@@ -340,6 +432,12 @@ function renderBack() {
   _crestBack.textContent = _iniVal || _ini.placeholder || '';
   _crestBack.classList.toggle('is-placeholder', !_iniVal);
   fitCrest(_crestBack);
+  const _crestMono = document.getElementById('crestMono');
+  if (_crestMono) {
+    _crestMono.textContent = _iniVal || _ini.placeholder || '';
+    _crestMono.classList.toggle('is-placeholder', !_iniVal);
+    fitCrest(_crestMono, 34);
+  }
   list.innerHTML = '';
   const allDishInputs = [...document.querySelectorAll('.dish-input')];
   // Allergene eines geleerten/geänderten Gerichts verwerfen — sonst „kleben" sie an der Zeile
@@ -391,13 +489,13 @@ function renderBack() {
     list.appendChild(item);
     refresh();
   });
-  fitCard(document.querySelector('#cardBack .back-body'));
+  fitBack();
 }
 
 /* ===== Persistenz ===== */
 function saveToStorage() {
   try {
-    const data = { fields: {}, sec: [], alg: {} };
+    const data = { fields: {}, sec: [], alg: {}, back: document.body.classList.contains('back-monogramm') ? 'monogramm' : 'allergene' };
     document.querySelectorAll('.field').forEach(inp => { if (inp.id) data.fields[inp.id] = inp.value; });
     document.querySelectorAll('.sec-title').forEach(inp => { data.sec.push(inp.value); });
     Object.entries(algByDish).forEach(([id, set]) => { if (set.size) data.alg[id] = [...set]; });
@@ -416,6 +514,7 @@ function loadFromStorage() {
       data.sec.forEach((v, i) => { if (titles[i] && typeof v === 'string') titles[i].value = v; });
     }
     if (data.alg) Object.entries(data.alg).forEach(([id, arr]) => { algByDish[id] = new Set(arr); });
+    if (data.back === 'monogramm') document.body.classList.add('back-monogramm');
   } catch (e) {}
 }
 
@@ -451,37 +550,76 @@ function autofitField(input, maxPt, minPt, swashSafety = 1.0) {
 function autoGrow(el) { el.style.height = 'auto'; el.style.height = el.scrollHeight + 'px'; }
 
 /* ===== Karteninhalt einpassen: bei Überlauf proportional herunterskalieren ===== */
-function fitCard(body) {
+function fitCard(body, reserve = 0) {
   if (!body) return;
   const inner = body.querySelector('.fit-inner');
   if (!inner) return;
   inner.style.transform = 'none';
   const cs = getComputedStyle(body);
-  const avail = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const avail = body.clientHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom) - reserve;
   const need = inner.offsetHeight;
   if (need > avail && avail > 0) {
     inner.style.transform = 'scale(' + (avail / need).toFixed(4) + ')';
   }
 }
+// Rückseite: am Bildschirm wächst die Karte mit (kein Skalieren). Nur im Druck
+// (Markierung body.printing) wird auf DL eingepasst — Platz für die Schlusszeile reservieren.
+function fitBack() {
+  const body = document.querySelector('#cardBack .back-body');
+  if (!body) return;
+  const inner = body.querySelector('.fit-inner');
+  if (!document.body.classList.contains('printing')) { if (inner) inner.style.transform = 'none'; return; }
+  const close = document.querySelector('#cardBack .back-close');
+  let reserve = 0;
+  if (close && getComputedStyle(close).display !== 'none' && (close.value || '').trim()) {
+    reserve = close.offsetHeight + 18;
+  }
+  fitCard(body, reserve);
+}
 function refit() {
   fitCard(document.querySelector('#cardFront .front-body'));
-  fitCard(document.querySelector('#cardBack .back-body'));
+  fitBack();
 }
 
 /* ===== Rückseiten-Kreis: Initialen einpassen (kein Stapeln/Überlauf) ===== */
-function fitCrest(el) {
-  let fs = 12;                       // pt — entspricht CSS-Ausgangswert
-  el.style.fontSize = fs + 'pt';
-  let guard = 0;
-  while (el.scrollWidth > el.clientWidth - 1 && fs > 7 && guard++ < 20) {
-    fs -= 0.5; el.style.fontSize = fs + 'pt';
+function fitCrest(el, startPt = 15) {
+  const text = (el.textContent || '').trim();
+  el.style.fontSize = startPt + 'pt';
+  if (!text) return;
+  const cs = getComputedStyle(el);
+  const family = cs.fontFamily, weight = cs.fontWeight || '500', style = cs.fontStyle || 'normal';
+  const lsPx = parseFloat(cs.letterSpacing) || 0;
+  const avail = el.clientWidth - 4;          // kleiner Innenrand
+  function widthAt(pt) {
+    _measureCtx.font = `${style} ${weight} ${(pt * 4 / 3).toFixed(2)}px ${family}`;
+    return _measureCtx.measureText(text).width + lsPx * Math.max(0, text.length - 1);
   }
+  const need = widthAt(startPt);
+  if (need > avail && avail > 0) {
+    el.style.fontSize = Math.max(7, startPt * (avail / need)).toFixed(1) + 'pt';
+  }
+}
+
+/* ===== Druck-Seitengröße je Modus (Heim = A4, Druckerei = 105×216 mm Bleed) =====
+   @page lässt sich nicht per Body-Klasse umschalten — daher dynamisch injiziert. */
+function applyPrintPageRule() {
+  let s = document.getElementById('dynPageRule');
+  if (!s) { s = document.createElement('style'); s.id = 'dynPageRule'; document.head.appendChild(s); }
+  const dr = document.body.classList.contains('mode-druckerei');
+  s.textContent = '@media print{@page{size:' + (dr ? '105mm 216mm' : '210mm 297mm') + ';margin:0;}}';
 }
 
 /* ===== Verdrahtung ===== */
 buildDishes();
 
-document.getElementById('btnPrint').addEventListener('click', () => { updateRowState(); refit(); window.print(); });
+document.getElementById('btnPrint').addEventListener('click', () => {
+  applyPrintPageRule();
+  document.body.classList.add('printing');     // Rückseite für den Druck auf DL fixieren + einpassen
+  updateRowState(); refit();
+  window.print();
+  document.body.classList.remove('printing');
+  fitBack();
+});
 
 const btnMode = document.getElementById('btnMode');
 btnMode.addEventListener('click', () => {
@@ -489,7 +627,23 @@ btnMode.addEventListener('click', () => {
   btnMode.dataset.mode = m;
   document.body.classList.toggle('mode-druckerei', m === 'druckerei');
   btnMode.textContent = 'Modus: ' + (m === 'heim' ? 'Heimdruck' : 'Druckerei');
+  applyPrintPageRule();
 });
+
+// Rückseite: Allergene <-> Monogramm (leere Bordeaux-Rückseite)
+const btnBack = document.getElementById('btnBack');
+const backLabel = document.querySelector('#wrapBack .card-label');
+function setBackMode(mode) {                         // 'allergene' | 'monogramm'
+  const mono = mode === 'monogramm';
+  document.body.classList.toggle('back-monogramm', mono);
+  btnBack.dataset.back = mode;
+  btnBack.textContent = 'Rückseite: ' + (mono ? 'Monogramm' : 'Allergene');
+  if (backLabel) backLabel.textContent = mono ? 'Rückseite — Monogramm' : 'Rückseite — Allergene (hier auswählen)';
+  renderBack();
+  fitBack();
+  saveToStorage();
+}
+btnBack.addEventListener('click', () => setBackMode(btnBack.dataset.back === 'allergene' ? 'monogramm' : 'allergene'));
 
 // Vorderseiten-Eingaben: speichern, Sichtbarkeit + Rückseite aktualisieren
 document.querySelectorAll('.field').forEach(inp => inp.addEventListener('input', saveToStorage));
@@ -500,15 +654,21 @@ document.querySelectorAll('.sec-title').forEach(inp => {
   inp.addEventListener('input', () => fitCard(document.querySelector('#cardFront .front-body')));
 });
 document.getElementById('fInitials').addEventListener('input', renderBack);
-window.addEventListener('beforeprint', () => { updateRowState(); refit(); });
+const fClose = document.getElementById('fClose');
+if (fClose) fClose.addEventListener('input', () => { autoGrow(fClose); fitBack(); });
+window.addEventListener('beforeprint', () => { applyPrintPageRule(); document.body.classList.add('printing'); updateRowState(); refit(); });
+window.addEventListener('afterprint', () => { document.body.classList.remove('printing'); fitBack(); });
 
 function setup() {
   loadFromStorage();
   document.querySelectorAll('.dish-input').forEach(autoGrow);
+  { const fc = document.getElementById('fClose'); if (fc) autoGrow(fc); }
   updateRowState();
   renderBack();
+  setBackMode(document.body.classList.contains('back-monogramm') ? 'monogramm' : 'allergene');
   autofitField(document.getElementById('fDate'), 9, 7, 1.08)();
-  autofitField(document.getElementById('fInitials'), 12, 8, 1.05)();
+  autofitField(document.getElementById('fInitials'), 15, 9, 1.05)();
+  applyPrintPageRule();
   refit();
 }
 if (document.fonts && document.fonts.ready) { document.fonts.ready.then(setup); }
