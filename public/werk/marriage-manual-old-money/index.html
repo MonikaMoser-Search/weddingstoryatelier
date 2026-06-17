@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google" content="notranslate">
+  <title>The Marriage Manual · EHE-WERKSTATT · Old Money · Wedding Story Atelier</title>
+  <style>
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Medium.ttf') format('truetype'); font-weight: 500; font-style: normal; font-display: swap; }
+    @font-face { font-family: 'Cormorant Garamond'; src: url('/Schriftarten/Cormorant_Garamond/static/CormorantGaramond-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+    @font-face { font-family: 'Cinzel'; src: url('/Schriftarten/Cinzel/Cinzel-Variable.ttf') format('truetype'); font-weight: 400 600; font-style: normal; font-display: swap; }
+
+    :root {
+      --burgund:       #8B1A35;
+      --burgund-soft:  rgba(139,26,53,0.45);
+      --cream:         #FEF8F7;
+      --gold:          #9C7B1A;
+      --ink:           #2A1014;
+      --ink-body:      rgba(42,16,20,0.86);
+      --ink-soft:      rgba(42,16,20,0.55);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      background: var(--cream);
+      font-family: 'Cormorant Garamond', serif;
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    .stage { max-width: 880px; margin: 0 auto; padding: 60px 40px 80px; }
+
+    .wordmark {
+      text-align: center; font-family: 'Cinzel', serif; font-size: 11pt;
+      letter-spacing: 0.36em; color: var(--burgund); text-transform: uppercase;
+      margin-bottom: 50px;
+    }
+
+    .header { text-align: center; margin-bottom: 30px; }
+    .eyebrow {
+      font-family: 'Cinzel', serif; font-size: 11pt; letter-spacing: 0.32em;
+      color: var(--burgund); text-transform: uppercase; margin-bottom: 14px;
+    }
+    .title { font-style: italic; font-weight: 500; font-size: 46pt; color: var(--burgund); line-height: 1.05; margin-bottom: 6px; }
+    .title-de { font-family: 'Cinzel', serif; font-size: 11pt; letter-spacing: 0.3em; color: var(--gold); text-transform: uppercase; }
+    .rule { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 22px auto; width: 30%; }
+    .rule-line { flex: 1; height: 0.5px; background: var(--burgund-soft); }
+    .rule-gem { width: 8px; height: 8px; background: var(--gold); transform: rotate(45deg); flex-shrink: 0; }
+    .intro { font-style: italic; font-size: 14pt; color: var(--ink-body); line-height: 1.45; max-width: 600px; margin: 0 auto; }
+
+    .access {
+      max-width: 600px; margin: 34px auto 0; background: #fff;
+      border: 1px solid var(--burgund-soft); padding: 18px 26px;
+    }
+    .access-label { font-family: 'Cinzel', serif; font-size: 8pt; letter-spacing: 0.28em; color: var(--gold); text-transform: uppercase; display: block; margin-bottom: 9px; }
+    .access-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 4px; }
+    .access-key { font-family: 'Cinzel', serif; font-size: 7.5pt; letter-spacing: 0.16em; color: var(--ink-soft); text-transform: uppercase; min-width: 64px; }
+    .access-val { font-size: 13pt; color: var(--ink); }
+
+    .section-label {
+      font-family: 'Cinzel', serif; font-size: 10pt; letter-spacing: 0.32em;
+      color: var(--burgund); text-transform: uppercase; text-align: center; margin: 64px 0 26px;
+    }
+
+    .games { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .game {
+      background: #fff; border: 1px solid var(--burgund-soft); padding: 22px 22px 18px;
+      display: flex; flex-direction: column; gap: 8px; text-decoration: none; color: inherit;
+      transition: all 0.2s; position: relative;
+    }
+    .game:hover { border-color: var(--burgund); background: #fffaf9; }
+    .game-num { font-family: 'Cinzel', serif; font-size: 8.5pt; letter-spacing: 0.26em; color: var(--gold); text-transform: uppercase; }
+    .game-name { font-style: italic; font-weight: 500; font-size: 17pt; color: var(--burgund); line-height: 1.15; }
+    .game-meta { font-size: 10.5pt; color: var(--ink-soft); font-style: italic; margin-top: auto; padding-top: 6px; line-height: 1.35; }
+    .game-action { display: inline-flex; align-items: center; gap: 6px; font-family: 'Cinzel', serif; font-size: 8.5pt; letter-spacing: 0.22em; color: var(--burgund); text-transform: uppercase; margin-top: 8px; }
+
+    .wide {
+      grid-column: 1 / -1; background: var(--burgund); color: var(--cream); border-color: var(--burgund);
+    }
+    .wide .game-num { color: rgba(254,248,247,0.65); }
+    .wide .game-name { color: var(--cream); }
+    .wide .game-meta { color: rgba(254,248,247,0.78); }
+    .wide .game-action { color: var(--cream); }
+    .wide:hover { background: #6F1429; border-color: #6F1429; }
+
+    .tip {
+      background: rgba(139,26,53,0.06); padding: 22px 28px; margin: 56px 0 0;
+      font-style: italic; font-size: 12pt; color: var(--ink-body); line-height: 1.5;
+    }
+    .tip strong {
+      font-family: 'Cinzel', serif; font-style: normal; font-size: 9pt; letter-spacing: 0.26em;
+      color: var(--burgund); text-transform: uppercase; display: block; margin-bottom: 6px;
+    }
+
+    .footer-rule { text-align: center; margin-top: 64px; }
+    .footer-text { font-family: 'Cinzel', serif; font-size: 8.5pt; letter-spacing: 0.36em; color: var(--burgund-soft); text-transform: uppercase; margin-top: 18px; }
+
+    @media (max-width: 680px) {
+      .stage { padding: 40px 20px 60px; }
+      .title { font-size: 34pt; }
+      .games { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="wordmark">Wedding Story Atelier</div>
+
+  <div class="header">
+    <div class="eyebrow">The Marriage Manual · Old Money</div>
+    <h1 class="title">Build your own instruction<br>manual for married life.</h1>
+    <div class="title-de">EHE-WERKSTATT · Liebe. Alltag. Aufbauanleitung.</div>
+    <div class="rule"><div class="rule-line"></div><div class="rule-gem"></div><div class="rule-line"></div></div>
+    <p class="intro">
+      Welcome to your atelier set. Component cards, style cards, decorative
+      backs and star-fan paddles — everything you print, cut and play.
+      <br><span style="font-size:12pt;">Willkommen in eurem Atelier-Set — alles zum Ausdrucken, Ausschneiden und Spielen.</span>
+    </p>
+  </div>
+
+  <!-- ── ENGLISH · US LETTER ── -->
+  <div class="section-label">— English · US Letter —</div>
+  <div class="games">
+    <a class="game" href="marriage_manual_en_us.pdf" download>
+      <div class="game-num">No. 01 · Cards</div>
+      <div class="game-name">The Cards</div>
+      <div class="game-meta">45 component cards + 8 style cards · 6 sheets to cut out</div>
+      <div class="game-action">Download PDF →</div>
+    </a>
+    <a class="game" href="marriage_manual_shared_en_us.pdf" download>
+      <div class="game-num">No. 02 · Backs</div>
+      <div class="game-name">Card Backs</div>
+      <div class="game-meta">Decorative backs · print double-sided behind the card sheets</div>
+      <div class="game-action">Download PDF →</div>
+    </a>
+    <a class="game" href="marriage_manual_fan_en.pdf" download>
+      <div class="game-num">No. 03 · Vote</div>
+      <div class="game-name">Star Fans</div>
+      <div class="game-meta">Scoring paddles 1 · 3 · 5 + wild card · fold-and-cut template</div>
+      <div class="game-action">Download PDF →</div>
+    </a>
+  </div>
+
+  <!-- ── DEUTSCH · A4 ── -->
+  <div class="section-label">— Deutsch · A4 —</div>
+  <div class="games">
+    <a class="game" href="marriage_manual_de.pdf" download>
+      <div class="game-num">No. 01 · Karten</div>
+      <div class="game-name">Die Spielkarten</div>
+      <div class="game-meta">45 Bauteil-Karten + 8 Stil-Karten · 6 Bögen zum Ausschneiden</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+    <a class="game" href="marriage_manual_shared.pdf" download>
+      <div class="game-num">No. 02 · Rückseiten</div>
+      <div class="game-name">Kartenrückseiten</div>
+      <div class="game-meta">Dekorative Rückseiten · beidseitig hinter die Kartenbögen drucken</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+    <a class="game" href="marriage_manual_fan_de.pdf" download>
+      <div class="game-num">No. 03 · Wertung</div>
+      <div class="game-name">Stern-Fächer</div>
+      <div class="game-meta">Wertungs-Fächer 1 · 3 · 5 + Joker · Falt- und Schneidevorlage</div>
+      <div class="game-action">PDF herunterladen →</div>
+    </a>
+  </div>
+
+  <!-- ── GUIDE ── -->
+  <div class="section-label">— Guide · Anleitung —</div>
+  <div class="games">
+    <a class="game wide" href="Marriage_Manual_OldMoney_Guide_DE-EN.pdf" download>
+      <div class="game-num">Print &amp; Play Guide · DE / EN</div>
+      <div class="game-name">How to print, cut, fold &amp; play</div>
+      <div class="game-meta">Bilingual user guide · home printing &amp; print shop, double-sided card backs, folding the star fans, paper recommendations and FAQ.</div>
+      <div class="game-action">Download PDF →</div>
+    </a>
+  </div>
+
+  <div class="tip">
+    <strong>Atelier print recommendation · Druckempfehlung</strong>
+    The two card sheets (cards &amp; backs) carry a full burgundy colour field — we recommend
+    200–230 gsm matte for the full Editorial effect. The star-fan template prints cleanly on
+    160–230 gsm. Always print one test sheet before the full run.
+    <br><br>
+    Die Kartenbögen (Karten &amp; Rückseiten) tragen eine volle Burgund-Farbfläche — wir empfehlen
+    200–230 g/m² matt. Die Stern-Fächer-Vorlage druckt sauber auf 160–230 g/m². Vor dem Hauptdruck
+    stets ein Testblatt drucken.
+  </div>
+
+  <div class="footer-rule">
+    <div class="rule" style="width:20%;"><div class="rule-line"></div><div class="rule-gem"></div><div class="rule-line"></div></div>
+    <div class="footer-text">Wedding Story Atelier</div>
+  </div>
+
+</div>
+
+</body>
+</html>
