@@ -124,10 +124,10 @@
     /* Männer-Namen: Cormorant Versalien (maskulin, stabil, identisch im PDF) */
     .card-name.masc {
       font-family: 'Cormorant Garamond', serif;
-      font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.10em; font-size: 34pt;
+      font-weight: 600;
+      letter-spacing: 0.01em; font-size: 40pt;
     }
-    .card-face.sq4 .card-name.masc { font-size: 26pt; }
+    .card-face.sq4 .card-name.masc { font-size: 30pt; }
 
     .card-ornament {
       display: flex; align-items: center; gap: 3mm; width: 80%;
@@ -924,11 +924,11 @@ async function drawCard(pdf, ox, oy, cardData, greeting, sentence) {
   st(txtStrong||txt);
   if (nameStr) {
     if (isMasc()) {
-      const mFS = nameFS * 0.68;
+      const mFS = nameFS * 0.80;
       pdfFont(pdf,'CormorantGaramond','semibold');
       pdf.setFontSize(mFS);
-      pdf.setCharSpace(0.10 * mFS * PTmm);
-      pdf.text(nameStr.toUpperCase(), cx, y+nameFS*PTmm*0.5, {baseline:'middle', align:'center'});
+      pdf.setCharSpace(0.01 * mFS * PTmm);
+      pdf.text(nameStr, cx, y+nameFS*PTmm*0.5, {baseline:'middle', align:'center'});
       pdf.setCharSpace(0);
     } else {
       pdfFont(pdf,'PinyonScript','normal');
