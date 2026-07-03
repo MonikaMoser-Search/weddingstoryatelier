@@ -16,7 +16,7 @@
     @font-face { font-family:'DM Sans'; src:url('/Schriftarten/DM_Sans/static/DMSans-Bold.ttf') format('truetype'); font-weight:700; font-style:normal; font-display:block; }
     @font-face { font-family:'Pinyon Script'; src:url('/Schriftarten/Pinyon_Script/PinyonScript-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; font-display:block; }  </style>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="fonts_base64.js?v=20260429"></script>
+  <script src="/atelier/fonts_base64.js?v=20260429"></script>
   <link rel="stylesheet" href="/atelier/wsa_panel.css">
   <style>
     /* ── Preview Panel ── */
@@ -121,6 +121,13 @@
       color: var(--txt-strong, #1A0D06);
     }
     .card-face.sq4 .card-name { font-size: 36pt; }
+    /* Männer-Namen: Cormorant Versalien (maskulin, stabil, identisch im PDF) */
+    .card-name.masc {
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.10em; font-size: 34pt;
+    }
+    .card-face.sq4 .card-name.masc { font-size: 26pt; }
 
     .card-ornament {
       display: flex; align-items: center; gap: 3mm; width: 80%;
@@ -413,6 +420,9 @@ const CARD_DIM = {
 // ════════════════════════════════════════════════════
 const ge = id => document.getElementById(id);
 const getRoleData = () => ROLES[lang].find(r => r.v === role) || ROLES[lang][0];
+// Männliche Rollen → Name in Cormorant-Versalien statt Pinyon-Kalligraphie
+const MALE_ROLES = ['ring_bearer','best_man','groomsman','officiant'];
+const isMasc = () => MALE_ROLES.includes(role);
 
 function tt(key) {
   const labels = {
@@ -760,7 +770,7 @@ function renderPreview() {
       <div class="corner-mark bl"></div>
       <div class="card-text">
         ${greeting ? `<div class="card-greeting">${greeting}</div>` : ''}
-        <div class="card-name">${name}</div>
+        <div class="card-name${isMasc()?' masc':''}">${name}</div>
         <div class="card-ornament"><div class="orn-dot"></div></div>
         <div class="card-role">${sentence}</div>
       </div>
@@ -810,7 +820,7 @@ function pdfFont(pdf, name, style) {
     WSA_FONTS.set(pdf, name, style);
   } else {
     const fb = {
-      CormorantGaramond:{normal:['Times','normal'],italic:['Times','italic'],light:['Times','normal']},
+      CormorantGaramond:{normal:['Times','normal'],italic:['Times','italic'],light:['Times','normal'],semibold:['Times','bold']},
       PinyonScript:{normal:['Times','italic']},
       DMSans:{light:['Helvetica','normal'],normal:['Helvetica','normal']},
     };
@@ -910,13 +920,23 @@ async function drawCard(pdf, ox, oy, cardData, greeting, sentence) {
     y += greetFS*PTmm + gap1;
   }
 
-  // Name — optisch zentriert (Tinten-Mitte statt Advance-Mitte)
-  st(txtStrong||txt); pdfFont(pdf,'PinyonScript','normal');
-  pdf.setFontSize(nameFS);
-  pdf.setCharSpace(0);
+  // Name — Männer: Cormorant Versalien (stabil, identisch zur Vorschau); Frauen: Pinyon optisch zentriert
+  st(txtStrong||txt);
   if (nameStr) {
-    const nameShift = measurePinyonOpticalCenter(nameStr, nameFS);
-    pdf.text(nameStr, cx - nameShift, y+nameFS*PTmm*0.5, {baseline:'middle'});
+    if (isMasc()) {
+      const mFS = nameFS * 0.68;
+      pdfFont(pdf,'CormorantGaramond','semibold');
+      pdf.setFontSize(mFS);
+      pdf.setCharSpace(0.10 * mFS * PTmm);
+      pdf.text(nameStr.toUpperCase(), cx, y+nameFS*PTmm*0.5, {baseline:'middle', align:'center'});
+      pdf.setCharSpace(0);
+    } else {
+      pdfFont(pdf,'PinyonScript','normal');
+      pdf.setFontSize(nameFS);
+      pdf.setCharSpace(0);
+      const nameShift = measurePinyonOpticalCenter(nameStr, nameFS);
+      pdf.text(nameStr, cx - nameShift, y+nameFS*PTmm*0.5, {baseline:'middle'});
+    }
   }
   y += nameFS*PTmm + gap2;
 
